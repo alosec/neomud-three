@@ -84,6 +84,7 @@ export const TOWN_SQUARE_SPEC = {
       targetId: "town:market",
       direction: "EAST",
       building: {
+        label: "Market",
         x: 20.0,
         z: -1.2,
         rotationY: -Math.PI / 2,
@@ -125,6 +126,7 @@ export const TOWN_SQUARE_SPEC = {
       targetId: "town:tavern",
       direction: "WEST",
       building: {
+        label: "Tavern",
         x: -20.5,
         z: 0,
         rotationY: Math.PI / 2,
@@ -137,9 +139,7 @@ export const TOWN_SQUARE_SPEC = {
         facadeMaterial: "plasterFacadeWarm",
         sign: true,
         awning: "awningRed"
-      },
-      doorway: { x: -17.35, z: 0, width: 0.38, height: 3.65, depth: 3.8 },
-      sign: { x: -17.03, y: 4.95, z: 0, width: 0.18, height: 1.0, depth: 4.4 }
+      }
     }
   ],
   features: {
@@ -219,7 +219,7 @@ export const TOWN_SQUARE_SPEC = {
         label: "Tavern",
         subtitle: "Common Room",
         palette: "red",
-        board: { center: [-18.25, 5.05, 0], size: [5.2, 1.0] },
+        board: { center: [-16.25, 3.45, 2.95], size: [4.2, 0.86] },
         threshold: { center: [-20.35, 0.05, 0], size: [1.35, 6.6], color: 0xf1a36f }
       }
     }

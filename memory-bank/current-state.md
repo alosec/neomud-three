@@ -35,8 +35,9 @@ Town Square status:
 - The west side now treats `town:tavern` as a larger tavern/bar entrance instead of a tiny decorative facade.
 - Town Square now has an explicit `TOWN_SQUARE_SPEC` authoring layer for surfaces, chunk rings, landmarks, props, spawns, and physical exit trigger volumes. `scripts/validate-neomud-three-specs.mjs` verifies that spec exits match the NeoMud room graph.
 - A wayfinding pass added visible prompt language: landmark boards, threshold markers, and a central signpost for Gate/Market/Temple/Tavern.
+- The latest architectural finish pass replaces the toy hut roof primitive with a reusable gabled-roof mesh, adds facade window trim/doors/signage for landmark buildings, adds gatehouse battlements, and removes duplicate generic portal frames from building landmarks.
 - The fountain has been rebuilt as a grouped plaza feature with apron, basin, centered water, column, upper bowl, falling-water hint, and light.
-- The scene is more readable but still not reconstructed as a convincing professional 3D place. Building architecture, material hierarchy, NPC integration, and chunked distant scenery remain active work.
+- The scene is more readable and less toy-like, but still not reconstructed as a convincing professional 3D place. Material hierarchy, authored player art, NPC integration, and chunked distant scenery remain active work.
 
 Local app/server status:
 
@@ -50,7 +51,7 @@ Known rough edges:
 - The renderer is still prototype architecture, with room-specific scene builders instead of a general room/component system. The authority boundary and first spec/trigger contract are real, but the rendering system itself still needs a proper registry/component pass.
 - Collision is clamp/trigger based, not mesh or navmesh based.
 - The window alpha asset is useful, but the cathedral window component still needs better proportions, trim, and lighting direction.
-- Town Square still needs a disciplined architectural finish pass: stronger building silhouettes, less toy-like massing, better roof/trim language, side-specific landmark detail, and NPC integration.
+- Town Square still needs a disciplined art-direction pass: stronger material hierarchy, fewer UI-like labels, better side-specific landmark detail, and NPC integration.
 - HTML-in-Canvas is not integrated into gameplay yet. The current lab uses normal DOM overlays plus Three.js.
 - Inventory catalog data and starter inventory are read from server messages, but combat, interaction prompts, dialogue, and multiplayer presence are not yet expressed as convincing in-world 3D affordances.
 
@@ -59,6 +60,7 @@ Test status:
 - `scripts/test-neomud-three.cjs` runs a local browser smoke test against the offline Three renderer at `?offline=1`.
 - The offline smoke test checks rendered triangles, avatar initialization, run animation activation, default room data, forward movement, diagonal/strafe movement, jump/landing, Town Square trigger/prompt/affordance metadata, physical South -> Temple movement, console errors, and failed HTTP requests.
 - `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, crosses physical exit triggers for Temple -> Town Square -> Temple, and asserts the server-confirmed room transitions.
+- If the server-backed test times out on auth with `Too many guest sessions`, restart the local `com.neomud.server.ApplicationKt` process and rerun the test; this is local session saturation rather than a renderer failure.
 - `scripts/validate-neomud-three-specs.mjs` checks that the authored Town Square render spec has physical trigger boxes and that every visual exit maps to the real NeoMud room graph.
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Both browser tests write QA screenshots into ignored `experiments/neomud-three/qa/latest/`.

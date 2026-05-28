@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T05:50:34.878Z",
+  "updated": "2026-05-28T06:10:32.179Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -268,10 +268,15 @@
           "id": 25,
           "body": "Wayfinding/readability pass: larger Gate/Market/Tavern/Temple landmarks, calmer surfaces, visible exit boards, threshold markers, central signpost, and QA score updated to 10/12 for readability/server sync/perf while architecture/art finish remains rough.",
           "created": "2026-05-28T05:50:06Z"
+        },
+        {
+          "id": 28,
+          "body": "Architecture pass improved Town Square landmark massing and readability without adding generated assets. Still prototype-grade; next work should focus material hierarchy, label reduction, NPC/item integration, and stronger authored identity.",
+          "created": "2026-05-28T06:09:25Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T05:50:06Z"
+      "updated": "2026-05-28T06:09:25Z"
     },
     {
       "id": "neo-1fb2.9",
@@ -351,10 +356,15 @@
           "id": 24,
           "body": "QA gates now include spec validation and server-backed physical trigger movement, not only debug requestMove.",
           "created": "2026-05-28T05:17:59Z"
+        },
+        {
+          "id": 30,
+          "body": "Full QA run: spec validation passed, offline smoke passed, headed Canary drive captured QA screenshot, server-backed Temple -> Town Square -> Temple passed after clearing local guest-session saturation.",
+          "created": "2026-05-28T06:09:43Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T05:17:59Z"
+      "updated": "2026-05-28T06:09:43Z"
     },
     {
       "id": "neo-1fb2.12",
@@ -546,6 +556,34 @@
       ],
       "created": "2026-05-28T05:50:06Z",
       "updated": "2026-05-28T05:50:06Z"
+    },
+    {
+      "id": "neo-1fb2.19",
+      "project": "NeoMud",
+      "title": "Add Town Square architectural finish pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 27,
+          "body": "Implemented a scoped Town Square architecture checkpoint: reusable gabled roofs, facade windows/trim/signage, gatehouse battlements, removal of duplicate market/tavern portal frames, and updated QA screenshots. Validation, offline smoke, and server-backed movement pass after restarting saturated guest sessions.",
+          "created": "2026-05-28T06:09:25Z"
+        },
+        {
+          "id": 29,
+          "body": "Implemented a scoped Town Square architecture checkpoint: reusable gabled roofs, facade windows/trim/signage, gatehouse battlements, removal of duplicate market/tavern portal frames, and updated QA screenshots. Validation, offline smoke, and server-backed movement pass after restarting saturated guest sessions.",
+          "created": "2026-05-28T06:09:35Z"
+        }
+      ],
+      "created": "2026-05-28T06:09:16Z",
+      "updated": "2026-05-28T06:09:50Z"
     }
   ],
   "ready": [

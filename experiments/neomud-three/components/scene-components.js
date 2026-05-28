@@ -65,7 +65,8 @@ export function addGabledHouse(root, materials, spec) {
     plasterMaterial = materials.plaster,
     facadeMaterial = materials.plasterFacade ?? plasterMaterial,
     sign = false,
-    awning = null
+    awning = null,
+    label = ""
   } = spec;
 
   const group = new THREE.Group();
@@ -90,20 +91,35 @@ export function addGabledHouse(root, materials, spec) {
   addBox(group, materials.timber, 0, totalHeight - 0.3, depth / 2 + 0.08, width, 0.18, 0.14);
   addBox(group, materials.timber, 0, totalHeight * 0.48, depth / 2 + 0.09, width * 0.86, 0.12, 0.12);
 
-  for (const side of [-1, 1]) {
-    addBox(group, materials.sign, side * width * 0.24, totalHeight * 0.62, depth / 2 + 0.11, 0.48, 0.52, 0.06);
+  addFacadeWindow(group, materials, -width * 0.26, totalHeight * 0.66, depth / 2 + 0.13, 0.58, 0.72);
+  addFacadeWindow(group, materials, width * 0.26, totalHeight * 0.66, depth / 2 + 0.13, 0.58, 0.72);
+  if (floors > 1) {
+    addFacadeWindow(group, materials, -width * 0.26, totalHeight * 0.38, depth / 2 + 0.13, 0.5, 0.58);
+    addFacadeWindow(group, materials, width * 0.26, totalHeight * 0.38, depth / 2 + 0.13, 0.5, 0.58);
   }
-  addBox(group, materials.darkTimber ?? materials.timber, 0, 0.86, depth / 2 + 0.12, 0.64, 1.2, 0.08);
+  addBox(group, materials.portalDark ?? materials.darkTimber ?? materials.timber, 0, 0.92, depth / 2 + 0.13, 0.88, 1.48, 0.1);
+  addBox(group, materials.trimLight ?? materials.sign, 0, 1.7, depth / 2 + 0.16, 1.1, 0.12, 0.12);
 
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(width, depth) * 0.7, 1.1, 4), roofMaterial);
-  roof.position.set(0, totalHeight + 0.5, 0);
-  roof.rotation.y = Math.PI / 4;
+  const roof = new THREE.Mesh(createGabledRoofGeometry(width + 0.7, depth + 0.65, 1.25), roofMaterial);
+  roof.position.set(0, totalHeight, 0);
   roof.castShadow = true;
   roof.receiveShadow = true;
   group.add(roof);
 
   if (sign) {
-    addBox(group, materials.sign, 0, totalHeight + 0.1, depth / 2 + 0.16, width * 0.58, 0.38, 0.08);
+    if (label) {
+      addTextBoard(group, label, {
+        x: 0,
+        y: totalHeight - 0.9,
+        z: depth / 2 + 0.56,
+        width: Math.min(width * 0.62, 4.8),
+        height: 0.78,
+        palette: label.toLowerCase().includes("market") ? "blue" : "red",
+        renderOrder: 9
+      });
+    } else {
+      addBox(group, materials.sign, 0, totalHeight + 0.1, depth / 2 + 0.16, width * 0.58, 0.38, 0.08);
+    }
   }
 
   if (awning) {
@@ -112,6 +128,41 @@ export function addGabledHouse(root, materials, spec) {
   }
 
   return group;
+}
+
+function addFacadeWindow(root, materials, x, y, z, width, height) {
+  addBox(root, materials.trimLight ?? materials.sign, x, y, z, width + 0.16, height + 0.16, 0.07);
+  addBox(root, materials.windowDark ?? materials.sign, x, y, z + 0.03, width, height, 0.08);
+  addBox(root, materials.timber, x, y, z + 0.08, 0.06, height + 0.04, 0.09);
+  addBox(root, materials.timber, x, y, z + 0.09, width + 0.04, 0.055, 0.09);
+}
+
+function createGabledRoofGeometry(width, depth, height) {
+  const halfWidth = width / 2;
+  const halfDepth = depth / 2;
+  const vertices = new Float32Array([
+    -halfWidth, 0, halfDepth,
+    halfWidth, 0, halfDepth,
+    0, height, halfDepth,
+    -halfWidth, 0, -halfDepth,
+    halfWidth, 0, -halfDepth,
+    0, height, -halfDepth
+  ]);
+  const indices = [
+    0, 1, 2,
+    5, 4, 3,
+    0, 2, 5,
+    0, 5, 3,
+    2, 1, 4,
+    2, 4, 5,
+    0, 3, 4,
+    0, 4, 1
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
 }
 
 export function addMarketStall(root, materials, spec) {
@@ -159,7 +210,6 @@ export function addPortalFrame(root, materials, spec) {
   root.add(group);
 
   addBox(group, materials.portalDark ?? materials.timber, 0, height / 2 - 0.18, 0, width, height, 0.26);
-  addBox(group, materials.sign, 0, height + 0.15, -0.18, width * 0.7, 0.36, 0.12);
   addBox(group, materials.timber, -width / 2 - 0.16, height / 2, -0.02, 0.22, height + 0.26, 0.32);
   addBox(group, materials.timber, width / 2 + 0.16, height / 2, -0.02, 0.22, height + 0.26, 0.32);
 

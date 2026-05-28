@@ -125,6 +125,8 @@ export function makeTownMaterials() {
     water: standardMaterial({ color: 0x67b5ce, roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 }),
     timber: standardMaterial({ color: 0x57351f, roughness: 0.78 }),
     darkTimber: standardMaterial({ color: 0x322013, roughness: 0.82 }),
+    trimLight: standardMaterial({ color: 0xd7c38d, roughness: 0.7 }),
+    windowDark: standardMaterial({ color: 0x17212a, emissive: 0x0b151d, emissiveIntensity: 0.28, roughness: 0.48 }),
     plaster: standardMaterial({ color: 0xc2b38c, roughness: 0.86 }),
     plasterWarm: standardMaterial({ color: 0xd2be8f, roughness: 0.86 }),
     plasterFacade: standardMaterial({ map: texture("townPlasterTimber"), roughness: 0.84 }),

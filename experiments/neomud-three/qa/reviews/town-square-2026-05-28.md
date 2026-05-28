@@ -39,3 +39,18 @@ Total: 8/12
 Total: 10/12
 
 Remaining visual gap: this is readable now, not professional-final. The next pass should improve architectural finish and material hierarchy without changing the server-authority contract.
+
+## Score After Architectural Finish Pass
+
+- Navigation readability: 2/2. Four exits remain visible through spec-backed labels, thresholds, signpost, and landmark massing.
+- Scale believability: 1/2. Tavern, market, gate, and temple threshold read more like inhabitable landmarks, but proportions/materials still feel prototype-grade.
+- Semantic match: 1/2. The scene now clearly communicates civic plaza, tavern, market, gate, temple, and fountain; it still lacks a specific Millhaven visual identity.
+- Interaction clarity: 2/2. Exit affordances remain visible and physical triggers still route through the normal movement path.
+- Server sync: 2/2. Server-backed physical movement passes Temple -> Town Square -> Temple after clearing saturated local guest sessions.
+- Performance: 2/2. Latest headed Town Square drive reports 112 draw calls and 52,268 triangles.
+
+Total: 10/12
+
+Architectural delta: replaced the toy/pyramid roof with reusable gabled roof geometry, added facade trim/windows/doors/signage, added gatehouse battlements, removed duplicate generic portal frames from building landmarks, and moved the west Tavern affordance into a readable freestanding position.
+
+Remaining visual gap: the room is now more legible and less fake, but still prototype-grade. Next work should reduce label clutter, establish a stronger material/value hierarchy, and integrate server NPCs/items into the physical scene.

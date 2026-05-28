@@ -727,11 +727,25 @@ function addGatehouseLandmark(root, materials, landmark) {
     addBox(group, materials.stone, tower.x, tower.height / 2, tower.z, tower.width, tower.height, tower.depth);
     addBox(group, materials.roof, tower.x, tower.height + 0.52, tower.z, tower.width + 0.6, 0.9, tower.depth + 0.4);
     addBox(group, materials.darkStone, tower.x, tower.height * 0.52, tower.z - 0.12, tower.width * 0.52, tower.height * 0.62, 0.18);
+    addBattlements(group, materials, tower.x, tower.height + 0.98, tower.z, tower.width, tower.depth);
   }
   addBox(group, materials.stone, landmark.lintel.x, 5.2, landmark.lintel.z, landmark.lintel.width, landmark.lintel.height, landmark.lintel.depth);
   addBox(group, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
   addBox(group, materials.portalDark, landmark.portal.x, landmark.portal.height / 2, landmark.portal.z, landmark.portal.width, landmark.portal.height, landmark.portal.depth);
   addPortalFrame(root, materials, portalFrameSpec(landmark));
+}
+
+function addBattlements(root, materials, x, y, z, width, depth) {
+  const count = 4;
+  for (let index = 0; index < count; index++) {
+    const offset = -width * 0.38 + (width * 0.76 * index) / (count - 1);
+    addBox(root, materials.stone, x + offset, y, z - depth * 0.42, width * 0.16, 0.48, 0.34);
+  }
+  for (let index = 0; index < 3; index++) {
+    const offset = -depth * 0.28 + (depth * 0.56 * index) / 2;
+    addBox(root, materials.stone, x - width * 0.42, y, z + offset, 0.34, 0.48, depth * 0.16);
+    addBox(root, materials.stone, x + width * 0.42, y, z + offset, 0.34, 0.48, depth * 0.16);
+  }
 }
 
 function addMarketLandmark(root, materials, landmark) {
@@ -747,7 +761,6 @@ function addMarketLandmark(root, materials, landmark) {
       depth: 1.5
     });
   }
-  addPortalFrame(root, materials, portalFrameSpec(landmark));
 }
 
 function addTempleThresholdLandmark(root, materials, landmark) {
@@ -770,16 +783,14 @@ function addTempleThresholdLandmark(root, materials, landmark) {
 function addTavernLandmark(root, materials, landmark) {
   const group = addGabledHouse(root, materials, resolveBuildingSpec(materials, landmark.building));
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
-  addBox(root, materials.portalDark, landmark.doorway.x, landmark.doorway.height / 2, landmark.doorway.z, landmark.doorway.width, landmark.doorway.height, landmark.doorway.depth, { rotationY: Math.PI / 2 });
-  addBox(root, materials.sign, landmark.sign.x, landmark.sign.y, landmark.sign.z, landmark.sign.width, landmark.sign.height, landmark.sign.depth, { rotationY: Math.PI / 2 });
   addBox(root, materials.darkTimber, -17.54, 3.0, -1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
   addBox(root, materials.darkTimber, -17.54, 3.0, 1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
-  addPortalFrame(root, materials, portalFrameSpec(landmark));
 }
 
 function resolveBuildingSpec(materials, building) {
   return {
     ...building,
+    label: building.label,
     roofMaterial: material(materials, building.roofMaterial),
     plasterMaterial: material(materials, building.plasterMaterial),
     facadeMaterial: material(materials, building.facadeMaterial),
