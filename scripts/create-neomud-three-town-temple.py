@@ -150,6 +150,28 @@ def marker3(name, x, y, z, kind, display_type="PLAIN_AXES", **props):
     return obj
 
 
+def batch_visible_meshes_by_material():
+    groups = {}
+    for obj in list(bpy.context.scene.objects):
+        if not obj.name.startswith("VIS_") or obj.type != "MESH" or not obj.data.materials:
+            continue
+        material_name = obj.data.materials[0].name
+        groups.setdefault(material_name, []).append(obj)
+
+    for material_name, objects in groups.items():
+        if len(objects) <= 1:
+            continue
+        bpy.ops.object.select_all(action="DESELECT")
+        for obj in objects:
+            obj.select_set(True)
+        bpy.context.view_layer.objects.active = objects[0]
+        bpy.ops.object.join()
+        active = bpy.context.view_layer.objects.active
+        active.name = f"VIS_batch_{material_name}"
+        active.data.name = f"{active.name}_mesh"
+        tag(active, "visible", semantic=f"batched_{material_name}")
+
+
 def prism_x3(name, x, y, z, thickness, profile_points, mat, kind="visible", **props):
     """Extrude a local z/y profile along x.
 
@@ -249,6 +271,74 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
         )
 
 
+def lancet_profile(width, height, shoulder=0.68):
+    half_width = width / 2
+    shoulder_y = height * shoulder
+    return [
+        (-half_width, 0.0),
+        (half_width, 0.0),
+        (half_width, shoulder_y),
+        (half_width * 0.66, height * 0.83),
+        (0.0, height),
+        (-half_width * 0.66, height * 0.83),
+        (-half_width, shoulder_y),
+    ]
+
+
+def lancet_prism_x3(name, x, y, z, thickness, width, height, mat, kind="visible", **props):
+    return prism_x3(name, x, y, z, thickness, lancet_profile(width, height), mat, kind=kind, **props)
+
+
+def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue, glass_red, glass_gold, light_material):
+    """Build one reusable wall/window bay in side-wall coordinates.
+
+    The bay is deliberately authored as a component: wall recess, thick frame,
+    inset lancet glass, mullions/tracery, sill, and restrained floor light.
+    """
+    face_x = x + inward * 0.16
+    frame_x = x + inward * 0.28
+    glass_x = x + inward * 0.42
+    floor_light_x = x + inward * 4.7
+
+    cube3(f"VIS_window_bay_{bay_id}_wall_backer", x - inward * 0.02, 5.05, z, 0.16, 6.8, 4.45, stone, semantic="cathedral_window_bay_wall")
+    lancet_prism_x3(f"VIS_window_bay_{bay_id}_recess", face_x, 2.0, z, 0.18, 3.9, 6.0, dark, semantic="cathedral_window_bay_recess")
+
+    # Frame and reveal thickness. These pieces are intentionally flat to the
+    # wall plane so the windows read clearly without foreground obstruction.
+    cube3(f"VIS_window_bay_{bay_id}_left_reveal", frame_x, 4.95, z - 1.96, 0.24, 5.88, 0.22, trim, semantic="cathedral_window_bay_reveal")
+    cube3(f"VIS_window_bay_{bay_id}_right_reveal", frame_x, 4.95, z + 1.96, 0.24, 5.88, 0.22, trim, semantic="cathedral_window_bay_reveal")
+    cube3(f"VIS_window_bay_{bay_id}_sill", frame_x, 2.02, z, 0.32, 0.42, 4.25, trim, semantic="cathedral_window_bay_sill")
+    cube3(f"VIS_window_bay_{bay_id}_spring_band", frame_x, 6.18, z, 0.28, 0.22, 3.55, trim, semantic="cathedral_window_bay_spring_band")
+    lancet_prism_x3(f"VIS_window_bay_{bay_id}_outer_arch", frame_x + inward * 0.02, 1.9, z, 0.16, 4.18, 6.28, trim, semantic="cathedral_window_bay_arch_frame")
+    lancet_prism_x3(f"VIS_window_bay_{bay_id}_inner_shadow_cut", frame_x + inward * 0.04, 2.23, z, 0.18, 3.46, 5.55, dark, semantic="cathedral_window_bay_arch_shadow")
+
+    # Inset colored lancets with dark lead lines. This replaces the former
+    # three pasted rectangular bars with a chapel-like grouped window.
+    lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_blue", glass_x, 2.4, z - 1.04, 0.08, 0.78, 4.9, glass_blue, semantic="cathedral_stained_glass_lancet")
+    lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_gold", glass_x + inward * 0.02, 2.34, z, 0.08, 0.86, 5.2, glass_gold, semantic="cathedral_stained_glass_lancet")
+    lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_red", glass_x, 2.4, z + 1.04, 0.08, 0.78, 4.9, glass_red, semantic="cathedral_stained_glass_lancet")
+    cube3(f"VIS_window_bay_{bay_id}_mullion_left", glass_x + inward * 0.04, 4.78, z - 0.52, 0.12, 4.88, 0.11, trim, semantic="cathedral_window_bay_mullion")
+    cube3(f"VIS_window_bay_{bay_id}_mullion_right", glass_x + inward * 0.04, 4.78, z + 0.52, 0.12, 4.88, 0.11, trim, semantic="cathedral_window_bay_mullion")
+    cube3(f"VIS_window_bay_{bay_id}_center_lead", glass_x + inward * 0.06, 4.88, z, 0.1, 4.35, 0.08, dark, semantic="cathedral_window_bay_lead")
+    cube3(f"VIS_window_bay_{bay_id}_lower_lead", glass_x + inward * 0.06, 3.2, z, 0.1, 0.1, 2.5, dark, semantic="cathedral_window_bay_lead")
+    cube3(f"VIS_window_bay_{bay_id}_upper_lead", glass_x + inward * 0.06, 5.24, z, 0.1, 0.1, 2.15, dark, semantic="cathedral_window_bay_lead")
+
+    # Use fewer, warmer, angled patches so the floor effect reads like light,
+    # not blue debug geometry.
+    cube3(
+        f"VIS_window_bay_{bay_id}_floor_light_gold",
+        floor_light_x,
+        0.032,
+        z + inward * 0.42,
+        5.4,
+        0.03,
+        0.44,
+        light_material,
+        rotation_y=inward * 0.24,
+        semantic="cathedral_window_bay_floor_light",
+    )
+
+
 def build_level():
     reset_scene()
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -288,18 +378,22 @@ def build_level():
             cube3(f"VIS_{side_name}_wall_rib_{index:02d}", side_x, 3.25, z, 0.34, 6.5, 0.44, trim, semantic="cathedral_wall_rib")
             cube3(f"VIS_{side_name}_wall_rib_cap_{index:02d}", side_x, 6.6, z, 0.54, 0.34, 1.05, trim, semantic="cathedral_wall_rib_cap")
 
-    # Stained glass windows and colored floor-light bands.
+    # Stained glass window bays.
     for side_x, side_name, inward in [(-13.05, "west", 1), (13.05, "east", -1)]:
         for index, z in enumerate([-28.5, -18.8, -9.1, 0.6, 10.3], start=1):
-            inner_x = side_x + inward * 0.7
-            cube3(f"VIS_{side_name}_window_recess_{index:02d}", inner_x, 5.15, z, 0.34, 6.15, 3.55, dark, semantic="cathedral_window_recess")
-            cube3(f"VIS_{side_name}_window_blue_{index:02d}", inner_x + inward * 0.13, 5.2, z - 0.95, 0.16, 5.05, 1.05, glass_blue, semantic="cathedral_stained_glass")
-            cube3(f"VIS_{side_name}_window_red_{index:02d}", inner_x + inward * 0.15, 5.2, z + 0.04, 0.16, 5.05, 0.94, glass_red, semantic="cathedral_stained_glass")
-            cube3(f"VIS_{side_name}_window_gold_{index:02d}", inner_x + inward * 0.17, 5.2, z + 0.96, 0.16, 5.05, 0.96, glass_gold, semantic="cathedral_stained_glass")
-            cube3(f"VIS_{side_name}_window_head_{index:02d}", inner_x + inward * 0.18, 8.15, z, 0.18, 0.5, 3.24, trim, semantic="cathedral_window_frame")
-            cube3(f"VIS_{side_name}_window_sill_{index:02d}", inner_x + inward * 0.18, 2.05, z, 0.18, 0.42, 3.4, trim, semantic="cathedral_window_frame")
-            cube3(f"VIS_{side_name}_window_mullion_{index:02d}", inner_x + inward * 0.2, 5.2, z, 0.13, 5.36, 0.12, trim, semantic="cathedral_window_mullion")
-            cube3(f"VIS_{side_name}_light_band_{index:02d}", side_x + inward * 4.6, 0.035, z + inward * 0.7, 5.8, 0.035, 0.56, glass_gold if index % 3 == 0 else glass_blue, rotation_y=inward * 0.22, semantic="stained_glass_floor_light")
+            add_cathedral_window_bay(
+                f"{side_name}_{index:02d}",
+                side_x,
+                z,
+                inward,
+                limestone,
+                trim,
+                dark,
+                glass_blue,
+                glass_red,
+                glass_gold,
+                glass_gold if index % 3 == 0 else glass_blue,
+            )
 
     # Entry doorway and exit trigger.
     cube3("VIS_north_door_recess", 0, 2.8, -38.15, 5.2, 5.6, 0.38, dark, semantic="north_entry_recess")
@@ -343,6 +437,8 @@ def build_level():
     marker3("SPAWN_player", 0, 0.9, -28.8, "spawn", spawn_id="player", heading_degrees=180)
     marker3("CAMERA_long_nave", 0, 3.4, -12.0, "camera_zone", camera_id="long_nave", distance=8.6, height=5.35, look_ahead=3.0)
     marker3("LIGHTS_altar_warm", 0, 5.5, 16.8, "light", display_type="SINGLE_ARROW", light_id="altar_warm", light_type="point", intensity=2.2)
+
+    batch_visible_meshes_by_material()
 
     bpy.ops.object.light_add(type="POINT", location=to_blender_location(0, 5.4, 17.5))
     altar_light = bpy.context.object

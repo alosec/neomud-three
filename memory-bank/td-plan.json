@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T22:08:04.028Z",
+  "updated": "2026-05-28T22:22:55.440Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2877,6 +2877,25 @@
       "description": "Create an isolated Blender/GLB candidate for a reusable cathedral wall-window bay with recess, frame, mullions/tracery, inset stained glass, mirrored left/right behavior, and controlled light projection. It must pass asset-lab screenshot QA before replacing the current colored slab windows in town:temple.",
       "type": "task",
       "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added isolated cathedral wall-window bay Blender/GLB package, asset-lab QA assertions, Temple integration, visible mesh batching, and passed lab/offline/room/server QA",
+      "labels": [
+        "pipeline"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T22:07:49Z",
+      "updated": "2026-05-28T22:22:45Z"
+    },
+    {
+      "id": "neo-1fb2.82",
+      "project": "NeoMud",
+      "title": "Build cathedral altar and incense asset QA candidates",
+      "description": "Create isolated Blender-authored asset candidates for the Temple altar/re-table and incense braziers, validate them in the cathedral asset lab, integrate only after screenshot QA, and preserve Temple room render budgets.",
+      "type": "task",
+      "priority": 0,
       "status": "todo",
       "status_type": "unstarted",
       "parent": "neo-1fb2",
@@ -2886,8 +2905,8 @@
       ],
       "blockers": [],
       "comments": [],
-      "created": "2026-05-28T22:07:49Z",
-      "updated": "2026-05-28T22:07:49Z"
+      "created": "2026-05-28T22:22:45Z",
+      "updated": "2026-05-28T22:22:45Z"
     }
   ]
 }

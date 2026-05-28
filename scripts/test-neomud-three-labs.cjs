@@ -54,6 +54,7 @@ const LABS = [
     snapshot: () => ({
       render: window.__neomudCathedralAssetLabDebug.render,
       asset: window.__neomudCathedralAssetLabDebug.asset,
+      assets: window.__neomudCathedralAssetLabDebug.assets,
       error: window.__neomudCathedralAssetLabDebug.error
     })
   }
@@ -134,10 +135,17 @@ async function main() {
       if (lab.id === "cathedral-asset-lab") {
         assert.equal(snapshot.error, null);
         assert.equal(snapshot.asset.id, "cathedral.pew");
+        const windowBay = snapshot.assets.find((asset) => asset.id === "cathedral.wall_window_bay");
+        assert.ok(windowBay, `expected cathedral wall-window bay asset: ${JSON.stringify(snapshot.assets)}`);
         assert.ok(snapshot.asset.summary.renderNodes >= 8, `expected detailed pew render nodes: ${JSON.stringify(snapshot.asset.summary)}`);
         assert.ok(snapshot.asset.colliders.includes("cathedral-pew-footprint"));
         assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_end_panel")), "expected profiled pew end panels");
         assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_back")), "expected separate pew backrest");
+        assert.ok(windowBay.summary.renderNodes >= 16, `expected detailed window bay render nodes: ${JSON.stringify(windowBay.summary)}`);
+        assert.ok(windowBay.colliders.includes("cathedral-window-bay-footprint"));
+        assert.ok(windowBay.renderNodes.some((name) => name.includes("_outer_arch")), "expected arched window frame");
+        assert.ok(windowBay.renderNodes.some((name) => name.includes("_mullion")), "expected window mullions");
+        assert.ok(windowBay.renderNodes.some((name) => name.includes("_glass_")), "expected inset glass lancets");
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });

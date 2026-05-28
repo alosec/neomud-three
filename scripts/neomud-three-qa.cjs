@@ -93,10 +93,10 @@ const RENDER_BUDGETS = {
     geometries: 90
   },
   "cathedral-asset-lab": {
-    calls: 140,
+    calls: 190,
     triangles: 30_000,
     textures: 18,
-    geometries: 120
+    geometries: 170
   }
 };
 

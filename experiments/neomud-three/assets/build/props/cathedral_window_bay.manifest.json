@@ -1,0 +1,49 @@
+{
+  "id": "cathedral.wall_window_bay",
+  "slug": "cathedral_window_bay",
+  "name": "Cathedral Wall Window Bay",
+  "packageVersion": 1,
+  "profile": "landmark",
+  "sourceBlend": "../../source/props/cathedral_window_bay/cathedral_window_bay.blend",
+  "runtimeGlb": "cathedral_window_bay.glb",
+  "files": {
+    "sourceBlendBytes": 109037,
+    "runtimeGlbBytes": 32420
+  },
+  "validator": {
+    "script": "scripts/validate-neomud-three-gltf.mjs",
+    "profile": "landmark",
+    "nodes": 20,
+    "meshes": 18,
+    "materials": 7,
+    "prefixes": {
+      "VIS_": 17,
+      "COL_": 1,
+      "NAV_": 0,
+      "SPAWN_": 0,
+      "TRG_": 0,
+      "PICKUP_": 0,
+      "ENEMY_": 0,
+      "PATH_": 0,
+      "CAMERA_": 1,
+      "LIGHTS_": 1
+    }
+  },
+  "runtimeQa": {
+    "cathedralAssetLabBudget": {
+      "drawCalls": 155,
+      "triangles": 2448,
+      "textures": 7,
+      "geometries": 142
+    },
+    "checks": [
+      "GLB landmark profile validation",
+      "Cathedral Asset Lab screenshot QA"
+    ]
+  },
+  "knownLimits": [
+    "This is the first asset-level wall-window bay candidate, not final stained glass.",
+    "The glass uses procedural colored lancet meshes rather than generated/painted stained-glass texture panels.",
+    "The Temple room material-batches repeated bay meshes during export; future room work should preserve that batching or replace it with instancing."
+  ]
+}

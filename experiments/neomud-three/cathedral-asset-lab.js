@@ -3,6 +3,7 @@ import { addTextBoard } from "./components/scene-components.js";
 import { instantiateBlenderLevel, preloadBlenderLevel } from "./level-loader.js";
 
 const PEW_URL = "./assets/build/props/cathedral_pew.glb";
+const WINDOW_BAY_URL = "./assets/build/props/cathedral_window_bay.glb";
 
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -48,6 +49,7 @@ let lastRenderStats = {};
 let labReady = false;
 let loadError = null;
 let assetSummary = null;
+let assetSummaries = [];
 
 window.__neomudCathedralAssetLabDebug = {
   get ready() {
@@ -58,6 +60,9 @@ window.__neomudCathedralAssetLabDebug = {
   },
   get asset() {
     return assetSummary;
+  },
+  get assets() {
+    return assetSummaries;
   },
   get render() {
     return lastRenderStats;
@@ -72,6 +77,8 @@ requestAnimationFrame(tick);
 async function loadAssets() {
   try {
     await preloadBlenderLevel(PEW_URL);
+    await preloadBlenderLevel(WINDOW_BAY_URL);
+    addWindowBayStation();
     addPewStation({ id: "front", label: "Pew Front", x: -8, z: -2.7, rotationY: 0 });
     addPewStation({ id: "side", label: "Pew Side", x: -1.4, z: -2.7, rotationY: Math.PI / 2 });
     addPewStation({ id: "three-quarter", label: "Pew 3/4", x: 5.5, z: -2.7, rotationY: -Math.PI / 5 });
@@ -87,12 +94,46 @@ async function loadAssets() {
       palette: "gold",
       renderOrder: 20
     });
-    assetSummary = buildAssetSummary();
+    assetSummaries = [
+      buildAssetSummary("cathedral.pew", PEW_URL),
+      buildAssetSummary("cathedral.wall_window_bay", WINDOW_BAY_URL)
+    ];
+    assetSummary = assetSummaries[0];
     labReady = true;
   } catch (error) {
     loadError = error?.message ?? String(error);
     throw error;
   }
+}
+
+function addWindowBayStation() {
+  const station = new THREE.Group();
+  station.name = "cathedral-window-bay-station";
+  station.position.set(0.4, 0, -9.2);
+  station.rotation.y = -0.06;
+  root.add(station);
+
+  const { scene: leftBay } = instantiateBlenderLevel(WINDOW_BAY_URL, { hideAuthoringNodes: true });
+  configureWindowBayScene(leftBay);
+  leftBay.position.set(-3.1, 0, 0);
+  station.add(leftBay);
+
+  const { scene: mirroredBay } = instantiateBlenderLevel(WINDOW_BAY_URL, { hideAuthoringNodes: true });
+  configureWindowBayScene(mirroredBay);
+  mirroredBay.position.set(3.1, 0, 0);
+  mirroredBay.scale.z = -1;
+  station.add(mirroredBay);
+
+  addTextBoard(root, "Window Bay Mirror Test", {
+    x: 0,
+    y: 8.95,
+    z: -11.85,
+    width: 4.2,
+    height: 0.48,
+    subtitle: "left/right wall asset",
+    palette: "green",
+    renderOrder: 20
+  });
 }
 
 function addPewStation({ id, label, x, z, rotationY }) {
@@ -116,6 +157,18 @@ function addPewStation({ id, label, x, z, rotationY }) {
     subtitle: "isolated",
     palette: "green",
     renderOrder: 20
+  });
+}
+
+function configureWindowBayScene(windowBay) {
+  windowBay.traverse((object) => {
+    if (!object.isMesh) return;
+    object.castShadow = object.name.startsWith("VIS_");
+    object.receiveShadow = object.name.startsWith("VIS_");
+    if (object.material) {
+      object.material = object.material.clone();
+      object.material.roughness = Math.max(object.material.roughness ?? 0.72, 0.68);
+    }
   });
 }
 
@@ -192,11 +245,11 @@ function addScaleFigure(target, x, z) {
   target.add(height);
 }
 
-function buildAssetSummary() {
-  const { level } = instantiateBlenderLevel(PEW_URL, { hideAuthoringNodes: true });
+function buildAssetSummary(id, url) {
+  const { level } = instantiateBlenderLevel(url, { hideAuthoringNodes: true });
   return {
-    id: "cathedral.pew",
-    url: PEW_URL,
+    id,
+    url,
     state: "asset-qa-candidate",
     summary: level.summary,
     colliders: level.byKind.collision.map((node) => node.userData.collider_id),
