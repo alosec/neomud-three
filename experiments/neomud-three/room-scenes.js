@@ -2443,12 +2443,13 @@ function addTavernBar(root, materials) {
   addBox(root, materials.trimLight, TAVERN.barX + 0.97, 1.68, TAVERN.barZ, 0.18, 0.18, 7.85);
   addBox(root, materials.darkTimber, -TAVERN.halfX + 0.29, 2.35, TAVERN.barZ, 0.26, 2.1, 7.8);
   addBox(root, materials.timber, -TAVERN.halfX + 0.58, 3.35, TAVERN.barZ, 0.42, 0.18, 7.6);
-  for (const z of [-5.8, -4.4, -3.0, -1.6, -0.2]) {
-    const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.24, 12), materials.sign);
-    mug.position.set(TAVERN.barX + 1.05, 1.92, z);
-    mug.castShadow = true;
-    root.add(mug);
-  }
+  addInstancedGeometry(
+    root,
+    new THREE.CylinderGeometry(0.12, 0.14, 0.24, 12),
+    materials.sign,
+    [-5.8, -4.4, -3.0, -1.6, -0.2].map((z) => ({ x: TAVERN.barX + 1.05, y: 1.92, z })),
+    "tavern-bar-mugs"
+  );
 }
 
 function addTavernBarkeepStaging(root, materials) {
@@ -2521,24 +2522,20 @@ function addTavernFireplace(root, materials, fireGroup) {
 }
 
 function addTavernTables(root, materials) {
+  const darkBoxes = [];
+  const timberBoxes = [];
   for (const table of TAVERN_TABLES) {
-    addTavernTable(root, materials, table);
+    const anchor = { x: table.x, z: table.z, rotationY: table.rotation };
+    darkBoxes.push(orientedBox(anchor, 0, 0.55, 0, 1.55, 0.24, 1.05));
+    timberBoxes.push(orientedBox(anchor, -0.55, 0.22, -0.32, 0.16, 0.44, 0.16));
+    timberBoxes.push(orientedBox(anchor, 0.55, 0.22, -0.32, 0.16, 0.44, 0.16));
+    timberBoxes.push(orientedBox(anchor, -0.55, 0.22, 0.32, 0.16, 0.44, 0.16));
+    timberBoxes.push(orientedBox(anchor, 0.55, 0.22, 0.32, 0.16, 0.44, 0.16));
+    timberBoxes.push(orientedBox(anchor, 0, 0.38, -0.82, 1.52, 0.22, 0.28));
+    timberBoxes.push(orientedBox(anchor, 0, 0.38, 0.82, 1.52, 0.22, 0.28));
   }
-}
-
-function addTavernTable(root, materials, { x, z, rotation }) {
-  const group = new THREE.Group();
-  group.position.set(x, 0, z);
-  group.rotation.y = rotation;
-  root.add(group);
-
-  addBox(group, materials.darkTimber, 0, 0.55, 0, 1.55, 0.24, 1.05);
-  addBox(group, materials.timber, -0.55, 0.22, -0.32, 0.16, 0.44, 0.16);
-  addBox(group, materials.timber, 0.55, 0.22, -0.32, 0.16, 0.44, 0.16);
-  addBox(group, materials.timber, -0.55, 0.22, 0.32, 0.16, 0.44, 0.16);
-  addBox(group, materials.timber, 0.55, 0.22, 0.32, 0.16, 0.44, 0.16);
-  addBox(group, materials.timber, 0, 0.38, -0.82, 1.52, 0.22, 0.28);
-  addBox(group, materials.timber, 0, 0.38, 0.82, 1.52, 0.22, 0.28);
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "tavern-tables-dark");
+  addInstancedBoxes(root, materials.timber, timberBoxes, "tavern-tables-timber");
 }
 
 function addTavernWarmth(root, materials) {

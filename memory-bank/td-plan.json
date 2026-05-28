@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:41:40.353Z",
+  "updated": "2026-05-28T18:51:37.722Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2431,6 +2431,29 @@
       ],
       "created": "2026-05-28T18:36:33Z",
       "updated": "2026-05-28T18:41:22Z"
+    },
+    {
+      "id": "neo-1fb2.25.5",
+      "project": "NeoMud",
+      "title": "Reclaim Tavern draw-call headroom",
+      "description": "Batch repeated Tavern table/furniture meshes so the room has budget for future visual polish without raising limits. Preserve layout, collision, screenshots, and server-backed traversal.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.25",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 114,
+          "body": "Completed: batched Tavern mugs and repeated table/bench parts into instanced meshes, dropping authored-room Tavern draw calls from 114 to 84 while preserving layout, collision, screenshots, and server-backed traversal. Offline smoke and server-backed QA pass after local server restart cleared stale guest-session saturation.",
+          "created": "2026-05-28T18:51:21Z"
+        }
+      ],
+      "created": "2026-05-28T18:44:10Z",
+      "updated": "2026-05-28T18:51:26Z"
     }
   ],
   "ready": [
