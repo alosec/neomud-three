@@ -40,18 +40,26 @@ second lane is strictly required to validate the first.
    - Acceptance is reviewability and reuse, not a prettier room yet.
    - New assets enter lab/zoo before room placement.
 
-3. Room composition lane
+3. Blender authoring lane
+   - Adds or improves Blender source scenes, GLB exports, asset validators, or
+     importer contracts.
+   - Acceptance is a source `.blend`, exported `.glb`, validation output, and a
+     clear parser/runtime plan.
+   - New substantial room/landmark/character geometry should prefer this lane
+     over direct JavaScript mesh authoring.
+
+4. Room composition lane
    - Improves one authored room or one named landmark inside a room.
    - Acceptance is fixed screenshot improvement, preserved traversal, preserved
      server state, and render budget compliance.
 
-4. Gameplay lane
+5. Gameplay lane
    - Adds or improves one real interaction: NPC, item, feature, inventory,
      combat/dialogue hint, or world feedback.
    - Acceptance is server-backed behavior when the server owns the state and a
      clear offline fallback only when useful for renderer testing.
 
-5. Character lane
+6. Character lane
    - Improves avatar model, animation, scale, or QA.
    - Acceptance includes Prop Zoo scale view, movement smoke, no grounded bob,
      run/jump behavior, and budget preservation.

@@ -44,13 +44,18 @@ The component layer now caches box geometries while still disposing them on room
 The fork now has the first production pipeline pieces:
 
 - `experiments/neomud-three/ART_DIRECTION.md` defines style, shape, material, lighting, asset, and QA rules.
+- `memory-bank/blender-glb-pipeline.md` defines Blender source scenes, GLB exports, object prefixes, and required custom properties for substantial authored geometry.
 - `render-assets.js` exposes approved material IDs and metadata: family, kind, intended use, texture source, dimensions, estimated GPU bytes, repeat, color space, roughness, metalness, alpha/emissive flags, and approval state.
 - `material-lab.html` renders every approved material on the same plane/cube/wall/cylinder test station.
 - `components/town-kit.js` defines the first reusable TownKit props.
 - `prop-zoo.html` stages TownKit props with player scale reference before they enter game rooms.
 - `scripts/test-neomud-three-labs.cjs` screenshots both labs and writes render/budget reports.
+- `scripts/create-neomud-three-movement-gym.py` creates the first Blender movement-gym `.blend` and exported GLB.
+- `scripts/validate-neomud-three-gltf.mjs` validates GLB naming prefixes and exported custom properties.
 
-This is now the required path for new visual content: material lab for materials, prop zoo for reusable components, then room spec assembly.
+This is now the required path for new visual content: Blender for substantial
+geometry, material lab for materials, prop zoo for reusable components, then
+room/spec/runtime assembly.
 
 ## Acceptance Bar
 

@@ -26,6 +26,7 @@ local.properties
 # OS
 .DS_Store
 Thumbs.db
+*.blend1
 
 # Kotlin
 *.class
@@ -53,6 +54,10 @@ maker/default_world.nmd
 .playwright-mcp/
 experiments/neomud-three/qa/latest/
 experiments/neomud-three/qa/cardinal/
+!experiments/neomud-three/assets/build/
+!experiments/neomud-three/assets/build/**
+!experiments/neomud-three/assets/source/
+!experiments/neomud-three/assets/source/**
 
 # Nano Banana image generation output
 nanobanana-output/

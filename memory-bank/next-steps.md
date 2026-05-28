@@ -5,6 +5,8 @@ High leverage next work:
 0. Use the new production pipeline for all visual work.
    - Treat `memory-bank/production-workflow.md` as the operating contract.
    - One pass must name one target, one problem, one hypothesis, constraints, and evidence.
+   - Treat `memory-bank/blender-glb-pipeline.md` as the authoring contract for substantial 3D geometry.
+   - Prefer Blender source + exported GLB + validator for new rooms, landmarks, collision layouts, and authored models instead of direct JS mesh construction.
    - Read `experiments/neomud-three/ART_DIRECTION.md` before visual edits.
    - Put new generated materials through `material-lab.html`.
    - Put new reusable components through `prop-zoo.html`.
@@ -21,6 +23,7 @@ High leverage next work:
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
+   - Add a GLB `WorldLoader` / `LevelParser` for the Blender movement gym: classify `VIS_`, `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_` nodes, hide non-render metadata nodes, and expose typed level data to the renderer.
 
 2. Upgrade Temple of the Dawn into the quality bar.
    - Better Gothic wall/window frames.
@@ -38,6 +41,7 @@ High leverage next work:
    - Give each NPC a real placement and interaction zone.
    - Expand the current low-poly tree into a fuller approved foliage kit from Prop Zoo.
    - Preserve the current exit readability and 240-call full-smoke budget, or explicitly justify a new budget before raising it.
+   - The next serious geometry pass should move one named landmark or graybox room slice into Blender source and GLB validation instead of adding more direct mesh code.
 
 3a. Continue player avatar production.
    - The visible player is now a v6 compact low-poly fantasy adventurer proxy with better hood/face separation, hands, darker palette, rear cloak structure, shoulder pieces, stronger gold trim, eye/nose detail, staff/gear accents, back gear, cloak shoulder mass, small steel details, and slimmer proportions. Xbot remains a hidden technical/reference asset, not the rendered character.

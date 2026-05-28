@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T20:08:15.786Z",
+  "updated": "2026-05-28T20:18:41.887Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2595,6 +2595,49 @@
       ],
       "created": "2026-05-28T20:04:51Z",
       "updated": "2026-05-28T20:08:00Z"
+    },
+    {
+      "id": "neo-1fb2.25.6",
+      "project": "NeoMud",
+      "title": "Add Tavern bar interaction affordance pass",
+      "description": "Use the production workflow for one bounded Tavern pass: make the bar/Barkeep service point read as the primary interaction affordance through existing materials, light, and minimal reusable geometry; preserve collision, server-backed traversal, and Tavern budget.",
+      "type": "task",
+      "priority": 1,
+      "status": "canceled",
+      "status_type": "canceled",
+      "parent": "neo-1fb2.25",
+      "close_reason": "canceled: direction rejected during workflow reset; replacing JS-authored mesh iteration with Blender/GLB authoring pipeline",
+      "labels": [
+        "neomud-three",
+        "tavern",
+        "visual-qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T20:09:50Z",
+      "updated": "2026-05-28T20:13:37Z"
+    },
+    {
+      "id": "neo-1fb2.75",
+      "project": "NeoMud",
+      "title": "Add Blender GLB authoring pipeline",
+      "description": "Make Blender a first-class NeoMud Three authoring layer: source/build asset directories, prefix/custom-property contract, generated movement-gym GLB, and a validator that checks exported level metadata before runtime integration.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: installed/verified Blender pipeline, added movement gym Blender source and GLB export, added GLB prefix/extras validator, and documented authoring contract",
+      "labels": [
+        "blender",
+        "gltf",
+        "neomud-three",
+        "pipeline"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T20:14:23Z",
+      "updated": "2026-05-28T20:18:27Z"
     }
   ],
   "ready": [

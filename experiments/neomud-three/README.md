@@ -19,9 +19,11 @@ It currently:
 - Adds simple authored collision volumes for the Temple altar/dais, Town Square fountain/dressing, North Gate watchtowers/walls/guard post, Forest Edge trees/log/stones, Forest Path roots/trees/stones, and Tavern tables/bar/fireplace.
 - Uses transparent generated stained glass inside a physical window component.
 - Loads the vendored Three.js/Xbot GLTF as a hidden animation/reference asset, but renders a compact instanced low-poly fantasy adventurer as the visible player. This reclaims substantial triangle budget for the rooms; it is still not the final authored character model.
+- Starts a Blender-authored GLB pipeline under `assets/source/` and `assets/build/`; new substantial geometry should move through Blender source, exported GLB, and validation before runtime integration.
 
 Art direction rules live in `ART_DIRECTION.md`.
 The graphics production rules live in `../../memory-bank/graphics-production-contract.md`.
+The Blender/GLB pipeline rules live in `../../memory-bank/blender-glb-pipeline.md`.
 
 Project state and next steps are tracked in `memory-bank/`.
 
@@ -71,4 +73,11 @@ Fixed authored-room screenshot anchors:
 
 ```bash
 NEOMUD_THREE_BROWSER_CHANNEL=chrome-canary node scripts/test-neomud-three-room-shots.cjs
+```
+
+Blender-authored movement gym:
+
+```bash
+blender --background --python scripts/create-neomud-three-movement-gym.py
+node scripts/validate-neomud-three-gltf.mjs
 ```
