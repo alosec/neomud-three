@@ -175,6 +175,16 @@ node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-th
 node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_tavern.glb
 ```
 
+Validate the full runtime package registry and manifests:
+
+```bash
+node scripts/validate-neomud-three-packages.mjs
+```
+
+The package validator checks every `LEVEL_PACKAGES` entry against its manifest,
+source image, source brief, source `.blend`, runtime `.glb`, file sizes,
+validator counts, GLB prefix summary, QA checklist, and known-limit metadata.
+
 ## Runtime Parser
 
 The first runtime bridge is in place:
@@ -222,8 +232,8 @@ The current movement gym lab QA proves:
 2. Promote `level-debug.js` into renderer/debug hooks with user-facing toggles
    for parsed colliders, trigger volumes, spawn points, path nodes, pickup/enemy
    markers, camera zones, and lights.
-3. Add a generated `*.manifest.json` beside each GLB with parse counts, budgets,
-   source image, source blend, validator profile, and package version.
+3. Generate or refresh `*.manifest.json` automatically from Blender/export and
+   QA reports instead of hand-editing manifest counts.
 4. Add glTF Transform inspection/optimization once the first main-runtime import is
    working.
 5. Add KTX2/Basis texture compression when generated materials become part of

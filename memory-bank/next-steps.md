@@ -24,6 +24,7 @@ High leverage next work:
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
    - The first main-runtime GLB adapter now exists in `glb-room-runtime.js`; Temple and Tavern both use it. Keep future Blender-authored rooms on that path instead of adding per-room GLB parsing glue.
+   - Run `node scripts/validate-neomud-three-packages.mjs` after any package, source brief, manifest, or registry change so source/manifest/GLB drift is caught before browser QA.
    - Promote the movement gym loader and room adapter into a named `WorldLoader` / `LevelParser` interface before the third room package lands.
    - `level-debug.js` now has reusable parsed-metadata debug drawing for `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_`; next step is wiring it into main renderer debug hooks with toggles.
 

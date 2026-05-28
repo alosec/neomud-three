@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T21:36:38.843Z",
+  "updated": "2026-05-28T21:43:46.987Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2812,6 +2812,25 @@
       "comments": [],
       "created": "2026-05-28T21:23:00Z",
       "updated": "2026-05-28T21:36:26Z"
+    },
+    {
+      "id": "neo-1fb2.78",
+      "project": "NeoMud",
+      "title": "Validate GLB room package manifests",
+      "description": "Add a package-level validator for LEVEL_PACKAGES entries that checks manifest/source image/source brief/source blend/runtime GLB existence, file sizes, GLB summary counts, QA checklist, and known-limit metadata so source-image-to-GLB packages cannot drift silently.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added package manifest validator, documented package gate, and verified package/GLB/spec/offline smoke checks",
+      "labels": [
+        "pipeline"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T21:42:41Z",
+      "updated": "2026-05-28T21:43:31Z"
     }
   ]
 }
