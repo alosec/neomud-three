@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:29:44.832Z",
+  "updated": "2026-05-28T18:34:33.132Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2385,6 +2385,29 @@
       ],
       "created": "2026-05-28T18:24:31Z",
       "updated": "2026-05-28T18:29:29Z"
+    },
+    {
+      "id": "neo-1fb2.25.3",
+      "project": "NeoMud",
+      "title": "Add courtyard garden bed to Prop Zoo",
+      "description": "Expose the new oval garden-bed pattern as a reusable TownKit/Prop Zoo component so Town Square landscaping remains reviewable outside the room scene.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.25",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 112,
+          "body": "Completed: added reusable TownKit garden.bed prop and staged it in Prop Zoo. Lab QA passes at 310 draw calls / 6,529 triangles / 47 textures / 198 geometries.",
+          "created": "2026-05-28T18:34:05Z"
+        }
+      ],
+      "created": "2026-05-28T18:31:49Z",
+      "updated": "2026-05-28T18:34:14Z"
     }
   ],
   "ready": [

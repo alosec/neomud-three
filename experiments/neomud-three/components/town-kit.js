@@ -24,6 +24,7 @@ export const TOWN_KIT_PROPS = [
   { id: "ground.trim.stone", label: "Stone Ground Trim", category: "surface" },
   { id: "candle.cluster", label: "Candle Cluster", category: "lighting" },
   { id: "planter.long", label: "Long Planter", category: "foliage" },
+  { id: "garden.bed", label: "Garden Bed", category: "foliage" },
   { id: "shrub.clump", label: "Shrub Clump", category: "foliage" },
   { id: "grass.tuft", label: "Grass Tuft", category: "foliage" },
   { id: "flower.cluster", label: "Flower Cluster", category: "foliage" },
@@ -117,6 +118,9 @@ export function addTownKitProp(root, materials, id, options = {}) {
       break;
     case "planter.long":
       addLongPlanter(group, materials);
+      break;
+    case "garden.bed":
+      addGardenBed(group, materials);
       break;
     case "shrub.clump":
       addShrubClump(group, materials);
@@ -384,6 +388,47 @@ function addLongPlanter(root, materials) {
   addBox(root, materials.timber, 0, 0.55, 0, 3.0, 0.16, 1.06);
   addBox(root, materials.foliageDark, -0.62, 0.82, 0, 1.12, 0.46, 0.72);
   addBox(root, materials.foliage, 0.58, 0.88, 0.05, 1.24, 0.54, 0.82);
+}
+
+function addGardenBed(root, materials) {
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.08, 28), materials.pathEdge);
+  base.position.y = 0.045;
+  base.scale.set(2.35, 1, 1.45);
+  base.castShadow = false;
+  base.receiveShadow = true;
+  root.add(base);
+
+  const foliage = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.07, 28), materials.foliageDark);
+  foliage.position.y = 0.095;
+  foliage.scale.set(2.08, 0.85, 1.18);
+  foliage.castShadow = false;
+  foliage.receiveShadow = true;
+  root.add(foliage);
+
+  for (const [x, z, scale, materialRef] of [
+    [-0.72, -0.22, 0.72, materials.foliage],
+    [0.2, 0.16, 0.62, materials.foliageDark],
+    [0.9, -0.08, 0.54, materials.foliage]
+  ]) {
+    const shrub = new THREE.Mesh(new THREE.DodecahedronGeometry(0.42, 0), materialRef);
+    shrub.position.set(x, 0.42 * scale, z);
+    shrub.scale.set(1.1 * scale, 0.58 * scale, 0.9 * scale);
+    shrub.castShadow = true;
+    shrub.receiveShadow = true;
+    root.add(shrub);
+  }
+
+  for (const [x, z, materialRef] of [
+    [-1.05, 0.42, materials.awningGold],
+    [-0.2, -0.48, materials.awningRed],
+    [0.56, 0.44, materials.awningBlue],
+    [1.15, -0.28, materials.awningGold]
+  ]) {
+    const flower = new THREE.Mesh(new THREE.DodecahedronGeometry(0.075, 0), materialRef);
+    flower.position.set(x, 0.36, z);
+    flower.castShadow = true;
+    root.add(flower);
+  }
 }
 
 function addShrubClump(root, materials) {
