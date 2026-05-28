@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:40:11.571Z",
+  "updated": "2026-05-28T17:50:41.732Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2270,6 +2270,29 @@
       ],
       "created": "2026-05-28T17:35:28Z",
       "updated": "2026-05-28T17:39:58Z"
+    },
+    {
+      "id": "neo-1fb2.69.3",
+      "project": "NeoMud",
+      "title": "Improve Hidden Cave chest hero prop",
+      "description": "Strengthen the moss-covered stone chest as a readable hero interactable using existing cave/town materials only: plinth, arch silhouette, straps/latch, moss glow, and better affordance staging without adding new generated assets.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.69",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 107,
+          "body": "Completed: moss chest now has a wider plinth, stone alcove, side obelisks, straps/latch, moss ribbons, glowing seal, halo affordance, adjusted cave camera, and wider collision. Room-shot, offline smoke, and server-backed QA pass; Hidden Cave remains under budget at 53 calls / 2,925 triangles.",
+          "created": "2026-05-28T17:50:18Z"
+        }
+      ],
+      "created": "2026-05-28T17:42:45Z",
+      "updated": "2026-05-28T17:50:25Z"
     }
   ],
   "ready": [

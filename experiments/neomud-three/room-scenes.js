@@ -251,7 +251,7 @@ const HIDDEN_CAVE = {
 
 const HIDDEN_CAVE_COLLIDERS = [
   { id: "collapsed-west-wall", center: [-9.7, 0.15], size: [2.8, 5.4] },
-  { id: "moss-chest", center: [-3.8, -2.15], size: [1.95, 1.35] },
+  { id: "moss-chest", center: [-3.8, -2.15], size: [2.8, 2.05] },
   { id: "north-rock-shelf", center: [-0.5, -8.1], size: [21.5, 1.3] },
   { id: "south-root-shelf", center: [-1.2, 8.1], size: [20.0, 1.3] },
   { id: "damp-stone-cluster", center: [4.9, 3.8], size: [2.2, 1.45] }
@@ -1341,11 +1341,11 @@ export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], roomCoins
       fogDensity: 0.034
     },
     camera: {
-      distance: 5.2,
-      height: 3.25,
-      sideOffset: -0.18,
-      lookAhead: 2.6,
-      targetHeight: 1.0
+      distance: 6.35,
+      height: 4.45,
+      sideOffset: -2.05,
+      lookAhead: 2.1,
+      targetHeight: 0.82
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -4197,26 +4197,71 @@ function addHiddenCaveChest(root, materials) {
   group.userData.visualRole = "hidden-cave-moss-chest";
   root.add(group);
 
-  addBox(group, materials.chestStone, 0, 0.32, 0, 1.35, 0.64, 0.92);
-  addBox(group, materials.chestStone, 0, 0.77, -0.02, 1.42, 0.28, 0.98, { rotationX: -0.08 });
-  addBox(group, materials.rootDark, 0, 0.65, -0.51, 1.5, 0.18, 0.12);
-  addBox(group, materials.chestMoss, -0.08, 0.96, -0.08, 1.05, 0.08, 0.56, { castShadow: false });
-  addBox(group, materials.chestMoss, -0.54, 0.54, 0.04, 0.16, 0.2, 0.72, { castShadow: false });
+  addBox(group, materials.wetStone, 0, 0.12, 0.04, 2.7, 0.24, 1.58);
+  addBox(group, materials.chestStone, 0, 0.38, 0, 1.58, 0.72, 1.02);
+  addBox(group, materials.chestStone, 0, 0.9, -0.03, 1.66, 0.32, 1.08, { rotationX: -0.08 });
+  addBox(group, materials.rootDark, 0, 0.7, -0.56, 1.76, 0.2, 0.12);
+  addBox(group, materials.rootDark, -0.52, 0.62, -0.58, 0.12, 0.74, 0.13);
+  addBox(group, materials.rootDark, 0.52, 0.62, -0.58, 0.12, 0.74, 0.13);
+  addBox(group, materials.sign, 0, 0.62, -0.66, 0.3, 0.24, 0.08, { castShadow: false });
+  addBox(group, materials.chestMoss, -0.1, 1.13, -0.08, 1.22, 0.1, 0.62, { castShadow: false });
+  addBox(group, materials.chestMoss, -0.62, 0.63, 0.04, 0.18, 0.28, 0.78, { castShadow: false });
+  addBox(group, materials.chestMoss, 0.62, 0.62, 0.05, 0.15, 0.22, 0.62, { castShadow: false });
+
+  addInstancedBoxes(group, materials.wetStone, [
+    { x: -1.22, y: 0.88, z: 0.62, width: 0.34, height: 1.72, depth: 0.32 },
+    { x: 1.22, y: 0.88, z: 0.62, width: 0.34, height: 1.72, depth: 0.32 },
+    { x: -1.72, y: 0.8, z: -0.24, width: 0.28, height: 1.6, depth: 0.34 },
+    { x: 1.72, y: 0.8, z: -0.24, width: 0.28, height: 1.6, depth: 0.34 },
+    { x: -1.72, y: 1.68, z: -0.24, width: 0.42, height: 0.18, depth: 0.46 },
+    { x: 1.72, y: 1.68, z: -0.24, width: 0.42, height: 0.18, depth: 0.46 },
+    { x: 0, y: 1.72, z: 0.62, width: 2.42, height: 0.34, depth: 0.34 },
+    { x: -0.72, y: 1.96, z: 0.62, width: 0.84, height: 0.28, depth: 0.3, rotationY: 0.08 },
+    { x: 0.72, y: 1.96, z: 0.62, width: 0.84, height: 0.28, depth: 0.3, rotationY: -0.08 }
+  ], "hidden-cave-chest-alcove-stone");
+  addInstancedBoxes(group, materials.chestMoss, [
+    { x: -1.24, y: 1.44, z: 0.42, width: 0.08, height: 0.72, depth: 0.12 },
+    { x: 1.24, y: 1.22, z: 0.42, width: 0.08, height: 0.56, depth: 0.12 },
+    { x: -1.72, y: 1.02, z: -0.45, width: 0.1, height: 0.82, depth: 0.12 },
+    { x: 1.72, y: 1.02, z: -0.45, width: 0.1, height: 0.82, depth: 0.12 },
+    { x: -0.18, y: 1.78, z: 0.4, width: 1.12, height: 0.08, depth: 0.12 }
+  ], "hidden-cave-chest-alcove-moss", { castShadow: false });
 
   const vial = new THREE.Mesh(
     new THREE.CylinderGeometry(0.08, 0.1, 0.34, 10),
     new THREE.MeshStandardMaterial({ color: 0x8beaff, emissive: 0x1b5a72, emissiveIntensity: 0.6, roughness: 0.3, metalness: 0 })
   );
-  vial.position.set(0.38, 1.06, -0.12);
+  vial.position.set(0.42, 1.22, -0.18);
   vial.rotation.z = -0.26;
   group.add(vial);
 
+  const seal = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.14, 0),
+    new THREE.MeshBasicMaterial({ color: 0x8fffe2, transparent: true, opacity: 0.9, depthWrite: false })
+  );
+  seal.position.set(0, 0.92, -0.69);
+  seal.renderOrder = 12;
+  group.add(seal);
+
+  const haloMaterial = new THREE.MeshBasicMaterial({
+    color: 0x79ffd2,
+    transparent: true,
+    opacity: 0.42,
+    depthWrite: false,
+    depthTest: false
+  });
+  const halo = new THREE.Mesh(new THREE.TorusGeometry(0.68, 0.022, 8, 36), haloMaterial);
+  halo.position.set(0, 1.38, -0.16);
+  halo.rotation.x = Math.PI / 2;
+  halo.renderOrder = 16;
+  group.add(halo);
+
   addTextBoard(root, "Stone Chest", {
     x: -3.8,
-    y: 1.72,
+    y: 2.16,
     z: -2.15,
-    width: 2.45,
-    height: 0.45,
+    width: 2.75,
+    height: 0.5,
     subtitle: "Inspect",
     palette: "blue",
     renderOrder: 11
