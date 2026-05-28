@@ -182,6 +182,12 @@ export function connectNeoMud(options = {}) {
     sendInteractFeature(featureId) {
       return send({ type: "interact_feature", featureId });
     },
+    sendPickupItem(itemId, quantity = 1) {
+      return send({ type: "pickup_item", itemId, quantity });
+    },
+    sendPickupCoins(coinType = "all") {
+      return send({ type: "pickup_coins", coinType });
+    },
     sendLook() {
       return send({ type: "look" });
     },

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T16:54:39.567Z",
+  "updated": "2026-05-28T17:05:30.199Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2122,6 +2122,34 @@
       ],
       "created": "2026-05-28T16:45:55Z",
       "updated": "2026-05-28T16:54:26Z"
+    },
+    {
+      "id": "neo-1fb2.72",
+      "project": "NeoMud",
+      "title": "Bridge rendered loot pickup to server",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 99,
+          "body": "Scope: make rendered ground item/coin markers actionable from the interaction panel using pickup_item/pickup_coins, handle pickup_result, and verify live Hidden Cave loot can be picked up through the Kotlin server.",
+          "created": "2026-05-28T16:57:13Z"
+        },
+        {
+          "id": 100,
+          "body": "Completed: rendered item/coin markers expose Pick up actions, the protocol bridge sends pickup_item/pickup_coins, pickup_result is rendered into the interaction panel/log, and server QA verifies ground state decreases after pickup when cave loot exists.",
+          "created": "2026-05-28T17:05:16Z"
+        }
+      ],
+      "created": "2026-05-28T16:57:13Z",
+      "updated": "2026-05-28T17:05:16Z"
     }
   ],
   "ready": [

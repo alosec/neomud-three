@@ -259,6 +259,20 @@ function handleServerMessage(message) {
       appendLog(`${lastInteractionResult.featureName}: ${lastInteractionResult.message}`);
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
+    case "pickup_result":
+      lastInteractionResult = {
+        success: true,
+        featureName: message.itemName ?? selectedInteractable?.name ?? "Pickup",
+        message: message.isCoin
+          ? `Picked up ${message.quantity} coin${message.quantity === 1 ? "" : "s"}.`
+          : `Picked up ${message.quantity} ${message.itemName ?? selectedInteractable?.name ?? "item"}.`
+      };
+      if (selectedInteractable?.actionType === "PICKUP_ITEM" || selectedInteractable?.actionType === "PICKUP_COINS") {
+        selectedInteractable = { ...selectedInteractable, actionConsumed: true };
+      }
+      appendLog(`${lastInteractionResult.featureName}: ${lastInteractionResult.message}`);
+      if (activePanel === "interaction") renderPanel(activePanel);
+      break;
     case "tutorial":
       appendLog(`${message.title}: ${message.content.split("\n")[0]}`);
       break;
@@ -765,7 +779,10 @@ function interactionPanel() {
   const body = entity.dialogue || entity.description || `${entity.name} is present in ${world.rooms.get(currentRoomId)?.name ?? "this room"}.`;
   const kindLabel = entity.kind === "npc" ? entity.role || "NPC" : entity.role || "Item";
   const hasServerAction = Boolean(entity.actionType);
-  const canUseServerAction = hasServerAction && serverCanDriveMovement();
+  const canUseServerAction = hasServerAction && serverCanDriveMovement() && !entity.actionConsumed;
+  const actionLabel = entity.actionConsumed
+    ? "Picked up"
+    : serverActionLabel(entity);
   const actionResult = lastInteractionResult
     ? `
       <div class="list-card">
@@ -786,12 +803,17 @@ function interactionPanel() {
     </div>
     <div class="panel-actions">
       ${hasServerAction
-        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction ? "Use" : "Server action unavailable"}</button>`
+        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction ? escapeHtml(actionLabel) : escapeHtml(entity.actionConsumed ? actionLabel : "Server action unavailable")}</button>`
         : ""}
       <button type="button" data-panel-target="log">Open log</button>
       <button type="button" data-panel-target="map">Map</button>
     </div>
   `);
+}
+
+function serverActionLabel(entity) {
+  if (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS") return "Pick up";
+  return "Use";
 }
 
 function helpPanel() {
@@ -856,7 +878,11 @@ function updateInteractionPrompt() {
     return;
   }
 
-  const action = nearbyInteractable.kind === "npc" ? "Talk" : "Inspect";
+  const action = nearbyInteractable.kind === "npc"
+    ? "Talk"
+    : nearbyInteractable.actionType === "PICKUP_ITEM" || nearbyInteractable.actionType === "PICKUP_COINS"
+      ? "Pick up"
+      : "Inspect";
   interactionPrompt.textContent = `F ${action} ${nearbyInteractable.name}`;
   interactionPrompt.classList.remove("hidden");
 }
@@ -872,6 +898,7 @@ function interactWithNearby() {
 
 function useSelectedInteractable(featureId) {
   if (!selectedInteractable || selectedInteractable.id !== featureId) return;
+  if (selectedInteractable.actionConsumed) return;
   if (!serverCanDriveMovement()) {
     lastInteractionResult = {
       success: false,
@@ -883,8 +910,11 @@ function useSelectedInteractable(featureId) {
     return;
   }
 
-  appendLog(`Using ${selectedInteractable.name} through the Kotlin server...`);
-  const sent = serverState.client.sendInteractFeature(featureId);
+  const actionText = selectedInteractable.actionType === "PICKUP_ITEM" || selectedInteractable.actionType === "PICKUP_COINS"
+    ? `Picking up ${selectedInteractable.name}`
+    : `Using ${selectedInteractable.name}`;
+  appendLog(`${actionText} through the Kotlin server...`);
+  const sent = sendSelectedInteractableCommand(selectedInteractable);
   if (!sent) {
     lastInteractionResult = {
       success: false,
@@ -894,8 +924,18 @@ function useSelectedInteractable(featureId) {
     appendLog(`${selectedInteractable.name}: ${lastInteractionResult.message}`);
     if (activePanel === "interaction") renderPanel(activePanel);
   } else {
-    updateStatusText(`Using ${selectedInteractable.name} through the Kotlin server...`);
+    updateStatusText(`${actionText} through the Kotlin server...`);
   }
+}
+
+function sendSelectedInteractableCommand(entity) {
+  if (entity.actionType === "PICKUP_ITEM") {
+    return serverState.client.sendPickupItem(entity.itemId ?? entity.id, entity.quantity ?? 1);
+  }
+  if (entity.actionType === "PICKUP_COINS") {
+    return serverState.client.sendPickupCoins(entity.coinType ?? "all");
+  }
+  return serverState.client.sendInteractFeature(entity.id);
 }
 
 function shortDirection(direction) {
@@ -1056,7 +1096,8 @@ function installDebugApi() {
               id: nearbyInteractable.id,
               kind: nearbyInteractable.kind,
               name: nearbyInteractable.name,
-              prompt: nearbyInteractable.prompt
+              prompt: nearbyInteractable.prompt,
+              actionType: nearbyInteractable.actionType ?? ""
             }
           : null
       };

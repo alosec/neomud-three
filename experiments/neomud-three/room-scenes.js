@@ -375,6 +375,9 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
         name: entity.name,
         role: entity.role ?? "",
         prompt: entity.prompt,
+        actionType: entity.actionType ?? "",
+        itemId: entity.itemId ?? "",
+        coinType: entity.coinType ?? "",
         x: entity.position.x,
         z: entity.position.z
       }));
@@ -1761,9 +1764,11 @@ function addMarketEntities(root, materials, worldRoot, world, npcs, roomItems, i
       id: normalized.id,
       name: normalized.name,
       role: "Market",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -4209,7 +4214,7 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
       id: feature.id,
       name,
       role: "Treasure",
-      prompt: `Inspect: ${name}`,
+      prompt: `Pick up: ${name}`,
       description: [feature.description, message].filter(Boolean).join(" "),
       actionType: feature.actionType ?? "",
       position: chestPosition.clone()
@@ -4261,6 +4266,8 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
       prompt: `Inspect: ${name}`,
       description: `Coins dropped from the moss-covered chest: ${name}.`,
       quantity: coinTotal(roomCoins),
+      actionType: "PICKUP_COINS",
+      coinType: "all",
       position: new THREE.Vector3(x, 0, z)
     });
   }

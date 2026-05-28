@@ -360,6 +360,48 @@ async function main() {
     }
     await page.keyboard.press("Escape");
 
+    const lootTarget = await page.evaluate(() => window.__neomudThreeDebug.room.entities.find(
+      (entity) => entity.role === "Cave Loot" && (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS")
+    ));
+    if (lootTarget) {
+      const beforeLootState = await page.evaluate(() => {
+        const coins = window.__neomudThreeDebug.server.roomCoins ?? {};
+        return {
+          items: window.__neomudThreeDebug.server.roomItems.length,
+          coinTotal: (coins.copper ?? 0) + (coins.silver ?? 0) * 100 + (coins.gold ?? 0) * 10_000 + (coins.platinum ?? 0) * 1_000_000
+        };
+      });
+      await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.0, z, heading: Math.PI / 2 }), lootTarget);
+      await page.waitForFunction(
+        (targetId) => window.__neomudThreeDebug.room.nearbyInteractable?.id === targetId,
+        lootTarget.id,
+        { timeout: 2_000 }
+      );
+      assert.match(await page.locator("#interaction-prompt").textContent(), /Pick up/i);
+      await page.keyboard.press("f");
+      assert.equal(await page.locator(`[data-interact-feature="${lootTarget.id}"]`).textContent(), "Pick up");
+      const beforePickupMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
+      await page.locator(`[data-interact-feature="${lootTarget.id}"]`).click();
+      await page.waitForFunction(
+        (before) => window.__neomudThreeDebug.server.messageCount > before
+          && /Picked up/i.test(window.__neomudThreeDebug.server.lastInteractionResult?.message ?? ""),
+        beforePickupMessages,
+        { timeout: 5_000 }
+      );
+      await page.waitForFunction(
+        ({ actionType, before }) => {
+          const server = window.__neomudThreeDebug.server;
+          const coins = server.roomCoins ?? {};
+          const coinTotal = (coins.copper ?? 0) + (coins.silver ?? 0) * 100 + (coins.gold ?? 0) * 10_000 + (coins.platinum ?? 0) * 1_000_000;
+          if (actionType === "PICKUP_ITEM") return server.roomItems.length < before.items;
+          return coinTotal < before.coinTotal;
+        },
+        { actionType: lootTarget.actionType, before: beforeLootState },
+        { timeout: 5_000 }
+      );
+      await page.keyboard.press("Escape");
+    }
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(
