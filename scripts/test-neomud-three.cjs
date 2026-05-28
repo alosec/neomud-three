@@ -90,6 +90,16 @@ async function main() {
     assert.ok(Math.abs(afterForward.y) < 0.02, `expected grounded walking y to stay stable, got ${afterForward.y}`);
 
     const templeColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    const templeLandmarks = await page.evaluate(() => window.__neomudThreeDebug.room.landmarks);
+    const templeTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(
+      templeLandmarks.some((landmark) => landmark.id === "town-temple-glb" && landmark.kind === "blender-level"),
+      `expected Temple to use Blender GLB level package, got ${JSON.stringify(templeLandmarks)}`
+    );
+    assert.ok(
+      templeTriggers.some((trigger) => trigger.direction === "NORTH" && trigger.targetId === "town:square"),
+      `expected Blender Temple north exit trigger, got ${JSON.stringify(templeTriggers)}`
+    );
     assert.ok(
       templeColliders.some((collider) => collider.id === "altar-dais"),
       `expected Temple altar collider, got ${JSON.stringify(templeColliders)}`

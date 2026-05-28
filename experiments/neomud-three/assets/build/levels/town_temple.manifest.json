@@ -1,0 +1,56 @@
+{
+  "id": "town:temple",
+  "slug": "town_temple",
+  "name": "Temple of the Dawn",
+  "packageVersion": 1,
+  "profile": "room",
+  "sourceImage": "../../source/scenes/town_temple/source.webp",
+  "sourceBrief": "../../source/scenes/town_temple/level-brief.json",
+  "sourceBlend": "../../source/scenes/town_temple/town_temple.blend",
+  "runtimeGlb": "town_temple.glb",
+  "files": {
+    "sourceImageBytes": 74634,
+    "sourceBlendBytes": 191427,
+    "runtimeGlbBytes": 331868
+  },
+  "validator": {
+    "script": "scripts/validate-neomud-three-gltf.mjs",
+    "profile": "room",
+    "nodes": 193,
+    "meshes": 190,
+    "materials": 12,
+    "prefixes": {
+      "VIS_": 182,
+      "COL_": 7,
+      "NAV_": 0,
+      "SPAWN_": 1,
+      "TRG_": 1,
+      "PICKUP_": 0,
+      "ENEMY_": 0,
+      "PATH_": 0,
+      "CAMERA_": 1,
+      "LIGHTS_": 1
+    }
+  },
+  "runtimeQa": {
+    "offlineTempleBudget": {
+      "drawCalls": 220,
+      "triangles": 4656,
+      "textures": 1,
+      "geometries": 171
+    },
+    "checks": [
+      "offline smoke",
+      "fixed room shots",
+      "GLB room profile validation",
+      "movement gym profile validation",
+      "room spec validation",
+      "server-backed traversal"
+    ]
+  },
+  "knownLimits": [
+    "Materials are first-pass Blender-authored stylized colors, not final generated texture families.",
+    "The package proves runtime GLB room loading and metadata extraction before final cathedral art polish.",
+    "The old procedural Temple builder remains in code as a temporary removal candidate."
+  ]
+}

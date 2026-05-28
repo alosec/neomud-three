@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T20:42:24.863Z",
+  "updated": "2026-05-28T21:11:21.792Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2749,50 +2749,31 @@
       ],
       "created": "2026-05-28T20:37:41Z",
       "updated": "2026-05-28T20:42:12Z"
-    }
-  ],
-  "ready": [
-    {
-      "id": "neo-1fb2.16",
-      "title": "Replace Xbot placeholder with NeoMud-authored skinned adventurer rig",
-      "priority": 2,
-      "project": "NeoMud",
-      "status": "backlog"
     },
     {
-      "id": "neo-1fb2",
-      "title": "NeoMud Three practical reset",
+      "id": "neo-1fb2.75.5",
+      "project": "NeoMud",
+      "title": "Promote Temple of the Dawn to Blender-authored GLB room package",
+      "description": "Create a validated Blender-authored runtime room package for town:temple using the existing NeoMud church/cathedral image as source material. Deliver source brief, Blender source, exported GLB with VIS/COL/SPAWN/TRG/CAMERA/LIGHTS metadata, Three.js runtime integration, and Chrome Canary QA screenshots/tests.",
+      "type": "task",
       "priority": 0,
-      "project": "NeoMud",
-      "status": "in-progress"
-    },
-    {
-      "id": "neo-1fb2.2",
-      "title": "Extract normalized client game state and command router",
-      "priority": 0,
-      "project": "NeoMud",
-      "status": "in-progress"
-    },
-    {
-      "id": "neo-1fb2.11",
-      "title": "Maintain repeatable QA gates",
-      "priority": 0,
-      "project": "NeoMud",
-      "status": "in-progress"
-    },
-    {
-      "id": "neo-1fb2.14",
-      "title": "Upgrade player avatar visual quality",
-      "priority": 0,
-      "project": "NeoMud",
-      "status": "in-progress"
-    },
-    {
-      "id": "neo-1fb2.3",
-      "title": "Extract persistent Three render engine",
-      "priority": 1,
-      "project": "NeoMud",
-      "status": "in-progress"
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.75",
+      "close_reason": "done: shipped first Blender-authored Temple room package into main runtime",
+      "labels": [
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 125,
+          "body": "Scope expanded from prop-zoo landmark to first playable GLB room package: town:temple now has source image, level brief, Blender source, runtime GLB, package manifest, runtime LEVEL_PACKAGES registry, preloaded GLB loader path, GLB-derived collision/spawn/trigger handling, and Chrome Canary smoke/room/lab/town screenshot QA.",
+          "created": "2026-05-28T21:11:03Z"
+        }
+      ],
+      "created": "2026-05-28T20:45:12Z",
+      "updated": "2026-05-28T21:11:03Z"
     }
   ]
 }

@@ -6,7 +6,7 @@ High leverage next work:
    - Treat `memory-bank/production-workflow.md` as the operating contract.
    - One pass must name one target, one problem, one hypothesis, constraints, and evidence.
    - Treat `memory-bank/blender-glb-pipeline.md` as the authoring contract for substantial 3D geometry.
-   - Prefer Blender source + exported GLB + validator for new rooms, landmarks, collision layouts, and authored models instead of direct JS mesh construction.
+   - Prefer source image/brief + Blender source + exported GLB + validator for new rooms, landmarks, collision layouts, and authored models instead of direct JS mesh construction.
    - Read `experiments/neomud-three/ART_DIRECTION.md` before visual edits.
    - Put new generated materials through `material-lab.html`.
    - Put new reusable components through `prop-zoo.html`.
@@ -26,15 +26,13 @@ High leverage next work:
    - Promote the movement gym loader from lab-only code into a main-runtime `WorldLoader` / `LevelParser` interface.
    - `level-debug.js` now has reusable parsed-metadata debug drawing for `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_`; next step is wiring it into main renderer debug hooks with toggles.
 
-2. Upgrade Temple of the Dawn into the quality bar.
-   - Better Gothic wall/window frames.
-   - More convincing transparent stained glass placement.
-   - Larger readable north doorway and exit affordance.
-   - Better pew/runner/candle proportions; the current warmth pass is useful but still blockout-grade.
-   - The first stained-glass floor patch pass is in; the next Temple pass should improve window/frame proportions or altar staging rather than adding more floor overlays.
-   - Temple window rectangular frames/ledges are now instanced, creating real call/geometries headroom for the next authored cathedral detail pass.
-   - The first altar retable pass is in; further altar work should refine proportions/material hierarchy rather than adding another centerpiece.
-   - The altar wall now has side lancet niches and vertical trim around the retable. Further Temple work should focus on wall/window proportions and material hierarchy, not adding more centerpieces.
+2. Refine the Blender-authored Temple of the Dawn package.
+   - The first real source-image-to-GLB room package is done for `town:temple`.
+   - Treat `experiments/neomud-three/assets/source/scenes/town_temple/level-brief.json` as the Temple production contract.
+   - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
+   - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
+   - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
+   - Remove the old procedural Temple builder after the GLB path has one more stable QA pass.
 
 3. Rebuild Town Square as a real 3D room.
    - Replace placeholder facades with authored structures.

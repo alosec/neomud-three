@@ -6,7 +6,7 @@ It currently:
 
 - Loads all default-world zone JSON so it can resolve cross-zone exits later.
 - Uses existing room graph data as the gameplay/navigation spine.
-- Authors Temple of the Dawn as a cathedral-scale room volume with generated material textures.
+- Loads Temple of the Dawn from a Blender-authored cathedral room package with `VIS_` render geometry, `COL_` collision, `SPAWN_` player marker, and `TRG_` north exit metadata.
 - Authors Town Square through `TOWN_SQUARE_SPEC`, including named landmark specs and physical trigger volumes mapped back to real NeoMud exits.
 - Authors North Gate as a fortified gate stage with Town Guard, physical South/North triggers, and a tighter corridor camera.
 - Authors Forest Edge as a compact forest threshold with Forest Rat, physical South/North triggers, and lightweight tree/log/stone collision.
@@ -20,7 +20,7 @@ It currently:
 - Adds simple authored collision volumes for the Temple altar/dais, Town Square fountain/dressing, North Gate watchtowers/walls/guard post, Forest Edge trees/log/stones, Forest Path roots/trees/stones, and Tavern tables/bar/fireplace.
 - Uses transparent generated stained glass inside a physical window component.
 - Loads the vendored Three.js/Xbot GLTF as a hidden animation/reference asset, but renders a compact instanced low-poly fantasy adventurer as the visible player. This reclaims substantial triangle budget for the rooms; it is still not the final authored character model.
-- Starts a Blender-authored GLB pipeline under `assets/source/` and `assets/build/`; new substantial geometry should move through Blender source, exported GLB, and validation before runtime integration.
+- Starts a Blender-authored GLB pipeline under `assets/source/` and `assets/build/`; new substantial geometry should move through source image/brief, Blender source, exported GLB, and validation before runtime integration.
 - Provides `level-debug.js`, a reusable parsed-GLB debug renderer used by Movement Gym, so collision, triggers, spawn points, pickups, enemy markers, paths, camera zones, and light markers can be reviewed without trusting hidden authoring meshes.
 
 Art direction rules live in `ART_DIRECTION.md`.
@@ -82,5 +82,12 @@ Blender-authored movement gym:
 
 ```bash
 blender --background --python scripts/create-neomud-three-movement-gym.py
-node scripts/validate-neomud-three-gltf.mjs
+node scripts/validate-neomud-three-gltf.mjs --profile=movement-gym experiments/neomud-three/assets/build/levels/movement_gym.glb
+```
+
+Blender-authored Temple of the Dawn package:
+
+```bash
+blender --background --python scripts/create-neomud-three-town-temple.py
+node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_temple.glb
 ```

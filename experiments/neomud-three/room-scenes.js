@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { LEVEL_PACKAGES } from "./level-packages.js";
+import { instantiateBlenderLevel } from "./level-loader.js";
 import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
 import { TOWN_SQUARE_SPEC } from "./room-specs.js";
 import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
@@ -264,6 +266,64 @@ const TEMPLE_COLLIDERS = [
 ];
 
 export function buildTempleRoom({ root, worldRoot, onExit }) {
+  const blenderTemple = instantiateBlenderLevel(LEVEL_PACKAGES["town:temple"].url, { hideAuthoringNodes: true });
+  return buildBlenderTempleRoom(root, blenderTemple);
+}
+
+function buildBlenderTempleRoom(root, { scene, level }) {
+  configureBlenderTempleScene(scene);
+  root.add(scene);
+
+  const colliders = collidersFromBlenderLevel(level);
+  const blockingColliders = colliders.filter((collider) => collider.id !== "world-floor");
+  const floorCollider = colliders.find((collider) => collider.id === "world-floor");
+  const bounds = boundsFromCollider(floorCollider) ?? { minX: -12.35, maxX: 12.35, minZ: -36.9, maxZ: 20.5 };
+  const triggers = triggersFromBlenderLevel(level);
+  const spawn = spawnFromBlenderLevel(level.spawn, { position: new THREE.Vector3(0, 0, TEMPLE.entrySpawnZ), heading: Math.PI });
+
+  return {
+    spawn,
+    source: "blender-glb",
+    status: "Blender-authored Temple of the Dawn: validated GLB room package with VIS geometry, COL collision, SPAWN marker, and TRG north exit.",
+    environment: {
+      background: 0x100c08,
+      fog: 0x120d09,
+      fogDensity: 0.018
+    },
+    spawnFor() {
+      return spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, bounds.minX, bounds.maxX);
+      position.z = THREE.MathUtils.clamp(position.z, bounds.minZ, bounds.maxZ);
+      resolveColliderPushout(position, blockingColliders, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, bounds.minX, bounds.maxX);
+      position.z = THREE.MathUtils.clamp(position.z, bounds.minZ, bounds.maxZ);
+    },
+    exitAt(position) {
+      return triggerAtPosition(position, triggers)?.targetId ?? null;
+    },
+    debugTriggers() {
+      return triggers;
+    },
+    debugLandmarks() {
+      return [{
+        id: "town-temple-glb",
+        kind: "blender-level",
+        source: LEVEL_PACKAGES["town:temple"].url,
+        renderNodes: level.summary.renderNodes,
+        collisionNodes: level.summary.collisionNodes,
+        triggerNodes: level.summary.triggerNodes
+      }];
+    },
+    debugColliders() {
+      return debugColliders(colliders, 0.42);
+    },
+    update() {}
+  };
+}
+
+function buildLegacyTempleRoom({ root, worldRoot, onExit }) {
   const materials = makeTempleMaterials();
   const runtime = {
     spawn: { position: new THREE.Vector3(0, 0, TEMPLE.entrySpawnZ), heading: Math.PI },
@@ -6166,6 +6226,98 @@ function horizontalDistanceSq(a, b) {
   const dx = a.x - b.x;
   const dz = a.z - b.z;
   return dx * dx + dz * dz;
+}
+
+function configureBlenderTempleScene(scene) {
+  scene.name = "town-temple-blender-level";
+  scene.traverse((object) => {
+    if (!object.isMesh) return;
+    object.castShadow = object.name.startsWith("VIS_");
+    object.receiveShadow = object.name.startsWith("VIS_");
+    if (object.material) {
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      for (const material of materials) {
+        if ("roughness" in material) material.roughness = Math.max(material.roughness ?? 0.78, 0.62);
+        if (object.name.includes("_ceiling_") || object.name.includes("_vault_")) {
+          material.side = THREE.DoubleSide;
+          if ("emissive" in material) {
+            material.emissive = new THREE.Color(0x554f42);
+            material.emissiveIntensity = Math.max(material.emissiveIntensity ?? 0, 0.24);
+          }
+        }
+        if (object.name.includes("_glass_") || object.name.includes("_light_band_")) {
+          material.transparent = true;
+          material.depthWrite = false;
+        }
+      }
+    }
+  });
+}
+
+function collidersFromBlenderLevel(level) {
+  return level.byKind.collision
+    .filter((node) => node.userData.collider === "box")
+    .map((node) => ({
+      id: node.userData.collider_id ?? stripDebugPrefix(node.name, "COL_"),
+      center: [node.position.x, node.position.z],
+      size: [node.size.x, node.size.z],
+      height: node.size.y,
+      y: node.position.y,
+      sourceNode: node.name
+    }));
+}
+
+function boundsFromCollider(collider) {
+  if (!collider) return null;
+  const [cx, cz] = collider.center;
+  const [width, depth] = collider.size;
+  return {
+    minX: cx - width / 2,
+    maxX: cx + width / 2,
+    minZ: cz - depth / 2,
+    maxZ: cz + depth / 2
+  };
+}
+
+function triggersFromBlenderLevel(level) {
+  return level.byKind.trigger
+    .filter((node) => node.userData.trigger_type)
+    .map((node) => ({
+      id: stripDebugPrefix(node.name, "TRG_"),
+      direction: node.userData.direction ?? "",
+      targetId: node.userData.target_room ?? "",
+      prompt: node.userData.prompt ?? "",
+      trigger: {
+        type: "box",
+        center: [node.position.x, node.position.y, node.position.z],
+        size: [node.size.x, node.size.y, node.size.z]
+      },
+      sourceNode: node.name
+    }));
+}
+
+function spawnFromBlenderLevel(node, fallback) {
+  if (!node) return fallback;
+  return {
+    position: new THREE.Vector3(node.position.x, 0, node.position.z),
+    heading: THREE.MathUtils.degToRad(Number(node.userData.heading_degrees ?? 0))
+  };
+}
+
+function triggerAtPosition(position, triggers) {
+  return triggers.find((entry) => {
+    const trigger = entry.trigger;
+    if (!trigger || trigger.type !== "box") return false;
+    const [cx, cy, cz] = trigger.center;
+    const [sx, sy, sz] = trigger.size;
+    return Math.abs(position.x - cx) <= sx / 2 &&
+      Math.abs((position.y ?? 0) - cy) <= sy / 2 &&
+      Math.abs(position.z - cz) <= sz / 2;
+  }) ?? null;
+}
+
+function stripDebugPrefix(name, prefix) {
+  return name.startsWith(prefix) ? name.slice(prefix.length).replaceAll("_", "-") : name;
 }
 
 function resolveColliderPushout(position, colliders, radius = 0.38) {

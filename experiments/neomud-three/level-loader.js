@@ -15,12 +15,33 @@ export const LEVEL_NODE_PREFIXES = {
 };
 
 const RENDER_PREFIXES = new Set(["VIS_"]);
+const gltfLoader = new GLTFLoader();
+const gltfCache = new Map();
 
 export async function loadBlenderLevel(url, { hideAuthoringNodes = true } = {}) {
-  const loader = new GLTFLoader();
-  const gltf = await loader.loadAsync(url);
-  const level = parseBlenderLevel(gltf.scene, { hideAuthoringNodes });
-  return { gltf, scene: gltf.scene, level };
+  await preloadBlenderLevel(url);
+  return instantiateBlenderLevel(url, { hideAuthoringNodes });
+}
+
+export async function preloadBlenderLevel(url) {
+  if (!gltfCache.has(url)) {
+    const promise = gltfLoader.loadAsync(url).then((gltf) => {
+      gltfCache.set(url, gltf);
+      return gltf;
+    });
+    gltfCache.set(url, promise);
+  }
+  return gltfCache.get(url);
+}
+
+export function instantiateBlenderLevel(url, { hideAuthoringNodes = true } = {}) {
+  const cached = gltfCache.get(url);
+  if (!cached || typeof cached.then === "function") {
+    throw new Error(`Blender level ${url} has not finished preloading`);
+  }
+  const scene = cloneSceneForRuntime(cached.scene);
+  const level = parseBlenderLevel(scene, { hideAuthoringNodes });
+  return { gltf: cached, scene, level };
 }
 
 export function parseBlenderLevel(scene, { hideAuthoringNodes = true } = {}) {
@@ -91,6 +112,21 @@ export function parseBlenderLevel(scene, { hideAuthoringNodes = true } = {}) {
     spawn,
     summary
   };
+}
+
+function cloneSceneForRuntime(source) {
+  const clone = source.clone(true);
+  clone.traverse((object) => {
+    if (object.geometry) object.geometry = object.geometry.clone();
+    object.material = cloneMaterial(object.material);
+  });
+  return clone;
+}
+
+function cloneMaterial(material) {
+  if (!material) return material;
+  if (Array.isArray(material)) return material.map((entry) => entry.clone?.() ?? entry);
+  return material.clone?.() ?? material;
 }
 
 function worldPosition(object) {

@@ -1,0 +1,66 @@
+{
+  "id": "town:temple",
+  "slug": "town_temple",
+  "name": "Temple of the Dawn",
+  "sourceImage": "source.webp",
+  "sourceImageOriginal": "maker/default_world_src/assets/images/rooms/town_temple.webp",
+  "sourceImageSize": [1024, 572],
+  "roomData": {
+    "zoneFile": "maker/default_world_src/world/town.zone.json",
+    "exits": {
+      "NORTH": "town:square"
+    }
+  },
+  "intent": {
+    "pipeline": "source-image-to-playable-level-package",
+    "interpretation": "Use the existing NeoMud cathedral image as concept art and composition reference, then produce a conventional runtime asset package rather than procedural runtime geometry.",
+    "style": "stylized theatrical fantasy diorama",
+    "target": "A readable cathedral interior with a long nave, altar focus, stained glass color, blocked collision around sacred furniture, and a clear north exit back to Town Square."
+  },
+  "spatialLayout": {
+    "mainArea": "long rectangular nave",
+    "playerEntrance": "north end of nave facing south toward the altar",
+    "landmark": "raised dawn altar on the south end",
+    "sideFeatures": [
+      "paired stone columns",
+      "tall stained glass window bands",
+      "pew rows framing the aisle"
+    ],
+    "exitAffordances": [
+      {
+        "direction": "NORTH",
+        "targetRoom": "town:square",
+        "visual": "large arched doors at the north end"
+      }
+    ]
+  },
+  "runtimePackage": {
+    "blenderSource": "town_temple.blend",
+    "glb": "../../../build/levels/town_temple.glb",
+    "requiredPrefixes": ["VIS_", "COL_", "SPAWN_", "TRG_", "CAMERA_", "LIGHTS_"],
+    "collision": [
+      "COL_world_floor",
+      "COL_west_wall",
+      "COL_east_wall",
+      "COL_south_wall",
+      "COL_altar_dais",
+      "COL_incense_west",
+      "COL_incense_east"
+    ],
+    "spawns": ["SPAWN_player"],
+    "triggers": ["TRG_exit_north_square"]
+  },
+  "qaAcceptance": [
+    "GLB validates with the room profile.",
+    "Temple runtime loads from the Blender GLB package.",
+    "Temple debug landmarks report a blender-level source.",
+    "Temple north trigger routes to town:square.",
+    "Altar collision remains present as altar-dais.",
+    "Chrome Canary offline smoke and fixed room-shot QA pass."
+  ],
+  "knownLimits": [
+    "Materials are currently Blender-authored flat/stylized materials rather than the final generated texture family.",
+    "The runtime still keeps the old procedural Temple builder as a removal candidate after the GLB path stabilizes.",
+    "This pass proves the production pipeline; the next pass should improve authored mesh detail, material IDs, and collision/debug visualization."
+  ]
+}

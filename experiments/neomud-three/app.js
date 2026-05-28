@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { loadWorld, sortedDirections } from "./world-data.js";
 import { connectNeoMud, defaultNeoMudServerUrl, offlineRequested } from "./neomud-protocol.js";
 import { buildRoomScene } from "./scene-registry.js";
+import { LEVEL_PACKAGES } from "./level-packages.js";
+import { preloadBlenderLevel } from "./level-loader.js";
 import { preloadGeneratedAssets } from "./render-assets.js";
 import { createRenderEngine } from "./render-engine.js";
 
@@ -150,7 +152,10 @@ async function main() {
   world = await loadWorld();
   worldCount.textContent = `${world.rooms.size} rooms, ${world.npcs.length} NPCs, ${world.zones.length} zones`;
   roomCount.textContent = "Playable vertical slice: Temple -> Town Square";
-  await preloadGeneratedAssets("starter");
+  await Promise.all([
+    preloadGeneratedAssets("starter"),
+    preloadBlenderLevel(LEVEL_PACKAGES["town:temple"].url)
+  ]);
   renderEngine.setRoomDebugVisible(roomDebugVisible);
 
   setRoom("town:temple", { snapCamera: true });

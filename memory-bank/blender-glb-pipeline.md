@@ -44,6 +44,11 @@ and server state.
 experiments/neomud-three/assets/source/levels/
   *.blend        Blender source files
 
+experiments/neomud-three/assets/source/scenes/<scene-id>/
+  source.webp    copied source/concept image when a room image drives the pass
+  level-brief.json semantic interpretation and acceptance contract
+  *.blend        Blender source scene
+
 experiments/neomud-three/assets/build/levels/
   *.glb          exported runtime assets
   *.manifest.json future generated metadata
@@ -105,7 +110,7 @@ PATH_patrol_001:
   order = 1
 ```
 
-## Current First Artifact
+## Current Artifacts
 
 The first artifact is a Blender-generated movement gym:
 
@@ -119,18 +124,37 @@ check:  node scripts/validate-neomud-three-gltf.mjs
 This is not production art. It proves the authoring/export/validation path and
 gives future movement, collision, camera, and trigger work a stable graybox.
 
+The first main-runtime room package is Temple of the Dawn:
+
+```text
+brief:  experiments/neomud-three/assets/source/scenes/town_temple/level-brief.json
+image:  experiments/neomud-three/assets/source/scenes/town_temple/source.webp
+source: experiments/neomud-three/assets/source/scenes/town_temple/town_temple.blend
+build:  experiments/neomud-three/assets/build/levels/town_temple.glb
+script: scripts/create-neomud-three-town-temple.py
+check:  node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_temple.glb
+```
+
+This is the first proof of the revised source-image-to-level-package workflow:
+the NeoMud cathedral room art is used as concept/composition input, Blender
+authors the navigable level package, GLB carries `VIS_`, `COL_`, `SPAWN_`,
+`TRG_`, `CAMERA_`, and `LIGHTS_` metadata, and the Three.js client loads the
+package as the primary `town:temple` runtime scene.
+
 ## Commands
 
 Create or refresh the source `.blend` and exported `.glb`:
 
 ```bash
 blender --background --python scripts/create-neomud-three-movement-gym.py
+blender --background --python scripts/create-neomud-three-town-temple.py
 ```
 
 Validate the exported GLB:
 
 ```bash
-node scripts/validate-neomud-three-gltf.mjs
+node scripts/validate-neomud-three-gltf.mjs --profile=movement-gym experiments/neomud-three/assets/build/levels/movement_gym.glb
+node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_temple.glb
 ```
 
 ## Runtime Parser
@@ -143,7 +167,7 @@ viewer: experiments/neomud-three/movement-gym.html
 qa:     NEOMUD_THREE_BROWSER_CHANNEL=chrome-canary node scripts/test-neomud-three-labs.cjs
 ```
 
-`level-loader.js` loads the movement gym GLB through `GLTFLoader`, classifies
+`level-loader.js` loads Blender-authored GLBs through `GLTFLoader`, classifies
 nodes by the Blender prefixes, hides non-`VIS_` authoring/gameplay nodes, and
 exposes a typed summary for future physics/gameplay systems.
 
@@ -167,13 +191,14 @@ The current movement gym lab QA proves:
 
 ## Next Pipeline Steps
 
-1. Convert the movement gym parser output into a `WorldLoader` / `LevelParser`
-   interface used by the main renderer, not only the lab page.
+1. Collapse the remaining runtime-specific Temple glue into a reusable
+   `WorldLoader` / `LevelParser` interface that can load any room package, not
+   just `town:temple`.
 2. Promote `level-debug.js` into renderer/debug hooks with user-facing toggles
    for parsed colliders, trigger volumes, spawn points, path nodes, pickup/enemy
    markers, camera zones, and lights.
-3. Move one existing room landmark from JavaScript-authored mesh code into a
-   Blender source scene.
+3. Add a generated `*.manifest.json` beside each GLB with parse counts, budgets,
+   source image, source blend, validator profile, and package version.
 4. Add glTF Transform inspection/optimization once the first main-runtime import is
    working.
 5. Add KTX2/Basis texture compression when generated materials become part of
