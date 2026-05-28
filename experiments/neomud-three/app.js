@@ -28,7 +28,7 @@ const hpValue = document.querySelector("#hp-value");
 const movementChip = document.querySelector("#movement-chip");
 
 const renderEngine = createRenderEngine(canvas);
-const { camera, worldRoot, player, clock } = renderEngine;
+const { camera, player, clock } = renderEngine;
 
 const keys = new Set();
 let world = null;
@@ -439,11 +439,10 @@ function setRoom(roomId, options = {}) {
 
   const fromRoomId = options.fromRoomId ?? currentRoomId;
   currentRoomId = roomId;
-  renderEngine.clearWorld();
 
-  roomRuntime = buildRoomScene({
+  roomRuntime = renderEngine.replaceWorld((root) => buildRoomScene({
     THREE,
-    root: worldRoot,
+    root,
     roomId,
     room,
     world,
@@ -451,7 +450,7 @@ function setRoom(roomId, options = {}) {
     serverNpcs: serverCanDriveMovement() ? serverState.npcs : [],
     serverItems: serverCanDriveMovement() ? serverState.roomItems : [],
     onExit: (targetId) => enterExitTarget(targetId)
-  });
+  }));
   if (!roomRuntime) return;
   nearbyInteractable = null;
   updateInteractionPrompt();

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T14:48:28.370Z",
+  "updated": "2026-05-28T14:53:31.782Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -103,10 +103,15 @@
           "id": 77,
           "body": "Camera-follow rig math moved into render-engine.js; app.js now passes heading and room camera settings. Debug hooks and room lifecycle APIs remain in app.js, so task stays in-progress.",
           "created": "2026-05-28T14:35:44Z"
+        },
+        {
+          "id": 80,
+          "body": "Room-root replacement/disposal moved behind renderEngine.replaceWorld(); app.js no longer reads or clears worldRoot directly. Debug hooks remain outside the engine, so task stays in-progress.",
+          "created": "2026-05-28T14:52:34Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T14:35:44Z"
+      "updated": "2026-05-28T14:52:34Z"
     },
     {
       "id": "neo-1fb2.4",

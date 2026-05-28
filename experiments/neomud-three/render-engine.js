@@ -41,15 +41,15 @@ export function createRenderEngine(canvas) {
     renderer,
     scene,
     camera,
-    worldRoot,
     player,
     clock,
     get renderStats() {
       return renderStats;
     },
-    clearWorld() {
+    replaceWorld(factory) {
       disposeObjectTree(worldRoot);
       worldRoot.clear();
+      return factory(worldRoot);
     },
     applyEnvironment(environment = {}) {
       const background = environment.background ?? 0x100c08;
