@@ -1367,6 +1367,7 @@ function addTownSpecLandmarks(root, materials, spec, debug = []) {
 
 function addTownSpecProps(root, materials, spec) {
   addTownLampCluster(root, materials, spec.props.lamps ?? []);
+  addTownStringLights(root, materials, spec.props.stringLights ?? []);
   addTownBenches(root, materials, spec.props.benches ?? []);
   addTownPlanters(root, materials, spec.props.planters ?? []);
   addTownFoliageDetails(root, materials, spec.props);
@@ -1387,6 +1388,69 @@ function addTownLampCluster(root, materials, lamps) {
   }
   addInstancedBoxes(root, materials.darkTimber, posts, "courtyard-lamp-posts");
   addInstancedBoxes(root, materials.timber, bars, "courtyard-lamp-bars");
+}
+
+function addTownStringLights(root, materials, strands) {
+  if (!strands.length) return;
+
+  const cables = [];
+  const hangers = [];
+  const bulbs = [];
+  const scratch = new THREE.Vector3();
+  const from = new THREE.Vector3();
+  const to = new THREE.Vector3();
+
+  for (const strand of strands) {
+    from.set(strand.from[0], strand.from[1], strand.from[2]);
+    to.set(strand.to[0], strand.to[1], strand.to[2]);
+    const dx = to.x - from.x;
+    const dz = to.z - from.z;
+    const length = Math.hypot(dx, dz);
+    if (length <= 0.01) continue;
+
+    const rotationY = Math.atan2(-dz, dx);
+    cables.push({
+      x: (from.x + to.x) / 2,
+      y: (from.y + to.y) / 2,
+      z: (from.z + to.z) / 2,
+      width: length,
+      height: 0.035,
+      depth: 0.035,
+      rotationY
+    });
+
+    const bulbCount = strand.bulbs ?? 5;
+    for (let index = 0; index < bulbCount; index++) {
+      const t = (index + 1) / (bulbCount + 1);
+      scratch.lerpVectors(from, to, t);
+      const sag = (strand.sag ?? 0.1) * Math.sin(Math.PI * t);
+      const y = scratch.y - sag;
+      hangers.push({
+        x: scratch.x,
+        y: y + 0.13,
+        z: scratch.z,
+        width: 0.035,
+        height: 0.28,
+        depth: 0.035,
+        rotationY
+      });
+      bulbs.push({
+        x: scratch.x,
+        y: y - 0.04,
+        z: scratch.z,
+        scale: [0.075, 0.075, 0.075],
+        rotationY
+      });
+    }
+
+    const glow = new THREE.PointLight(0xffc06f, 0.42, 5.8);
+    glow.position.set((from.x + to.x) / 2, ((from.y + to.y) / 2) - 0.2, (from.z + to.z) / 2);
+    root.add(glow);
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, cables, "courtyard-string-light-cables", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.trimLight, hangers, "courtyard-string-light-hangers", { castShadow: false, receiveShadow: false });
+  addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), materials.sign, bulbs, "courtyard-string-light-bulbs", { castShadow: false, receiveShadow: false });
 }
 
 function addTownBenches(root, materials, benches) {

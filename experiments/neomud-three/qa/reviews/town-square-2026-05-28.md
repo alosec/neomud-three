@@ -290,3 +290,20 @@ Total: 11/12
 Visual/performance delta: stopped rendering the high-poly Xbot example mesh by default and replaced it with the compact instanced fantasy proxy. This makes the player less detailed but reclaims enough triangle budget for future room work.
 
 Remaining visual gap: this is a budget-corrected player proxy, not final art. Next Town Square upgrades can now spend headroom on better landmark architecture or NPC staging, but the player should eventually become a properly authored lower-cost character.
+
+## Score After Plaza Warmth Pass
+
+- Navigation readability: 2/2. Gate, Market, Temple, Tavern, fountain, NPCs, and physical exit affordances remain readable from fixed anchors.
+- Scale believability: 1/2. Larger inner-courtyard tree clusters and plaza string lights help the square feel more inhabited, but the architecture is still blockout-grade.
+- Semantic match: 2/2. The new detail supports a civic courtyard rather than adding unrelated decoration.
+- Interaction clarity: 2/2. Physical triggers, NPC proximity prompts, compass/HUD affordances, and collision-aware tree volumes still pass.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes.
+- Performance: 2/2. Latest full smoke Town Square budget reports 231 draw calls / 12,548 triangles / 18 textures / 150 geometries; fixed Town Square anchors report 128 calls / 9,210 triangles / 19 textures / 194 geometries.
+
+Total: 11/12
+
+Visual delta: added Prop Zoo-approved plaza tree and string-lantern samples, placed additional large trees inside the actual courtyard composition, and added warm north/side string-light strands around the fountain/lamp area. A front/south string-light strand was rejected during screenshot review because it cut across the Temple-facing camera, so it was removed before commit.
+
+QA delta: `node --check` for changed Three files, spec validation, Prop Zoo/Material Lab QA, Town Square screenshot anchors, offline smoke, authored-room screenshots, and server-backed movement all pass.
+
+Remaining visual gap: the scene is warmer and less empty, but the next meaningful visual upgrade should target authored landmark structure, NPC staging, or ground/stone trim rather than adding more general-purpose foliage.

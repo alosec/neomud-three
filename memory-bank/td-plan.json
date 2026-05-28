@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T11:28:49.245Z",
+  "updated": "2026-05-28T11:43:27.558Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1520,6 +1520,27 @@
       "comments": [],
       "created": "2026-05-28T11:10:40Z",
       "updated": "2026-05-28T11:28:20Z"
+    },
+    {
+      "id": "neo-4e3f",
+      "project": "NeoMud",
+      "title": "Build next Town Square warmth/detail pass from kit components",
+      "description": "Use reclaimed avatar render budget for deliberate Town Square warmth/detail: expand foliage/support props through TownKit/Prop Zoo patterns, apply them to the room spec, preserve exit readability and budgets, run screenshot QA, update memory bank, commit and push.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: added Prop Zoo plaza tree/string lantern pieces, applied a collision-aware Town Square plaza warmth pass, fixed screenshot composition, and kept offline/server/screenshot/lab QA within budget",
+      "labels": [
+        "neomud-three",
+        "qa",
+        "visual"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T11:34:01Z",
+      "updated": "2026-05-28T11:43:08Z"
     }
   ],
   "ready": [

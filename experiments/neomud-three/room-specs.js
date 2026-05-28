@@ -154,6 +154,12 @@ export const TOWN_SQUARE_SPEC = {
         { x: -18.2, z: 6.4, scale: 1.2, rotationY: -0.22 },
         { x: 18.2, z: -7.0, scale: 1.16, rotationY: 0.38 },
         { x: 18.4, z: 6.7, scale: 1.08, rotationY: -0.56 },
+        { x: -11.2, z: -8.0, scale: 1.22, rotationY: -0.38 },
+        { x: 11.2, z: -8.0, scale: 1.24, rotationY: 0.42 },
+        { x: -11.4, z: 8.3, scale: 1.18, rotationY: 0.26 },
+        { x: 11.4, z: 8.2, scale: 1.2, rotationY: -0.34 },
+        { x: -6.0, z: 13.8, scale: 0.94, rotationY: 0.72 },
+        { x: 6.1, z: 13.8, scale: 0.96, rotationY: -0.78 },
         { x: -6.8, z: -18.5, scale: 0.92, rotationY: 0.18 },
         { x: 6.8, z: -18.4, scale: 0.96, rotationY: -0.34 },
         { x: -7.2, z: 18.8, scale: 0.98, rotationY: 0.48 },
@@ -311,6 +317,11 @@ export const TOWN_SQUARE_SPEC = {
       { x: 6.1, z: -5.5 },
       { x: -6.1, z: 5.5 },
       { x: 6.1, z: 5.5 }
+    ],
+    stringLights: [
+      { from: [-6.1, 2.42, -5.5], to: [6.1, 2.42, -5.5], bulbs: 6, sag: 0.14 },
+      { from: [-6.1, 2.28, -5.5], to: [-6.1, 2.28, 5.5], bulbs: 5, sag: 0.1 },
+      { from: [6.1, 2.28, -5.5], to: [6.1, 2.28, 5.5], bulbs: 5, sag: 0.1 }
     ],
     benches: [
       { x: -5.2, z: 8.2, rotationY: -0.38 },

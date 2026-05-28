@@ -25,7 +25,9 @@ export const TOWN_KIT_PROPS = [
   { id: "shrub.clump", label: "Shrub Clump", category: "foliage" },
   { id: "grass.tuft", label: "Grass Tuft", category: "foliage" },
   { id: "flower.cluster", label: "Flower Cluster", category: "foliage" },
+  { id: "tree.plaza", label: "Plaza Tree", category: "foliage" },
   { id: "banner.pole", label: "Banner Pole", category: "wayfinding" },
+  { id: "string.lanterns", label: "String Lanterns", category: "lighting" },
   { id: "barrel", label: "Barrel", category: "prop" },
   { id: "crate", label: "Crate", category: "prop" },
   { id: "crate.stack", label: "Crate Stack", category: "prop" },
@@ -111,8 +113,14 @@ export function addTownKitProp(root, materials, id, options = {}) {
     case "flower.cluster":
       addFlowerCluster(group, materials);
       break;
+    case "tree.plaza":
+      addPlazaTreeSample(group, materials);
+      break;
     case "banner.pole":
       addBannerPole(group, materials);
+      break;
+    case "string.lanterns":
+      addStringLanternSample(group, materials);
       break;
     case "barrel":
       addBarrel(group, materials);
@@ -320,6 +328,22 @@ function addBannerPole(root, materials) {
   addBox(root, materials.awningGold, 0.32, 2.06, 0, 0.08, 0.96, 0.62);
 }
 
+function addStringLanternSample(root, materials) {
+  addBox(root, materials.darkTimber, -1.45, 1.25, 0, 0.12, 2.5, 0.12);
+  addBox(root, materials.darkTimber, 1.45, 1.25, 0, 0.12, 2.5, 0.12);
+  addBox(root, materials.darkTimber, 0, 2.34, 0, 2.9, 0.035, 0.035);
+  for (const x of [-0.95, -0.32, 0.32, 0.95]) {
+    addBox(root, materials.trimLight, x, 2.1, 0, 0.08, 0.28, 0.08);
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), materials.sign);
+    bulb.position.set(x, 1.9, 0);
+    bulb.castShadow = false;
+    root.add(bulb);
+  }
+  const glow = new THREE.PointLight(0xffc46f, 1.0, 3.2);
+  glow.position.set(0, 2.0, 0.15);
+  root.add(glow);
+}
+
 function addTempleAltar(root, materials) {
   addBox(root, materials.plazaStone, 0, 0.18, 0, 3.4, 0.36, 1.8);
   addBox(root, materials.stone, 0, 0.72, 0.16, 2.65, 0.88, 1.02);
@@ -392,6 +416,39 @@ function addTreeSample(root, materials) {
   upper.castShadow = true;
   upper.receiveShadow = true;
   root.add(upper);
+}
+
+function addPlazaTreeSample(root, materials) {
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.48, 3.15, 8), materials.trunk);
+  trunk.position.y = 1.58;
+  trunk.castShadow = true;
+  trunk.receiveShadow = true;
+  root.add(trunk);
+
+  const lower = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), materials.foliageDark);
+  lower.position.set(-0.18, 3.34, 0.04);
+  lower.scale.set(1.95, 1.08, 1.62);
+  lower.castShadow = true;
+  lower.receiveShadow = true;
+  root.add(lower);
+
+  const side = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), materials.foliage);
+  side.position.set(0.72, 3.9, -0.18);
+  side.scale.set(1.18, 0.92, 1.05);
+  side.castShadow = true;
+  side.receiveShadow = true;
+  root.add(side);
+
+  const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), materials.foliage);
+  crown.position.set(0.04, 4.45, 0.14);
+  crown.scale.set(1.32, 0.92, 1.18);
+  crown.castShadow = true;
+  crown.receiveShadow = true;
+  root.add(crown);
+
+  addBox(root, materials.foliageDark, 0.02, 0.24, 0, 1.65, 0.22, 1.08);
+  addBox(root, materials.awningGold, -0.42, 0.44, 0.18, 0.12, 0.12, 0.12);
+  addBox(root, materials.awningRed, 0.32, 0.45, -0.24, 0.1, 0.1, 0.1);
 }
 
 function createGabledRoofGeometry(width, depth, height) {

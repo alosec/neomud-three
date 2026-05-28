@@ -65,7 +65,8 @@ High leverage next work:
    - The first north Gate pass adds instanced banner/portal trim planes with negligible budget cost; further Gate work needs actual gate kit pieces, not more surface decoration.
    - The south Temple facade has a subtle approved-glass glow pass; the first doorway glow attempt was rejected in screenshot QA because it looked like a visible rectangle.
    - The Tavern interior now has a warmer lighting/camera pass; further Tavern work should target wall/ceiling composition and material treatment rather than more loose furniture.
-   - Do not keep solving warmth by adding more loose foliage; Town Square is now triangle-budget constrained.
-   - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k, creating real headroom for future room detail.
-   - Add the next Prop Zoo items only when they unlock that landmark pass: conifer variant, ground decal, stone trim, gate trim, or stained-glass/window frame variant.
+   - The first plaza warmth pass adds approved Prop Zoo plaza tree/string-lantern pieces, places additional large trees inside the courtyard composition, and keeps the front string-light strand out of the Temple-facing camera.
+   - Do not keep solving warmth by adding more loose foliage; the next pass should improve a named landmark or authored gameplay staging.
+   - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k, and the first plaza warmth pass spends only part of that headroom while keeping full smoke at roughly 12.5k triangles.
+   - Add the next Prop Zoo items only when they unlock that landmark pass: ground decal, stone trim, gate trim, stained-glass/window frame variant, or a better NPC staging prop.
    - Keep Town Square under the current render budget and update fixed screenshots.
