@@ -500,6 +500,11 @@ async function main() {
       { timeout: 5_000 }
     );
     await page.keyboard.up("w");
+    await page.waitForFunction(
+      () => document.querySelector("#room-name")?.textContent?.trim() === "Hidden Cave",
+      null,
+      { timeout: 2_000 }
+    );
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Hidden Cave");
     const hiddenCaveTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.deepEqual(
@@ -522,7 +527,7 @@ async function main() {
     assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
 
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
-    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.05, z, heading: -Math.PI / 2 }), caveChest);
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
     await page.waitForFunction(
       () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
       null,

@@ -16,7 +16,7 @@ import {
 } from "./room-scenes.js";
 
 export function buildRoomScene(context) {
-  const { roomId, world, serverAuthoritative = false, serverNpcs = [], serverItems = [], onExit } = context;
+  const { roomId, world, serverAuthoritative = false, serverNpcs = [], serverItems = [], serverCoins = null, onExit } = context;
   const room = world.rooms.get(roomId);
   if (!room) return null;
 
@@ -122,7 +122,8 @@ export function buildRoomScene(context) {
     return buildHiddenCaveRoom({
       ...context,
       worldRoot: WORLD_ROOT,
-      roomItems: serverItems
+      roomItems: serverItems,
+      roomCoins: serverCoins
     });
   }
 

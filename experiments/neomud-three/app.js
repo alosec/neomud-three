@@ -55,6 +55,7 @@ const serverState = {
   players: [],
   npcs: [],
   roomItems: [],
+  roomCoins: null,
   mapRooms: [],
   visitedRooms: [],
   inventory: [],
@@ -243,6 +244,7 @@ function handleServerMessage(message) {
       break;
     case "room_items_update":
       serverState.roomItems = message.items ?? [];
+      serverState.roomCoins = message.coins ?? null;
       refreshRendererEntities();
       break;
     case "system_message":
@@ -330,7 +332,8 @@ function upsertServerNpc(message) {
 function refreshRendererEntities() {
   roomRuntime?.syncEntities?.({
     npcs: serverCanDriveMovement() ? serverState.npcs : [],
-    roomItems: serverCanDriveMovement() ? serverState.roomItems : []
+    roomItems: serverCanDriveMovement() ? serverState.roomItems : [],
+    roomCoins: serverCanDriveMovement() ? serverState.roomCoins : null
   });
 }
 
@@ -459,6 +462,7 @@ function setRoom(roomId, options = {}) {
     serverAuthoritative: serverCanDriveMovement(),
     serverNpcs: serverCanDriveMovement() ? serverState.npcs : [],
     serverItems: serverCanDriveMovement() ? serverState.roomItems : [],
+    serverCoins: serverCanDriveMovement() ? serverState.roomCoins : null,
     onExit: (targetId) => enterExitTarget(targetId)
   }));
   if (!roomRuntime) return;
@@ -1073,6 +1077,11 @@ function installDebugApi() {
           id: npc.id ?? npc.npcId ?? "",
           name: npc.name ?? npc.npcName ?? ""
         })),
+        roomItems: serverState.roomItems.map((item) => ({
+          id: item.itemId ?? item.id ?? "",
+          quantity: item.quantity ?? item.count ?? 1
+        })),
+        roomCoins: serverState.roomCoins,
         mapRooms: serverState.mapRooms.length,
         inventory: serverState.inventory.length
       };

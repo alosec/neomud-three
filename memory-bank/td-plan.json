@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T16:43:28.620Z",
+  "updated": "2026-05-28T16:54:39.567Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2094,6 +2094,34 @@
       ],
       "created": "2026-05-28T16:39:24Z",
       "updated": "2026-05-28T16:43:15Z"
+    },
+    {
+      "id": "neo-1fb2.71",
+      "project": "NeoMud",
+      "title": "Render server dropped loot in Hidden Cave",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 97,
+          "body": "Scope: carry room_items_update coins into the Three renderer, stage Hidden Cave loot near the chest, and add conditional server QA that verifies dropped loot visuals after a successful chest interaction.",
+          "created": "2026-05-28T16:46:14Z"
+        },
+        {
+          "id": 98,
+          "body": "Completed: room_items_update now carries coins into client room state; Hidden Cave stages dropped items/coins around the chest; server-backed QA conditionally verifies visual loot after successful chest interaction.",
+          "created": "2026-05-28T16:54:17Z"
+        }
+      ],
+      "created": "2026-05-28T16:45:55Z",
+      "updated": "2026-05-28T16:54:26Z"
     }
   ],
   "ready": [

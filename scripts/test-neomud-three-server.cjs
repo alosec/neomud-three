@@ -305,6 +305,11 @@ async function main() {
       { timeout: 10_000 }
     );
     await page.keyboard.up("w");
+    await page.waitForFunction(
+      () => document.querySelector("#room-name")?.textContent?.trim() === "Hidden Cave",
+      null,
+      { timeout: 2_000 }
+    );
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Hidden Cave");
     const hiddenCaveTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.ok(hiddenCaveTriggers.some((trigger) => trigger.id === "exit-east-deep" && trigger.targetId === "forest:deep"));
@@ -318,7 +323,7 @@ async function main() {
     assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
 
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
-    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.05, z, heading: -Math.PI / 2 }), caveChest);
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
     await page.waitForFunction(
       () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
       null,
@@ -336,6 +341,23 @@ async function main() {
     );
     const chestResult = await page.evaluate(() => window.__neomudThreeDebug.server.lastInteractionResult);
     assert.match(chestResult.message, /preserved|vial|gloves|untouched|doesn't seem to do anything more/i);
+    if (chestResult.success) {
+      await page.waitForFunction(
+        () => {
+          const server = window.__neomudThreeDebug.server;
+          const coins = server.roomCoins ?? {};
+          const hasServerLoot = server.roomItems.length > 0
+            || (coins.copper ?? 0) > 0
+            || (coins.silver ?? 0) > 0
+            || (coins.gold ?? 0) > 0
+            || (coins.platinum ?? 0) > 0;
+          const hasVisualLoot = window.__neomudThreeDebug.room.entities.some((entity) => entity.role === "Cave Loot");
+          return hasServerLoot && hasVisualLoot;
+        },
+        null,
+        { timeout: 5_000 }
+      );
+    }
     await page.keyboard.press("Escape");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));

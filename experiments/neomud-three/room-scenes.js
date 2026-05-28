@@ -1313,7 +1313,7 @@ export function buildDeepForestRoom({ root, worldRoot, npcs = [], roomItems = []
   };
 }
 
-export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], world }) {
+export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], roomCoins = null, world }) {
   const materials = { ...makeTownMaterials(), ...makeHiddenCaveMaterials() };
   const interactables = [];
   const entityLayer = new THREE.Group();
@@ -1321,11 +1321,11 @@ export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], world }) 
 
   const cave = addHiddenCaveStage(root, materials, worldRoot);
 
-  const syncEntities = ({ roomItems: nextRoomItems = roomItems } = {}) => {
+  const syncEntities = ({ roomItems: nextRoomItems = roomItems, roomCoins: nextRoomCoins = roomCoins } = {}) => {
     disposeObjectTree(entityLayer);
     entityLayer.clear();
     interactables.length = 0;
-    addHiddenCaveEntities(entityLayer, materials, world, nextRoomItems, interactables);
+    addHiddenCaveEntities(entityLayer, materials, world, nextRoomItems, nextRoomCoins, interactables);
   };
   syncEntities();
 
@@ -4197,7 +4197,7 @@ function addHiddenCaveExitAffordance(root) {
   });
 }
 
-function addHiddenCaveEntities(root, materials, world, roomItems, interactables) {
+function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, interactables) {
   const room = world?.rooms?.get?.("forest:cave");
   const chestPosition = new THREE.Vector3(-3.8, 0, -2.15);
 
@@ -4216,11 +4216,19 @@ function addHiddenCaveEntities(root, materials, world, roomItems, interactables)
     });
   }
 
+  const lootPositions = [
+    { x: -2.42, z: -2.18 },
+    { x: -2.82, z: -1.25 },
+    { x: -1.58, z: -1.65 },
+    { x: -1.85, z: -2.85 }
+  ];
+
   for (const [index, item] of roomItems.entries()) {
     const normalized = normalizeRoomItem(item, world);
     if (!normalized.id) continue;
-    const x = -1.2 + index * 0.85;
-    const z = 2.4 + (index % 2) * 0.75;
+    const placement = lootPositions[index % lootPositions.length];
+    const x = placement.x + Math.floor(index / lootPositions.length) * 0.48;
+    const z = placement.z + Math.floor(index / lootPositions.length) * 0.32;
     addItemMarker(root, materials, {
       id: normalized.id,
       name: normalized.name,
@@ -4239,6 +4247,67 @@ function addHiddenCaveEntities(root, materials, world, roomItems, interactables)
       position: new THREE.Vector3(x, 0, z)
     });
   }
+
+  if (hasCoins(roomCoins)) {
+    const name = coinLabel(roomCoins);
+    const x = -2.52;
+    const z = -2.92;
+    addHiddenCaveCoinPile(root, materials, roomCoins, x, z);
+    interactables.push({
+      kind: "item",
+      id: "cave-coins",
+      name,
+      role: "Cave Loot",
+      prompt: `Inspect: ${name}`,
+      description: `Coins dropped from the moss-covered chest: ${name}.`,
+      quantity: coinTotal(roomCoins),
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function addHiddenCaveCoinPile(root, materials, coins, x, z) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.userData = { kind: "item", id: "cave-coins", name: coinLabel(coins) };
+  root.add(group);
+
+  addInstancedGeometry(group, new THREE.CylinderGeometry(0.13, 0.13, 0.045, 10), materials.sign, [
+    { x: -0.18, y: 0.04, z: 0.02, scale: [1, 1, 1], rotationY: 0.1 },
+    { x: 0.02, y: 0.065, z: -0.08, scale: [1, 1, 1], rotationY: 0.38 },
+    { x: 0.18, y: 0.04, z: 0.08, scale: [1, 1, 1], rotationY: -0.22 },
+    { x: -0.04, y: 0.105, z: 0.1, scale: [0.9, 1, 0.9], rotationY: 0.62 }
+  ], "hidden-cave-coin-pile");
+
+  addTextBoard(group, coinLabel(coins), {
+    x: 0,
+    y: 0.86,
+    z: 0.12,
+    width: 1.55,
+    height: 0.35,
+    subtitle: "Ground",
+    palette: "gold",
+    renderOrder: 12
+  });
+}
+
+function hasCoins(coins) {
+  return coinTotal(coins) > 0;
+}
+
+function coinTotal(coins = {}) {
+  if (!coins) return 0;
+  return (coins.copper ?? 0) + (coins.silver ?? 0) * 100 + (coins.gold ?? 0) * 10_000 + (coins.platinum ?? 0) * 1_000_000;
+}
+
+function coinLabel(coins = {}) {
+  if (!coins) return "0c";
+  const parts = [];
+  if ((coins.platinum ?? 0) > 0) parts.push(`${coins.platinum}p`);
+  if ((coins.gold ?? 0) > 0) parts.push(`${coins.gold}g`);
+  if ((coins.silver ?? 0) > 0) parts.push(`${coins.silver}s`);
+  if ((coins.copper ?? 0) > 0 || !parts.length) parts.push(`${coins.copper ?? 0}c`);
+  return parts.join(" ");
 }
 
 function hiddenCaveTriggers() {
