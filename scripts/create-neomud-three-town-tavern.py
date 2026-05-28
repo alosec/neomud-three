@@ -274,7 +274,10 @@ def build_level():
     cube3("TRG_exit_east_square", HALF_X - 0.45, 1.4, 0, 1.25, 2.8, 4.7, trigger, kind="trigger", trigger_type="exit", direction="EAST", target_room="town:square", prompt="Return to Town Square")
     marker3("SPAWN_player", 7.15, 0.9, 0, "spawn", spawn_id="player", heading_degrees=-90)
     marker3("CAMERA_tavern_cutaway", 3.5, 3.15, 0, "camera_zone", camera_id="tavern_cutaway", distance=6.35, height=3.28, look_ahead=2.75)
-    marker3("LIGHTS_fireplace_warm", FIREPLACE_X + 1.35, 2.0, FIREPLACE_Z, "light", display_type="SINGLE_ARROW", light_id="fireplace_warm", light_type="point", intensity=3.2)
+    marker3("LIGHTS_tavern_ambient_fill", 0, 3.1, 0, "light", display_type="SINGLE_ARROW", light_id="ambient_fill", light_type="hemisphere", intensity=0.78, sky_color="#ffd8a8", ground_color="#26160f")
+    marker3("LIGHTS_room_warm", -1.0, 4.0, -0.8, "light", display_type="SINGLE_ARROW", light_id="room_warm", light_type="point", intensity=4.8, distance=16.5, color="#ffa85a")
+    marker3("LIGHTS_fireplace_warm", FIREPLACE_X + 1.35, 2.0, FIREPLACE_Z, "light", display_type="SINGLE_ARROW", light_id="fireplace_warm", light_type="point", intensity=6.2, distance=10.5, color="#ff7d2f")
+    marker3("LIGHTS_door_cool_fill", HALF_X - 0.7, 2.8, 0, "light", display_type="SINGLE_ARROW", light_id="door_cool_fill", light_type="point", intensity=1.45, distance=8.4, color="#d9e5ff")
 
     batch_visible_meshes_by_material()
 

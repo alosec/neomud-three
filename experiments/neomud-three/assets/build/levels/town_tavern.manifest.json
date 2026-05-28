@@ -10,13 +10,13 @@
   "runtimeGlb": "town_tavern.glb",
   "files": {
     "sourceImageBytes": 51606,
-    "sourceBlendBytes": 139944,
-    "runtimeGlbBytes": 237224
+    "sourceBlendBytes": 140643,
+    "runtimeGlbBytes": 237908
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 22,
+    "nodes": 25,
     "meshes": 19,
     "materials": 12,
     "prefixes": {
@@ -29,20 +29,20 @@
       "ENEMY_": 0,
       "PATH_": 0,
       "CAMERA_": 1,
-      "LIGHTS_": 1
+      "LIGHTS_": 4
     }
   },
   "runtimeQa": {
     "offlineTavernBudget": {
       "drawCalls": 30,
       "triangles": 6882,
-      "textures": 48,
+      "textures": 49,
       "geometries": 21
     },
     "serverTavernBudget": {
       "drawCalls": 30,
       "triangles": 6882,
-      "textures": 47,
+      "textures": 48,
       "geometries": 21
     },
     "checks": [
@@ -57,6 +57,7 @@
   "knownLimits": [
     "The Barkeep is still a runtime server/world-data overlay, not a GLB-authored character.",
     "The locked cellar trapdoor is represented visually but is not a physical locked-exit interaction yet.",
+    "Runtime lighting is now driven by four authored LIGHTS_ markers, but Tavern material style is still flat-color low-poly.",
     "Materials are first-pass Blender-authored stylized colors pending generated texture family integration."
   ]
 }

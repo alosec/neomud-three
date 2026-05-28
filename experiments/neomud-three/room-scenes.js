@@ -456,6 +456,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       fogDensity: 0.012
     },
     configureScene: (scene) => configureBlenderTavernScene(scene, flameMeshes),
+    configureLights: configureBlenderTavernLights,
     floorColliderId: "world-floor",
     colliderRadius: 0.42,
     landmarkId: "town-tavern-glb"
@@ -521,6 +522,14 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       });
     }
   };
+}
+
+function configureBlenderTavernLights(scene, level) {
+  addRuntimeLightsFromBlenderLevel(scene, level, {
+    idPrefix: "tavern-runtime-marker-",
+    defaultColor: 0xffa85a,
+    defaultDistance: 12
+  });
 }
 
 export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
@@ -6224,20 +6233,6 @@ function configureBlenderTavernScene(scene, flameMeshes = []) {
     }
   });
 
-  const ambientFill = new THREE.HemisphereLight(0xffd8a8, 0x26160f, 0.78);
-  scene.add(ambientFill);
-
-  const roomLight = new THREE.PointLight(0xffa85a, 4.8, 16.5);
-  roomLight.position.set(-1.0, 4.0, -0.8);
-  scene.add(roomLight);
-
-  const fireLight = new THREE.PointLight(0xff7d2f, 6.2, 10.5);
-  fireLight.position.set(TAVERN.fireplaceX + 1.35, 2.0, TAVERN.fireplaceZ);
-  scene.add(fireLight);
-
-  const doorFill = new THREE.PointLight(0xd9e5ff, 1.45, 8.4);
-  doorFill.position.set(TAVERN.halfX - 0.7, 2.8, 0);
-  scene.add(doorFill);
 }
 
 function resolveColliderPushout(position, colliders, radius = 0.38) {

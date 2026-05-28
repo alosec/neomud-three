@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T23:38:17.000Z",
+  "updated": "2026-05-28T23:47:30.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -3033,6 +3033,28 @@
       "comments": [],
       "created": "2026-05-28T23:33:10Z",
       "updated": "2026-05-28T23:38:17Z"
+    },
+    {
+      "id": "neo-1fb2.89",
+      "project": "NeoMud",
+      "title": "Drive Tavern lights from Blender markers",
+      "description": "",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: Tavern now exports ambient/room/fireplace/door LIGHTS_ markers, runtime instantiates four lights from GLB metadata, and lab/room/offline/server QA pass",
+      "labels": [
+        "blender",
+        "lighting",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T23:42:03Z",
+      "updated": "2026-05-28T23:47:30Z"
     }
   ]
 }

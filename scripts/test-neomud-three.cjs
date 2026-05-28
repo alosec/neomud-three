@@ -669,7 +669,9 @@ async function main() {
         landmark.id === "town-tavern-glb" &&
         landmark.kind === "blender-level" &&
         landmark.manifest?.endsWith("town_tavern.manifest.json") &&
-        landmark.sourceBrief?.endsWith("town_tavern/level-brief.json")
+        landmark.sourceBrief?.endsWith("town_tavern/level-brief.json") &&
+        landmark.lightNodes >= 4 &&
+        landmark.runtimeLights?.length >= 4
       ),
       `expected Tavern to use Blender GLB level package, got ${JSON.stringify(tavernLandmarks)}`
     );

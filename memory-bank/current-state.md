@@ -175,7 +175,7 @@ Tavern status:
 - GLB-authored collision covers the tables, bar, fireplace, and floor bounds so the player cannot clip through the main furniture.
 - Visible meshes are batched by material inside the Blender export script, dropping the runtime Tavern to 30 draw calls while preserving table/bar/fireplace collision and Barkeep overlay behavior.
 - The room uses a room-specific camera rig override because the outdoor follow camera clips badly in interior spaces.
-- The latest readability pass warms the Tavern background/fog, adds hemisphere fill plus separate bar/table/fireplace light emphasis, and lowers/tightens the interior camera so screenshots prioritize the bar, fireplace, tables, and exit instead of the ceiling mass.
+- The latest readability pass warms the Tavern background/fog, lowers/tightens the interior camera, and now drives ambient/room/fireplace/door-fill lights from four authored `LIGHTS_` markers in the Tavern GLB instead of hardcoded runtime light positions.
 - Barkeep Grom is rendered from NeoMud NPC/world/server data as an interactable standee behind the bar.
 - Offline and server-backed tests physically move Town Square -> Tavern -> Town Square and assert the Barkeep entity is present.
 - Visual quality is still first-pass low-poly, but this is now a proper Blender package with server-driven interaction overlay rather than runtime-authored geometry.
