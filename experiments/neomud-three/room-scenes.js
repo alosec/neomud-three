@@ -1159,37 +1159,37 @@ function addTownSpecFountain(root, materials, fountainSpec) {
   apron.receiveShadow = true;
   group.add(apron);
 
-  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(2.25, 2.55, 0.54, 64), materials.stone);
+  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(2.25, 2.55, 0.54, 32), materials.stone);
   fountainBase.position.y = 0.34;
   fountainBase.castShadow = true;
   fountainBase.receiveShadow = true;
   group.add(fountainBase);
 
-  const innerBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.86, 0.2, 64), materials.darkStone);
+  const innerBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.86, 0.2, 32), materials.darkStone);
   innerBasin.position.y = 0.62;
   innerBasin.receiveShadow = true;
   group.add(innerBasin);
 
-  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.66, 1.66, 0.045, 64), materials.water);
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.66, 1.66, 0.045, 32), materials.water);
   water.position.y = 0.76;
   group.add(water);
 
-  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 32), materials.stone);
+  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 16), materials.stone);
   column.position.y = 1.28;
   column.castShadow = true;
   group.add(column);
 
-  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.64, 0.24, 48), materials.stone);
+  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.64, 0.24, 24), materials.stone);
   topBowl.position.y = 1.96;
   topBowl.castShadow = true;
   group.add(topBowl);
 
-  const topWater = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.035, 48), materials.water);
+  const topWater = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.035, 24), materials.water);
   topWater.position.y = 2.1;
   group.add(topWater);
 
   const fallingWater = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.045, 0.065, 1.08, 18),
+    new THREE.CylinderGeometry(0.045, 0.065, 1.08, 12),
     new THREE.MeshBasicMaterial({ color: 0xaee8ff, transparent: true, opacity: 0.38 })
   );
   fallingWater.position.y = 1.47;
@@ -2076,20 +2076,30 @@ function addTempleExteriorWindow(root, materials, spec) {
 
 function addTempleRoseWindow(root, materials, spec) {
   const frameMaterial = cloneDoubleSideMaterial(materials.trimLight);
-  const glass = new THREE.Mesh(new THREE.CircleGeometry(spec.radius * 0.86, 48), materials.templeGlass ?? materials.windowDark);
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(spec.radius * 0.86, 32), materials.templeGlass ?? materials.windowDark);
   glass.position.set(spec.x, spec.y, spec.z - 0.08);
   glass.renderOrder = 5;
   root.add(glass);
 
-  const ring = new THREE.Mesh(new THREE.RingGeometry(spec.radius * 0.92, spec.radius * 1.08, 64), frameMaterial);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(spec.radius * 0.92, spec.radius * 1.08, 40), frameMaterial);
   ring.position.set(spec.x, spec.y, spec.z - 0.1);
   ring.renderOrder = 6;
   root.add(ring);
 
-  for (let index = 0; index < 8; index++) {
-    const spoke = addBox(root, frameMaterial, spec.x, spec.y, spec.z - 0.12, spec.radius * 1.75, 0.05, 0.055);
-    spoke.rotation.z = (Math.PI * index) / 8;
-  }
+  addInstancedGeometry(
+    root,
+    new THREE.BoxGeometry(1, 1, 1),
+    frameMaterial,
+    Array.from({ length: 8 }, (_, index) => ({
+      x: spec.x,
+      y: spec.y,
+      z: spec.z - 0.12,
+      scale: [spec.radius * 1.75, 0.05, 0.055],
+      rotationZ: (Math.PI * index) / 8
+    })),
+    "south-temple-rose-spokes",
+    { castShadow: true, receiveShadow: true }
+  );
 }
 
 function addTriangularPediment(root, material, spec) {

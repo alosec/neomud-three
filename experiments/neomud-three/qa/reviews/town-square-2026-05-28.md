@@ -258,3 +258,20 @@ Visual delta: added one instanced approved `templeGlassGlow` plane batch behind 
 QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass after this change.
 
 Remaining visual gap: this is the last reasonable additive Town Square pass before budget work. The next scene-quality step should reclaim calls/triangles through instancing or simplified geometry before adding more landmark detail.
+
+## Score After Budget Reclaim Pass
+
+- Navigation readability: 2/2. Gate, Market, Temple, Tavern, NPCs, and physical exits remain readable after geometry simplification.
+- Scale believability: 1/2. The fountain keeps its silhouette after lower segment counts, but the scene remains stylized blockout-quality.
+- Semantic match: 2/2. No semantic room content changed.
+- Interaction clarity: 2/2. Physical triggers, NPC proximity prompts, and UI affordances still pass offline and server-backed tests.
+- Server sync: 2/2. Server-backed QA passes after restarting the local saturated guest-session server.
+- Performance: 2/2. Full-smoke Town Square drops from 59,853 to 59,189 triangles; fixed Town Square anchors report 131 calls / 55,851 triangles / 20 textures / 202 geometries.
+
+Total: 11/12
+
+Optimization delta: reduced decorative fountain cylinder segment counts and batched the south Temple rose-window spokes into one instanced mesh. The pass reclaims triangle and draw-call headroom without changing layout, movement, triggers, or room data.
+
+QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass. The first post-change server-backed run hit local guest-auth saturation; restarting the local Kotlin server restored the gate.
+
+Remaining visual gap: Town Square still needs more budget work before larger visual upgrades. The current Xbot avatar is the dominant triangle cost, so future quality work should either accept a higher avatar budget deliberately or replace/compress that model with an authored lower-cost adventurer.

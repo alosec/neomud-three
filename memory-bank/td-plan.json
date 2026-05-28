@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T10:54:36.223Z",
+  "updated": "2026-05-28T11:06:24.911Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1486,6 +1486,23 @@
       "comments": [],
       "created": "2026-05-28T10:48:42Z",
       "updated": "2026-05-28T10:54:21Z"
+    },
+    {
+      "id": "neo-1fb2.58",
+      "project": "NeoMud",
+      "title": "Reclaim Town Square render budget before more detail",
+      "description": "Reduce Town Square draw-call and triangle pressure by batching repeated details and simplifying high-segment decorative geometry without changing layout, movement, or server behavior.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: reduced fountain segment counts, batched Temple rose spokes, and restored server-backed QA after local server restart",
+      "labels": [],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T10:56:34Z",
+      "updated": "2026-05-28T11:06:03Z"
     }
   ],
   "ready": [

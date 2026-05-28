@@ -66,6 +66,6 @@ High leverage next work:
    - The south Temple facade has a subtle approved-glass glow pass; the first doorway glow attempt was rejected in screenshot QA because it looked like a visible rectangle.
    - The Tavern interior now has a warmer lighting/camera pass; further Tavern work should target wall/ceiling composition and material treatment rather than more loose furniture.
    - Do not keep solving warmth by adding more loose foliage; Town Square is now triangle-budget constrained.
-   - Before adding more Town Square geometry, reclaim budget through instancing or simpler collision/render geometry. Full-smoke Town Square is now intentionally close to budget.
+   - A first budget-reclaim pass lowered the Town Square full-smoke triangle count from 59,853 to 59,189. Continue reclaiming budget before larger landmark/character upgrades; the Xbot avatar still dominates triangle pressure.
    - Add the next Prop Zoo items only when they unlock that landmark pass: conifer variant, ground decal, stone trim, gate trim, or stained-glass/window frame variant.
    - Keep Town Square under the current render budget and update fixed screenshots.
