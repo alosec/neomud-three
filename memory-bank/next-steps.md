@@ -22,6 +22,7 @@ High leverage next work:
    - Larger readable north doorway and exit affordance.
    - Better pew/runner/candle proportions; the current warmth pass is useful but still blockout-grade.
    - The first stained-glass floor patch pass is in; the next Temple pass should improve window/frame proportions or altar staging rather than adding more floor overlays.
+   - Temple window rectangular frames/ledges are now instanced, creating real call/geometries headroom for the next authored cathedral detail pass.
 
 3. Rebuild Town Square as a real 3D room.
    - Replace placeholder facades with authored structures.
@@ -68,6 +69,6 @@ High leverage next work:
    - The first plaza warmth pass adds approved Prop Zoo plaza tree/string-lantern pieces, places additional large trees inside the courtyard composition, and keeps the front string-light strand out of the Temple-facing camera.
    - Do not keep solving warmth by adding more loose foliage; the next pass should improve a named landmark or authored gameplay staging.
    - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k, and the first plaza warmth pass spends only part of that headroom while keeping full smoke at roughly 12.5k triangles.
-   - The Temple stained-glass floor pass spends part of the Temple call budget; further Temple visual work should reclaim calls or replace existing pieces before adding more batches.
+   - The Temple window batching pass reclaimed more than 100 full-smoke draw calls; further Temple visual work can spend some of this headroom on one deliberate authored improvement, not several unrelated details.
    - Add the next Prop Zoo items only when they unlock that landmark pass: ground decal, stone trim, gate trim, stained-glass/window frame variant, or a better NPC staging prop.
    - Keep Town Square under the current render budget and update fixed screenshots.

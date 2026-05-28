@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T11:55:05.315Z",
+  "updated": "2026-05-28T12:06:52.685Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1562,6 +1562,28 @@
       "comments": [],
       "created": "2026-05-28T11:48:31Z",
       "updated": "2026-05-28T11:54:40Z"
+    },
+    {
+      "id": "neo-1a65",
+      "project": "NeoMud",
+      "title": "Batch Temple window frame geometry to reclaim draw calls",
+      "description": "Replace repeated per-window rectangular frame/ledge meshes in Temple with instanced batches so future cathedral detail has budget headroom. Preserve screenshots, movement, and server authority QA.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: batched repeated Temple rectangular window frames/ledges into two instanced meshes, dropping Temple full-smoke calls from 357 to 254 while preserving screenshots and server route QA",
+      "labels": [
+        "neomud-three",
+        "performance",
+        "qa",
+        "visual"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T12:01:43Z",
+      "updated": "2026-05-28T12:06:24Z"
     }
   ],
   "ready": [

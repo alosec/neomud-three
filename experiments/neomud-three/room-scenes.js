@@ -844,10 +844,16 @@ function addAisleInlays(root) {
 
 function addTempleWindows(root, materials, beams) {
   const positions = [-32.5, -24.8, -17.1, -9.4, -1.7, 6.0, 13.7];
+  const windows = [];
   for (const z of positions) {
-    addWindow(root, beams, materials, -14.05, 7.15, z, Math.PI / 2, 1);
-    addWindow(root, beams, materials, 14.05, 7.15, z, -Math.PI / 2, -1);
+    windows.push({ x: -14.05, y: 7.15, z, rotationY: Math.PI / 2, side: 1 });
+    windows.push({ x: 14.05, y: 7.15, z, rotationY: -Math.PI / 2, side: -1 });
   }
+
+  for (const windowSpec of windows) {
+    addWindow(root, beams, materials, windowSpec.x, windowSpec.y, windowSpec.z, windowSpec.rotationY, windowSpec.side);
+  }
+  addTempleWindowFrameBatches(root, materials, windows);
 }
 
 function addTempleGlassFloorPatches(root) {
@@ -919,22 +925,7 @@ function addWindow(root, beams, materials, x, y, z, rotY, side) {
   glass.renderOrder = 2;
   group.add(glass);
 
-  const frameMaterial = materials.windowFrame;
-  addLocalBox(group, frameMaterial, 0, 0.04, 0.14, 4.52, 0.24, 0.22);
-  addLocalBox(group, frameMaterial, -1.93, 3.05, 0.12, 0.26, 6.1, 0.26);
-  addLocalBox(group, frameMaterial, 1.93, 3.05, 0.12, 0.26, 6.1, 0.26);
-  addLocalBox(group, frameMaterial, 0, 3.35, 0.18, 0.11, 6.65, 0.16);
-  addLocalBox(group, frameMaterial, -0.95, 3.8, 0.18, 0.09, 5.85, 0.14);
-  addLocalBox(group, frameMaterial, 0.95, 3.8, 0.18, 0.09, 5.85, 0.14);
-  addLocalBox(group, frameMaterial, 0, 3.05, 0.18, 3.15, 0.1, 0.14);
-  addLocalBox(group, frameMaterial, 0, 5.15, 0.18, 2.55, 0.1, 0.14);
-  addLocalBox(group, frameMaterial, 0, 6.55, 0.18, 1.75, 0.09, 0.14);
-  addArchedFrame(group, frameMaterial, 4.1, 9.18, 0.18, 0.095);
-
-  const ledge = new THREE.Mesh(new THREE.BoxGeometry(4.95, 0.24, 0.68), materials.trim);
-  ledge.position.set(0, -0.12, 0.22);
-  ledge.castShadow = true;
-  group.add(ledge);
+  addArchedFrame(group, materials.windowFrame, 4.1, 9.18, 0.18, 0.095);
 
   const beam = new THREE.Mesh(
     new THREE.PlaneGeometry(15.5, 3.3),
@@ -949,6 +940,48 @@ function addWindow(root, beams, materials, x, y, z, rotY, side) {
   beam.position.set(x + side * 6.7, 2.7, z + 1.9);
   beam.rotation.set(-0.62, rotY, side * 0.42);
   beams.add(beam);
+}
+
+function addTempleWindowFrameBatches(root, materials, windows) {
+  const frameBoxes = [];
+  const ledges = [];
+  const frameParts = [
+    [0, 0.04, 0.14, 4.52, 0.24, 0.22],
+    [-1.93, 3.05, 0.12, 0.26, 6.1, 0.26],
+    [1.93, 3.05, 0.12, 0.26, 6.1, 0.26],
+    [0, 3.35, 0.18, 0.11, 6.65, 0.16],
+    [-0.95, 3.8, 0.18, 0.09, 5.85, 0.14],
+    [0.95, 3.8, 0.18, 0.09, 5.85, 0.14],
+    [0, 3.05, 0.18, 3.15, 0.1, 0.14],
+    [0, 5.15, 0.18, 2.55, 0.1, 0.14],
+    [0, 6.55, 0.18, 1.75, 0.09, 0.14]
+  ];
+
+  for (const windowSpec of windows) {
+    const anchor = { x: windowSpec.x, y: windowSpec.y - 3.25, z: windowSpec.z, rotationY: windowSpec.rotationY };
+    for (const [localX, localY, localZ, width, height, depth] of frameParts) {
+      frameBoxes.push(templeWindowBox(anchor, localX, localY, localZ, width, height, depth));
+    }
+    ledges.push(templeWindowBox(anchor, 0, -0.12, 0.22, 4.95, 0.24, 0.68));
+  }
+
+  addInstancedBoxes(root, materials.windowFrame, frameBoxes, "temple-window-frame-rects");
+  addInstancedBoxes(root, materials.trim, ledges, "temple-window-ledges");
+}
+
+function templeWindowBox(anchor, localX, localY, localZ, width, height, depth) {
+  const rotationY = anchor.rotationY ?? 0;
+  const cos = Math.cos(rotationY);
+  const sin = Math.sin(rotationY);
+  return {
+    x: anchor.x + localX * cos + localZ * sin,
+    y: anchor.y + localY,
+    z: anchor.z - localX * sin + localZ * cos,
+    width,
+    height,
+    depth,
+    rotationY
+  };
 }
 
 function archedWindowGeometry(width, height, segments) {
