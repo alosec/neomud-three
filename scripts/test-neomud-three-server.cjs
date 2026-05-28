@@ -127,9 +127,11 @@ async function main() {
     assert.ok(forestTriggers.some((trigger) => trigger.id === "exit-south-gate"));
     assert.ok(forestTriggers.some((trigger) => trigger.id === "exit-north-path"));
     const forestEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
-    assert.ok(
-      forestEntities.some((entity) => entity.id === "npc:forest_rat" && /Forest Rat/i.test(entity.name)),
-      `expected server Forest Rat entity in Forest Edge, got ${JSON.stringify(forestEntities)}`
+    const forestServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      forestEntities.map((entity) => entity.id).sort(),
+      forestServerNpcs.map((npc) => npc.id).sort(),
+      `expected Forest Edge rendered entities to mirror live server NPCs: server=${JSON.stringify(forestServerNpcs)} rendered=${JSON.stringify(forestEntities)}`
     );
     await saveScreenshot(page, "server-forest-edge.png");
     budgetReports.push(await collectBudgetStatus(page, "forest:edge"));
@@ -149,9 +151,11 @@ async function main() {
     assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-north-deep"));
     assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-east-clearing"));
     const forestPathEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
-    assert.ok(
-      forestPathEntities.some((entity) => entity.id === "npc:shadow_wolf" && /Shadow Wolf/i.test(entity.name)),
-      `expected server Shadow Wolf entity in Forest Path, got ${JSON.stringify(forestPathEntities)}`
+    const forestPathServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      forestPathEntities.map((entity) => entity.id).sort(),
+      forestPathServerNpcs.map((npc) => npc.id).sort(),
+      `expected Forest Path rendered entities to mirror live server NPCs: server=${JSON.stringify(forestPathServerNpcs)} rendered=${JSON.stringify(forestPathEntities)}`
     );
     await saveScreenshot(page, "server-forest-path.png");
     budgetReports.push(await collectBudgetStatus(page, "forest:path"));

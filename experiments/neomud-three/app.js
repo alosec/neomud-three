@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { loadWorld, sortedDirections } from "./world-data.js";
 import { connectNeoMud, defaultNeoMudServerUrl, offlineRequested } from "./neomud-protocol.js";
 import { buildRoomScene } from "./scene-registry.js";
-import { makePlayerAvatar } from "./player-avatar.js";
 import { preloadGeneratedAssets } from "./render-assets.js";
+import { createRenderEngine } from "./render-engine.js";
 
 const canvas = document.querySelector("#scene");
 const roomName = document.querySelector("#room-name");
@@ -27,43 +27,13 @@ const hpFill = document.querySelector("#hp-fill");
 const hpValue = document.querySelector("#hp-value");
 const movementChip = document.querySelector("#movement-chip");
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.34;
-renderer.shadowMap.enabled = true;
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x100c08);
-scene.fog = new THREE.FogExp2(0x120d09, 0.018);
-
-const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 250);
-camera.position.set(0, 4.6, 8.5);
-
-const worldRoot = new THREE.Group();
-scene.add(worldRoot);
-
-const player = makePlayerAvatar();
-player.position.set(0, 0, 4.4);
-scene.add(player);
-
-const ambient = new THREE.HemisphereLight(0xfff1cf, 0x21160f, 2.2);
-scene.add(ambient);
-
-const sun = new THREE.DirectionalLight(0xffe8ba, 3.15);
-sun.position.set(-4, 8, 5);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-scene.add(sun);
+const renderEngine = createRenderEngine(canvas);
+const { camera, worldRoot, player, clock } = renderEngine;
 
 const keys = new Set();
-const clock = new THREE.Clock();
 let world = null;
 let currentRoomId = "town:temple";
 let roomRuntime = null;
-let lastRenderStats = { calls: 0, triangles: 0 };
 let inputMode = "menu";
 let activePanel = null;
 let currentStatusDetail = "";
@@ -195,7 +165,7 @@ async function main() {
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
   panelClose.addEventListener("click", closePanel);
 
-  renderer.setAnimationLoop(render);
+  renderEngine.setAnimationLoop(render);
 }
 
 function connectGameServer() {
@@ -470,8 +440,7 @@ function setRoom(roomId, options = {}) {
 
   const fromRoomId = options.fromRoomId ?? currentRoomId;
   currentRoomId = roomId;
-  disposeObjectTree(worldRoot);
-  worldRoot.clear();
+  renderEngine.clearWorld();
 
   roomRuntime = buildRoomScene({
     THREE,
@@ -479,6 +448,7 @@ function setRoom(roomId, options = {}) {
     roomId,
     room,
     world,
+    serverAuthoritative: serverCanDriveMovement(),
     serverNpcs: serverCanDriveMovement() ? serverState.npcs : [],
     serverItems: serverCanDriveMovement() ? serverState.roomItems : [],
     onExit: (targetId) => enterExitTarget(targetId)
@@ -486,7 +456,7 @@ function setRoom(roomId, options = {}) {
   if (!roomRuntime) return;
   nearbyInteractable = null;
   updateInteractionPrompt();
-  applyEnvironment(roomRuntime.environment);
+  renderEngine.applyEnvironment(roomRuntime.environment);
 
   const spawn = roomRuntime.spawnFor?.(fromRoomId) ?? roomRuntime.spawn;
   const spawnPosition = spawn.position ?? spawn;
@@ -869,14 +839,6 @@ function interactWithNearby() {
   updateInteractionPrompt();
 }
 
-function applyEnvironment(environment = {}) {
-  const background = environment.background ?? 0x100c08;
-  const fog = environment.fog ?? background;
-  const fogDensity = environment.fogDensity ?? 0.018;
-  scene.background = new THREE.Color(background);
-  scene.fog = new THREE.FogExp2(fog, fogDensity);
-}
-
 function shortDirection(direction) {
   return direction
     .replace("NORTH", "N")
@@ -911,24 +873,9 @@ function render() {
   roomRuntime?.update?.(dt, player, camera);
   updateNearbyInteractable();
   updateCamera(dt);
-  renderer.render(scene, camera);
-  lastRenderStats = {
-    calls: renderer.info.render.calls,
-    triangles: renderer.info.render.triangles,
-    textures: renderer.info.memory.textures,
-    geometries: renderer.info.memory.geometries
-  };
+  renderEngine.render();
   updateCompass();
   updatePlayerHud();
-}
-
-function disposeObjectTree(root) {
-  const disposed = new Set();
-  root.traverse((object) => {
-    if (!object.geometry || disposed.has(object.geometry)) return;
-    object.geometry.dispose?.();
-    disposed.add(object.geometry);
-  });
 }
 
 function updatePlayer(dt) {
@@ -1028,9 +975,7 @@ function axis(primary, secondary = null) {
 }
 
 function resize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderEngine.resize();
 }
 
 function installDebugApi() {
@@ -1050,7 +995,7 @@ function installDebugApi() {
       };
     },
     get render() {
-      return lastRenderStats;
+      return renderEngine.renderStats;
     },
     get avatar() {
       return player.userData.avatarInfo?.() ?? { loaded: false, loadFailed: true, activeAnimation: "missing" };
@@ -1083,6 +1028,10 @@ function installDebugApi() {
         pendingMove: serverState.pendingMove,
         lastError: serverState.lastError,
         messageCount: serverState.messageCount,
+        npcs: serverState.npcs.map((npc) => ({
+          id: npc.id ?? npc.npcId ?? "",
+          name: npc.name ?? npc.npcName ?? ""
+        })),
         mapRooms: serverState.mapRooms.length,
         inventory: serverState.inventory.length
       };

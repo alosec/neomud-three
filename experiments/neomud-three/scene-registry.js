@@ -10,7 +10,7 @@ import {
 } from "./room-scenes.js";
 
 export function buildRoomScene(context) {
-  const { roomId, world, serverNpcs = [], serverItems = [], onExit } = context;
+  const { roomId, world, serverAuthoritative = false, serverNpcs = [], serverItems = [], onExit } = context;
   const room = world.rooms.get(roomId);
   if (!room) return null;
 
@@ -26,9 +26,7 @@ export function buildRoomScene(context) {
     return buildTownSquareRoom({
       ...context,
       worldRoot: WORLD_ROOT,
-      npcs: serverNpcs.length
-        ? serverNpcs
-        : world.npcs.filter((npc) => npc.startRoomId === "town:square"),
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:square"),
       roomItems: serverItems
     });
   }
@@ -37,9 +35,7 @@ export function buildRoomScene(context) {
     return buildTavernRoom({
       ...context,
       worldRoot: WORLD_ROOT,
-      npcs: serverNpcs.length
-        ? serverNpcs
-        : world.npcs.filter((npc) => npc.startRoomId === "town:tavern"),
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:tavern"),
       roomItems: serverItems
     });
   }
@@ -48,9 +44,7 @@ export function buildRoomScene(context) {
     return buildNorthGateRoom({
       ...context,
       worldRoot: WORLD_ROOT,
-      npcs: serverNpcs.length
-        ? serverNpcs
-        : world.npcs.filter((npc) => npc.startRoomId === "town:gate"),
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:gate"),
       roomItems: serverItems
     });
   }
@@ -59,9 +53,7 @@ export function buildRoomScene(context) {
     return buildForestEdgeRoom({
       ...context,
       worldRoot: WORLD_ROOT,
-      npcs: serverNpcs.length
-        ? serverNpcs
-        : world.npcs.filter((npc) => npc.startRoomId === "forest:edge"),
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:edge"),
       roomItems: serverItems
     });
   }
@@ -70,9 +62,7 @@ export function buildRoomScene(context) {
     return buildForestPathRoom({
       ...context,
       worldRoot: WORLD_ROOT,
-      npcs: serverNpcs.length
-        ? serverNpcs
-        : world.npcs.filter((npc) => npc.startRoomId === "forest:path"),
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:path"),
       roomItems: serverItems
     });
   }

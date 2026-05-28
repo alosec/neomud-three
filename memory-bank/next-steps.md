@@ -10,6 +10,8 @@ High leverage next work:
    - Keep fixed screenshot anchors in `scripts/test-neomud-three-town-shots.cjs` current after Town Square visual changes.
 
 1. Build a small renderer architecture instead of per-room hacks.
+   - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
+   - Next extraction should move camera rig/update and debug render hooks behind the engine boundary.
    - Room scene registry.
    - Room render specs for authored spaces, starting with `TOWN_SQUARE_SPEC`.
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
