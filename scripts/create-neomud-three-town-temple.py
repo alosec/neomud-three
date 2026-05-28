@@ -146,6 +146,59 @@ def mesh3(name, vertices, faces, mat, kind="visible", **props):
     return obj
 
 
+def smoke_wisp3(name, x, y, z, height, width, drift_x, drift_z, mat, kind="visible", **props):
+    """Create clustered translucent puffs instead of hard cone geometry."""
+    segments = 8
+    rings = 4
+    puff_count = 6
+    vertices = []
+    faces = []
+
+    def append_puff(center_x, center_y, center_z, rx, ry, rz):
+        start = len(vertices)
+        for ring in range(rings + 1):
+            phi = math.pi * ring / rings
+            sin_phi = math.sin(phi)
+            cos_phi = math.cos(phi)
+            for segment in range(segments):
+                theta = 2 * math.pi * segment / segments
+                vertices.append((
+                    center_x + rx * sin_phi * math.cos(theta),
+                    center_y + ry * cos_phi,
+                    center_z + rz * sin_phi * math.sin(theta),
+                ))
+
+        for ring in range(rings):
+            row = start + ring * segments
+            next_row = start + (ring + 1) * segments
+            for segment in range(segments):
+                faces.append((
+                    row + segment,
+                    row + (segment + 1) % segments,
+                    next_row + (segment + 1) % segments,
+                    next_row + segment,
+                ))
+
+    for index in range(puff_count):
+        t = index / (puff_count - 1)
+        sway = math.sin((t * 1.35 + 0.16) * math.pi)
+        curl = math.cos((t * 1.8 + 0.05) * math.pi)
+        scale = 1 - t * 0.46
+        append_puff(
+            x + drift_x * t + sway * width * 0.24,
+            y + height * t,
+            z + drift_z * t + curl * width * 0.16,
+            width * (0.78 + 0.14 * math.sin(t * math.pi)) * scale,
+            height * (0.13 + 0.03 * math.sin(t * math.pi)) * scale,
+            width * 0.48 * scale,
+        )
+
+    obj = mesh3(name, vertices, faces, mat, kind=kind, **props)
+    for polygon in obj.data.polygons:
+        polygon.use_smooth = True
+    return obj
+
+
 def plane_x3_uv(name, x, y, z, width, height, mat, kind="visible", **props):
     """Create a vertical textured plane at fixed x, spanning z/y."""
     mesh = bpy.data.meshes.new(f"{name}_mesh")
@@ -516,8 +569,18 @@ def add_cathedral_altar_incense_fixture(fixture_id, x, z, stone, trim, dark, clo
         cylinder3(f"VIS_altar_{fixture_id}_{label}_incense_stem", bx, 0.82, z - 0.78, 0.13, 1.12, 12, dark, semantic="cathedral_incense_brazier")
         cone3(f"VIS_altar_{fixture_id}_{label}_incense_bowl", bx, 1.45, z - 0.78, 0.52, 0.34, 0.34, 16, trim, semantic="cathedral_incense_brazier")
         cylinder3(f"VIS_altar_{fixture_id}_{label}_incense_coal", bx, 1.66, z - 0.78, 0.3, 0.08, 14, glass_red, semantic="cathedral_incense_coal")
-        cone3(f"VIS_altar_{fixture_id}_{label}_smoke_lower", bx + side * 0.04, 2.16, z - 0.76, 0.35, 0.18, 1.05, 12, smoke, rotation_y=side * 0.25, semantic="cathedral_incense_smoke")
-        cone3(f"VIS_altar_{fixture_id}_{label}_smoke_upper", bx - side * 0.08, 2.95, z - 0.7, 0.26, 0.08, 1.2, 12, smoke, rotation_y=-side * 0.2, semantic="cathedral_incense_smoke")
+        smoke_wisp3(
+            f"VIS_altar_{fixture_id}_{label}_smoke_wisp_column",
+            bx + side * 0.02,
+            1.72,
+            z - 0.78,
+            2.55,
+            0.34,
+            side * 0.22,
+            0.18,
+            smoke,
+            semantic="cathedral_incense_smoke_wisp",
+        )
 
 
 def build_level():
@@ -533,7 +596,7 @@ def build_level():
     wood_dark = material("MAT_temple_pew_dark_endgrain", (0.15, 0.08, 0.04, 1), roughness=0.86)
     wood_highlight = material("MAT_temple_pew_worn_edge", (0.50, 0.30, 0.13, 1), roughness=0.72)
     cloth = material("MAT_temple_dawn_cloth", (0.86, 0.78, 0.60, 1), roughness=0.66)
-    smoke = material("MAT_temple_incense_smoke", (0.72, 0.76, 0.72, 0.34), roughness=0.9, alpha=0.34)
+    smoke = material("MAT_temple_incense_smoke", (0.72, 0.76, 0.72, 0.13), roughness=0.96, alpha=0.13)
     glass_blue = material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
     glass_red = material("MAT_temple_glass_red", (0.88, 0.13, 0.16, 0.64), roughness=0.28, alpha=0.64, emission=(0.72, 0.06, 0.07, 1), emission_strength=0.18)
     glass_gold = material("MAT_temple_glass_gold", (1.0, 0.68, 0.14, 0.62), roughness=0.32, alpha=0.62, emission=(0.9, 0.42, 0.04, 1), emission_strength=0.18)

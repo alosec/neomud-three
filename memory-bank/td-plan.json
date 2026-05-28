@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T23:03:58.616Z",
+  "updated": "2026-05-28T23:17:39.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2945,6 +2945,28 @@
       "comments": [],
       "created": "2026-05-28T22:59:41Z",
       "updated": "2026-05-28T23:03:55Z"
+    },
+    {
+      "id": "neo-1fb2.85",
+      "project": "NeoMud",
+      "title": "Soften cathedral incense smoke fixture",
+      "description": "",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: replaced hard altar incense cone smoke with subtler Blender-authored smoke-wisp puff columns and passed lab/room/offline/server QA",
+      "labels": [
+        "blender",
+        "cathedral",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T23:09:09Z",
+      "updated": "2026-05-28T23:17:39Z"
     }
   ]
 }

@@ -7,17 +7,17 @@
   "sourceBlend": "../../source/props/cathedral_altar_incense/cathedral_altar_incense.blend",
   "runtimeGlb": "cathedral_altar_incense.glb",
   "files": {
-    "sourceBlendBytes": 124696,
-    "runtimeGlbBytes": 1126852
+    "sourceBlendBytes": 128939,
+    "runtimeGlbBytes": 1129200
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "landmark",
-    "nodes": 40,
-    "meshes": 38,
+    "nodes": 38,
+    "meshes": 36,
     "materials": 10,
     "prefixes": {
-      "VIS_": 35,
+      "VIS_": 33,
       "COL_": 3,
       "NAV_": 0,
       "SPAWN_": 0,
@@ -32,9 +32,9 @@
   "runtimeQa": {
     "cathedralAssetLabBudget": {
       "drawCalls": 258,
-      "triangles": 4782,
+      "triangles": 7150,
       "textures": 10,
-      "geometries": 208
+      "geometries": 204
     },
     "checks": [
       "GLB landmark profile validation",
@@ -44,6 +44,6 @@
   "knownLimits": [
     "This is the first asset-level altar/incense candidate with generated painted stained-glass panels, not final cathedral altar art.",
     "Retable glass now uses the same painted lancet texture candidate as wall windows, but panel repetition is still visible.",
-    "Smoke is still low-poly translucent geometry and should be revisited as a dedicated effect after fixture composition stabilizes."
+    "Smoke now uses subtle low-poly translucent puff columns instead of hard cone geometry, but it is still authored geometry rather than a true shader/particle effect."
   ]
 }

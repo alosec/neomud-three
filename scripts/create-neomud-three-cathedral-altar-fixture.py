@@ -37,7 +37,7 @@ def build_asset():
     trim = temple.material("MAT_temple_warm_limestone_trim", (0.82, 0.74, 0.54, 1), roughness=0.7)
     dark = temple.material("MAT_temple_recess_shadow", (0.12, 0.10, 0.08, 1), roughness=0.94)
     cloth = temple.material("MAT_temple_dawn_cloth", (0.86, 0.78, 0.60, 1), roughness=0.66)
-    smoke = temple.material("MAT_temple_incense_smoke", (0.72, 0.76, 0.72, 0.34), roughness=0.9, alpha=0.34)
+    smoke = temple.material("MAT_temple_incense_smoke", (0.72, 0.76, 0.72, 0.13), roughness=0.96, alpha=0.13)
     glass_blue = temple.material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
     glass_red = temple.material("MAT_temple_glass_red", (0.88, 0.13, 0.16, 0.64), roughness=0.28, alpha=0.64, emission=(0.72, 0.06, 0.07, 1), emission_strength=0.18)
     glass_gold = temple.material("MAT_temple_glass_gold", (1.0, 0.68, 0.14, 0.62), roughness=0.32, alpha=0.62, emission=(0.9, 0.42, 0.04, 1), emission_strength=0.18)

@@ -80,7 +80,8 @@ the GLB, not an optimized final material pipeline.
 
 The first candidate replaces the flat black re-table blockout with a tiered
 dais/table, draped cloth, arched re-table panels, a generated painted dawn-glass
-layer, a dawn medallion, paired incense bowls, ember cues, and smoke geometry.
+layer, a dawn medallion, paired incense bowls, ember cues, and subtle low-poly
+smoke-wisp puff columns.
 It is accepted as a playable prototype, not final cathedral art.
 
 ## Current Texture Candidate

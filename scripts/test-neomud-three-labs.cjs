@@ -156,7 +156,7 @@ async function main() {
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_dawn_medallion")), "expected dawn focal motif");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_painted_glass_center")), "expected painted altar glass texture layer");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_incense_bowl")), "expected readable incense bowls");
-        assert.ok(altarFixture.renderNodes.some((name) => name.includes("_smoke_")), "expected smoke wisp geometry");
+        assert.ok(altarFixture.renderNodes.some((name) => name.includes("_smoke_wisp_")), "expected smoke wisp geometry");
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });
