@@ -74,6 +74,7 @@ export async function glbSummaryFromFile(filename, profile) {
   for (const prefix of PROFILE_REQUIREMENTS[profile]) {
     assert.ok(nodes.some((node) => node.name.startsWith(prefix)), `${filename}: missing required ${prefix} node`);
   }
+  validateLightNodes(filename, nodes);
 
   return {
     nodes: nodes.length,
@@ -84,6 +85,19 @@ export async function glbSummaryFromFile(filename, profile) {
       nodes.filter((node) => node.name.startsWith(prefix)).length
     ]))
   };
+}
+
+function validateLightNodes(filename, nodes) {
+  const supportedTypes = new Set(["point", "hemisphere", "hemi", "directional", "sun", "spot", "area"]);
+  for (const node of nodes.filter((entry) => entry.name.startsWith("LIGHTS_"))) {
+    assert.equal(node.extras?.neomud_kind, "light", `${filename}: ${node.name} missing light kind`);
+    assert.ok(node.extras?.light_id, `${filename}: ${node.name} missing light_id`);
+    assert.ok(supportedTypes.has(node.extras?.light_type), `${filename}: ${node.name} has unsupported light_type ${node.extras?.light_type}`);
+    assert.ok(Number.isFinite(Number(node.extras?.intensity)), `${filename}: ${node.name} missing numeric intensity`);
+    if (node.extras?.light_type === "point" || node.extras?.light_type === "spot") {
+      assert.ok(node.extras?.distance === undefined || Number.isFinite(Number(node.extras.distance)), `${filename}: ${node.name} has non-numeric distance`);
+    }
+  }
 }
 
 export async function readGlbJson(filename) {

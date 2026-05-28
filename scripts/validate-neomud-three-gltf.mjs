@@ -94,6 +94,17 @@ async function main() {
   const enemies = nodes.filter((node) => node.name.startsWith("ENEMY_"));
   assert.ok(enemies.every((node) => node.extras?.enemy_type), "ENEMY_ nodes must define enemy_type");
 
+  const lights = nodes.filter((node) => node.name.startsWith("LIGHTS_"));
+  for (const light of lights) {
+    assert.equal(light.extras?.neomud_kind, "light", `${light.name} missing light kind`);
+    assert.ok(light.extras?.light_id, `${light.name} missing light_id`);
+    assert.ok(["point", "hemisphere", "hemi", "directional", "sun", "spot", "area"].includes(light.extras?.light_type), `${light.name} has unsupported light_type ${light.extras?.light_type}`);
+    assert.ok(Number.isFinite(Number(light.extras?.intensity)), `${light.name} missing numeric intensity`);
+    if (["point", "spot"].includes(light.extras?.light_type)) {
+      assert.ok(light.extras?.distance === undefined || Number.isFinite(Number(light.extras.distance)), `${light.name} has non-numeric distance`);
+    }
+  }
+
   const summary = {
     file: path.relative(repoRoot, glbPath),
     profile,
