@@ -22,6 +22,7 @@ It currently:
 - Loads the vendored Three.js/Xbot GLTF as a hidden animation/reference asset, but renders a compact instanced low-poly fantasy adventurer as the visible player. This reclaims substantial triangle budget for the rooms; it is still not the final authored character model.
 - Starts a Blender-authored GLB pipeline under `assets/source/` and `assets/build/`; new substantial geometry should move through source image/brief, Blender source, exported GLB, and validation before runtime integration.
 - Provides `level-debug.js`, a reusable parsed-GLB debug renderer used by Movement Gym, so collision, triggers, spawn points, pickups, enemy markers, paths, camera zones, and light markers can be reviewed without trusting hidden authoring meshes.
+- Provides `glb-room-runtime.js`, a reusable adapter that turns parsed Blender GLB room packages into the normal playable-room runtime contract: spawn, clamp, physical exits, debug colliders, debug triggers, and package landmark metadata.
 
 Art direction rules live in `ART_DIRECTION.md`.
 The graphics production rules live in `../../memory-bank/graphics-production-contract.md`.

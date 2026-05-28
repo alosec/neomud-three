@@ -177,6 +177,14 @@ pickups, enemy marker, patrol path, camera zone, and light marker. Movement Gym
 uses that shared renderer, and lab QA asserts those debug counts so future
 Blender/export/parser changes cannot silently drop gameplay authoring data.
 
+`glb-room-runtime.js` is the first main-game runtime bridge. It instantiates a
+preloaded package, lets room code apply any material/lighting adjustments,
+derives colliders, bounds, spawn, exit triggers, debug colliders, debug
+triggers, and package landmark metadata from parsed GLB nodes, then returns the
+same room runtime contract as the older JavaScript-authored rooms. `town:temple`
+uses this adapter now; future room packages should use it instead of re-creating
+GLB parsing glue in `room-scenes.js`.
+
 The current movement gym lab QA proves:
 
 - 8 visible render nodes stay visible.
@@ -191,9 +199,8 @@ The current movement gym lab QA proves:
 
 ## Next Pipeline Steps
 
-1. Collapse the remaining runtime-specific Temple glue into a reusable
-   `WorldLoader` / `LevelParser` interface that can load any room package, not
-   just `town:temple`.
+1. Split `glb-room-runtime.js` into a typed `WorldLoader` / `LevelParser`
+   boundary once a second GLB-authored room uses the same contract.
 2. Promote `level-debug.js` into renderer/debug hooks with user-facing toggles
    for parsed colliders, trigger volumes, spawn points, path nodes, pickup/enemy
    markers, camera zones, and lights.

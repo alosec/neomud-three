@@ -93,7 +93,12 @@ async function main() {
     const templeLandmarks = await page.evaluate(() => window.__neomudThreeDebug.room.landmarks);
     const templeTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.ok(
-      templeLandmarks.some((landmark) => landmark.id === "town-temple-glb" && landmark.kind === "blender-level"),
+      templeLandmarks.some((landmark) =>
+        landmark.id === "town-temple-glb" &&
+        landmark.kind === "blender-level" &&
+        landmark.manifest?.endsWith("town_temple.manifest.json") &&
+        landmark.sourceBrief?.endsWith("town_temple/level-brief.json")
+      ),
       `expected Temple to use Blender GLB level package, got ${JSON.stringify(templeLandmarks)}`
     );
     assert.ok(

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T21:11:21.792Z",
+  "updated": "2026-05-28T21:19:57.409Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2774,6 +2774,25 @@
       ],
       "created": "2026-05-28T20:45:12Z",
       "updated": "2026-05-28T21:11:03Z"
+    },
+    {
+      "id": "neo-1fb2.76",
+      "project": "NeoMud",
+      "title": "Extract reusable GLB room runtime adapter",
+      "description": "Move GLB-derived runtime behavior out of room-scenes.js into a reusable adapter that can instantiate a preloaded package, configure the scene, derive colliders/bounds/triggers/spawn/debug metadata from parsed GLB nodes, and return the standard room runtime contract. Wire town:temple through the adapter and prove via Chrome Canary QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added glb-room-runtime adapter, wired Temple through it, exposed package manifest/source brief debug metadata, and verified offline/room/lab/town/server QA",
+      "labels": [
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T21:17:19Z",
+      "updated": "2026-05-28T21:19:45Z"
     }
   ]
 }

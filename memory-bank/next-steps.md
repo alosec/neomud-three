@@ -23,7 +23,8 @@ High leverage next work:
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
-   - Promote the movement gym loader from lab-only code into a main-runtime `WorldLoader` / `LevelParser` interface.
+   - The first main-runtime GLB adapter now exists in `glb-room-runtime.js`; keep future Blender-authored rooms on that path instead of adding per-room GLB parsing glue.
+   - Promote the movement gym loader and room adapter into a named `WorldLoader` / `LevelParser` interface after the second room package lands.
    - `level-debug.js` now has reusable parsed-metadata debug drawing for `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_`; next step is wiring it into main renderer debug hooks with toggles.
 
 2. Refine the Blender-authored Temple of the Dawn package.
@@ -32,7 +33,7 @@ High leverage next work:
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
-   - Remove the old procedural Temple builder after the GLB path has one more stable QA pass.
+   - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
 
 3. Rebuild Town Square as a real 3D room.
    - Replace placeholder facades with authored structures.
