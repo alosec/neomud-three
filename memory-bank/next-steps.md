@@ -24,7 +24,7 @@ High leverage next work:
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
    - Promote the movement gym loader from lab-only code into a main-runtime `WorldLoader` / `LevelParser` interface.
-   - Add debug drawing toggles for parsed `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_` metadata.
+   - Movement Gym now has parsed-metadata debug drawing for `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_`; next step is moving that into reusable renderer debug hooks with toggles.
 
 2. Upgrade Temple of the Dawn into the quality bar.
    - Better Gothic wall/window frames.

@@ -147,6 +147,12 @@ qa:     NEOMUD_THREE_BROWSER_CHANNEL=chrome-canary node scripts/test-neomud-thre
 nodes by the Blender prefixes, hides non-`VIS_` authoring/gameplay nodes, and
 exposes a typed summary for future physics/gameplay systems.
 
+`movement-gym.js` now renders a debug layer from the parsed metadata instead of
+from hand-maintained duplicates: collision boxes, trigger volume, spawn marker,
+pickups, enemy marker, patrol path, camera zone, and light marker. Lab QA
+asserts those debug counts so future Blender/export/parser changes cannot
+silently drop gameplay authoring data.
+
 The current movement gym lab QA proves:
 
 - 8 visible render nodes stay visible.
@@ -154,14 +160,18 @@ The current movement gym lab QA proves:
 - 8 collision nodes, 1 spawn, 1 trigger, 5 pickups, 1 enemy, 4 path nodes,
   1 camera zone, and 1 light marker are present.
 - The portal trigger targets `town:square`.
-- Render budget is currently 9 calls / 96 triangles / 1 texture / 9 geometries.
+- The parsed debug layer contains 8 collider boxes, 1 trigger box, 1 camera
+  zone box, pickup/enemy/spawn/light markers, and 1 patrol path line.
+- Render budget is currently 24 calls / 278 triangles / 1 texture / 24 geometries
+  with the debug layer visible.
 
 ## Next Pipeline Steps
 
 1. Convert the movement gym parser output into a `WorldLoader` / `LevelParser`
    interface used by the main renderer, not only the lab page.
-2. Add debug drawing toggles for parsed colliders, trigger volumes, spawn
-   points, path nodes, and pickup/enemy markers.
+2. Promote the movement gym debug drawing into reusable renderer/debug hooks
+   with toggles for parsed colliders, trigger volumes, spawn points, path nodes,
+   pickup/enemy markers, camera zones, and lights.
 3. Move one existing room landmark from JavaScript-authored mesh code into a
    Blender source scene.
 4. Add glTF Transform inspection/optimization once the first main-runtime import is

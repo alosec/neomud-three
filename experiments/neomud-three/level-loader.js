@@ -54,6 +54,7 @@ export function parseBlenderLevel(scene, { hideAuthoringNodes = true } = {}) {
       kind,
       userData: { ...object.userData },
       position: worldPosition(object),
+      size: worldSize(object),
       hasMesh: Boolean(object.isMesh),
       hiddenByParser: hideAuthoringNodes && !RENDER_PREFIXES.has(prefix)
     };
@@ -100,6 +101,17 @@ function worldPosition(object) {
   };
 }
 
+function worldSize(object) {
+  if (!object.isMesh) return { x: 0, y: 0, z: 0 };
+  tempBox.setFromObject(object);
+  tempBox.getSize(tempSize);
+  return {
+    x: round(tempSize.x),
+    y: round(tempSize.y),
+    z: round(tempSize.z)
+  };
+}
+
 function groupPaths(pathNodes) {
   const groups = new Map();
   for (const node of pathNodes) {
@@ -118,3 +130,5 @@ function round(value) {
 }
 
 const tempVector = new THREE.Vector3();
+const tempSize = new THREE.Vector3();
+const tempBox = new THREE.Box3();

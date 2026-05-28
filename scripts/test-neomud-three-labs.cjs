@@ -42,6 +42,7 @@ const LABS = [
     snapshot: () => ({
       render: window.__neomudMovementGymDebug.render,
       level: window.__neomudMovementGymDebug.level,
+      debug: window.__neomudMovementGymDebug.debug,
       error: window.__neomudMovementGymDebug.error
     })
   }
@@ -107,6 +108,17 @@ async function main() {
         assert.equal(snapshot.level.spawn.name, "SPAWN_player");
         assert.equal(snapshot.level.triggers[0].userData.target_room, "town:square");
         assert.deepEqual(snapshot.level.paths, [{ id: "training_dummy_patrol", count: 4 }]);
+        assert.deepEqual(snapshot.debug, {
+          colliders: 8,
+          triggers: 1,
+          cameraZones: 1,
+          pickups: 5,
+          enemies: 1,
+          spawns: 1,
+          lights: 1,
+          paths: 1,
+          objects: 15
+        });
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });

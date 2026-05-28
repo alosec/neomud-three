@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T20:23:55.513Z",
+  "updated": "2026-05-28T20:29:35.257Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2666,6 +2666,34 @@
       ],
       "created": "2026-05-28T20:22:56Z",
       "updated": "2026-05-28T20:23:40Z"
+    },
+    {
+      "id": "neo-1fb2.75.2",
+      "project": "NeoMud",
+      "title": "Add movement gym debug draw from parsed GLB metadata",
+      "description": "Render a debug layer for the Blender movement gym from parsed level metadata: collision boxes, trigger volume, spawn marker, pickups, enemy marker, patrol path, camera zone, and light marker. Keep authoring nodes hidden and assert coverage in lab QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.75",
+      "close_reason": "",
+      "labels": [
+        "blender",
+        "debug",
+        "gltf",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 122,
+          "body": "Completed: Movement Gym debug layer renders from parsed GLB metadata and is asserted by lab QA.",
+          "created": "2026-05-28T20:29:21Z"
+        }
+      ],
+      "created": "2026-05-28T20:25:48Z",
+      "updated": "2026-05-28T20:29:21Z"
     }
   ],
   "ready": [
