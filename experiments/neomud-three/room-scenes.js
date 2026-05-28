@@ -5993,21 +5993,67 @@ function addNpcStaging(root, materials, npc, placement) {
 
 function addTrainingStaging(root, materials) {
   addBox(root, materials.road, 0, 0.022, 0, 2.35, 0.04, 1.7, { castShadow: false });
-  addBox(root, materials.darkTimber, -1.35, 1.05, -0.85, 0.12, 2.1, 0.12);
-  addBox(root, materials.darkTimber, -1.35, 1.92, -0.05, 0.12, 0.12, 1.72);
-  addBox(root, materials.trimLight ?? materials.sign, -1.35, 1.2, -0.45, 0.08, 1.4, 0.08, { rotationZ: 0.38 });
-  addBox(root, materials.trimLight ?? materials.sign, -1.35, 1.2, 0.45, 0.08, 1.4, 0.08, { rotationZ: -0.38 });
-  addBox(root, materials.sign, 1.02, 0.32, -0.72, 0.92, 0.26, 0.48);
-  addBox(root, materials.darkTimber, 1.02, 0.58, -0.72, 0.62, 0.08, 0.34);
+  addInstancedBoxes(root, materials.sign, [
+    { x: -0.72, y: 0.07, z: -0.8, width: 0.9, height: 0.05, depth: 0.06 },
+    { x: -0.72, y: 0.07, z: 0.8, width: 0.9, height: 0.05, depth: 0.06 },
+    { x: -1.16, y: 0.07, z: 0, width: 0.06, height: 0.05, depth: 1.62 },
+    { x: -0.28, y: 0.07, z: 0, width: 0.06, height: 0.05, depth: 1.62 }
+  ], "guildmaster-training-mat-trim", { castShadow: false });
+  addInstancedBoxes(root, materials.darkTimber, [
+    { x: -1.35, y: 1.05, z: -0.85, width: 0.12, height: 2.1, depth: 0.12 },
+    { x: -1.35, y: 1.92, z: -0.05, width: 0.12, height: 0.12, depth: 1.72 },
+    { x: 1.08, y: 0.72, z: -0.72, width: 0.16, height: 1.18, depth: 0.16 },
+    { x: 1.08, y: 1.32, z: -0.72, width: 0.86, height: 0.12, depth: 0.12 },
+    { x: 0.68, y: 0.64, z: -0.72, width: 0.12, height: 0.82, depth: 0.12 },
+    { x: 1.48, y: 0.64, z: -0.72, width: 0.12, height: 0.82, depth: 0.12 }
+  ], "guildmaster-training-dark");
+  addInstancedBoxes(root, materials.trimLight ?? materials.sign, [
+    { x: -1.35, y: 1.2, z: -0.45, width: 0.08, height: 1.4, depth: 0.08, rotationZ: 0.38 },
+    { x: -1.35, y: 1.2, z: 0.45, width: 0.08, height: 1.4, depth: 0.08, rotationZ: -0.38 },
+    { x: 0.78, y: 1.02, z: -0.74, width: 0.06, height: 1.05, depth: 0.08, rotationZ: 0.22 },
+    { x: 1.26, y: 1.02, z: -0.74, width: 0.06, height: 1.05, depth: 0.08, rotationZ: -0.22 }
+  ], "guildmaster-training-blades");
+  addInstancedBoxes(root, materials.timber, [
+    { x: 1.02, y: 0.32, z: -0.72, width: 0.92, height: 0.26, depth: 0.48 },
+    { x: 1.02, y: 0.58, z: -0.72, width: 0.62, height: 0.08, depth: 0.34 },
+    { x: 0.05, y: 0.72, z: 0.74, width: 0.58, height: 1.05, depth: 0.28 },
+    { x: 0.05, y: 1.36, z: 0.74, width: 0.84, height: 0.18, depth: 0.42 }
+  ], "guildmaster-training-timber");
+  addInstancedBoxes(root, materials.awningRed ?? materials.sign, [
+    { x: 0.05, y: 1.32, z: 0.49, width: 0.62, height: 0.08, depth: 0.08 },
+    { x: 0.05, y: 1.32, z: 0.99, width: 0.62, height: 0.08, depth: 0.08 },
+    { x: -0.25, y: 1.32, z: 0.74, width: 0.08, height: 0.08, depth: 0.5 },
+    { x: 0.35, y: 1.32, z: 0.74, width: 0.08, height: 0.08, depth: 0.5 }
+  ], "guildmaster-practice-target");
 }
 
 function addWrenStaging(root, materials) {
-  addBox(root, materials.road, 0, 0.02, 0, 2.15, 0.04, 1.35, { castShadow: false });
-  addBox(root, materials.darkTimber, -0.95, 0.38, -0.58, 0.26, 0.76, 0.22);
-  addBox(root, materials.timber, -0.36, 0.72, -0.7, 1.45, 0.14, 0.34);
-  addBox(root, materials.timber, -0.36, 0.44, -0.84, 1.32, 0.12, 0.12);
-  addBox(root, materials.darkTimber, -0.95, 0.26, -0.92, 0.1, 0.52, 0.1);
-  addBox(root, materials.darkTimber, 0.22, 0.26, -0.92, 0.1, 0.52, 0.1);
+  addBox(root, materials.road, 0, 0.02, 0, 2.35, 0.04, 1.55, { castShadow: false });
+  addInstancedBoxes(root, materials.darkTimber, [
+    { x: -0.95, y: 0.38, z: -0.58, width: 0.26, height: 0.76, depth: 0.22 },
+    { x: -0.95, y: 0.26, z: -0.92, width: 0.1, height: 0.52, depth: 0.1 },
+    { x: 0.22, y: 0.26, z: -0.92, width: 0.1, height: 0.52, depth: 0.1 },
+    { x: 0.88, y: 0.78, z: 0.1, width: 0.12, height: 1.56, depth: 0.12 },
+    { x: 0.88, y: 1.52, z: 0.1, width: 0.92, height: 0.12, depth: 0.12 }
+  ], "old-wren-quest-dark");
+  addInstancedBoxes(root, materials.timber, [
+    { x: -0.36, y: 0.72, z: -0.7, width: 1.45, height: 0.14, depth: 0.34 },
+    { x: -0.36, y: 0.44, z: -0.84, width: 1.32, height: 0.12, depth: 0.12 },
+    { x: 0.35, y: 0.52, z: 0.48, width: 0.9, height: 0.12, depth: 0.55 },
+    { x: -0.02, y: 0.25, z: 0.28, width: 0.1, height: 0.5, depth: 0.1 },
+    { x: 0.72, y: 0.25, z: 0.28, width: 0.1, height: 0.5, depth: 0.1 },
+    { x: -0.02, y: 0.25, z: 0.68, width: 0.1, height: 0.5, depth: 0.1 },
+    { x: 0.72, y: 0.25, z: 0.68, width: 0.1, height: 0.5, depth: 0.1 }
+  ], "old-wren-quest-timber");
+  addInstancedBoxes(root, materials.trimLight ?? materials.sign, [
+    { x: 0.24, y: 0.62, z: 0.36, width: 0.34, height: 0.04, depth: 0.2 },
+    { x: 0.58, y: 0.63, z: 0.52, width: 0.26, height: 0.04, depth: 0.18 },
+    { x: 0.88, y: 1.42, z: -0.08, width: 0.64, height: 0.42, depth: 0.05 }
+  ], "old-wren-quest-papers", { castShadow: false });
+  addInstancedBoxes(root, materials.awningBlue ?? materials.sign, [
+    { x: 0.1, y: 0.66, z: 0.6, width: 0.28, height: 0.08, depth: 0.22 },
+    { x: 0.88, y: 1.54, z: -0.09, width: 0.36, height: 0.08, depth: 0.06 }
+  ], "old-wren-quest-blue", { castShadow: false });
 
   const lantern = new THREE.PointLight(0x9bd8ee, 1.25, 4.6);
   lantern.position.set(0.82, 0.82, -0.44);
@@ -6142,7 +6188,7 @@ function addInstancedBoxes(root, materialRef, boxes, visualRole, options = {}) {
   const dummy = new THREE.Object3D();
   boxes.forEach((box, index) => {
     dummy.position.set(box.x, box.y, box.z);
-    dummy.rotation.set(0, box.rotationY ?? 0, 0);
+    dummy.rotation.set(box.rotationX ?? 0, box.rotationY ?? 0, box.rotationZ ?? 0);
     dummy.scale.set(box.width, box.height, box.depth);
     dummy.updateMatrix();
     mesh.setMatrixAt(index, dummy.matrix);

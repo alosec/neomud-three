@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T19:20:59.939Z",
+  "updated": "2026-05-28T19:31:29.970Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2500,6 +2500,29 @@
       ],
       "created": "2026-05-28T19:03:19Z",
       "updated": "2026-05-28T19:20:37Z"
+    },
+    {
+      "id": "neo-d994",
+      "project": "NeoMud",
+      "title": "Improve Town Square NPC staging",
+      "description": "Upgrade Guildmaster Aldric and Old Wren staging in Town Square with low-cost authored props that clarify trainer/quest roles. Use existing materials/components, preserve interaction panels and server entity mirroring, and verify fixed Town screenshots plus offline/server traversal.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 117,
+          "body": "Completed: upgraded Guildmaster Aldric and Old Wren staging with low-cost authored trainer/quest props. Town-shot QA, offline smoke, server-backed traversal, and authored-room screenshots pass; Town Square full-smoke remains inside budget at 210/240 calls.",
+          "created": "2026-05-28T19:30:38Z"
+        }
+      ],
+      "created": "2026-05-28T19:23:37Z",
+      "updated": "2026-05-28T19:30:57Z"
     }
   ],
   "ready": [

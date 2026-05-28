@@ -89,6 +89,7 @@ High leverage next work:
    - The first civic support pass adds approved Prop Zoo notice board, market cart, and firewood stack components into Town Square with collider coverage.
    - The courtyard garden composition pass adds larger main-ground tree clusters with oval garden beds, shrubs, and flowers through `TOWN_SQUARE_SPEC`; `garden.bed` is now also staged in Prop Zoo. Further warmth work should improve landmark-specific story dressing instead of adding more generic greenery.
    - Do not keep solving warmth by adding more loose foliage; the next pass should improve a named landmark or authored gameplay staging.
+   - Guildmaster Aldric and Old Wren now have richer local staging props. Further Town Square NPC work should connect role-specific affordances to real dialogue/combat/tutorial interactions rather than adding disconnected clutter.
    - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k; surface and gate batching now leaves current Town Square full smoke at roughly 13.6k triangles and 211/240 draw calls. Keep spending that headroom deliberately.
    - The Temple window batching pass reclaimed more than 100 full-smoke draw calls, and the altar retable spends part of that headroom while keeping full smoke at 276 calls.
    - Stone ground trim and gate trim are now in Prop Zoo and applied to Town Square; add the next Prop Zoo items only when they unlock that landmark pass: stained-glass/window frame variant or a better NPC staging prop.
