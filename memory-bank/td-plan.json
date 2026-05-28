@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:20:41.749Z",
+  "updated": "2026-05-28T17:26:30.835Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2201,6 +2201,29 @@
       ],
       "created": "2026-05-28T17:15:28Z",
       "updated": "2026-05-28T17:20:31Z"
+    },
+    {
+      "id": "neo-1fb2.69.1",
+      "project": "NeoMud",
+      "title": "Improve Hidden Cave wall and ceiling composition",
+      "description": "Replace the flat Hidden Cave shell feel with a more believable authored chamber: layered wall ribs, ceiling silhouettes, stalactites, damp ledges, and better chest staging using existing materials only.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.69",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 104,
+          "body": "Completed: Hidden Cave now adds layered wall ribs, low ceiling plates, stalactites, damp ledges, and stronger chest alcove staging using existing cave materials only. Room-shot QA, offline smoke, and server-backed QA pass; Hidden Cave budgets are 43 calls / 2,111 triangles in screenshot/offline/server runs.",
+          "created": "2026-05-28T17:26:11Z"
+        }
+      ],
+      "created": "2026-05-28T17:21:48Z",
+      "updated": "2026-05-28T17:26:19Z"
     }
   ],
   "ready": [

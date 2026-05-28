@@ -4057,6 +4057,8 @@ function addHiddenCaveStage(root, materials, worldRoot) {
     { x: 11.28, y: 1.05, z: 4.9, width: 0.72, height: 2.1, depth: 7.0 }
   ], "hidden-cave-walls");
 
+  addHiddenCaveShellDetails(root, materials);
+
   addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.wetStone, [
     { x: -10.2, y: 2.2, z: -3.1, scale: [1.7, 1.18, 1.0], rotationY: 0.2 },
     { x: -9.8, y: 2.15, z: 3.2, scale: [1.5, 1.08, 1.25], rotationY: -0.4 },
@@ -4093,6 +4095,50 @@ function addHiddenCaveStage(root, materials, worldRoot) {
   root.add(dripLight);
 
   return { moss, mist };
+}
+
+function addHiddenCaveShellDetails(root, materials) {
+  addInstancedBoxes(root, materials.wetStone, [
+    { x: -8.9, y: 1.72, z: -8.05, width: 2.7, height: 1.44, depth: 0.7, rotationY: 0.06 },
+    { x: -5.0, y: 1.55, z: -8.12, width: 1.7, height: 1.18, depth: 0.74, rotationY: -0.08 },
+    { x: -0.6, y: 1.88, z: -8.1, width: 2.3, height: 1.66, depth: 0.66, rotationY: 0.04 },
+    { x: 4.1, y: 1.48, z: -8.04, width: 1.9, height: 1.14, depth: 0.7, rotationY: -0.05 },
+    { x: 8.4, y: 1.82, z: -8.08, width: 2.2, height: 1.52, depth: 0.68, rotationY: 0.08 },
+    { x: -7.2, y: 1.42, z: 8.08, width: 2.3, height: 1.2, depth: 0.72, rotationY: -0.06 },
+    { x: -2.0, y: 1.72, z: 8.08, width: 2.8, height: 1.44, depth: 0.72, rotationY: 0.04 },
+    { x: 3.5, y: 1.36, z: 8.1, width: 1.9, height: 1.04, depth: 0.72, rotationY: -0.04 },
+    { x: 8.0, y: 1.68, z: 8.07, width: 2.1, height: 1.32, depth: 0.7, rotationY: 0.07 },
+    { x: -10.8, y: 1.95, z: -5.7, width: 0.9, height: 2.2, depth: 1.25 },
+    { x: -10.85, y: 2.05, z: 5.5, width: 0.88, height: 2.1, depth: 1.25 },
+    { x: 10.95, y: 1.68, z: -6.5, width: 0.72, height: 1.7, depth: 1.45 },
+    { x: 10.95, y: 1.58, z: 6.2, width: 0.72, height: 1.55, depth: 1.4 }
+  ], "hidden-cave-layered-wall-ribs");
+
+  addInstancedBoxes(root, materials.caveWall, [
+    { x: -6.8, y: 3.08, z: -5.4, width: 6.6, height: 0.5, depth: 3.2, rotationY: 0.08 },
+    { x: 0.0, y: 3.26, z: -4.9, width: 7.2, height: 0.46, depth: 3.0, rotationY: -0.06 },
+    { x: 6.8, y: 3.02, z: -4.4, width: 5.4, height: 0.5, depth: 2.8, rotationY: 0.12 },
+    { x: -5.2, y: 3.02, z: 4.9, width: 6.2, height: 0.48, depth: 3.0, rotationY: -0.1 },
+    { x: 2.0, y: 3.2, z: 4.9, width: 7.4, height: 0.46, depth: 2.8, rotationY: 0.05 },
+    { x: 8.0, y: 2.94, z: 3.8, width: 3.6, height: 0.42, depth: 2.4, rotationY: -0.12 }
+  ], "hidden-cave-low-ceiling-plates");
+
+  addInstancedBoxes(root, materials.dampMoss, [
+    { x: -4.3, y: 0.18, z: -2.15, width: 2.85, height: 0.12, depth: 1.55, rotationY: -0.16 },
+    { x: -3.1, y: 0.22, z: -3.18, width: 1.4, height: 0.1, depth: 0.8, rotationY: 0.12 },
+    { x: -8.8, y: 0.26, z: 4.2, width: 3.4, height: 0.16, depth: 0.9, rotationY: 0.18 },
+    { x: 7.5, y: 0.21, z: 6.7, width: 2.6, height: 0.12, depth: 0.72, rotationY: -0.22 }
+  ], "hidden-cave-damp-ledges");
+
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1, 7), materials.wetStone, [
+    { x: -6.1, y: 2.32, z: -5.7, scale: [0.18, 0.82, 0.18], rotationX: Math.PI, rotationZ: 0.06 },
+    { x: -2.4, y: 2.28, z: -6.2, scale: [0.14, 0.62, 0.14], rotationX: Math.PI, rotationZ: -0.08 },
+    { x: 2.2, y: 2.34, z: -5.6, scale: [0.16, 0.74, 0.16], rotationX: Math.PI, rotationZ: 0.04 },
+    { x: 6.4, y: 2.16, z: -4.9, scale: [0.14, 0.58, 0.14], rotationX: Math.PI, rotationZ: -0.1 },
+    { x: -5.0, y: 2.18, z: 4.6, scale: [0.16, 0.72, 0.16], rotationX: Math.PI, rotationZ: 0.08 },
+    { x: 0.9, y: 2.26, z: 5.2, scale: [0.2, 0.9, 0.2], rotationX: Math.PI, rotationZ: -0.05 },
+    { x: 5.7, y: 2.12, z: 4.6, scale: [0.13, 0.55, 0.13], rotationX: Math.PI, rotationZ: 0.07 }
+  ], "hidden-cave-stalactites");
 }
 
 function addHiddenCaveMoss(root, materials) {
