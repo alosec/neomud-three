@@ -4802,6 +4802,7 @@ function addArchedFrame(root, material, width, height, z, radius) {
 }
 
 function addAltar(root, materials, smokePuffs) {
+  addTempleAltarWallComposition(root, materials);
   addTempleAltarRetable(root, materials);
 
   const dais = new THREE.Mesh(new THREE.CylinderGeometry(5.4, 6.25, 0.44, 8), materials.trim);
@@ -4877,6 +4878,43 @@ function addTempleAltarRetable(root, materials) {
   const altarAccent = new THREE.PointLight(0xffd58a, 2.1, 7.2);
   altarAccent.position.set(0, 4.2, TEMPLE.southZ - 1.2);
   root.add(altarAccent);
+}
+
+function addTempleAltarWallComposition(root, materials) {
+  const z = TEMPLE.southZ - 0.32;
+  const trimBoxes = [
+    { x: -6.35, y: 4.6, z, width: 0.28, height: 7.2, depth: 0.28 },
+    { x: 6.35, y: 4.6, z, width: 0.28, height: 7.2, depth: 0.28 },
+    { x: -4.25, y: 3.82, z, width: 0.22, height: 5.4, depth: 0.24 },
+    { x: 4.25, y: 3.82, z, width: 0.22, height: 5.4, depth: 0.24 },
+    { x: -5.28, y: 7.92, z, width: 2.25, height: 0.22, depth: 0.24 },
+    { x: 5.28, y: 7.92, z, width: 2.25, height: 0.22, depth: 0.24 },
+    { x: -5.28, y: 1.16, z, width: 2.45, height: 0.26, depth: 0.28 },
+    { x: 5.28, y: 1.16, z, width: 2.45, height: 0.26, depth: 0.28 },
+    { x: 0, y: 7.42, z, width: 3.25, height: 0.24, depth: 0.26 },
+    { x: 0, y: 1.02, z, width: 5.35, height: 0.28, depth: 0.3 },
+    { x: -1.95, y: 4.18, z, width: 0.18, height: 5.65, depth: 0.22 },
+    { x: 1.95, y: 4.18, z, width: 0.18, height: 5.65, depth: 0.22 }
+  ];
+  addInstancedBoxes(root, materials.trim, trimBoxes, "temple-altar-wall-trim");
+
+  const darkPanels = [
+    { x: -5.3, y: 3.86, z: z - 0.03, width: 1.66, height: 4.7, depth: 0.08 },
+    { x: 5.3, y: 3.86, z: z - 0.03, width: 1.66, height: 4.7, depth: 0.08 }
+  ];
+  addInstancedBoxes(root, materials.windowReveal, darkPanels, "temple-altar-wall-recesses", { castShadow: false });
+
+  for (const x of [-5.3, 5.3]) {
+    const glow = new THREE.Mesh(archedWindowGeometry(1.34, 4.45, 28), materials.windowGlow);
+    glow.position.set(x, 1.54, z - 0.09);
+    glow.renderOrder = 1;
+    root.add(glow);
+
+    const glass = new THREE.Mesh(archedWindowGeometry(1.04, 4.08, 28), materials.glass);
+    glass.position.set(x, 1.72, z - 0.12);
+    glass.renderOrder = 2;
+    root.add(glass);
+  }
 }
 
 function addIncense(root, smokePuffs, x, z) {

@@ -28,6 +28,7 @@ High leverage next work:
    - The first stained-glass floor patch pass is in; the next Temple pass should improve window/frame proportions or altar staging rather than adding more floor overlays.
    - Temple window rectangular frames/ledges are now instanced, creating real call/geometries headroom for the next authored cathedral detail pass.
    - The first altar retable pass is in; further altar work should refine proportions/material hierarchy rather than adding another centerpiece.
+   - The altar wall now has side lancet niches and vertical trim around the retable. Further Temple work should focus on wall/window proportions and material hierarchy, not adding more centerpieces.
 
 3. Rebuild Town Square as a real 3D room.
    - Replace placeholder facades with authored structures.

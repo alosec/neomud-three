@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:50:41.732Z",
+  "updated": "2026-05-28T18:01:36.023Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2293,6 +2293,29 @@
       ],
       "created": "2026-05-28T17:42:45Z",
       "updated": "2026-05-28T17:50:25Z"
+    },
+    {
+      "id": "neo-1fb2.7.1",
+      "project": "NeoMud",
+      "title": "Improve Temple altar wall composition",
+      "description": "Add a stronger Gothic apse/altar-wall composition using existing temple materials: vertical side niches, tracery, trim, and glow that reduce the blank masonry wall while preserving altar collision and QA budgets.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.7",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 108,
+          "body": "Completed: Temple altar wall now has side lancet niches, vertical trim, recessed side panels, and stronger framing around the existing dawn retable. Room-shot, offline smoke, and server-backed QA pass; Temple remains under budget at 290 calls / 35,406 triangles in smoke/server QA.",
+          "created": "2026-05-28T18:00:54Z"
+        }
+      ],
+      "created": "2026-05-28T17:53:33Z",
+      "updated": "2026-05-28T18:01:09Z"
     }
   ],
   "ready": [
