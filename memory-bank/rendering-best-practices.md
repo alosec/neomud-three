@@ -17,10 +17,10 @@ The current Town Square still tries too hard. The backdrop, cobbles, timber faca
 
 Research anchors:
 
-- Three.js `InstancedMesh` docs: repeated geometry should be instanced when many similar objects appear.
-- Three.js `LOD` docs: distant content should use lower-detail representations.
-- Three.js texture guidance: texture memory grows quickly with image dimensions and mip levels, so generated assets need size/format discipline.
-- MDN WebGL best practices: reduce draw calls, avoid redundant state churn, prefer batching/atlases/instancing where practical.
+- Three.js `InstancedMesh` docs: repeated geometry should be instanced when many similar objects appear. https://threejs.org/docs/#api/en/objects/InstancedMesh
+- Three.js `LOD` docs: distant content should use lower-detail representations. https://threejs.org/docs/#api/en/objects/LOD
+- Three.js texture guidance: texture memory grows quickly with image dimensions and mip levels, so generated assets need size/format discipline. https://threejs.org/manual/#en/textures
+- MDN WebGL best practices: reduce draw calls, avoid redundant state churn, prefer batching/atlases/instancing where practical. https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices
 
 ## Practical Rules
 
@@ -58,3 +58,15 @@ Town Square should move toward a “small playable plaza”:
 - Minimal play HUD: room chip, compass, crosshair only.
 - Menus remain DOM for now; HTML-in-Canvas waits until the 3D world reads as a game space.
 
+## Authoring Model
+
+Do not hand-edit a room as scattered mesh calls. Each authored room needs a `RoomRenderSpec` with:
+
+- `surfaces`: ground, paths, curbs, aprons, water, and other horizontal/vertical material regions.
+- `chunkRings`: near/middle/far scene layers, so distant scenery can be simplified or swapped out.
+- `landmarks`: named physical objects that correspond to NeoMud rooms, exits, NPC zones, or interactables.
+- `props`: lamps, stalls, benches, crates, trees, signs, and clutter that can later be instanced.
+- `exits`: trigger volumes/thresholds mapped to the server room graph.
+- `spawn` / `entrySpawns`: camera and player staging for each server transition.
+
+Renderer code should instantiate the spec. Design iteration should mostly edit the spec.

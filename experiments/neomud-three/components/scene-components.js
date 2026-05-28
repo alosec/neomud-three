@@ -11,6 +11,15 @@ export function addBox(root, material, x, y, z, width, height, depth, options = 
   return mesh;
 }
 
+export function addSurfaceRect(root, material, spec) {
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(spec.width, spec.depth), material);
+  mesh.position.set(spec.x ?? 0, spec.y ?? 0.018, spec.z ?? 0);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.receiveShadow = true;
+  root.add(mesh);
+  return mesh;
+}
+
 export function addGroundPlane(root, material, width, depth, options = {}) {
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), material);
   mesh.position.set(options.x ?? 0, options.y ?? 0, options.z ?? 0);

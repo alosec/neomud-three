@@ -33,6 +33,7 @@ Town Square status:
 - Town Square is rough but playable and still below the quality bar.
 - The latest pass reduces the HUD in play mode, adds an asset manifest/material manager, uses a calmer generated hills/sky horizon, and shifts away from many tiny perimeter houses toward fewer named landmarks.
 - The west side now treats `town:tavern` as a larger tavern/bar entrance instead of a tiny decorative facade.
+- Town Square now has an explicit `TOWN_SQUARE_SPEC` authoring layer for surfaces, chunk rings, landmarks, props, spawns, and exit triggers. The goal is to edit room intent/data rather than moving raw meshes by hand.
 - The scene is still not reconstructed as a convincing full 3D place. Building scale, entrance affordances, material noise, NPC integration, and chunked distant scenery remain active work.
 
 Local app/server status:
@@ -56,5 +57,6 @@ Test status:
 - `scripts/test-neomud-three.cjs` runs a local browser smoke test against the offline Three renderer at `?offline=1`.
 - The offline smoke test checks rendered triangles, default room data, forward movement, diagonal/strafe movement, Town Square switching, console errors, and failed HTTP requests.
 - `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, moves north to Town Square through `move_ok`, then moves south back to Temple.
+- `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Both browser tests write QA screenshots into ignored `experiments/neomud-three/qa/latest/`.
 - Manual Canary QA is currently pointed at `http://127.0.0.1:4183/experiments/neomud-three/`.

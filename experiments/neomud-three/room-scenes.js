@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
+import { TOWN_SQUARE_SPEC } from "./room-specs.js";
 import {
   addBackdrop as addComponentBackdrop,
   addBox,
@@ -7,7 +8,8 @@ import {
   addGroundPlane,
   addLamp as addComponentLamp,
   addMarketStall as addComponentMarketStall,
-  addPortalFrame
+  addPortalFrame,
+  addSurfaceRect
 } from "./components/scene-components.js";
 
 const TEMPLE = {
@@ -73,40 +75,14 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
 
 export function buildTownSquareRoom({ root, worldRoot, npcs }) {
   const materials = makeTownMaterials();
+  const spec = TOWN_SQUARE_SPEC;
 
-  addGroundPlane(root, materials.cobble, 46, 46);
-
-  addTownRoads(root, materials);
-
-  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(1.95, 2.25, 0.48, 56), materials.stone);
-  fountainBase.position.y = 0.21;
-  fountainBase.castShadow = true;
-  root.add(fountainBase);
-
-  const waterBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.68, 1.68, 0.08, 56), materials.water);
-  waterBasin.position.y = 0.52;
-  root.add(waterBasin);
-
-  const fountainColumn = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 32), materials.stone);
-  fountainColumn.position.y = 1.1;
-  fountainColumn.castShadow = true;
-  root.add(fountainColumn);
-
-  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.58, 0.18, 40), materials.stone);
-  topBowl.position.y = 1.78;
-  topBowl.castShadow = true;
-  root.add(topBowl);
-
-  const spray = new THREE.PointLight(0xaee8ff, 4.4, 10);
-  spray.position.set(0, 2.1, 0);
-  root.add(spray);
-
-  addTownHorizon(root, worldRoot);
-  addTownSquareStructures(root, materials);
-  addTownPortal(root, materials, "Gate", new THREE.Vector3(0, 0, -21.0), "town:gate", 0);
-  addTownPortal(root, materials, "Market", new THREE.Vector3(21.0, 0, 0), "town:market", -Math.PI / 2);
-  addTownPortal(root, materials, "Temple", new THREE.Vector3(0, 0, 21.0), "town:temple", Math.PI);
-  addTownPortal(root, materials, "Tavern", new THREE.Vector3(-21.0, 0, 0), "town:tavern", Math.PI / 2);
+  addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
+  addTownSpecSurfaces(root, materials, spec);
+  const fountain = addTownSpecFountain(root, materials, spec.features.fountain);
+  addTownSpecChunkRings(root, materials, spec);
+  addTownSpecLandmarks(root, materials, spec);
+  addTownSpecProps(root, materials, spec);
 
   for (const [index, npc] of npcs.entries()) {
     const angle = -0.9 + index * 0.75;
@@ -114,34 +90,23 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
   }
 
   return {
-    spawn: { position: new THREE.Vector3(0, 0, 12.2), heading: 0 },
-    status: "Town Square: physical Millhaven plaza with expanded streets, fountain, market stalls, timber buildings, NPC zones, and four server-backed exits",
-    environment: {
-      background: 0xc3d7df,
-      fog: 0xc3d7df,
-      fogDensity: 0.006
-    },
+    spawn: spawnFromSpec(spec.spawn),
+    status: `${spec.name}: ${spec.intent}`,
+    environment: spec.environment,
     spawnFor(fromRoomId) {
-      if (fromRoomId === "town:temple") return { position: new THREE.Vector3(0, 0, 12.2), heading: 0 };
-      if (fromRoomId === "town:market") return { position: new THREE.Vector3(12.2, 0, 0), heading: -Math.PI / 2 };
-      if (fromRoomId === "town:tavern") return { position: new THREE.Vector3(-12.2, 0, 0), heading: Math.PI / 2 };
-      if (fromRoomId === "town:gate") return { position: new THREE.Vector3(0, 0, -12.2), heading: Math.PI };
+      if (spec.entrySpawns[fromRoomId]) return spawnFromSpec(spec.entrySpawns[fromRoomId]);
       return this.spawn;
     },
     clamp(position) {
-      position.x = THREE.MathUtils.clamp(position.x, -21.1, 21.1);
-      position.z = THREE.MathUtils.clamp(position.z, -21.1, 21.1);
+      position.x = THREE.MathUtils.clamp(position.x, spec.size.clamp.minX, spec.size.clamp.maxX);
+      position.z = THREE.MathUtils.clamp(position.z, spec.size.clamp.minZ, spec.size.clamp.maxZ);
     },
     exitAt(position) {
-      if (position.z > 20.45 && Math.abs(position.x) < 2.4) return "town:temple";
-      if (position.z < -20.45 && Math.abs(position.x) < 2.4) return "town:gate";
-      if (position.x > 20.45 && Math.abs(position.z) < 2.4) return "town:market";
-      if (position.x < -20.45 && Math.abs(position.z) < 2.4) return "town:tavern";
-      return null;
+      return exitAtFromSpec(position, spec);
     },
     update(dt) {
-      waterBasin.rotation.z += dt * 0.25;
-      topBowl.rotation.y += dt * 0.2;
+      fountain.water.rotation.z += dt * 0.25;
+      fountain.topBowl.rotation.y += dt * 0.2;
     }
   };
 }
@@ -560,6 +525,187 @@ function spawnForEntryDirection(direction) {
   if (direction === "EAST") return { position: new THREE.Vector3(5.7, 0, 0), heading: -Math.PI / 2 };
   if (direction === "WEST") return { position: new THREE.Vector3(-5.7, 0, 0), heading: Math.PI / 2 };
   return { position: new THREE.Vector3(0, 0, 5.7), heading: 0 };
+}
+
+function material(materials, key) {
+  return materials[key] ?? materials.cobble;
+}
+
+function spawnFromSpec(spawn) {
+  return {
+    position: new THREE.Vector3(...spawn.position),
+    heading: spawn.heading ?? 0
+  };
+}
+
+function exitAtFromSpec(position, spec) {
+  for (const exit of spec.exits) {
+    if (exit.axis === "z") {
+      const crossed = exit.threshold < 0 ? position.z < exit.threshold : position.z > exit.threshold;
+      if (crossed && position.x >= exit.min && position.x <= exit.max) return exit.targetId;
+    } else {
+      const crossed = exit.threshold < 0 ? position.x < exit.threshold : position.x > exit.threshold;
+      if (crossed && position.z >= exit.min && position.z <= exit.max) return exit.targetId;
+    }
+  }
+  return null;
+}
+
+function addTownSpecSurfaces(root, materials, spec) {
+  for (const path of spec.surfaces.paths) {
+    addSurfaceRect(root, material(materials, path.material), path);
+  }
+  for (const curb of spec.surfaces.curbs) {
+    addBox(root, materials.darkStone, curb.x, curb.height / 2, curb.z, curb.width, curb.height, curb.depth);
+  }
+}
+
+function addTownSpecFountain(root, materials, fountainSpec) {
+  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(1.95, fountainSpec.radius, 0.48, 56), materials.stone);
+  fountainBase.position.set(fountainSpec.x, 0.21, fountainSpec.z);
+  fountainBase.castShadow = true;
+  root.add(fountainBase);
+
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.68, 1.68, 0.08, 56), materials.water);
+  water.position.set(fountainSpec.x, 0.52, fountainSpec.z);
+  root.add(water);
+
+  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 32), materials.stone);
+  column.position.set(fountainSpec.x, 1.1, fountainSpec.z);
+  column.castShadow = true;
+  root.add(column);
+
+  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.58, 0.18, 40), materials.stone);
+  topBowl.position.set(fountainSpec.x, 1.78, fountainSpec.z);
+  topBowl.castShadow = true;
+  root.add(topBowl);
+
+  const spray = new THREE.PointLight(0xaee8ff, 4.4, 10);
+  spray.position.set(fountainSpec.x, 2.1, fountainSpec.z);
+  root.add(spray);
+
+  return { water, topBowl };
+}
+
+function addTownSpecChunkRings(root, materials, spec) {
+  for (const chunk of spec.chunkRings) {
+    if (chunk.kind === "backdrop") {
+      addComponentBackdrop(root, chunk.asset, chunk.x, chunk.y, chunk.z, chunk.width, chunk.height, {
+        opacity: chunk.opacity,
+        unlit: true
+      });
+    }
+    if (chunk.kind === "wall-runs") {
+      for (const run of chunk.runs) {
+        addBox(root, material(materials, chunk.material), run.x, run.height / 2, run.z, run.width, run.height, run.depth, { castShadow: false });
+      }
+    }
+  }
+}
+
+function addTownSpecLandmarks(root, materials, spec) {
+  for (const landmark of spec.landmarks) {
+    if (landmark.kind === "gatehouse") addGatehouseLandmark(root, materials, landmark);
+    if (landmark.kind === "market-hall") addMarketLandmark(root, materials, landmark);
+    if (landmark.kind === "temple-threshold") addTempleThresholdLandmark(root, materials, landmark);
+    if (landmark.kind === "tavern") addTavernLandmark(root, materials, landmark);
+  }
+}
+
+function addTownSpecProps(root, materials, spec) {
+  for (const lamp of spec.props.lamps) {
+    addComponentLamp(root, materials, lamp.x, lamp.z, { intensity: 1.45, distance: 5.2 });
+  }
+}
+
+function addGatehouseLandmark(root, materials, landmark) {
+  const group = new THREE.Group();
+  group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  root.add(group);
+
+  for (const tower of landmark.towers) {
+    addBox(group, materials.stone, tower.x, tower.height / 2, tower.z, tower.width, tower.height, tower.depth);
+    addBox(group, materials.roof, tower.x, tower.height + 0.52, tower.z, tower.width + 0.6, 0.9, tower.depth + 0.4);
+  }
+  addBox(group, materials.stone, landmark.lintel.x, 5.2, landmark.lintel.z, landmark.lintel.width, landmark.lintel.height, landmark.lintel.depth);
+  addBox(group, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
+  addBox(group, materials.portalDark, landmark.portal.x, landmark.portal.height / 2, landmark.portal.z, landmark.portal.width, landmark.portal.height, landmark.portal.depth);
+  addPortalFrame(root, materials, portalFrameSpec(landmark));
+}
+
+function addMarketLandmark(root, materials, landmark) {
+  const group = addGabledHouse(root, materials, resolveBuildingSpec(materials, landmark.building));
+  group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  for (const stall of landmark.stalls) {
+    addComponentMarketStall(root, materials, {
+      x: stall.x,
+      z: stall.z,
+      rotationY: -Math.PI / 2,
+      awningMaterial: material(materials, stall.awningMaterial),
+      width: 3.0,
+      depth: 1.5
+    });
+  }
+  addPortalFrame(root, materials, portalFrameSpec(landmark));
+}
+
+function addTempleThresholdLandmark(root, materials, landmark) {
+  const group = new THREE.Group();
+  group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  root.add(group);
+  for (const step of landmark.steps) {
+    addBox(group, materials.stone, step.x, step.y, step.z, step.width, step.height, step.depth);
+  }
+  addBox(group, materials.sign, 0, 1.35, 20.0, 3.1, 0.22, 0.22);
+  for (const column of landmark.columns) {
+    addBox(group, materials.stone, column.x, 1.55, column.z, 0.32, 3.1, 0.32);
+  }
+  addPortalFrame(root, materials, portalFrameSpec(landmark));
+}
+
+function addTavernLandmark(root, materials, landmark) {
+  const group = addGabledHouse(root, materials, resolveBuildingSpec(materials, landmark.building));
+  group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  addBox(root, materials.portalDark, landmark.doorway.x, landmark.doorway.height / 2, landmark.doorway.z, landmark.doorway.width, landmark.doorway.height, landmark.doorway.depth, { rotationY: Math.PI / 2 });
+  addBox(root, materials.sign, landmark.sign.x, landmark.sign.y, landmark.sign.z, landmark.sign.width, landmark.sign.height, landmark.sign.depth, { rotationY: Math.PI / 2 });
+  addBox(root, materials.darkTimber, -17.54, 3.0, -1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
+  addBox(root, materials.darkTimber, -17.54, 3.0, 1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
+  addPortalFrame(root, materials, portalFrameSpec(landmark));
+}
+
+function resolveBuildingSpec(materials, building) {
+  return {
+    ...building,
+    roofMaterial: material(materials, building.roofMaterial),
+    plasterMaterial: material(materials, building.plasterMaterial),
+    facadeMaterial: material(materials, building.facadeMaterial),
+    awning: building.awning ? material(materials, building.awning) : null
+  };
+}
+
+function portalFrameSpec(landmark) {
+  const rotations = {
+    NORTH: 0,
+    EAST: -Math.PI / 2,
+    SOUTH: Math.PI,
+    WEST: Math.PI / 2
+  };
+  const fallback = {
+    NORTH: { x: 0, z: -21 },
+    EAST: { x: 21, z: 0 },
+    SOUTH: { x: 0, z: 21 },
+    WEST: { x: -21, z: 0 }
+  }[landmark.direction];
+  const entrance = landmark.entrance ?? fallback;
+  return {
+    label: landmark.name,
+    targetId: landmark.targetId,
+    x: entrance.x,
+    z: entrance.z,
+    rotationY: rotations[landmark.direction],
+    width: entrance.width ?? 3.2,
+    height: landmark.id === "north-gate" ? 3.45 : landmark.id === "west-tavern" ? 3.5 : 3.0
+  };
 }
 
 function addTownRoads(root, materials) {

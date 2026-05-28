@@ -4,6 +4,7 @@ High leverage next work:
 
 1. Build a small renderer architecture instead of per-room hacks.
    - Room scene registry.
+   - Room render specs for authored spaces, starting with `TOWN_SQUARE_SPEC`.
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
@@ -29,6 +30,7 @@ High leverage next work:
    - Assert physical exit traversal from temple to square through the live server, not only debug movement.
    - Add visual screenshots for temple and square after major renderer changes.
    - Add collision and spawn-heading checks for each authored room.
+   - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
 
 6. Revisit HTML-in-Canvas once the 3D space is stable.
    - Use real HTML panels as texture sources on in-world boards, doors, books, plaques, and dialogue surfaces.

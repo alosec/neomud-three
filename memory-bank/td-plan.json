@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T04:05:09.223Z",
+  "updated": "2026-05-28T04:21:08.679Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -122,10 +122,15 @@
           "id": 4,
           "body": "Added initial scene-registry.js so app.js resolves room scenes through one registry instead of hard-coded builders; RoomRenderSpec remains next.",
           "created": "2026-05-28T03:18:28Z"
+        },
+        {
+          "id": 12,
+          "body": "Added initial TOWN_SQUARE_SPEC authoring layer with surfaces, chunk rings, landmarks, props, spawns, and exit triggers so future layout changes are spec edits instead of raw mesh surgery.",
+          "created": "2026-05-28T04:20:26Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T03:18:28Z"
+      "updated": "2026-05-28T04:20:26Z"
     },
     {
       "id": "neo-1fb2.5",
@@ -326,10 +331,15 @@
           "id": 8,
           "body": "QA note: offline Playwright smoke passes. Server-backed test can pass after restarting guest sessions, but the local server hit the Too many guest sessions state during this pass; this should be made deterministic before treating server QA as robust.",
           "created": "2026-05-28T04:04:08Z"
+        },
+        {
+          "id": 13,
+          "body": "Added scripts/play-neomud-three.cjs for headed Chrome/Canary real-time playtesting, including optional drive-and-close route plus QA screenshots and render/server/player snapshots.",
+          "created": "2026-05-28T04:20:26Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T04:04:08Z"
+      "updated": "2026-05-28T04:20:26Z"
     }
   ],
   "ready": [

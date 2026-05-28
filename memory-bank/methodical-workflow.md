@@ -19,11 +19,24 @@ Use two loops, and keep them separate:
 Current QA commands:
 
 ```bash
-NODE_PATH=/Users/alex/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules /Users/alex/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/test-neomud-three.cjs
+npm install --prefix scripts
+node scripts/test-neomud-three.cjs
 ```
 
 ```bash
-NODE_PATH=/Users/alex/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules /Users/alex/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node scripts/test-neomud-three-server.cjs
+node scripts/test-neomud-three-server.cjs
+```
+
+Real-time playtest loop:
+
+```bash
+node scripts/play-neomud-three.cjs --room=town:square
+```
+
+Automated headed drive-and-close loop:
+
+```bash
+node scripts/play-neomud-three.cjs --room=town:square --drive --close
 ```
 
 Manual QA target:
@@ -36,5 +49,6 @@ Minimum bar before pushing:
 - `node --check` on changed JavaScript files.
 - Offline smoke test passes.
 - Server-backed test passes when the Kotlin server is running.
+- Headed playtest script is run for meaningful movement/camera/visual changes.
 - Manual Canary check after meaningful visual or input changes.
 - Memory bank updated when architecture, workflow, or current rough edges change.
