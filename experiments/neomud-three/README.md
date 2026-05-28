@@ -13,6 +13,7 @@ It currently:
 - Authors Winding Forest Path as a forked forest route with Shadow Wolf/Forest Bandit staging, physical South/North/East triggers, and root/tree/stone collision.
 - Defines approved material IDs and metadata in `render-assets.js`; rooms consume material sets instead of arbitrary generated files.
 - Keeps the persistent Three.js shell in `render-engine.js`, separate from `app.js` protocol/UI/movement logic.
+- Provides an optional playable-room debug overlay in `runtime-debug.js`; press Backquote or call `window.__neomudThreeDebug.setDebugOverlay(true)` to render current room colliders, exit triggers, and entity markers.
 - Provides a material lab and prop zoo so generated textures/components can be reviewed before entering rooms; the zoo now includes forest tree/log/stone props used by Forest Edge.
 - Lets you walk a compact fantasy adventurer avatar with sane movement: WASD/arrows turn and move, Q/E strafe, Shift runs, Space jumps, diagonals work. The old procedural walk bob has been removed; the visible gait is driven by explicit walk/run animation state.
 - Shows a compact player HUD with HP and movement mode.

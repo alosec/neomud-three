@@ -32,6 +32,7 @@ const pickupFeedbackDetail = document.querySelector("#pickup-feedback-detail");
 
 const renderEngine = createRenderEngine(canvas);
 const { camera, player, clock } = renderEngine;
+const urlParams = new URLSearchParams(window.location.search);
 
 const keys = new Set();
 let world = null;
@@ -45,6 +46,7 @@ let nearbyInteractable = null;
 let selectedInteractable = null;
 let lastInteractionResult = null;
 let pickupFeedbackTimeout = 0;
+let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
 
 const gameLog = [];
 
@@ -149,6 +151,7 @@ async function main() {
   worldCount.textContent = `${world.rooms.size} rooms, ${world.npcs.length} NPCs, ${world.zones.length} zones`;
   roomCount.textContent = "Playable vertical slice: Temple -> Town Square";
   await preloadGeneratedAssets("starter");
+  renderEngine.setRoomDebugVisible(roomDebugVisible);
 
   setRoom("town:temple", { snapCamera: true });
   setInputMode("menu");
@@ -354,6 +357,7 @@ function refreshRendererEntities() {
     roomItems: serverCanDriveMovement() ? serverState.roomItems : [],
     roomCoins: serverCanDriveMovement() ? serverState.roomCoins : null
   });
+  refreshRoomDebugOverlay();
 }
 
 function upsertServerRoom(room) {
@@ -503,6 +507,7 @@ function setRoom(roomId, options = {}) {
   if (!roomRuntime) return;
   nearbyInteractable = null;
   updateInteractionPrompt();
+  refreshRoomDebugOverlay();
   renderEngine.applyEnvironment(roomRuntime.environment);
 
   const spawn = roomRuntime.spawnFor?.(fromRoomId) ?? roomRuntime.spawn;
@@ -527,6 +532,28 @@ function setRoom(roomId, options = {}) {
   updateCamera(1, options.snapCamera);
 }
 
+function refreshRoomDebugOverlay() {
+  if (!roomDebugVisible) {
+    renderEngine.setRoomDebugVisible(false);
+    return renderEngine.roomDebug;
+  }
+  return renderEngine.updateRoomDebugLayer(currentRoomDebugMetadata());
+}
+
+function currentRoomDebugMetadata() {
+  return {
+    colliders: roomRuntime?.debugColliders?.() ?? [],
+    triggers: roomRuntime?.debugTriggers?.() ?? [],
+    entities: roomRuntime?.debugEntities?.() ?? []
+  };
+}
+
+function setRoomDebugOverlay(visible) {
+  roomDebugVisible = Boolean(visible);
+  renderEngine.setRoomDebugVisible(roomDebugVisible);
+  return refreshRoomDebugOverlay();
+}
+
 function updateExitButtons(room) {
   const exits = sortedDirections(Object.keys(room.exits ?? {})).map((direction) => [direction, room.exits[direction]]);
   roomExits.replaceChildren(...exits.map(([direction, targetId]) => {
@@ -542,6 +569,12 @@ function updateExitButtons(room) {
 
 function handleKeyDown(event) {
   if (isTyping(event.target)) return;
+
+  if (event.code === "Backquote") {
+    event.preventDefault();
+    setRoomDebugOverlay(!roomDebugVisible);
+    return;
+  }
 
   const panelId = panelKeys.get(event.code);
   if (panelId) {
@@ -1162,6 +1195,9 @@ function installDebugApi() {
         pickup: renderEngine.pickupEffectCount
       };
     },
+    get debugOverlay() {
+      return renderEngine.roomDebug;
+    },
     get avatar() {
       return player.userData.avatarInfo?.() ?? { loaded: false, loadFailed: true, activeAnimation: "missing" };
     },
@@ -1229,6 +1265,12 @@ function installDebugApi() {
     },
     requestMove(direction) {
       return requestMove(direction);
+    },
+    setDebugOverlay(visible) {
+      return setRoomDebugOverlay(visible);
+    },
+    toggleDebugOverlay() {
+      return setRoomDebugOverlay(!roomDebugVisible);
     },
     placePlayer({ x = player.position.x, y = 0, z = player.position.z, heading = movement.heading } = {}) {
       player.position.set(x, y, z);

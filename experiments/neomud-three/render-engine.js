@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { makePlayerAvatar } from "./player-avatar.js";
+import { disposeRoomDebugLayer, emptyRoomDebugSummary, renderRoomDebugLayer } from "./runtime-debug.js";
 
 export function createRenderEngine(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
@@ -23,6 +24,11 @@ export function createRenderEngine(canvas) {
   const effectRoot = new THREE.Group();
   scene.add(effectRoot);
 
+  const debugRoot = new THREE.Group();
+  debugRoot.name = "room-runtime-debug-layer";
+  debugRoot.visible = false;
+  scene.add(debugRoot);
+
   const player = makePlayerAvatar();
   player.position.set(0, 0, 4.4);
   scene.add(player);
@@ -40,6 +46,7 @@ export function createRenderEngine(canvas) {
   const cameraTarget = new THREE.Vector3(0, 1.4, 0);
   const pickupEffects = [];
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
+  let roomDebug = emptyRoomDebugSummary(false);
 
   return {
     renderer,
@@ -53,10 +60,36 @@ export function createRenderEngine(canvas) {
     get pickupEffectCount() {
       return pickupEffects.length;
     },
+    get roomDebug() {
+      return roomDebug;
+    },
     replaceWorld(factory) {
       disposeObjectTree(worldRoot);
       worldRoot.clear();
+      disposeRoomDebugLayer(debugRoot);
+      roomDebug = emptyRoomDebugSummary(debugRoot.visible);
       return factory(worldRoot);
+    },
+    setRoomDebugVisible(visible) {
+      debugRoot.visible = Boolean(visible);
+      roomDebug = {
+        ...roomDebug,
+        visible: debugRoot.visible
+      };
+      if (!debugRoot.visible) {
+        disposeRoomDebugLayer(debugRoot);
+        roomDebug = emptyRoomDebugSummary(false);
+      }
+      return roomDebug;
+    },
+    updateRoomDebugLayer(metadata = {}) {
+      if (!debugRoot.visible) {
+        disposeRoomDebugLayer(debugRoot);
+        roomDebug = emptyRoomDebugSummary(false);
+        return roomDebug;
+      }
+      roomDebug = renderRoomDebugLayer(debugRoot, metadata);
+      return roomDebug;
     },
     applyEnvironment(environment = {}) {
       const background = environment.background ?? 0x100c08;

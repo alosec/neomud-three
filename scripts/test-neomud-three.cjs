@@ -154,6 +154,19 @@ async function main() {
       entities.some((entity) => entity.id === "npc:old_wren" && entity.kind === "npc"),
       `expected Old Wren entity in Town Square, got ${JSON.stringify(entities)}`
     );
+    const defaultDebugOverlay = await page.evaluate(() => window.__neomudThreeDebug.debugOverlay);
+    assert.equal(defaultDebugOverlay.visible, false, `expected room debug overlay to default off: ${JSON.stringify(defaultDebugOverlay)}`);
+    const townDebugOverlay = await page.evaluate(() => window.__neomudThreeDebug.setDebugOverlay(true));
+    assert.equal(townDebugOverlay.visible, true, `expected room debug overlay to turn on: ${JSON.stringify(townDebugOverlay)}`);
+    assert.ok(townDebugOverlay.colliders > 8, `expected Town Square collider debug coverage, got ${JSON.stringify(townDebugOverlay)}`);
+    assert.equal(townDebugOverlay.triggers, 4, `expected four Town Square trigger debug boxes, got ${JSON.stringify(townDebugOverlay)}`);
+    assert.ok(townDebugOverlay.entities >= 2, `expected Town Square entity markers, got ${JSON.stringify(townDebugOverlay)}`);
+    assert.ok(townDebugOverlay.objects >= 10, `expected debug layer objects, got ${JSON.stringify(townDebugOverlay)}`);
+    await page.waitForTimeout(120);
+    await saveScreenshot(page, "offline-town-square-debug.png");
+    const disabledDebugOverlay = await page.evaluate(() => window.__neomudThreeDebug.setDebugOverlay(false));
+    assert.deepEqual(disabledDebugOverlay, { visible: false, colliders: 0, triggers: 0, entities: 0, objects: 0 });
+    await page.waitForTimeout(120);
     await saveScreenshot(page, "offline-town-square.png");
     budgetReports.push(await collectBudgetStatus(page, "town:square"));
     assertRenderBudget(assert, "town:square", budgetReports.at(-1).stats);

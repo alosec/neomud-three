@@ -17,7 +17,7 @@ High leverage next work:
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
    - Camera-follow rig math is now inside `render-engine.js`.
    - Room-root replacement/disposal is now inside `render-engine.js`.
-   - Next extraction should move debug render hooks behind the engine boundary.
+   - Playable-room debug rendering for current colliders, triggers, and entities is now behind the engine boundary in `runtime-debug.js`; next renderer-debug work should add a small in-app dev toggle or extend the same path to GLB-authored room metadata.
    - Room scene registry.
    - Room render specs for authored spaces, starting with `TOWN_SQUARE_SPEC`.
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.

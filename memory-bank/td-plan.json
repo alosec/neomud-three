@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T20:35:44.304Z",
+  "updated": "2026-05-28T20:42:24.863Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2722,6 +2722,33 @@
       ],
       "created": "2026-05-28T20:32:02Z",
       "updated": "2026-05-28T20:35:33Z"
+    },
+    {
+      "id": "neo-1fb2.75.4",
+      "project": "NeoMud",
+      "title": "Add playable room debug overlay",
+      "description": "Add an optional visual debug overlay in the playable Three client that renders current room colliders, exit triggers, and entity markers from roomRuntime debug metadata. It must be off by default, toggleable through the debug API and keyboard, and asserted in offline browser QA without changing normal render budgets.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.75",
+      "close_reason": "completed",
+      "labels": [
+        "debug",
+        "qa",
+        "renderer"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 124,
+          "body": "Completed: runtime-debug.js renders playable room colliders, triggers, and entity markers; app exposes Backquote/debug API toggle; offline QA captures and asserts Town Square debug overlay before normal budget checks.",
+          "created": "2026-05-28T20:42:12Z"
+        }
+      ],
+      "created": "2026-05-28T20:37:41Z",
+      "updated": "2026-05-28T20:42:12Z"
     }
   ],
   "ready": [
