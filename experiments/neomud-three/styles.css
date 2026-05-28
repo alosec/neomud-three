@@ -220,6 +220,42 @@ body[data-input-mode="play"] .crosshair {
   transform-origin: left center;
 }
 
+.pickup-feedback {
+  margin-top: 8px;
+  padding: 7px 8px;
+  border: 1px solid rgba(244, 206, 120, 0.42);
+  color: #fff4c7;
+  background:
+    linear-gradient(180deg, rgba(74, 49, 18, 0.82), rgba(21, 14, 8, 0.76)),
+    rgba(21, 14, 8, 0.72);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+}
+
+.pickup-feedback.hidden {
+  display: none;
+}
+
+.pickup-feedback strong,
+.pickup-feedback span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickup-feedback strong {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.pickup-feedback span {
+  margin-top: 2px;
+  color: #f6db91;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .movement-chip {
   position: absolute;
   right: 10px;

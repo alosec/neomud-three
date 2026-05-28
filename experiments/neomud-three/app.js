@@ -26,6 +26,9 @@ const interactionPrompt = document.querySelector("#interaction-prompt");
 const hpFill = document.querySelector("#hp-fill");
 const hpValue = document.querySelector("#hp-value");
 const movementChip = document.querySelector("#movement-chip");
+const pickupFeedback = document.querySelector("#pickup-feedback");
+const pickupFeedbackTitle = document.querySelector("#pickup-feedback-title");
+const pickupFeedbackDetail = document.querySelector("#pickup-feedback-detail");
 
 const renderEngine = createRenderEngine(canvas);
 const { camera, player, clock } = renderEngine;
@@ -41,6 +44,7 @@ let exitCooldownUntil = 0;
 let nearbyInteractable = null;
 let selectedInteractable = null;
 let lastInteractionResult = null;
+let pickupFeedbackTimeout = 0;
 
 const gameLog = [];
 
@@ -270,6 +274,7 @@ function handleServerMessage(message) {
       if (selectedInteractable?.actionType === "PICKUP_ITEM" || selectedInteractable?.actionType === "PICKUP_COINS") {
         selectedInteractable = { ...selectedInteractable, actionConsumed: true };
       }
+      showPickupFeedback(message);
       appendLog(`${lastInteractionResult.featureName}: ${lastInteractionResult.message}`);
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
@@ -441,6 +446,21 @@ function appendLog(line) {
   gameLog.push(line);
   if (gameLog.length > 80) gameLog.shift();
   if (activePanel === "log") renderPanel(activePanel);
+}
+
+function showPickupFeedback(message) {
+  if (!pickupFeedback || !pickupFeedbackTitle || !pickupFeedbackDetail) return;
+  const quantity = Math.max(1, message.quantity ?? 1);
+  const itemName = message.itemName ?? selectedInteractable?.name ?? "item";
+  pickupFeedbackTitle.textContent = message.isCoin ? "Coins gained" : "Item gained";
+  pickupFeedbackDetail.textContent = message.isCoin
+    ? `+${quantity} coin${quantity === 1 ? "" : "s"}`
+    : `+${quantity} ${itemName}`;
+  pickupFeedback.classList.remove("hidden");
+  window.clearTimeout(pickupFeedbackTimeout);
+  pickupFeedbackTimeout = window.setTimeout(() => {
+    pickupFeedback.classList.add("hidden");
+  }, 4200);
 }
 
 function updateStatusText(override = null) {
@@ -1190,6 +1210,13 @@ function installDebugApi() {
         inventory: serverState.inventory.length
       };
     },
+    get pickupFeedback() {
+      return {
+        visible: Boolean(pickupFeedback && !pickupFeedback.classList.contains("hidden")),
+        title: pickupFeedbackTitle?.textContent ?? "",
+        detail: pickupFeedbackDetail?.textContent ?? ""
+      };
+    },
     setRoom(roomId) {
       setRoom(roomId, { fromRoomId: currentRoomId, snapCamera: true });
       return currentRoomId;
@@ -1219,6 +1246,10 @@ function installDebugApi() {
       serverState.client?.close();
       serverState.enabled = false;
       updateStatusText("Disconnected from Kotlin server; using local fallback.");
+    },
+    showPickupFeedback(message) {
+      showPickupFeedback(message);
+      return this.pickupFeedback;
     }
   };
 }

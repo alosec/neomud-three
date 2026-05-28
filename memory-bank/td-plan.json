@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:13:27.771Z",
+  "updated": "2026-05-28T17:20:41.749Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2178,6 +2178,29 @@
       ],
       "created": "2026-05-28T17:07:46Z",
       "updated": "2026-05-28T17:13:15Z"
+    },
+    {
+      "id": "neo-1fb2.9.1",
+      "project": "NeoMud",
+      "title": "Add HUD pickup feedback for live loot",
+      "description": "Show visible HUD feedback when server-confirmed item or coin pickup changes inventory, so live loot resolution is legible without opening the Inventory panel.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.9",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 103,
+          "body": "Completed: server-confirmed pickup_result now shows a compact HUD pickup toast; debug API exposes deterministic pickup feedback state; server-backed QA asserts the toast on live pickup when loot exists and always writes server-hidden-cave-pickup.png for UI review.",
+          "created": "2026-05-28T17:20:27Z"
+        }
+      ],
+      "created": "2026-05-28T17:15:28Z",
+      "updated": "2026-05-28T17:20:31Z"
     }
   ],
   "ready": [

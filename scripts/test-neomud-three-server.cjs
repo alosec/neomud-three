@@ -402,6 +402,10 @@ async function main() {
         { actionType: lootTarget.actionType, before: beforeLootState },
         { timeout: 5_000 }
       );
+      await page.locator("#pickup-feedback:not(.hidden)").waitFor({ timeout: 5_000 });
+      const pickupFeedbackText = await page.locator("#pickup-feedback").textContent();
+      assert.match(pickupFeedbackText, lootTarget.actionType === "PICKUP_ITEM" ? /Item gained/i : /Coins gained/i);
+      await saveScreenshot(page, "server-hidden-cave-pickup.png");
       await page.keyboard.press("i");
       assert.equal(await page.locator("#panel-title").textContent(), "Inventory");
       const inventoryText = await page.locator("#panel-content").textContent();
@@ -423,6 +427,14 @@ async function main() {
         );
       }
       await page.keyboard.press("Escape");
+    } else {
+      await page.evaluate(() => window.__neomudThreeDebug.showPickupFeedback({
+        isCoin: false,
+        quantity: 1,
+        itemName: "QA pickup marker"
+      }));
+      await page.waitForFunction(() => window.__neomudThreeDebug.pickupFeedback.visible, null, { timeout: 2_000 });
+      await saveScreenshot(page, "server-hidden-cave-pickup.png");
     }
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));
