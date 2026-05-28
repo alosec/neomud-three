@@ -103,7 +103,9 @@ export const TOWN_SQUARE_SPEC = {
         plasterMaterial: "plasterWarm",
         facadeMaterial: "plasterFacade",
         sign: false,
-        awning: "awningBlue"
+        awning: "awningBlue",
+        roofHeight: 1.48,
+        dormers: 0
       },
       stalls: [
         { x: 14.6, z: -7.6, awningMaterial: "awningBlue" },
@@ -145,23 +147,15 @@ export const TOWN_SQUARE_SPEC = {
         plasterMaterial: "plasterWarm",
         facadeMaterial: "plasterFacadeWarm",
         sign: false,
-        awning: "awningRed"
+        awning: "awningRed",
+        roofHeight: 1.62,
+        chimney: true,
+        dormers: 1
       }
     }
   ],
   features: {
-    fountain: { x: 0, z: 0, radius: 2.25 },
-    signpost: {
-      x: -7.25,
-      z: 5.15,
-      y: 1.95,
-      signs: [
-        { label: "Gate", subtitle: "North", palette: "green" },
-        { label: "Market", subtitle: "East", palette: "blue" },
-        { label: "Temple", subtitle: "South", palette: "gold" },
-        { label: "Tavern", subtitle: "West", palette: "red" }
-      ]
-    }
+    fountain: { x: 0, z: 0, radius: 2.25 }
   },
   entities: {
     npcPlacements: {
@@ -193,9 +187,7 @@ export const TOWN_SQUARE_SPEC = {
       { x: -6.1, z: -5.5 },
       { x: 6.1, z: -5.5 },
       { x: -6.1, z: 5.5 },
-      { x: 6.1, z: 5.5 },
-      { x: -14.4, z: 8.8 },
-      { x: 14.4, z: -8.8 }
+      { x: 6.1, z: 5.5 }
     ]
   },
   exits: [

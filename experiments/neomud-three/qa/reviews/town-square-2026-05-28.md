@@ -99,3 +99,18 @@ Total: 11/12
 Material delta: added deterministic procedural packed-dirt, gravel-road, and plaza-paver materials; added explicit fountain plaza and landmark stoop surfaces; added shallow paver borders to separate foreground plaza, route network, and building thresholds.
 
 Remaining visual gap: surface hierarchy is clearer, but the palette is still too yellow/tan overall and the scene still needs stronger facade/roof art direction.
+
+## Score After Facade And Palette Pass
+
+- Navigation readability: 2/2. Exits remain readable through landmark massing, large boards, threshold surfaces, and the compass; the removed center signpost reduces clutter without losing route clarity.
+- Scale believability: 1/2. The tavern roof, chimney, dormer, facade trim, and props read better, but the landmark buildings are still simple blockout forms rather than convincing authored architecture.
+- Semantic match: 2/2. The plaza still communicates gate, market, tavern, temple, fountain, Guildmaster, and Old Wren without relying on a stacked route sign.
+- Interaction clarity: 2/2. Entity proximity prompts and physical exit triggers still pass offline and server-backed tests.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Temple and server NPC entity checks pass after clearing stale local guest sessions.
+- Performance: 2/2. Latest headed Town Square drive reports 158 draw calls and 54,736 triangles.
+
+Total: 11/12
+
+Visual delta: removed the central signpost, cooled the road/plaza/ground palette, enlarged roof silhouettes, added limited tavern/market props, reduced dormers, and trimmed perimeter lamps to keep draw calls under the current budget.
+
+Remaining visual gap: this is a cleaner prototype, not a professional scene. The next high-leverage work is not more decoration; it is stronger component-level architecture, material/style rules, authored building proportions, and a real content QA loop for screenshots.

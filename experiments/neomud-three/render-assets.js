@@ -139,8 +139,8 @@ function valueNoise(ctx, width, height, base, flecks, alpha, random) {
 
 function packedDirtTexture() {
   return proceduralTexture("town-packed-dirt", [10, 10], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#777057", 1600, 0.13, random);
-    ctx.strokeStyle = "rgba(76, 68, 48, 0.10)";
+    valueNoise(ctx, width, height, "#6f745e", 1400, 0.09, random);
+    ctx.strokeStyle = "rgba(58, 66, 50, 0.08)";
     ctx.lineWidth = 1.2;
     for (let i = 0; i < 18; i++) {
       ctx.beginPath();
@@ -154,9 +154,9 @@ function packedDirtTexture() {
 
 function roadTexture() {
   return proceduralTexture("town-road-gravel", [7, 7], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#9b8461", 1800, 0.16, random);
-    ctx.fillStyle = "rgba(74, 58, 39, 0.10)";
-    for (let i = 0; i < 280; i++) {
+    valueNoise(ctx, width, height, "#878476", 1500, 0.1, random);
+    ctx.fillStyle = "rgba(58, 56, 50, 0.08)";
+    for (let i = 0; i < 220; i++) {
       ctx.beginPath();
       ctx.ellipse(random() * width, random() * height, 1 + random() * 3, 0.8 + random() * 2.4, random() * Math.PI, 0, Math.PI * 2);
       ctx.fill();
@@ -166,8 +166,8 @@ function roadTexture() {
 
 function plazaPaverTexture() {
   return proceduralTexture("town-plaza-pavers", [2.8, 2.8], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#aa966d", 900, 0.1, random);
-    ctx.strokeStyle = "rgba(70, 58, 40, 0.14)";
+    valueNoise(ctx, width, height, "#9fa29a", 750, 0.08, random);
+    ctx.strokeStyle = "rgba(54, 56, 52, 0.12)";
     ctx.lineWidth = 1.4;
     const cell = 56;
     for (let y = -cell; y < height + cell; y += cell) {
@@ -207,23 +207,23 @@ export function makeTempleMaterials() {
 export function makeTownMaterials() {
   return {
     cobble: standardMaterial({ map: texture("millhavenCobblestone", [3.7, 3.7]), color: 0xb9a77e, roughness: 0.9, metalness: 0.02 }),
-    road: standardMaterial({ map: roadTexture(), color: 0xd2c2a6, roughness: 0.94 }),
-    plazaStone: standardMaterial({ map: plazaPaverTexture(), color: 0xd9c8a2, roughness: 0.88 }),
-    pathEdge: standardMaterial({ color: 0x9c8a63, roughness: 0.88 }),
-    packedDirt: standardMaterial({ map: packedDirtTexture(), color: 0xbdb99a, roughness: 0.97 }),
-    stone: standardMaterial({ map: texture("templeLimestoneWall", [1.4, 1.4]), color: 0xb8ae95, roughness: 0.78 }),
+    road: standardMaterial({ map: roadTexture(), color: 0xc6c2b6, roughness: 0.94 }),
+    plazaStone: standardMaterial({ map: plazaPaverTexture(), color: 0xc9cbc2, roughness: 0.88 }),
+    pathEdge: standardMaterial({ color: 0x817c68, roughness: 0.88 }),
+    packedDirt: standardMaterial({ map: packedDirtTexture(), color: 0xa4ad91, roughness: 0.97 }),
+    stone: standardMaterial({ map: texture("templeLimestoneWall", [1.4, 1.4]), color: 0xa8ada5, roughness: 0.78 }),
     darkStone: standardMaterial({ map: texture("templeLimestoneWall", [1.1, 1.1]), color: 0x6a6254, roughness: 0.84 }),
     water: standardMaterial({ color: 0x67b5ce, roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 }),
     timber: standardMaterial({ color: 0x57351f, roughness: 0.78 }),
     darkTimber: standardMaterial({ color: 0x322013, roughness: 0.82 }),
-    trimLight: standardMaterial({ color: 0xd7c38d, roughness: 0.7 }),
+    trimLight: standardMaterial({ color: 0xc8bb94, roughness: 0.7 }),
     windowDark: standardMaterial({ color: 0x17212a, emissive: 0x0b151d, emissiveIntensity: 0.28, roughness: 0.48 }),
-    plaster: standardMaterial({ color: 0xc2b38c, roughness: 0.86 }),
-    plasterWarm: standardMaterial({ color: 0xd2be8f, roughness: 0.86 }),
-    plasterFacade: standardMaterial({ map: texture("townPlasterTimber"), roughness: 0.84 }),
-    plasterFacadeWarm: standardMaterial({ map: texture("townPlasterTimber"), color: 0xfff0c8, roughness: 0.84 }),
-    roof: standardMaterial({ color: 0x3f6673, roughness: 0.82 }),
-    roofRed: standardMaterial({ color: 0x7f3d2d, roughness: 0.84 }),
+    plaster: standardMaterial({ color: 0xb9b19d, roughness: 0.86 }),
+    plasterWarm: standardMaterial({ color: 0xc6b89c, roughness: 0.86 }),
+    plasterFacade: standardMaterial({ map: texture("townPlasterTimber"), color: 0xd3cabc, roughness: 0.84 }),
+    plasterFacadeWarm: standardMaterial({ map: texture("townPlasterTimber"), color: 0xd9c6aa, roughness: 0.84 }),
+    roof: standardMaterial({ color: 0x345e67, roughness: 0.82 }),
+    roofRed: standardMaterial({ color: 0x783e35, roughness: 0.84 }),
     awningRed: standardMaterial({ color: 0xa24532, roughness: 0.76 }),
     awningBlue: standardMaterial({ color: 0x385d7a, roughness: 0.76 }),
     awningGold: standardMaterial({ color: 0xb68537, roughness: 0.78 }),

@@ -972,6 +972,7 @@ function addBattlements(root, materials, x, y, z, width, depth) {
 function addMarketLandmark(root, materials, landmark) {
   const group = addGabledHouse(root, materials, resolveBuildingSpec(materials, landmark.building));
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  addMarketDetailProps(root, materials);
   for (const stall of landmark.stalls) {
     addComponentMarketStall(root, materials, {
       x: stall.x,
@@ -981,6 +982,17 @@ function addMarketLandmark(root, materials, landmark) {
       width: 3.0,
       depth: 1.5
     });
+  }
+}
+
+function addMarketDetailProps(root, materials) {
+  for (const [x, z, w, d] of [
+    [15.75, -6.2, 0.78, 0.58],
+    [15.85, -2.2, 0.62, 0.52],
+    [16.05, 1.4, 0.7, 0.56]
+  ]) {
+    addBox(root, materials.darkTimber, x, 0.24, z, w, 0.48, d, { rotationY: -Math.PI / 2 });
+    addBox(root, materials.trimLight, x, 0.54, z, w * 0.82, 0.12, d * 0.82, { rotationY: -Math.PI / 2 });
   }
 }
 
@@ -1006,6 +1018,22 @@ function addTavernLandmark(root, materials, landmark) {
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
   addBox(root, materials.darkTimber, -17.54, 3.0, -1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
   addBox(root, materials.darkTimber, -17.54, 3.0, 1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
+  addTavernDetailProps(root, materials);
+}
+
+function addTavernDetailProps(root, materials) {
+  for (const z of [-2.45, 2.45]) {
+    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 0.72, 18), materials.darkTimber);
+    barrel.position.set(-17.05, 0.36, z);
+    barrel.rotation.z = Math.PI / 2;
+    barrel.castShadow = true;
+    barrel.receiveShadow = true;
+    root.add(barrel);
+    addBox(root, materials.trimLight, -17.05, 0.36, z - 0.22, 0.06, 0.78, 0.05, { rotationY: Math.PI / 2 });
+    addBox(root, materials.trimLight, -17.05, 0.36, z + 0.22, 0.06, 0.78, 0.05, { rotationY: Math.PI / 2 });
+  }
+  addBox(root, materials.darkTimber, -16.85, 1.15, 0, 0.22, 2.3, 0.16, { rotationY: Math.PI / 2 });
+  addBox(root, materials.sign, -16.72, 2.15, 0, 0.1, 0.58, 1.8, { rotationY: Math.PI / 2 });
 }
 
 function resolveBuildingSpec(materials, building) {

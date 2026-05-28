@@ -66,7 +66,10 @@ export function addGabledHouse(root, materials, spec) {
     facadeMaterial = materials.plasterFacade ?? plasterMaterial,
     sign = false,
     awning = null,
-    label = ""
+    label = "",
+    roofHeight = 1.25,
+    chimney = false,
+    dormers = 0
   } = spec;
 
   const group = new THREE.Group();
@@ -100,11 +103,25 @@ export function addGabledHouse(root, materials, spec) {
   addBox(group, materials.portalDark ?? materials.darkTimber ?? materials.timber, 0, 0.92, depth / 2 + 0.13, 0.88, 1.48, 0.1);
   addBox(group, materials.trimLight ?? materials.sign, 0, 1.7, depth / 2 + 0.16, 1.1, 0.12, 0.12);
 
-  const roof = new THREE.Mesh(createGabledRoofGeometry(width + 0.7, depth + 0.65, 1.25), roofMaterial);
+  const roof = new THREE.Mesh(createGabledRoofGeometry(width + 1.05, depth + 0.9, roofHeight), roofMaterial);
   roof.position.set(0, totalHeight, 0);
   roof.castShadow = true;
   roof.receiveShadow = true;
   group.add(roof);
+  addBox(group, materials.darkTimber ?? materials.timber, 0, totalHeight + roofHeight * 0.55, depth / 2 + 0.04, width + 0.62, 0.12, 0.16);
+  addBox(group, materials.darkTimber ?? materials.timber, 0, totalHeight + roofHeight * 0.55, -depth / 2 - 0.04, width + 0.62, 0.12, 0.16);
+
+  if (chimney) {
+    addBox(group, materials.darkStone ?? materials.timber, -width * 0.34, totalHeight + roofHeight * 0.78, -depth * 0.18, 0.42, 1.35, 0.42);
+    addBox(group, materials.stone ?? materials.darkStone, -width * 0.34, totalHeight + roofHeight * 1.48, -depth * 0.18, 0.58, 0.22, 0.58);
+  }
+
+  for (let index = 0; index < dormers; index++) {
+    const offset = dormers === 1 ? 0 : -width * 0.18 + index * width * 0.36;
+    addBox(group, facadeMaterial, offset, totalHeight + 0.55, depth / 2 + 0.42, 0.78, 0.58, 0.18);
+    addBox(group, roofMaterial, offset, totalHeight + 0.92, depth / 2 + 0.42, 0.98, 0.24, 0.28);
+    addFacadeWindow(group, materials, offset, totalHeight + 0.52, depth / 2 + 0.54, 0.38, 0.34);
+  }
 
   if (sign) {
     if (label) {

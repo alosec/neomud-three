@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T06:55:23.192Z",
+  "updated": "2026-05-28T07:13:38.810Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -283,10 +283,15 @@
           "id": 37,
           "body": "Material hierarchy pass separated field, roads, plaza, and thresholds. Next Town Square work should reduce the yellow/tan palette and improve facade/roof silhouettes.",
           "created": "2026-05-28T06:55:03Z"
+        },
+        {
+          "id": 39,
+          "body": "Facade/palette pass shipped: central signpost removed, landmark boards carry navigation, surfaces cooled, tavern/market props added, lamps/dormers reduced. QA: offline smoke pass, server-backed pass, spec validation pass, headed Town Square 158 calls / 54,736 triangles.",
+          "created": "2026-05-28T07:13:14Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T06:55:03Z"
+      "updated": "2026-05-28T07:13:14Z"
     },
     {
       "id": "neo-1fb2.9",
@@ -382,10 +387,15 @@
           "id": 33,
           "body": "QA now covers entity metadata, Old Wren proximity interaction, dialogue panel content, server NPC entity resolution, and no failed sprite requests.",
           "created": "2026-05-28T06:30:08Z"
+        },
+        {
+          "id": 40,
+          "body": "QA checkpoint for facade/palette pass: node --check changed modules, spec validation, git diff --check, offline smoke, headed Canary playtest, and server-backed Temple -> Town Square -> Temple test all passed. Local server required clearing stale guest sessions first.",
+          "created": "2026-05-28T07:13:21Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T06:30:08Z"
+      "updated": "2026-05-28T07:13:21Z"
     },
     {
       "id": "neo-1fb2.12",
@@ -674,6 +684,29 @@
       ],
       "created": "2026-05-28T06:54:40Z",
       "updated": "2026-05-28T06:55:03Z"
+    },
+    {
+      "id": "neo-1fb2.23",
+      "project": "NeoMud",
+      "title": "Refine Town Square facades and palette",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 38,
+          "body": "Pass removes redundant central signpost, cools Town Square road/plaza/ground palette, adds restrained facade/roof props, reduces lamps/dormers, and keeps headed QA under budget at 158 draw calls / 54,736 triangles.",
+          "created": "2026-05-28T07:13:00Z"
+        }
+      ],
+      "created": "2026-05-28T07:12:40Z",
+      "updated": "2026-05-28T07:13:07Z"
     }
   ],
   "ready": [
