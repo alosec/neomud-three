@@ -1199,6 +1199,7 @@ function addForestEdgeStage(root, materials, worldRoot) {
   ], "forest-edge-surfaces");
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4);
+  addForestEdgeDepthLayers(root, materials);
   addForestEdgeSouthTownWall(root, materials);
   addForestEdgeTrees(root, materials);
   addForestEdgeDressing(root, materials);
@@ -1237,6 +1238,68 @@ function addForestEdgeSouthTownWall(root, materials) {
   addInstancedBoxes(root, materials.portalDark, dark, "forest-edge-south-gate-shadow", { castShadow: false, receiveShadow: false });
 }
 
+function addForestEdgeDepthLayers(root, materials) {
+  addInstancedBoxes(
+    root,
+    materials.foliageDark,
+    [
+      { x: -15.8, y: 1.02, z: -4.8, width: 0.62, height: 2.04, depth: 29.6 },
+      { x: 15.8, y: 1.02, z: -4.8, width: 0.62, height: 2.04, depth: 29.6 },
+      { x: -10.8, y: 0.58, z: -20.3, width: 7.4, height: 1.16, depth: 0.72 },
+      { x: 10.8, y: 0.58, z: -20.3, width: 7.4, height: 1.16, depth: 0.72 }
+    ],
+    "forest-edge-side-undergrowth"
+  );
+  addInstancedBoxes(
+    root,
+    materials.foliage,
+    [
+      { x: -13.6, y: 0.42, z: 4.2, width: 2.8, height: 0.84, depth: 5.8, rotationY: -0.08 },
+      { x: 13.5, y: 0.42, z: 3.9, width: 2.8, height: 0.84, depth: 5.6, rotationY: 0.08 },
+      { x: -13.2, y: 0.44, z: -12.4, width: 3.2, height: 0.88, depth: 7.8, rotationY: 0.12 },
+      { x: 13.2, y: 0.44, z: -12.6, width: 3.2, height: 0.88, depth: 7.8, rotationY: -0.12 }
+    ],
+    "forest-edge-side-shrub-masses",
+    { castShadow: false }
+  );
+
+  addTownContextTrees(root, materials, [
+    { x: -14.2, z: -20.2, scale: 1.62, rotationY: 0.44 },
+    { x: -10.6, z: -22.4, scale: 1.35, rotationY: -0.24 },
+    { x: -5.8, z: -23.2, scale: 1.18, rotationY: 0.18 },
+    { x: 5.8, z: -23.0, scale: 1.2, rotationY: -0.18 },
+    { x: 10.8, z: -22.1, scale: 1.42, rotationY: 0.28 },
+    { x: 14.2, z: -19.7, scale: 1.68, rotationY: -0.46 }
+  ]);
+
+  addInstancedGeometry(
+    root,
+    new THREE.DodecahedronGeometry(1, 0),
+    materials.foliageDark,
+    [
+      { x: -12.8, y: 7.2, z: -3.8, scale: [2.9, 1.05, 2.2], rotationY: 0.28 },
+      { x: 12.8, y: 7.1, z: -4.4, scale: [2.8, 1.0, 2.2], rotationY: -0.34 },
+      { x: -10.2, y: 7.7, z: -16.2, scale: [2.4, 0.9, 1.9], rotationY: -0.16 },
+      { x: 10.4, y: 7.8, z: -16.4, scale: [2.5, 0.92, 1.9], rotationY: 0.18 }
+    ],
+    "forest-edge-high-canopy-dark",
+    { castShadow: false, receiveShadow: false }
+  );
+  addInstancedGeometry(
+    root,
+    new THREE.DodecahedronGeometry(1, 0),
+    materials.foliage,
+    [
+      { x: -8.5, y: 6.65, z: -8.8, scale: [1.55, 0.68, 1.2], rotationY: 0.14 },
+      { x: 8.8, y: 6.72, z: -9.2, scale: [1.55, 0.68, 1.2], rotationY: -0.18 },
+      { x: -4.2, y: 7.25, z: -18.6, scale: [1.26, 0.54, 0.96], rotationY: -0.12 },
+      { x: 4.1, y: 7.2, z: -18.8, scale: [1.26, 0.54, 0.96], rotationY: 0.16 }
+    ],
+    "forest-edge-high-canopy-light",
+    { castShadow: false, receiveShadow: false }
+  );
+}
+
 function addForestEdgeTrees(root, materials) {
   const trees = [
     { x: -10.4, z: 10.2, scale: 1.35, rotationY: 0.22 },
@@ -1252,21 +1315,8 @@ function addForestEdgeTrees(root, materials) {
 }
 
 function addForestEdgeDressing(root, materials) {
-  const darkTimber = [
-    { x: -5.8, y: 0.36, z: -8.6, width: 3.5, height: 0.58, depth: 0.64, rotationY: 0.32 },
-    { x: -5.8, y: 0.74, z: -8.6, width: 3.1, height: 0.16, depth: 0.72, rotationY: 0.32 }
-  ];
-  const stones = [
-    { x: 5.8, y: 0.46, z: -7.4, width: 1.62, height: 0.92, depth: 1.12, rotationY: -0.25 },
-    { x: 6.7, y: 0.28, z: -6.55, width: 0.9, height: 0.56, depth: 0.72, rotationY: 0.44 }
-  ];
-  const moss = [
-    { x: 5.74, y: 0.98, z: -7.4, width: 1.35, height: 0.08, depth: 0.82, rotationY: -0.25 },
-    { x: -5.8, y: 1.06, z: -8.6, width: 2.4, height: 0.06, depth: 0.36, rotationY: 0.32 }
-  ];
-  addInstancedBoxes(root, materials.darkTimber, darkTimber, "forest-edge-fallen-log");
-  addInstancedBoxes(root, materials.darkStone, stones, "forest-edge-mossy-stones");
-  addInstancedBoxes(root, materials.foliage, moss, "forest-edge-moss-patches", { castShadow: false, receiveShadow: true });
+  addTownKitProp(root, materials, "log.fallen", { x: -5.8, z: -8.6, rotationY: 0.32, scale: 1.05 });
+  addTownKitProp(root, materials, "stone.moss", { x: 5.8, z: -7.4, rotationY: -0.25, scale: 1.12 });
 
   addInstancedGeometry(
     root,

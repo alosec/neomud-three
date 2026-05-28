@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T13:34:00.090Z",
+  "updated": "2026-05-28T13:43:22.545Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1758,6 +1758,27 @@
       "comments": [],
       "created": "2026-05-28T13:25:19Z",
       "updated": "2026-05-28T13:33:49Z"
+    },
+    {
+      "id": "neo-1fb2.60",
+      "project": "NeoMud",
+      "title": "Forest Edge depth and forest prop kit pass",
+      "description": "Improve the authored Forest Edge room without adding new rooms: add reusable forest prop components to Prop Zoo, layer the flat backdrop with depth cards/foreground canopy, preserve physical exits/collision/server behavior, and update screenshots/docs/QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added Forest Edge depth layers, staged ancient tree/fallen log/mossy stone in Prop Zoo, preserved budgets, and reran lab/offline/room/server QA",
+      "labels": [
+        "forest",
+        "neomud-three",
+        "visual-qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T13:36:43Z",
+      "updated": "2026-05-28T13:43:07Z"
     }
   ],
   "ready": [

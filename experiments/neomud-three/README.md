@@ -11,7 +11,7 @@ It currently:
 - Authors North Gate as a fortified gate stage with Town Guard, physical South/North triggers, and a tighter corridor camera.
 - Authors Forest Edge as a compact forest threshold with Forest Rat, physical South/North triggers, and lightweight tree/log/stone collision.
 - Defines approved material IDs and metadata in `render-assets.js`; rooms consume material sets instead of arbitrary generated files.
-- Provides a material lab and prop zoo so generated textures/components can be reviewed before entering rooms.
+- Provides a material lab and prop zoo so generated textures/components can be reviewed before entering rooms; the zoo now includes forest tree/log/stone props used by Forest Edge.
 - Lets you walk a compact fantasy adventurer avatar with sane movement: WASD/arrows turn and move, Q/E strafe, Shift runs, Space jumps, diagonals work. The old procedural walk bob has been removed; the visible gait is driven by explicit walk/run animation state.
 - Shows a compact player HUD with HP and movement mode.
 - Adds simple authored collision volumes for the Temple altar/dais, Town Square fountain/dressing, North Gate watchtowers/walls/guard post, Forest Edge trees/log/stones, and Tavern tables/bar/fireplace.

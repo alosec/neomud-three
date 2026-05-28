@@ -37,6 +37,9 @@ export const TOWN_KIT_PROPS = [
   { id: "altar.temple", label: "Temple Altar", category: "landmark" },
   { id: "gatehouse", label: "Gatehouse", category: "landmark" },
   { id: "gate.trim.stone", label: "Gate Trim", category: "landmark" },
+  { id: "tree.forest.ancient", label: "Ancient Forest Tree", category: "foliage" },
+  { id: "log.fallen", label: "Fallen Log", category: "foliage" },
+  { id: "stone.moss", label: "Mossy Stone", category: "foliage" },
   { id: "tree.context", label: "Context Tree", category: "background" }
 ];
 
@@ -150,6 +153,15 @@ export function addTownKitProp(root, materials, id, options = {}) {
       break;
     case "gate.trim.stone":
       addGateTrimSample(group, materials);
+      break;
+    case "tree.forest.ancient":
+      addAncientForestTree(group, materials);
+      break;
+    case "log.fallen":
+      addFallenLog(group, materials);
+      break;
+    case "stone.moss":
+      addMossyStone(group, materials);
       break;
     case "tree.context":
       addTreeSample(group, materials);
@@ -427,6 +439,50 @@ function addGateTrimSample(root, materials) {
   addBox(root, materials.darkTimber, 0, 2.42, -0.43, 1.64, 0.08, 0.08);
   addBox(root, materials.windowDark, -1.62, 1.92, -0.42, 0.14, 0.82, 0.08);
   addBox(root, materials.windowDark, 1.62, 1.92, -0.42, 0.14, 0.82, 0.08);
+}
+
+function addAncientForestTree(root, materials) {
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.62, 3.85, 8), materials.trunk);
+  trunk.position.y = 1.92;
+  trunk.castShadow = true;
+  trunk.receiveShadow = true;
+  root.add(trunk);
+
+  const lower = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), materials.foliageDark);
+  lower.position.set(-0.2, 4.18, 0);
+  lower.scale.set(2.28, 1.05, 1.82);
+  const side = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), materials.foliage);
+  side.position.set(0.82, 4.76, -0.1);
+  side.scale.set(1.34, 0.9, 1.22);
+  const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(1, 0), materials.foliage);
+  crown.position.set(-0.04, 5.3, 0.12);
+  crown.scale.set(1.52, 0.92, 1.34);
+  for (const mesh of [lower, side, crown]) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    root.add(mesh);
+  }
+}
+
+function addFallenLog(root, materials) {
+  addBox(root, materials.darkTimber, 0, 0.34, 0, 3.2, 0.56, 0.62, { rotationY: 0.24 });
+  addBox(root, materials.timber, -1.68, 0.34, -0.42, 0.42, 0.46, 0.34, { rotationY: 0.24 });
+  addBox(root, materials.foliageDark, -0.28, 0.72, 0.02, 1.45, 0.08, 0.32, { castShadow: false, rotationY: 0.24 });
+}
+
+function addMossyStone(root, materials) {
+  const main = new THREE.Mesh(new THREE.DodecahedronGeometry(0.72, 0), materials.darkStone);
+  main.position.set(-0.25, 0.52, 0);
+  main.scale.set(1.34, 0.72, 1.0);
+  const side = new THREE.Mesh(new THREE.DodecahedronGeometry(0.46, 0), materials.stone);
+  side.position.set(0.7, 0.33, 0.26);
+  side.scale.set(0.9, 0.55, 0.72);
+  for (const mesh of [main, side]) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    root.add(mesh);
+  }
+  addBox(root, materials.foliageDark, -0.28, 0.98, 0, 1.1, 0.08, 0.72, { castShadow: false, rotationY: -0.14 });
 }
 
 function addTreeSample(root, materials) {

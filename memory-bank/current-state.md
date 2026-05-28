@@ -22,7 +22,7 @@ Playable Three.js lab:
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
 - Generated/approved material usage now flows through explicit material IDs and metadata in `render-assets.js` rather than undocumented texture calls. The first material lab is at `material-lab.html`.
 - The first reusable TownKit prop set is staged in `prop-zoo.html` with the player avatar as a scale reference.
-- Prop Zoo now includes warm/support props beyond landmark shells: tavern table/stool, runner rug, stone ground trim, candle cluster, long planter, banner pole, string lanterns, crate stack, bench, altar, gatehouse, gate trim, low-poly broadleaf context tree, plaza tree, shrub clump, grass tuft, flower cluster, Tavern frontage, warm Tavern window, and projecting Tavern sign.
+- Prop Zoo now includes warm/support props beyond landmark shells: tavern table/stool, runner rug, stone ground trim, candle cluster, long planter, banner pole, string lanterns, crate stack, bench, altar, gatehouse, gate trim, low-poly broadleaf context tree, plaza tree, ancient forest tree, fallen log, mossy stone, shrub clump, grass tuft, flower cluster, Tavern frontage, warm Tavern window, and projecting Tavern sign.
 - HUD exit buttons, minimap movement, debug movement, and physical exit triggers now route through the same `move` command path when the server session is live.
 
 Cathedral status:
@@ -79,10 +79,10 @@ Forest Edge status:
 
 - `forest:edge` now has an authored Three.js room instead of the generic fallback shell.
 - The room uses real NeoMud exits: South returns to North Gate and North continues to Forest Path. Physical triggers, debug trigger metadata, collision volumes, and server-backed traversal all use the same movement path as the rest of the slice.
-- The scene is a compact forest threshold with a central dirt path, south town wall/gate silhouette, large low-poly trees, grass tufts, wildflowers, mossy stones, fallen log, and the existing forest-path backdrop.
+- The scene is a compact forest threshold with a central dirt path, south town wall/gate silhouette, large low-poly trees, layered side/back undergrowth, high canopy masses, grass tufts, wildflowers, mossy stones, fallen log, and the existing forest-path backdrop.
 - Forest Rat is rendered from NeoMud NPC/world/server data as a hostile interactable standee on the path edge.
 - Simple tree, log, and stone collision keeps the player from clipping through the main foreground dressing.
-- Visual quality is still first-pass. The generated forest backdrop is doing a lot of work, the stage edges are still obvious from some angles, and the trees/materials need a future depth-card/material pass. It is accepted as playable/authored slice work, not final forest art.
+- The first forest depth pass adds Prop Zoo-approved forest props, side shrub masses, back tree layers, and overhead canopy chunks. Visual quality is still first-pass: the generated forest backdrop is doing a lot of work, the stage edges are still visible from some angles, and the forest material family needs a later dedicated pass. It is accepted as playable/authored slice work, not final forest art.
 
 Tavern status:
 
@@ -128,12 +128,12 @@ Test status:
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 22 textures / 29 geometries; Forest Edge 32 calls / 3,214 triangles / 25 textures / 26 geometries; Tavern 106 calls / 6,728 triangles / 27 textures / 59 geometries.
-- Latest server-backed QA reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 21 textures / 29 geometries; Forest Edge 32 calls / 3,214 triangles / 23 textures / 26 geometries; Tavern 106 calls / 6,728 triangles / 27 textures / 59 geometries.
+- Latest offline smoke reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 22 textures / 29 geometries; Forest Edge 42 calls / 4,270 triangles / 25 textures / 36 geometries; Tavern 106 calls / 6,728 triangles / 27 textures / 59 geometries.
+- Latest server-backed QA reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 21 textures / 29 geometries; Forest Edge 42 calls / 4,270 triangles / 23 textures / 36 geometries; Tavern 105 calls / 6,716 triangles / 27 textures / 59 geometries.
 - Latest Town Square screenshot-anchor QA reports 133 calls / 10,058 triangles / 19 textures / 189 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 259 calls / 33,372 triangles / 6 textures / 180 geometries; Town Square 203 calls / 13,518 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 21 textures / 29 geometries; Forest Edge 32 calls / 3,214 triangles / 23 textures / 26 geometries; Tavern 106 calls / 6,728 triangles / 25 textures / 59 geometries, with no console errors or failed requests.
+- Latest authored-room screenshot QA reports Temple 259 calls / 33,372 triangles / 6 textures / 196 geometries; Town Square 203 calls / 13,518 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 21 textures / 29 geometries; Forest Edge 42 calls / 4,270 triangles / 23 textures / 36 geometries; Tavern 106 calls / 6,728 triangles / 25 textures / 59 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest Prop Zoo QA reports 246 draw calls, 4,977 triangles, 39 textures, 161 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest Prop Zoo QA reports 259 draw calls, 5,243 triangles, 42 textures, 171 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.
 - Browser QA scripts write screenshots into ignored `experiments/neomud-three/qa/latest/`.
 - Manual Canary QA is currently pointed at `http://127.0.0.1:4183/experiments/neomud-three/`.
