@@ -51,6 +51,7 @@ Town Square status:
 - The current courtyard/foliage pass adds larger low-poly broadleaf trees inside the actual Town Square composition instead of only at the far edge, plus benches, planters, banners, crate stacks, shrubs, grass tufts, flower clusters, and collision for fountain/tree/dressing volumes.
 - The west Tavern landmark is now larger and less flat: the generic red awning was replaced with a Prop Zoo-approved frontage/porch, warm lower windows, heavier roof massing, and instanced live-room window batches to preserve budget headroom.
 - The east Market Hall landmark is now larger and clearer, with a readable Market sign, fewer/larger stalls, and instanced crate/produce detail instead of several one-off prop meshes.
+- The north Gate landmark now has a low-budget trim pass: instanced banner and portal trim planes add architectural readability while increasing full-smoke Town Square cost by only 2 draw calls and 10 triangles.
 - New Town Square screenshot QA anchors write fixed north/gate/tavern/market/temple views through `scripts/test-neomud-three-town-shots.cjs`.
 - Authored-room screenshot QA now writes fixed Temple nave/altar, Town Square plaza, and Tavern entry/bar views through `scripts/test-neomud-three-room-shots.cjs`.
 - The component layer now caches shared box geometries while still disposing scene geometries on room teardown, which keeps route-to-route render budgets meaningful.
@@ -101,10 +102,10 @@ Test status:
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 101 calls / 54,881 triangles / 22 textures / 59 geometries.
-- Latest server-backed QA reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 101 calls / 54,881 triangles / 21 textures / 59 geometries.
-- Latest Town Square screenshot-anchor QA reports 136 calls / 55,911 triangles / 20 textures / 199 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 329 calls / 81,549 triangles / 7 textures / 297 geometries; Town Square 222 calls / 59,747 triangles / 19 textures / 155 geometries; Tavern 101 calls / 54,881 triangles / 21 textures / 59 geometries, with no console errors or failed requests.
+- Latest offline smoke reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 232 calls / 59,833 triangles / 19 textures / 157 geometries; Tavern 101 calls / 54,881 triangles / 22 textures / 59 geometries.
+- Latest server-backed QA reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 232 calls / 59,833 triangles / 19 textures / 157 geometries; Tavern 100 calls / 54,869 triangles / 21 textures / 59 geometries.
+- Latest Town Square screenshot-anchor QA reports 136 calls / 55,911 triangles / 20 textures / 201 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest authored-room screenshot QA reports Temple 329 calls / 81,549 triangles / 7 textures / 297 geometries; Town Square 224 calls / 59,757 triangles / 19 textures / 153 geometries; Tavern 101 calls / 54,881 triangles / 21 textures / 59 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest Prop Zoo QA reports 207 draw calls, 53,118 triangles, 36 textures, 173 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.

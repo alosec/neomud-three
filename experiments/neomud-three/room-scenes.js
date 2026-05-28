@@ -1843,7 +1843,40 @@ function addGatehouseLandmark(root, materials, landmark) {
   addBox(group, materials.stone, landmark.lintel.x, 5.2, landmark.lintel.z, landmark.lintel.width, landmark.lintel.height, landmark.lintel.depth);
   addBox(group, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
   addBox(group, materials.portalDark, landmark.portal.x, landmark.portal.height / 2, landmark.portal.z, landmark.portal.width, landmark.portal.height, landmark.portal.depth);
+  addGatehouseTrim(group, materials, landmark);
   addPortalFrame(root, materials, portalFrameSpec(landmark));
+}
+
+function addGatehouseTrim(root, materials, landmark) {
+  const frontZ = Math.max(...landmark.towers.map((tower) => tower.z + tower.depth / 2)) + 0.035;
+  const bannerGeometry = new THREE.PlaneGeometry(1, 1);
+  addInstancedGeometry(
+    root,
+    bannerGeometry,
+    materials.awningBlue,
+    landmark.towers.map((tower) => ({
+      x: tower.x,
+      y: tower.height * 0.43,
+      z: frontZ,
+      scale: [0.58, 2.35, 1]
+    })),
+    "north-gate-banners",
+    { castShadow: false, receiveShadow: false }
+  );
+
+  const trimGeometry = new THREE.PlaneGeometry(1, 1);
+  addInstancedGeometry(
+    root,
+    trimGeometry,
+    materials.trimLight,
+    [
+      { x: landmark.portal.x - landmark.portal.width * 0.56, y: landmark.portal.height * 0.52, z: frontZ + 0.018, scale: [0.18, landmark.portal.height * 0.82, 1] },
+      { x: landmark.portal.x + landmark.portal.width * 0.56, y: landmark.portal.height * 0.52, z: frontZ + 0.018, scale: [0.18, landmark.portal.height * 0.82, 1] },
+      { x: landmark.portal.x, y: landmark.portal.height + 0.28, z: frontZ + 0.02, scale: [landmark.portal.width * 1.22, 0.18, 1] }
+    ],
+    "north-gate-portal-trim",
+    { castShadow: false, receiveShadow: false }
+  );
 }
 
 function addBattlements(root, materials, x, y, z, width, depth) {

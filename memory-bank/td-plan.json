@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T10:38:56.606Z",
+  "updated": "2026-05-28T10:46:31.921Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1452,6 +1452,23 @@
       "comments": [],
       "created": "2026-05-28T10:35:08Z",
       "updated": "2026-05-28T10:38:22Z"
+    },
+    {
+      "id": "neo-1fb2.56",
+      "project": "NeoMud",
+      "title": "Refine north gate landmark with low-budget trim",
+      "description": "Improve Town Square north gate readability and architectural finish using instanced trim/banners only; preserve current Town Square render budgets and physical exit behavior.",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added low-cost instanced banner and portal trim planes to the north gate and kept Town Square under budget",
+      "labels": [],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T10:41:07Z",
+      "updated": "2026-05-28T10:46:13Z"
     }
   ],
   "ready": [
