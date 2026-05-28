@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T07:25:21.261Z",
+  "updated": "2026-05-28T07:42:24.631Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -288,10 +288,15 @@
           "id": 39,
           "body": "Facade/palette pass shipped: central signpost removed, landmark boards carry navigation, surfaces cooled, tavern/market props added, lamps/dormers reduced. QA: offline smoke pass, server-backed pass, spec validation pass, headed Town Square 158 calls / 54,736 triangles.",
           "created": "2026-05-28T07:13:14Z"
+        },
+        {
+          "id": 44,
+          "body": "Playable slice expanded: Town Square west exit now enters authored Rusty Tankard Tavern scene, then returns to Town Square through an east physical exit. Offline/server tests assert Barkeep Grom and round-trip movement.",
+          "created": "2026-05-28T07:42:09Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T07:13:14Z"
+      "updated": "2026-05-28T07:42:09Z"
     },
     {
       "id": "neo-1fb2.9",
@@ -735,6 +740,29 @@
       ],
       "created": "2026-05-28T07:24:34Z",
       "updated": "2026-05-28T07:24:57Z"
+    },
+    {
+      "id": "neo-1fb2.25",
+      "project": "NeoMud",
+      "title": "Author Tavern interior scene",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 43,
+          "body": "Added authored Rusty Tankard room with open cutaway interior, room-specific camera rig, Barkeep Grom interactable from NeoMud NPC data, east physical exit to Town Square, Tavern render budgets, and offline/server tests for Town Square -> Tavern -> Town Square.",
+          "created": "2026-05-28T07:41:33Z"
+        }
+      ],
+      "created": "2026-05-28T07:41:13Z",
+      "updated": "2026-05-28T07:41:50Z"
     }
   ],
   "ready": [

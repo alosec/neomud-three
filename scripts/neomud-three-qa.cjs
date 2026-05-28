@@ -13,6 +13,12 @@ const RENDER_BUDGETS = {
     triangles: 60_000,
     textures: 48,
     geometries: 230
+  },
+  "town:tavern": {
+    calls: 120,
+    triangles: 60_000,
+    textures: 32,
+    geometries: 100
   }
 };
 

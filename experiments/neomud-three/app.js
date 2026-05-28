@@ -994,15 +994,16 @@ function updatePlayer(dt) {
 function updateCamera(dt, snap = false) {
   const forward = new THREE.Vector3(Math.sin(movement.heading), 0, -Math.cos(movement.heading));
   const right = new THREE.Vector3(Math.cos(movement.heading), 0, Math.sin(movement.heading));
+  const rig = roomRuntime?.camera ?? {};
   const desired = player.position
     .clone()
-    .addScaledVector(forward, -8.6)
-    .addScaledVector(right, -0.35)
-    .add(new THREE.Vector3(0, 5.35, 0));
+    .addScaledVector(forward, -(rig.distance ?? 8.6))
+    .addScaledVector(right, rig.sideOffset ?? -0.35)
+    .add(new THREE.Vector3(0, rig.height ?? 5.35, 0));
   const lookTarget = player.position
     .clone()
-    .addScaledVector(forward, 3.0)
-    .add(new THREE.Vector3(0, 1.45, 0));
+    .addScaledVector(forward, rig.lookAhead ?? 3.0)
+    .add(new THREE.Vector3(0, rig.targetHeight ?? 1.45, 0));
 
   if (snap) {
     camera.position.copy(desired);

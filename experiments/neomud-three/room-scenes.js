@@ -162,6 +162,105 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
   };
 }
 
+export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = makeTownMaterials();
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  const fire = new THREE.Group();
+  root.add(entityLayer);
+  root.add(fire);
+
+  addTavernInterior(root, materials, fire);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addTavernEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(4.35, 0, 0), heading: -Math.PI / 2 },
+    status: "The Rusty Tankard: authored tavern interior with bar, fireplace, trapdoor, and server-driven barkeep.",
+    environment: {
+      background: 0x21140c,
+      fog: 0x21140c,
+      fogDensity: 0.018
+    },
+    camera: {
+      distance: 5.4,
+      height: 3.15,
+      sideOffset: -0.18,
+      lookAhead: 2.1,
+      targetHeight: 1.28
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      return fromRoomId === "town:square"
+        ? { position: new THREE.Vector3(4.35, 0, 0), heading: -Math.PI / 2 }
+        : this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -7.35, 7.35);
+      position.z = THREE.MathUtils.clamp(position.z, -5.75, 5.75);
+    },
+    exitAt(position) {
+      return position.x > 7.05 && Math.abs(position.z) < 2.05 ? "town:square" : null;
+    },
+    debugTriggers() {
+      return [
+        {
+          id: "exit-east-square",
+          direction: "EAST",
+          targetId: "town:square",
+          prompt: "Return to Town Square",
+          trigger: { type: "box", center: [7.25, 1, 0], size: [1.2, 3, 4.1] },
+          affordance: {
+            label: "Town Square",
+            subtitle: "East Door"
+          }
+        }
+      ];
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    nearestInteractable(position, maxDistance = 2.45) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update() {
+      fire.children.forEach((child, index) => {
+        if (child.material?.opacity) {
+          child.material.opacity = 0.46 + Math.sin(performance.now() * 0.007 + index) * 0.13;
+        }
+      });
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0016 + index) * 0.018;
+        }
+      });
+    }
+  };
+}
+
 export function buildGenericRoom({ root, room, worldRoot, rooms }) {
   const materials = makeGenericMaterials(room);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), materials.floor);
@@ -204,6 +303,195 @@ export function buildGenericRoom({ root, room, worldRoot, rooms }) {
     },
     update() {}
   };
+}
+
+function addTavernInterior(root, materials, fireGroup) {
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(16.8, 12.8), materials.darkTimber);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  root.add(floor);
+
+  addBox(root, materials.plasterWarm, -8.25, 2.25, 0, 0.42, 4.5, 12.8, { castShadow: false });
+  addBox(root, materials.plaster, 0, 2.25, -6.25, 16.8, 4.5, 0.42, { castShadow: false });
+  addBox(root, materials.plaster, 0, 2.25, 6.25, 16.8, 4.5, 0.42, { castShadow: false });
+  addBox(root, materials.darkTimber, 8.05, 2.2, -2.42, 0.36, 4.4, 0.42);
+  addBox(root, materials.darkTimber, 8.05, 2.2, 2.42, 0.36, 4.4, 0.42);
+
+  for (const z of [-5.2, -2.6, 0, 2.6, 5.2]) {
+    addBox(root, materials.timber, 0, 4.16, z, 16.9, 0.28, 0.28);
+  }
+  for (const x of [-6.2, -3.1, 0, 3.1, 6.2]) {
+    addBox(root, materials.darkTimber, x, 0.075, 0, 0.12, 0.15, 12.5, { castShadow: false });
+  }
+
+  addTavernBar(root, materials);
+  addTavernFireplace(root, materials, fireGroup);
+  addTavernTables(root, materials);
+  addTavernTrapdoor(root, materials);
+  addTavernExit(root, materials);
+
+  const roomLight = new THREE.PointLight(0xffa04f, 4.6, 13.2);
+  roomLight.position.set(-1.2, 3.5, -1.2);
+  root.add(roomLight);
+  const doorFill = new THREE.PointLight(0xd9e5ff, 1.2, 6.2);
+  doorFill.position.set(7.0, 2.8, 0);
+  root.add(doorFill);
+}
+
+function addTavernBar(root, materials) {
+  addBox(root, materials.darkTimber, -6.0, 0.72, -2.35, 1.05, 1.44, 6.45);
+  addBox(root, materials.timber, -5.42, 1.52, -2.35, 0.72, 0.24, 6.8);
+  addBox(root, materials.trimLight, -5.03, 1.68, -2.35, 0.18, 0.18, 6.85);
+  addBox(root, materials.darkTimber, -7.96, 2.35, -2.35, 0.26, 2.1, 6.8);
+  addBox(root, materials.timber, -7.68, 3.35, -2.35, 0.42, 0.18, 6.6);
+  for (const z of [-4.7, -3.5, -2.3, -1.1, 0.1]) {
+    const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.24, 12), materials.sign);
+    mug.position.set(-4.95, 1.92, z);
+    mug.castShadow = true;
+    root.add(mug);
+  }
+}
+
+function addTavernFireplace(root, materials, fireGroup) {
+  addBox(root, materials.darkStone, -8.0, 1.16, 3.35, 0.46, 2.32, 2.2);
+  addBox(root, materials.portalDark, -7.7, 0.9, 3.35, 0.18, 1.45, 1.28);
+  addBox(root, materials.darkStone, -7.52, 1.85, 3.35, 0.34, 0.34, 1.78);
+  addBox(root, materials.darkTimber, -7.45, 0.46, 3.05, 0.36, 0.18, 0.88);
+  addBox(root, materials.darkTimber, -7.45, 0.46, 3.64, 0.36, 0.18, 0.88);
+
+  for (const [z, color] of [[3.12, 0xff4f22], [3.36, 0xffb13a], [3.58, 0xffe07a]]) {
+    const flame = new THREE.Mesh(
+      new THREE.ConeGeometry(0.18, 0.72, 10),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.56 })
+    );
+    flame.position.set(-7.42, 0.88, z);
+    flame.rotation.z = -0.28;
+    fireGroup.add(flame);
+  }
+  const fireLight = new THREE.PointLight(0xff7d2f, 6.4, 8.6);
+  fireLight.position.set(-6.8, 1.9, 3.35);
+  root.add(fireLight);
+}
+
+function addTavernTables(root, materials) {
+  for (const table of [
+    { x: -1.8, z: -4.0, rotation: 0.18 },
+    { x: 2.65, z: -3.25, rotation: -0.24 },
+    { x: -0.4, z: 3.25, rotation: 0.42 },
+    { x: 3.8, z: 2.45, rotation: -0.12 }
+  ]) {
+    addTavernTable(root, materials, table);
+  }
+}
+
+function addTavernTable(root, materials, { x, z, rotation }) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = rotation;
+  root.add(group);
+
+  addBox(group, materials.darkTimber, 0, 0.55, 0, 1.55, 0.24, 1.05);
+  addBox(group, materials.timber, -0.55, 0.22, -0.32, 0.16, 0.44, 0.16);
+  addBox(group, materials.timber, 0.55, 0.22, -0.32, 0.16, 0.44, 0.16);
+  addBox(group, materials.timber, -0.55, 0.22, 0.32, 0.16, 0.44, 0.16);
+  addBox(group, materials.timber, 0.55, 0.22, 0.32, 0.16, 0.44, 0.16);
+  addBox(group, materials.timber, 0, 0.38, -0.82, 1.52, 0.22, 0.28);
+  addBox(group, materials.timber, 0, 0.38, 0.82, 1.52, 0.22, 0.28);
+}
+
+function addTavernTrapdoor(root, materials) {
+  addBox(root, materials.portalDark, -1.7, 0.05, 4.65, 1.85, 0.08, 1.32, { castShadow: false });
+  addBox(root, materials.trimLight, -1.7, 0.11, 4.65, 1.95, 0.06, 0.12, { castShadow: false });
+  addBox(root, materials.trimLight, -2.62, 0.11, 4.65, 0.12, 0.06, 1.38, { castShadow: false });
+  addTextBoard(root, "Cellar", {
+    x: -1.7,
+    y: 0.64,
+    z: 4.65,
+    width: 1.6,
+    height: 0.36,
+    subtitle: "Locked",
+    palette: "gold"
+  });
+}
+
+function addTavernExit(root, materials) {
+  addBox(root, materials.trimLight, 7.35, 0.09, -2.08, 0.18, 0.18, 0.64, { castShadow: false });
+  addBox(root, materials.trimLight, 7.35, 0.09, 2.08, 0.18, 0.18, 0.64, { castShadow: false });
+  addExitThreshold(root, { x: 7.15, z: 0, width: 1.1, depth: 4.15, color: 0xe3c36e, opacity: 0.22 });
+}
+
+function addTavernEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const placements = {
+    "npc:barkeep": {
+      position: [-5.6, 0, -2.2],
+      heading: Math.PI / 2,
+      role: "Barkeep",
+      palette: "red",
+      width: 1.62,
+      height: 2.85
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = placements[normalized.id] ?? {
+      position: [1.2 + index * 1.15, 0, 2.8 - index * 0.8],
+      heading: Math.PI,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 3,
+      width: placement.width ?? 1.68,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = 1.2 + index * 0.8;
+    const z = -1.5 + (index % 2) * 1.3;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Ground",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
 }
 
 function addTempleShell(root, materials) {
@@ -891,13 +1179,13 @@ function imageId(id) {
 function npcRoleLabel(npc) {
   if (npc.behaviorType === "trainer") return "Trainer";
   if (npc.behaviorType === "quest") return "Quest";
-  if (npc.behaviorType === "merchant") return "Merchant";
+  if (npc.behaviorType === "merchant" || npc.behaviorType === "vendor") return "Vendor";
   return "NPC";
 }
 
 function npcPalette(npc) {
   if (npc.behaviorType === "quest") return "blue";
-  if (npc.behaviorType === "merchant") return "red";
+  if (npc.behaviorType === "merchant" || npc.behaviorType === "vendor") return "red";
   return "gold";
 }
 

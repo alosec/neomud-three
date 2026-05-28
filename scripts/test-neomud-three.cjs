@@ -139,6 +139,47 @@ async function main() {
     assert.match(await page.locator("#panel-content").textContent(), /blood|Wardens/i);
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -20.2, z: 0, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:tavern",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "The Rusty Tankard");
+    const tavernTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(tavernTriggers.some((trigger) => trigger.id === "exit-east-square"));
+    const tavernEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      tavernEntities.some((entity) => entity.id === "npc:barkeep" && /Barkeep Grom/i.test(entity.name)),
+      `expected Barkeep Grom entity in Tavern, got ${JSON.stringify(tavernEntities)}`
+    );
+    await saveScreenshot(page, "offline-tavern.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:tavern"));
+    assertRenderBudget(assert, "town:tavern", budgetReports.at(-1).stats);
+
+    const barkeep = tavernEntities.find((entity) => entity.id === "npc:barkeep");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.1, z, heading: -Math.PI / 2 }), barkeep);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:barkeep",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Barkeep Grom/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Barkeep Grom");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 6.8, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:square",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(

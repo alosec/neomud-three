@@ -12,7 +12,7 @@ Playable Three.js lab:
 
 - The lab lives in `experiments/neomud-three/`.
 - It loads NeoMud default-world zone JSON from `maker/default_world_src`.
-- It builds a playable vertical slice from `town:temple` to `town:square`.
+- It builds a playable vertical slice across `town:temple`, `town:square`, and `town:tavern`.
 - By default, the lab connects to the Kotlin/JVM NeoMud server at `ws://127.0.0.1:8080/game`, logs in as an ephemeral guest, and treats `room_info` / `move_ok` as the authoritative room state.
 - `?offline=1` disables the server path and uses the static room graph fallback.
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
@@ -45,6 +45,15 @@ Town Square status:
 - The scene is more readable and less toy-like, but still not reconstructed as a convincing professional 3D place. Material hierarchy, authored player art, richer NPC staging, and chunked distant scenery remain active work.
 - Renderer QA now records render calls, triangles, texture count, and geometry count. The browser tests enforce current budgets for Temple and Town Square, and the headed playtest writes `experiments/neomud-three/qa/latest/report.json` with budget pass/fail details.
 
+Tavern status:
+
+- `town:tavern` now has an authored Three.js interior instead of the generic fallback shell.
+- The Rusty Tankard is a cutaway stage with plank floor, side walls, low beams, bar counter, mugs, fireplace, tables/benches, a locked cellar hatch marker, and an open east threshold back to Town Square.
+- The room uses a room-specific camera rig override because the outdoor follow camera clips badly in interior spaces.
+- Barkeep Grom is rendered from NeoMud NPC/world/server data as an interactable standee behind the bar.
+- Offline and server-backed tests physically move Town Square -> Tavern -> Town Square and assert the Barkeep entity is present.
+- Visual quality is still blockout-grade, but it is now a real playable third room in the server-authoritative slice.
+
 Local app/server status:
 
 - Local server defaults were adjusted to bind to `127.0.0.1` instead of all interfaces.
@@ -66,11 +75,12 @@ Test status:
 - `scripts/test-neomud-three.cjs` runs a local browser smoke test against the offline Three renderer at `?offline=1`.
 - The offline smoke test checks rendered triangles, avatar initialization, run animation activation, default room data, forward movement, diagonal/strafe movement, jump/landing, Town Square trigger/prompt/affordance metadata, physical South -> Temple movement, console errors, and failed HTTP requests.
 - The offline smoke test also verifies Town Square entity metadata for Guildmaster Aldric and Old Wren, moves near Old Wren, opens the interaction panel, and checks dialogue content.
-- `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, crosses physical exit triggers for Temple -> Town Square -> Temple, asserts server-confirmed room transitions, and verifies server NPCs resolve to visible Town Square entities.
+- `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, crosses physical exit triggers for Temple -> Town Square -> Tavern -> Town Square -> Temple, asserts server-confirmed room transitions, and verifies server NPCs resolve to visible Town Square/Tavern entities.
 - If the server-backed test times out on auth with `Too many guest sessions`, restart the local `com.neomud.server.ApplicationKt` process and rerun the test; this is local session saturation rather than a renderer failure.
 - `scripts/validate-neomud-three-specs.mjs` checks that the authored Town Square render spec has physical trigger boxes and that every visual exit maps to the real NeoMud room graph.
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed Town Square QA after the render-budget gate reports 158 draw calls, 54,736 triangles, 19 textures, 222 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.
 - Both browser tests write QA screenshots into ignored `experiments/neomud-three/qa/latest/`.
 - Manual Canary QA is currently pointed at `http://127.0.0.1:4183/experiments/neomud-three/`.
