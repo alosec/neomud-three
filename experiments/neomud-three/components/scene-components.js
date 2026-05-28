@@ -202,7 +202,8 @@ export function addNpcStandee(root, materials, spec) {
     rotationY = 0,
     height = 3.05,
     width = 1.7,
-    palette = "gold"
+    palette = "gold",
+    showLabel = false
   } = spec;
 
   const group = new THREE.Group();
@@ -249,16 +250,18 @@ export function addNpcStandee(root, materials, spec) {
   sprite.renderOrder = 6;
   group.add(sprite);
 
-  addTextBoard(group, name, {
-    x: 0,
-    y: height + 0.68,
-    z: 0.18,
-    width: Math.max(2.5, Math.min(4.1, name.length * 0.22)),
-    height: 0.58,
-    subtitle: role,
-    palette,
-    renderOrder: 11
-  });
+  if (showLabel) {
+    addTextBoard(group, name, {
+      x: 0,
+      y: height + 0.68,
+      z: 0.18,
+      width: Math.max(2.5, Math.min(4.1, name.length * 0.22)),
+      height: 0.58,
+      subtitle: role,
+      palette,
+      renderOrder: 11
+    });
+  }
 
   const light = new THREE.PointLight(palette === "blue" ? 0x9bd8ee : palette === "red" ? 0xf0a070 : 0xf0c878, 0.85, 4.2);
   light.position.set(0, 1.45, 0.4);

@@ -673,8 +673,8 @@ function addTownSpecSignpost(root, materials, signpostSpec) {
       x: offset.x,
       y: offset.y,
       z: offset.z,
-      width: 1.86,
-      height: 0.42,
+      width: 1.58,
+      height: 0.34,
       subtitle: sign.subtitle,
       palette: sign.palette,
       renderOrder: 10
@@ -724,6 +724,7 @@ function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, room
 
     const placement = spec.entities?.npcPlacements?.[normalized.id] ?? fallbackNpcPlacement(index);
     const [x, , z] = placement.position;
+    addNpcStaging(root, materials, normalized, placement);
     addNpcStandee(root, materials, {
       id: normalized.id,
       name: normalized.name,
@@ -734,7 +735,8 @@ function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, room
       rotationY: placement.heading ?? 0,
       height: placement.height ?? 3,
       width: placement.width ?? 1.68,
-      palette: placement.palette ?? npcPalette(normalized)
+      palette: placement.palette ?? npcPalette(normalized),
+      showLabel: placement.showLabel ?? false
     });
 
     interactables.push({
@@ -777,6 +779,50 @@ function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, room
       position: new THREE.Vector3(x, 0, z)
     });
   }
+}
+
+function addNpcStaging(root, materials, npc, placement) {
+  const [x, , z] = placement.position;
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = placement.heading ?? 0;
+  group.userData = { kind: "npc-staging", npcId: npc.id };
+  root.add(group);
+
+  if (npc.id === "npc:guildmaster") {
+    addTrainingStaging(group, materials);
+  } else if (npc.id === "npc:old_wren") {
+    addWrenStaging(group, materials);
+  }
+}
+
+function addTrainingStaging(root, materials) {
+  addBox(root, materials.road, 0, 0.022, 0, 2.35, 0.04, 1.7, { castShadow: false });
+  addBox(root, materials.darkTimber, -1.35, 1.05, -0.85, 0.12, 2.1, 0.12);
+  addBox(root, materials.darkTimber, -1.35, 1.92, -0.05, 0.12, 0.12, 1.72);
+  addBox(root, materials.trimLight ?? materials.sign, -1.35, 1.2, -0.45, 0.08, 1.4, 0.08, { rotationZ: 0.38 });
+  addBox(root, materials.trimLight ?? materials.sign, -1.35, 1.2, 0.45, 0.08, 1.4, 0.08, { rotationZ: -0.38 });
+  addBox(root, materials.sign, 1.02, 0.32, -0.72, 0.92, 0.26, 0.48);
+  addBox(root, materials.darkTimber, 1.02, 0.58, -0.72, 0.62, 0.08, 0.34);
+}
+
+function addWrenStaging(root, materials) {
+  addBox(root, materials.road, 0, 0.02, 0, 2.15, 0.04, 1.35, { castShadow: false });
+  addBox(root, materials.darkTimber, -0.95, 0.38, -0.58, 0.26, 0.76, 0.22);
+  addBox(root, materials.timber, -0.36, 0.72, -0.7, 1.45, 0.14, 0.34);
+  addBox(root, materials.timber, -0.36, 0.44, -0.84, 1.32, 0.12, 0.12);
+  addBox(root, materials.darkTimber, -0.95, 0.26, -0.92, 0.1, 0.52, 0.1);
+  addBox(root, materials.darkTimber, 0.22, 0.26, -0.92, 0.1, 0.52, 0.1);
+
+  const lantern = new THREE.PointLight(0x9bd8ee, 1.25, 4.6);
+  lantern.position.set(0.82, 0.82, -0.44);
+  root.add(lantern);
+  const lanternGlass = new THREE.Mesh(
+    new THREE.SphereGeometry(0.13, 12, 8),
+    new THREE.MeshBasicMaterial({ color: 0x9bd8ee, transparent: true, opacity: 0.8 })
+  );
+  lanternGlass.position.copy(lantern.position);
+  root.add(lanternGlass);
 }
 
 function normalizeNpc(npc, worldNpcsById) {

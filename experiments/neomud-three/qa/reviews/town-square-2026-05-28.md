@@ -69,3 +69,18 @@ Total: 11/12
 Entity delta: replaced loose NPC sprite placement with an entity layer, authored NPC placement in `TOWN_SQUARE_SPEC`, debug entity metadata, proximity detection, interaction prompt, and an interaction panel. Offline QA verifies Old Wren interaction content; server QA verifies server NPCs render as Town Square entities.
 
 Remaining visual gap: this is meaningfully more game-like, but still not professional-final. NPCs need better authored bodies/staging, and labels should eventually become diegetic signs or contextual UI instead of floating boards everywhere.
+
+## Score After Label Cleanup And NPC Staging Pass
+
+- Navigation readability: 2/2. Exits still read through landmark massing, exit boards, thresholds, compass, and a smaller side-positioned signpost.
+- Scale believability: 1/2. NPCs now have local staging props instead of only floating labels, but the scene still uses sprite standees and flat simple ground.
+- Semantic match: 2/2. Guildmaster training props and Old Wren's bench/lantern reinforce the actual Town Square roles.
+- Interaction clarity: 2/2. NPC names moved out of always-on world labels; the proximity prompt and interaction panel remain the primary interaction surface.
+- Server sync: 2/2. Offline and server-backed tests still pass with entity metadata and interaction coverage.
+- Performance: 2/2. Latest headed Town Square drive reports 133 draw calls and 54,462 triangles.
+
+Total: 11/12
+
+Visual delta: removed always-on NPC nameboards, moved/reduced the central signpost, removed duplicate market/tavern building labels, and added simple staging props around Guildmaster Aldric and Old Wren.
+
+Remaining visual gap: label clutter is reduced, but the plaza still needs stronger art direction: more convincing ground/road value hierarchy, better facade detail, and less billboard-like character presentation.

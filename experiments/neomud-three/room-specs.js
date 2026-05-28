@@ -95,7 +95,7 @@ export const TOWN_SQUARE_SPEC = {
         roofMaterial: "roof",
         plasterMaterial: "plasterWarm",
         facadeMaterial: "plasterFacade",
-        sign: true,
+        sign: false,
         awning: "awningBlue"
       },
       stalls: [
@@ -137,7 +137,7 @@ export const TOWN_SQUARE_SPEC = {
         roofMaterial: "roofRed",
         plasterMaterial: "plasterWarm",
         facadeMaterial: "plasterFacadeWarm",
-        sign: true,
+        sign: false,
         awning: "awningRed"
       }
     }
@@ -145,9 +145,9 @@ export const TOWN_SQUARE_SPEC = {
   features: {
     fountain: { x: 0, z: 0, radius: 2.25 },
     signpost: {
-      x: -3.85,
-      z: 3.25,
-      y: 2.35,
+      x: -7.25,
+      z: 5.15,
+      y: 1.95,
       signs: [
         { label: "Gate", subtitle: "North", palette: "green" },
         { label: "Market", subtitle: "East", palette: "blue" },
@@ -159,16 +159,16 @@ export const TOWN_SQUARE_SPEC = {
   entities: {
     npcPlacements: {
       "npc:guildmaster": {
-        position: [-4.7, 0, -3.2],
-        heading: Math.PI * 0.22,
+        position: [-5.25, 0, -3.85],
+        heading: Math.PI * 0.18,
         role: "Trainer",
         palette: "gold",
         height: 3.25,
         width: 1.82
       },
       "npc:old_wren": {
-        position: [5.15, 0, -1.1],
-        heading: -Math.PI * 0.72,
+        position: [4.85, 0, -1.35],
+        heading: -Math.PI * 0.68,
         role: "Quest",
         palette: "blue",
         height: 3.05,
