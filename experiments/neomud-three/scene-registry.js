@@ -5,6 +5,7 @@ import {
   buildForestPathRoom,
   buildForgeRoom,
   buildGenericRoom,
+  buildHiddenCaveRoom,
   buildMagicShopRoom,
   buildMarketRoom,
   buildNorthGateRoom,
@@ -113,6 +114,14 @@ export function buildRoomScene(context) {
       ...context,
       worldRoot: WORLD_ROOT,
       npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:deep"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "forest:cave") {
+    return buildHiddenCaveRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
       roomItems: serverItems
     });
   }

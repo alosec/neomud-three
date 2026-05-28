@@ -50,7 +50,7 @@ High leverage next work:
 
 5. Expand the test harness with real gameplay gates.
    - Assert physical exit traversal from temple to square through the live server, not only debug movement.
-   - Keep the authored-room screenshot suite current for Temple, Town Square, North Gate, Forest Edge, Forest Path, and Tavern after major renderer changes.
+   - Keep the authored-room screenshot suite current for Temple, Town Square, Market Street, Magic Shop, Forge, North Gate, Forest Edge, Forest Path, Deep Forest, Hidden Cave, Sunlit Clearing, and Tavern after major renderer changes.
    - Add collision and spawn-heading checks for each authored room.
    - Keep adding fixed screenshot anchors before major visual passes, not after the fact.
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
@@ -75,7 +75,8 @@ High leverage next work:
    - Grimjaw's Forge is now an authored room with Grimjaw the Artificer, a west physical trigger back to Magic Shop, forge benches/racks/anvils/furnace dressing, collision, fixed screenshots, and server-backed traversal. Further Forge work should strengthen the furnace as a hero prop and make the artificer/crafting affordance more explicit.
    - Forest Edge is now an authored room with Forest Rat, South/North physical triggers, lightweight tree/log/stone collision, Prop Zoo forest props, first-pass side/back depth layers, and server-backed traversal. Further Forest work should improve the backdrop/material transition and path lighting rather than blindly expanding room count.
    - Forest Path is now an authored room with Shadow Wolf/Forest Bandit offline staging, server-backed Shadow Wolf traversal, South/North/East physical triggers, and fixed screenshots. Further forest work should improve material/lighting/depth coherence before adding Deep Forest or Clearing.
-   - Deep Forest is now an authored room with a visible south return, visible west cave route, hidden-exit atmosphere for stream/ruins, Giant Forest Spider offline staging, live server entity mirroring, collision, fixed screenshots, and server-backed traversal. Further Deep Forest work should author Hidden Cave or turn the hidden exit clues into proper server-aware discovery affordances.
+   - Deep Forest is now an authored room with a visible south return, visible west cave route, hidden-exit atmosphere for stream/ruins, Giant Forest Spider offline staging, live server entity mirroring, collision, fixed screenshots, and server-backed traversal. Further Deep Forest work should turn the hidden exit clues into proper server-aware discovery affordances and improve spider/cave-mouth staging.
+   - Hidden Cave is now an authored room with an east return to Deep Forest, moss-covered chest affordance from NeoMud world data, collision, fixed screenshots, offline smoke, and server-backed traversal. Further Hidden Cave work should refine the cave walls/ceiling composition and make the treasure interaction server-command capable instead of only locally inspectable.
    - Sunlit Clearing is now an authored sanctuary room with larger trees, flower/grass dressing, butterflies, fallen logs, west physical trigger, collision, fixed screenshots, and server-backed traversal. Further Clearing work should improve tree canopy composition and sanctuary affordance rather than adding hostile content.
    - The south Temple facade has a subtle approved-glass glow pass; the first doorway glow attempt was rejected in screenshot QA because it looked like a visible rectangle.
    - The Tavern interior now has a warmer lighting/camera pass; further Tavern work should target wall/ceiling composition and material treatment rather than more loose furniture.

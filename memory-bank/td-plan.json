@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T16:20:22.105Z",
+  "updated": "2026-05-28T16:35:44.134Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2038,6 +2038,34 @@
       ],
       "created": "2026-05-28T16:07:27Z",
       "updated": "2026-05-28T16:20:19Z"
+    },
+    {
+      "id": "neo-1fb2.69",
+      "project": "NeoMud",
+      "title": "Author Hidden Cave room",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 93,
+          "body": "Scope: replace forest:cave generic fallback with authored cave room, moss-covered chest affordance, east physical exit to Deep Forest, collision, screenshots, offline smoke, and server-backed traversal.",
+          "created": "2026-05-28T16:22:27Z"
+        },
+        {
+          "id": 94,
+          "body": "Completed: authored Hidden Cave room with moss-covered chest affordance, east return to Deep Forest, collisions, fixed screenshots, offline smoke, and server-backed traversal QA.",
+          "created": "2026-05-28T16:35:13Z"
+        }
+      ],
+      "created": "2026-05-28T16:22:27Z",
+      "updated": "2026-05-28T16:35:20Z"
     }
   ],
   "ready": [

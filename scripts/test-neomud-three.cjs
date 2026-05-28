@@ -492,6 +492,57 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Giant Forest Spider");
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.0, z: -3.2, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:cave",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Hidden Cave");
+    const hiddenCaveTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      hiddenCaveTriggers.map((trigger) => trigger.direction).sort(),
+      ["EAST"]
+    );
+    assert.ok(hiddenCaveTriggers.some((trigger) => trigger.id === "exit-east-deep" && trigger.targetId === "forest:deep"));
+    const hiddenCaveColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      hiddenCaveColliders.some((collider) => collider.id === "moss-chest"),
+      `expected Hidden Cave moss chest collider, got ${JSON.stringify(hiddenCaveColliders)}`
+    );
+    const hiddenCaveEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      hiddenCaveEntities.some((entity) => entity.id === "cave_chest" && /moss-covered stone chest/i.test(entity.name)),
+      `expected cave_chest interactable in Hidden Cave, got ${JSON.stringify(hiddenCaveEntities)}`
+    );
+    await saveScreenshot(page, "offline-hidden-cave.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:cave"));
+    assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
+
+    const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.05, z, heading: -Math.PI / 2 }), caveChest);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /moss-covered stone chest/i);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
+    assert.match(await page.locator("#panel-content").textContent(), /preserved|vial|gloves|untouched/i);
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:deep",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 21.6, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(

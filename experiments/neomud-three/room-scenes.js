@@ -240,6 +240,23 @@ const DEEP_FOREST_COLLIDERS = [
   { id: "webbed-stump", center: [2.8, 4.2], size: [2.1, 1.55] }
 ];
 
+const HIDDEN_CAVE = {
+  width: 24,
+  depth: 18,
+  halfX: 12,
+  halfZ: 9,
+  eastExitX: 10.85,
+  exitHalfZ: 2.75
+};
+
+const HIDDEN_CAVE_COLLIDERS = [
+  { id: "collapsed-west-wall", center: [-9.7, 0.15], size: [2.8, 5.4] },
+  { id: "moss-chest", center: [-3.8, -2.15], size: [1.95, 1.35] },
+  { id: "north-rock-shelf", center: [-0.5, -8.1], size: [21.5, 1.3] },
+  { id: "south-root-shelf", center: [-1.2, 8.1], size: [20.0, 1.3] },
+  { id: "damp-stone-cluster", center: [4.9, 3.8], size: [2.2, 1.45] }
+];
+
 const TEMPLE_COLLIDERS = [
   { id: "altar-dais", center: [0, TEMPLE.altarZ + 0.12], size: [6.0, 3.25] },
   { id: "left-incense-brazier", center: [-2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] },
@@ -1291,6 +1308,94 @@ export function buildDeepForestRoom({ root, worldRoot, npcs = [], roomItems = []
         if (child.userData.kind === "npc") {
           child.position.y = Math.sin(performance.now() * 0.0022 + index) * 0.026;
         }
+      });
+    }
+  };
+}
+
+export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], world }) {
+  const materials = { ...makeTownMaterials(), ...makeHiddenCaveMaterials() };
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  const cave = addHiddenCaveStage(root, materials, worldRoot);
+
+  const syncEntities = ({ roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addHiddenCaveEntities(entityLayer, materials, world, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(7.4, 0, 0), heading: -Math.PI / 2 },
+    status: "Hidden Cave: authored damp cave chamber with moss-covered chest, collision, and authoritative east return to Deep Forest.",
+    environment: {
+      background: 0x071012,
+      fog: 0x071012,
+      fogDensity: 0.034
+    },
+    camera: {
+      distance: 5.2,
+      height: 3.25,
+      sideOffset: -0.18,
+      lookAhead: 2.6,
+      targetHeight: 1.0
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "forest:deep") return { position: new THREE.Vector3(7.4, 0, 0), heading: -Math.PI / 2 };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -HIDDEN_CAVE.halfX + 0.55, HIDDEN_CAVE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -HIDDEN_CAVE.halfZ + 0.55, HIDDEN_CAVE.halfZ - 0.55);
+      resolveColliderPushout(position, HIDDEN_CAVE_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -HIDDEN_CAVE.halfX + 0.55, HIDDEN_CAVE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -HIDDEN_CAVE.halfZ + 0.55, HIDDEN_CAVE.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.x > HIDDEN_CAVE.eastExitX && Math.abs(position.z) < HIDDEN_CAVE.exitHalfZ) return "forest:deep";
+      return null;
+    },
+    debugTriggers() {
+      return hiddenCaveTriggers();
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(HIDDEN_CAVE_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.7) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update() {
+      cave.mist.children.forEach((child, index) => {
+        child.position.y = child.userData.baseY + Math.sin(performance.now() * 0.0015 + index) * 0.05;
+        child.material.opacity = 0.12 + Math.sin(performance.now() * 0.0019 + index) * 0.035;
+      });
+      cave.moss.children.forEach((child, index) => {
+        child.material.opacity = 0.56 + Math.sin(performance.now() * 0.0022 + index) * 0.14;
       });
     }
   };
@@ -3904,6 +4009,250 @@ function deepForestTriggers() {
         label: "Hidden Cave",
         subtitle: "West",
         threshold: { center: [DEEP_FOREST.westExitX, 0.05, DEEP_FOREST.caveExitZ], size: [1.35, DEEP_FOREST.exitHalfWidth * 2], color: 0x7fe3c5 }
+      }
+    }
+  ];
+}
+
+function makeHiddenCaveMaterials() {
+  return {
+    caveFloor: new THREE.MeshStandardMaterial({ color: 0x1d2523, roughness: 0.96, metalness: 0 }),
+    caveWall: new THREE.MeshStandardMaterial({ color: 0x2c3330, roughness: 0.94, metalness: 0 }),
+    wetStone: new THREE.MeshStandardMaterial({ color: 0x3f4b49, roughness: 0.78, metalness: 0 }),
+    dampMoss: new THREE.MeshStandardMaterial({ color: 0x254c38, roughness: 0.9, metalness: 0 }),
+    chestStone: new THREE.MeshStandardMaterial({ color: 0x54615d, roughness: 0.86, metalness: 0 }),
+    chestMoss: new THREE.MeshStandardMaterial({ color: 0x48b874, emissive: 0x1c6a44, emissiveIntensity: 0.58, roughness: 0.82, metalness: 0 }),
+    rootDark: new THREE.MeshStandardMaterial({ color: 0x24170f, roughness: 0.9, metalness: 0 }),
+    mossGlow: new THREE.MeshBasicMaterial({ color: 0x79ffd2, transparent: true, opacity: 0.64, depthWrite: false }),
+    water: new THREE.MeshBasicMaterial({ color: 0x5cc6d6, transparent: true, opacity: 0.22, depthWrite: false }),
+    blueMist: new THREE.MeshBasicMaterial({ color: 0x8ff0df, transparent: true, opacity: 0.14, depthWrite: false })
+  };
+}
+
+function addHiddenCaveStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.caveFloor, HIDDEN_CAVE.width, HIDDEN_CAVE.depth);
+
+  addInstancedSurfaceRects(root, materials, [
+    { material: "wetStone", x: -3.0, z: -2.4, width: 12.4, depth: 6.4, y: 0.024, rotationZ: -0.04 },
+    { material: "dampMoss", x: -6.2, z: 3.8, width: 5.6, depth: 2.45, y: 0.027, rotationZ: 0.16 },
+    { material: "caveFloor", x: 4.0, z: 0.2, width: 9.2, depth: 3.8, y: 0.023, rotationZ: 0.03 },
+    { material: "water", x: -0.2, z: 6.35, width: 7.2, depth: 1.1, y: 0.032, rotationZ: -0.06 }
+  ], "hidden-cave-floor-surfaces");
+
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_cave.webp`, -12.08, 4.35, 0, 11.5, 6.6, {
+    rotationY: Math.PI / 2,
+    opacity: 0.24
+  });
+
+  addInstancedBoxes(root, materials.caveWall, [
+    { x: -0.5, y: 0.75, z: -8.48, width: 22.2, height: 1.5, depth: 0.58 },
+    { x: -1.2, y: 0.72, z: 8.48, width: 20.5, height: 1.44, depth: 0.62 },
+    { x: -11.38, y: 1.28, z: 0, width: 0.92, height: 2.56, depth: 7.2 },
+    { x: 11.28, y: 1.05, z: -4.9, width: 0.72, height: 2.1, depth: 7.0 },
+    { x: 11.28, y: 1.05, z: 4.9, width: 0.72, height: 2.1, depth: 7.0 }
+  ], "hidden-cave-walls");
+
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.wetStone, [
+    { x: -10.2, y: 2.2, z: -3.1, scale: [1.7, 1.18, 1.0], rotationY: 0.2 },
+    { x: -9.8, y: 2.15, z: 3.2, scale: [1.5, 1.08, 1.25], rotationY: -0.4 },
+    { x: -1.2, y: 1.35, z: -7.7, scale: [2.2, 0.72, 0.55], rotationY: 0.08 },
+    { x: 5.0, y: 0.82, z: 3.75, scale: [1.05, 0.58, 0.72], rotationY: -0.34 },
+    { x: 6.0, y: 0.58, z: 4.35, scale: [0.72, 0.42, 0.5], rotationY: 0.46 }
+  ], "hidden-cave-rock-masses");
+
+  addInstancedBoxes(root, materials.rootDark, [
+    { x: -8.9, y: 0.42, z: -1.8, width: 4.5, height: 0.28, depth: 0.34, rotationY: -0.42 },
+    { x: -8.7, y: 0.56, z: 1.3, width: 4.0, height: 0.26, depth: 0.3, rotationY: 0.34 },
+    { x: -3.9, y: 0.3, z: 6.8, width: 5.4, height: 0.22, depth: 0.28, rotationY: -0.1 },
+    { x: 3.2, y: 0.34, z: -7.15, width: 4.2, height: 0.22, depth: 0.26, rotationY: 0.18 }
+  ], "hidden-cave-root-runs");
+
+  const moss = addHiddenCaveMoss(root, materials);
+  const mist = addHiddenCaveMist(root, materials);
+  addHiddenCaveChest(root, materials);
+  addHiddenCaveExitAffordance(root);
+
+  const ambientFill = new THREE.HemisphereLight(0x8ed4c7, 0x060809, 0.62);
+  root.add(ambientFill);
+
+  const entranceLight = new THREE.DirectionalLight(0x8ccfa8, 1.0);
+  entranceLight.position.set(8.5, 5.5, 1.2);
+  root.add(entranceLight);
+
+  const mossLight = new THREE.PointLight(0x5ff0b0, 1.45, 7.5);
+  mossLight.position.set(-4.1, 1.45, -2.0);
+  root.add(mossLight);
+
+  const dripLight = new THREE.PointLight(0x74d6ec, 0.72, 6.2);
+  dripLight.position.set(0.2, 1.2, 6.2);
+  root.add(dripLight);
+
+  return { moss, mist };
+}
+
+function addHiddenCaveMoss(root, materials) {
+  const group = new THREE.Group();
+  group.userData.visualRole = "hidden-cave-moss-glow";
+  root.add(group);
+
+  const patches = [
+    { x: -5.4, y: 0.11, z: -3.0, width: 2.7, height: 0.04, depth: 0.55, rotationY: 0.18 },
+    { x: -3.5, y: 0.74, z: -2.85, width: 1.4, height: 0.08, depth: 0.28, rotationY: -0.12 },
+    { x: -10.98, y: 1.45, z: -1.1, width: 0.05, height: 1.1, depth: 1.6, rotationY: 0 },
+    { x: -10.98, y: 1.32, z: 2.5, width: 0.05, height: 0.86, depth: 1.3, rotationY: 0 },
+    { x: 1.2, y: 0.09, z: 6.15, width: 2.6, height: 0.035, depth: 0.38, rotationY: -0.06 }
+  ];
+
+  for (const patch of patches) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(patch.width, patch.height, patch.depth), materials.mossGlow.clone());
+    mesh.position.set(patch.x, patch.y, patch.z);
+    mesh.rotation.y = patch.rotationY ?? 0;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    group.add(mesh);
+  }
+
+  return group;
+}
+
+function addHiddenCaveMist(root, materials) {
+  const group = new THREE.Group();
+  group.userData.visualRole = "hidden-cave-floor-mist";
+  root.add(group);
+
+  const mistPatches = [
+    { x: -4.8, y: 0.48, z: -2.2, width: 4.2, height: 0.48, depth: 0.12, rotationY: 0.16 },
+    { x: -0.2, y: 0.38, z: 5.95, width: 5.6, height: 0.38, depth: 0.1, rotationY: -0.04 },
+    { x: 6.3, y: 0.42, z: 0.4, width: 4.2, height: 0.36, depth: 0.1, rotationY: 0.1 }
+  ];
+
+  for (const patch of mistPatches) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(patch.width, patch.height, patch.depth), materials.blueMist.clone());
+    mesh.position.set(patch.x, patch.y, patch.z);
+    mesh.rotation.y = patch.rotationY ?? 0;
+    mesh.userData.baseY = patch.y;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    group.add(mesh);
+  }
+
+  return group;
+}
+
+function addHiddenCaveChest(root, materials) {
+  const group = new THREE.Group();
+  group.position.set(-3.8, 0, -2.15);
+  group.rotation.y = -0.18;
+  group.userData.visualRole = "hidden-cave-moss-chest";
+  root.add(group);
+
+  addBox(group, materials.chestStone, 0, 0.32, 0, 1.35, 0.64, 0.92);
+  addBox(group, materials.chestStone, 0, 0.77, -0.02, 1.42, 0.28, 0.98, { rotationX: -0.08 });
+  addBox(group, materials.rootDark, 0, 0.65, -0.51, 1.5, 0.18, 0.12);
+  addBox(group, materials.chestMoss, -0.08, 0.96, -0.08, 1.05, 0.08, 0.56, { castShadow: false });
+  addBox(group, materials.chestMoss, -0.54, 0.54, 0.04, 0.16, 0.2, 0.72, { castShadow: false });
+
+  const vial = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.08, 0.1, 0.34, 10),
+    new THREE.MeshStandardMaterial({ color: 0x8beaff, emissive: 0x1b5a72, emissiveIntensity: 0.6, roughness: 0.3, metalness: 0 })
+  );
+  vial.position.set(0.38, 1.06, -0.12);
+  vial.rotation.z = -0.26;
+  group.add(vial);
+
+  addTextBoard(root, "Stone Chest", {
+    x: -3.8,
+    y: 1.72,
+    z: -2.15,
+    width: 2.45,
+    height: 0.45,
+    subtitle: "Inspect",
+    palette: "blue",
+    renderOrder: 11
+  });
+}
+
+function addHiddenCaveExitAffordance(root) {
+  for (const trigger of hiddenCaveTriggers()) {
+    const threshold = trigger.affordance.threshold;
+    addExitThreshold(root, {
+      x: threshold.center[0],
+      z: threshold.center[2],
+      width: threshold.size[0],
+      depth: threshold.size[1],
+      color: threshold.color,
+      opacity: 0.18
+    });
+  }
+
+  addTextBoard(root, "Deep Forest", {
+    x: 10.9,
+    y: 2.15,
+    z: 3.35,
+    width: 0.92,
+    height: 0.22,
+    subtitle: "East",
+    palette: "green",
+    renderOrder: 9
+  });
+}
+
+function addHiddenCaveEntities(root, materials, world, roomItems, interactables) {
+  const room = world?.rooms?.get?.("forest:cave");
+  const chestPosition = new THREE.Vector3(-3.8, 0, -2.15);
+
+  for (const feature of room?.interactables ?? []) {
+    const name = feature.label ?? feature.id;
+    const message = feature.actionData?.message ?? "";
+    interactables.push({
+      kind: "item",
+      id: feature.id,
+      name,
+      role: "Treasure",
+      prompt: `Inspect: ${name}`,
+      description: [feature.description, message].filter(Boolean).join(" "),
+      actionType: feature.actionType ?? "",
+      position: chestPosition.clone()
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -1.2 + index * 0.85;
+    const z = 2.4 + (index % 2) * 0.75;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Cave Loot",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function hiddenCaveTriggers() {
+  return [
+    {
+      id: "exit-east-deep",
+      direction: "EAST",
+      targetId: "forest:deep",
+      prompt: "Return to the Deep Forest",
+      trigger: { type: "box", center: [HIDDEN_CAVE.eastExitX, 1, 0], size: [1.65, 3, HIDDEN_CAVE.exitHalfZ * 2] },
+      affordance: {
+        label: "Deep Forest",
+        subtitle: "East",
+        threshold: { center: [HIDDEN_CAVE.eastExitX, 0.05, 0], size: [1.35, HIDDEN_CAVE.exitHalfZ * 2], color: 0x8ddf9a }
       }
     }
   ];

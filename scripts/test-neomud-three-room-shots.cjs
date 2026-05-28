@@ -28,6 +28,8 @@ const ANCHORS = [
   { id: "forest-path-fork", roomId: "forest:path", filename: "room-shot-forest-path-fork.png", x: 0, z: -2.0, heading: 0 },
   { id: "deep-forest-entry", roomId: "forest:deep", filename: "room-shot-deep-forest-entry.png", x: 0, z: 13.8, heading: 0 },
   { id: "deep-forest-spider", roomId: "forest:deep", filename: "room-shot-deep-forest-spider.png", x: 0.8, z: 1.0, heading: 0 },
+  { id: "hidden-cave-entry", roomId: "forest:cave", filename: "room-shot-hidden-cave-entry.png", x: 7.4, z: 0, heading: -Math.PI / 2 },
+  { id: "hidden-cave-chest", roomId: "forest:cave", filename: "room-shot-hidden-cave-chest.png", x: 1.4, z: -0.8, heading: -Math.PI / 2 },
   { id: "sunlit-clearing-entry", roomId: "forest:clearing", filename: "room-shot-sunlit-clearing-entry.png", x: 11.3, z: 3.6, heading: -Math.PI / 2 },
   { id: "sunlit-clearing-log", roomId: "forest:clearing", filename: "room-shot-sunlit-clearing-log.png", x: 3.2, z: 1.4, heading: -Math.PI * 0.72 },
   { id: "tavern-entry", roomId: "town:tavern", filename: "room-shot-tavern-entry.png", x: 7.1, z: 0, heading: -Math.PI / 2 },

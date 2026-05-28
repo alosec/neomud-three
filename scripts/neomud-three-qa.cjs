@@ -62,10 +62,16 @@ const RENDER_BUDGETS = {
     textures: 48,
     geometries: 180
   },
+  "forest:cave": {
+    calls: 145,
+    triangles: 70_000,
+    textures: 54,
+    geometries: 150
+  },
   "forest:clearing": {
     calls: 160,
     triangles: 80_000,
-    textures: 48,
+    textures: 54,
     geometries: 170
   },
   "material-lab": {

@@ -297,6 +297,35 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "forest:deep"));
     assertRenderBudget(assert, "forest:deep", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.0, z: -3.2, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:cave",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Hidden Cave");
+    const hiddenCaveTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(hiddenCaveTriggers.some((trigger) => trigger.id === "exit-east-deep" && trigger.targetId === "forest:deep"));
+    const hiddenCaveEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      hiddenCaveEntities.some((entity) => entity.id === "cave_chest" && /moss-covered stone chest/i.test(entity.name)),
+      `expected cave_chest interactable in live Hidden Cave, got ${JSON.stringify(hiddenCaveEntities)}`
+    );
+    await saveScreenshot(page, "server-hidden-cave.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:cave"));
+    assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:deep",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 21.6, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(
