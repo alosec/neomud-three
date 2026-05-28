@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T12:20:12.884Z",
+  "updated": "2026-05-28T12:34:14.944Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1605,6 +1605,27 @@
       "comments": [],
       "created": "2026-05-28T12:10:58Z",
       "updated": "2026-05-28T12:19:40Z"
+    },
+    {
+      "id": "neo-2531",
+      "project": "NeoMud",
+      "title": "Improve Tavern wall and bar composition",
+      "description": "Use existing Town materials and instanced geometry to make Tavern walls/bar feel authored: wall braces, back-bar shelves, bottle/mug silhouettes, and warm accents. Keep movement/collision/server behavior unchanged and preserve room budgets.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: added instanced Tavern wall braces, back-bar shelves, bottle silhouettes, framed wall panels, and dark window shapes; offline/room/server QA passes within budget",
+      "labels": [
+        "neomud-three",
+        "qa",
+        "visual"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T12:27:57Z",
+      "updated": "2026-05-28T12:33:47Z"
     }
   ],
   "ready": [

@@ -69,6 +69,7 @@ Tavern status:
 - `town:tavern` now has an authored Three.js interior instead of the generic fallback shell.
 - The Rusty Tankard is a cutaway stage with plank floor, side walls, low beams, bar counter, mugs, fireplace, tables/benches, a locked cellar hatch marker, and an open east threshold back to Town Square.
 - The interior is now scaled up, with additional stools, candles, shelves, a runner rug, and collision around tables, bar, and fireplace so the player cannot clip through the main furniture.
+- A wall/bar composition pass adds instanced timber bracing, back-bar shelving, colored bottle silhouettes, framed wall panels, and dark window/notice shapes. It makes the room less flat while preserving collision and server behavior.
 - The room uses a room-specific camera rig override because the outdoor follow camera clips badly in interior spaces.
 - The latest readability pass warms the Tavern background/fog, adds hemisphere fill plus separate bar/table/fireplace light emphasis, and lowers/tightens the interior camera so screenshots prioritize the bar, fireplace, tables, and exit instead of the ceiling mass.
 - Barkeep Grom is rendered from NeoMud NPC/world/server data as an interactable standee behind the bar.
@@ -106,10 +107,10 @@ Test status:
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 276 calls / 34,326 triangles / 6 textures / 192 geometries; Town Square 231 calls / 12,548 triangles / 18 textures / 150 geometries; Tavern 95 calls / 5,148 triangles / 21 textures / 48 geometries.
-- Latest server-backed QA reports Temple 276 calls / 34,326 triangles / 6 textures / 192 geometries; Town Square 231 calls / 12,548 triangles / 18 textures / 150 geometries; Tavern 95 calls / 5,148 triangles / 20 textures / 48 geometries.
+- Latest offline smoke reports Temple 276 calls / 34,326 triangles / 6 textures / 192 geometries; Town Square 231 calls / 12,548 triangles / 18 textures / 150 geometries; Tavern 102 calls / 6,192 triangles / 21 textures / 55 geometries.
+- Latest server-backed QA reports Temple 276 calls / 34,326 triangles / 6 textures / 192 geometries; Town Square 231 calls / 12,548 triangles / 18 textures / 150 geometries; Tavern 102 calls / 6,192 triangles / 20 textures / 55 geometries.
 - Latest Town Square screenshot-anchor QA reports 128 calls / 9,210 triangles / 19 textures / 194 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 255 calls / 32,836 triangles / 6 textures / 192 geometries; Town Square 223 calls / 12,472 triangles / 18 textures / 150 geometries; Tavern 95 calls / 5,148 triangles / 20 textures / 48 geometries, with no console errors or failed requests.
+- Latest authored-room screenshot QA reports Temple 255 calls / 32,836 triangles / 6 textures / 192 geometries; Town Square 223 calls / 12,472 triangles / 18 textures / 150 geometries; Tavern 102 calls / 6,192 triangles / 20 textures / 55 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest Prop Zoo QA reports 221 draw calls, 4,209 triangles, 37 textures, 144 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.

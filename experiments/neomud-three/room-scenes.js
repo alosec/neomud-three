@@ -391,6 +391,7 @@ function addTavernInterior(root, materials, fireGroup) {
   addTavernFireplace(root, materials, fireGroup);
   addTavernTables(root, materials);
   addTavernWarmth(root, materials);
+  addTavernWallComposition(root, materials);
   addTavernTrapdoor(root, materials);
   addTavernExit(root, materials);
 
@@ -484,6 +485,76 @@ function addTavernWarmth(root, materials) {
     addBox(root, materials.sign, -7.35, 2.56, z, 0.32, 0.26, 0.2);
     addBox(root, materials.sign, -5.05, 2.56, z, 0.28, 0.22, 0.2);
   }
+}
+
+function addTavernWallComposition(root, materials) {
+  const darkTimber = [];
+  const timber = [];
+  const trim = [];
+  const gold = [];
+  const red = [];
+  const blue = [];
+  const darkGlass = [];
+
+  for (const z of [-TAVERN.halfZ + 0.36, TAVERN.halfZ - 0.36]) {
+    for (const x of [-7.6, -3.8, 0, 3.8, 7.6]) {
+      darkTimber.push({ x, y: 2.12, z, width: 0.18, height: 3.35, depth: 0.18 });
+    }
+    darkTimber.push({ x: 0, y: 1.28, z, width: TAVERN.width - 1.3, height: 0.16, depth: 0.16 });
+    timber.push({ x: 0, y: 3.38, z, width: TAVERN.width - 1.7, height: 0.14, depth: 0.14 });
+  }
+
+  for (const z of [-6.25, -3.1, 0.05, 3.2, 6.35]) {
+    darkTimber.push({ x: -TAVERN.halfX + 0.45, y: 2.08, z, width: 0.18, height: 3.22, depth: 0.18 });
+  }
+  darkTimber.push({ x: -TAVERN.halfX + 0.48, y: 1.28, z: 0, width: 0.16, height: 0.16, depth: TAVERN.depth - 1.2 });
+  timber.push({ x: -TAVERN.halfX + 0.5, y: 3.36, z: 0, width: 0.14, height: 0.14, depth: TAVERN.depth - 1.8 });
+
+  for (const [y, width] of [[2.18, 5.8], [2.82, 5.1], [3.42, 4.35]]) {
+    darkTimber.push({ x: -TAVERN.halfX + 0.72, y, z: TAVERN.barZ - 2.35, width: 0.2, height: 0.16, depth: width });
+    trim.push({ x: -TAVERN.halfX + 0.86, y: y + 0.18, z: TAVERN.barZ - 2.35, width: 0.08, height: 0.18, depth: width * 0.92 });
+  }
+
+  const bottleRows = [
+    { y: 2.45, zStart: -6.3, count: 8 },
+    { y: 3.08, zStart: -5.82, count: 7 },
+    { y: 3.68, zStart: -5.35, count: 6 }
+  ];
+  for (const row of bottleRows) {
+    for (let index = 0; index < row.count; index++) {
+      const z = row.zStart + index * 0.62;
+      const target = index % 3 === 0 ? gold : index % 3 === 1 ? blue : red;
+      target.push({ x: -TAVERN.halfX + 0.98, y: row.y, z, width: 0.13, height: 0.42, depth: 0.13 });
+      trim.push({ x: -TAVERN.halfX + 1.05, y: row.y + 0.27, z, width: 0.07, height: 0.09, depth: 0.07 });
+    }
+  }
+
+  const wallPanels = [
+    { x: -5.1, z: -TAVERN.halfZ + 0.29, color: red },
+    { x: 0.2, z: -TAVERN.halfZ + 0.29, color: blue },
+    { x: 5.4, z: -TAVERN.halfZ + 0.29, color: gold },
+    { x: -5.4, z: TAVERN.halfZ - 0.29, color: gold },
+    { x: 0.0, z: TAVERN.halfZ - 0.29, color: red },
+    { x: 5.1, z: TAVERN.halfZ - 0.29, color: blue }
+  ];
+  for (const panel of wallPanels) {
+    darkTimber.push({ x: panel.x, y: 2.56, z: panel.z, width: 1.18, height: 1.42, depth: 0.09 });
+    panel.color.push({ x: panel.x, y: 2.56, z: panel.z + (panel.z < 0 ? 0.06 : -0.06), width: 0.82, height: 0.96, depth: 0.045 });
+  }
+
+  for (const [x, z] of [[4.8, -TAVERN.halfZ + 0.28], [7.65, TAVERN.halfZ - 0.28]]) {
+    darkTimber.push({ x, y: 2.45, z, width: 1.65, height: 1.18, depth: 0.1 });
+    darkGlass.push({ x, y: 2.45, z: z + (z < 0 ? 0.06 : -0.06), width: 1.28, height: 0.82, depth: 0.05 });
+    trim.push({ x, y: 1.74, z: z + (z < 0 ? 0.08 : -0.08), width: 1.85, height: 0.12, depth: 0.13 });
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, darkTimber, "tavern-wall-dark-timber");
+  addInstancedBoxes(root, materials.timber, timber, "tavern-wall-timber");
+  addInstancedBoxes(root, materials.trimLight, trim, "tavern-wall-trim");
+  addInstancedBoxes(root, materials.sign, gold, "tavern-wall-gold-accents");
+  addInstancedBoxes(root, materials.awningRed, red, "tavern-wall-red-accents");
+  addInstancedBoxes(root, materials.awningBlue, blue, "tavern-wall-blue-accents");
+  addInstancedBoxes(root, materials.windowDark, darkGlass, "tavern-wall-dark-glass");
 }
 
 function addTavernStools(root, materials) {
