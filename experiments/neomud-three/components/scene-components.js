@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { texture } from "../render-assets.js";
 
+const textTextureCache = new Map();
+
 export function addBox(root, material, x, y, z, width, height, depth, options = {}) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
   mesh.position.set(x, y, z);
@@ -164,6 +166,61 @@ export function addPortalFrame(root, materials, spec) {
   return group;
 }
 
+export function addTextBoard(root, text, spec) {
+  const {
+    x,
+    y,
+    z,
+    rotationY = 0,
+    width = 3.8,
+    height = 0.78,
+    subtitle = "",
+    palette = "gold",
+    renderOrder = 8
+  } = spec;
+
+  const map = textBoardTexture(text, { subtitle, palette });
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map,
+      transparent: true,
+      depthWrite: false
+    })
+  );
+  sprite.position.set(x, y, z);
+  sprite.scale.set(width, height, 1);
+  sprite.renderOrder = renderOrder;
+  sprite.userData.rotationY = rotationY;
+  root.add(sprite);
+  return sprite;
+}
+
+export function addExitThreshold(root, spec) {
+  const {
+    x,
+    z,
+    width,
+    depth,
+    color = 0xf0c878,
+    opacity = 0.22
+  } = spec;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(width, depth),
+    new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    })
+  );
+  mesh.position.set(x, 0.045, z);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.renderOrder = 4;
+  root.add(mesh);
+  return mesh;
+}
+
 export function addLamp(root, materials, x, z, options = {}) {
   addBox(root, materials.darkTimber ?? materials.timber, x, 1.1, z, 0.13, 2.2, 0.13);
   addBox(root, materials.timber, x, 2.14, z, 0.58, 0.09, 0.09);
@@ -179,4 +236,89 @@ export function addLamp(root, materials, x, z, options = {}) {
   flame.position.copy(lamp.position);
   root.add(flame);
   return lamp;
+}
+
+function textBoardTexture(text, options = {}) {
+  const { subtitle = "", palette = "gold" } = options;
+  const key = `${text}|${subtitle}|${palette}`;
+  if (textTextureCache.has(key)) return textTextureCache.get(key);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 768;
+  canvas.height = 192;
+  const ctx = canvas.getContext("2d");
+  const colors = boardPalette(palette);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  roundRect(ctx, 10, 10, canvas.width - 20, canvas.height - 20, 20);
+  ctx.fillStyle = colors.background;
+  ctx.fill();
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = colors.border;
+  ctx.stroke();
+
+  ctx.fillStyle = colors.title;
+  ctx.font = "800 58px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text.toUpperCase(), canvas.width / 2, subtitle ? 78 : 96, canvas.width - 72);
+
+  if (subtitle) {
+    ctx.fillStyle = colors.subtitle;
+    ctx.font = "700 28px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+    ctx.fillText(subtitle, canvas.width / 2, 136, canvas.width - 88);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
+  textTextureCache.set(key, texture);
+  return texture;
+}
+
+function boardPalette(name) {
+  if (name === "blue") {
+    return {
+      background: "rgba(22, 42, 49, 0.92)",
+      border: "rgba(166, 211, 222, 0.88)",
+      title: "#f5f2dd",
+      subtitle: "#bfe8f0"
+    };
+  }
+  if (name === "red") {
+    return {
+      background: "rgba(58, 27, 20, 0.92)",
+      border: "rgba(221, 159, 91, 0.9)",
+      title: "#fff0cf",
+      subtitle: "#f1c599"
+    };
+  }
+  if (name === "green") {
+    return {
+      background: "rgba(25, 45, 29, 0.92)",
+      border: "rgba(174, 214, 139, 0.88)",
+      title: "#f4f2d9",
+      subtitle: "#cfe9b9"
+    };
+  }
+  return {
+    background: "rgba(48, 34, 18, 0.92)",
+    border: "rgba(225, 180, 91, 0.9)",
+    title: "#fff1c7",
+    subtitle: "#dec486"
+  };
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
 }

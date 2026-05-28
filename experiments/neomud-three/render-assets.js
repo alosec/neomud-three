@@ -117,9 +117,9 @@ export function makeTempleMaterials() {
 
 export function makeTownMaterials() {
   return {
-    cobble: standardMaterial({ map: texture("millhavenCobblestone", [5, 5]), color: 0xd5ceb7, roughness: 0.88, metalness: 0.02 }),
-    road: standardMaterial({ color: 0x92744d, roughness: 0.92 }),
-    packedDirt: standardMaterial({ color: 0x8a714d, roughness: 0.94 }),
+    cobble: standardMaterial({ map: texture("millhavenCobblestone", [3.7, 3.7]), color: 0xb9a77e, roughness: 0.9, metalness: 0.02 }),
+    road: standardMaterial({ color: 0xb8945e, roughness: 0.92 }),
+    packedDirt: standardMaterial({ color: 0x867152, roughness: 0.95 }),
     stone: standardMaterial({ map: texture("templeLimestoneWall", [1.4, 1.4]), color: 0xb8ae95, roughness: 0.78 }),
     darkStone: standardMaterial({ map: texture("templeLimestoneWall", [1.1, 1.1]), color: 0x6a6254, roughness: 0.84 }),
     water: standardMaterial({ color: 0x67b5ce, roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 }),

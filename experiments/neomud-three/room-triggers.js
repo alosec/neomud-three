@@ -8,7 +8,8 @@ export function triggerDebugInfo(exits = []) {
     direction: exit.direction,
     targetId: exit.targetId,
     prompt: exit.prompt,
-    trigger: exit.trigger
+    trigger: exit.trigger,
+    affordance: exit.affordance
   }));
 }
 
@@ -25,6 +26,7 @@ export function validateRoomRenderSpec(spec, room, rooms) {
     if (!exit?.id) errors.push(`${label} missing id`);
     if (!exit?.direction) errors.push(`${label} missing direction`);
     if (!exit?.targetId) errors.push(`${label} missing targetId`);
+    if (!exit?.prompt) errors.push(`${label} missing prompt`);
     if (exit?.direction) specDirections.add(exit.direction);
     if (exit?.direction && roomExits[exit.direction] !== exit.targetId) {
       errors.push(`${label} target ${exit.targetId} does not match room graph ${exit.direction} -> ${roomExits[exit.direction] ?? "<missing>"}`);
@@ -33,6 +35,7 @@ export function validateRoomRenderSpec(spec, room, rooms) {
       errors.push(`${label} target ${exit.targetId} does not exist in world graph`);
     }
     validateBoxTrigger(errors, label, exit?.trigger);
+    validateAffordance(errors, label, exit?.affordance);
   }
 
   for (const [direction, targetId] of Object.entries(roomExits)) {
@@ -70,6 +73,30 @@ function validateBoxTrigger(errors, label, trigger) {
   if (!isNumericTriple(trigger.size)) errors.push(`${label} trigger.size must be [x, y, z]`);
   if (isNumericTriple(trigger.size) && trigger.size.some((value) => value <= 0)) {
     errors.push(`${label} trigger.size values must be positive`);
+  }
+}
+
+function validateAffordance(errors, label, affordance) {
+  if (!affordance) {
+    errors.push(`${label} missing visible affordance`);
+    return;
+  }
+  if (!affordance.label) errors.push(`${label} affordance missing label`);
+  if (!affordance.board) {
+    errors.push(`${label} affordance missing board`);
+  } else {
+    if (!isNumericTriple(affordance.board.center)) errors.push(`${label} affordance.board.center must be [x, y, z]`);
+    if (!Array.isArray(affordance.board.size) || affordance.board.size.length !== 2 || affordance.board.size.some((value) => !Number.isFinite(value) || value <= 0)) {
+      errors.push(`${label} affordance.board.size must be [width, height] with positive values`);
+    }
+  }
+  if (!affordance.threshold) {
+    errors.push(`${label} affordance missing threshold`);
+  } else {
+    if (!isNumericTriple(affordance.threshold.center)) errors.push(`${label} affordance.threshold.center must be [x, y, z]`);
+    if (!Array.isArray(affordance.threshold.size) || affordance.threshold.size.length !== 2 || affordance.threshold.size.some((value) => !Number.isFinite(value) || value <= 0)) {
+      errors.push(`${label} affordance.threshold.size must be [width, depth] with positive values`);
+    }
   }
 }
 

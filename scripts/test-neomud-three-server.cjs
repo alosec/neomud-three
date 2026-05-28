@@ -79,6 +79,7 @@ async function main() {
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Town Square");
     const townTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.ok(townTriggers.some((trigger) => trigger.id === "exit-south-temple"));
+    assert.ok(townTriggers.every((trigger) => trigger.prompt && trigger.affordance?.label));
     await saveScreenshot(page, "server-town-square.png");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));

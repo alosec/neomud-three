@@ -8,7 +8,7 @@ Screenshots reviewed:
 - `experiments/neomud-three/qa/latest/server-town-square.png`
 - `experiments/neomud-three/qa/latest/playtest-driven.png`
 
-## Score
+## Score After Physical Trigger Pass
 
 - Navigation readability: 1/2. Four exits exist and the compass helps, but the west/east/north affordances still do not read within three seconds without context.
 - Scale believability: 1/2. The tavern is larger than the earlier tiny-house pass, but several forms still read as props rather than inhabitable buildings.
@@ -26,3 +26,16 @@ Total: 8/12
 - Do not generate new Town Square textures until the exit landmarks and building scale read correctly in screenshots.
 - The fountain is now coherent enough to stop touching unless it interferes with navigation.
 - Add visible exit/prompt affordances before adding more decorative props.
+
+## Score After Wayfinding Pass
+
+- Navigation readability: 2/2. The four exits have spec-backed trigger prompts, visible threshold markers, large landmark boards, and a central wayfinding signpost.
+- Scale believability: 1/2. Gate/tavern/market/temple landmarks are larger, but the building massing still reads blocky and not architecturally finished.
+- Semantic match: 1/2. The room now clearly says "plaza with gate, market, tavern, temple", but it still lacks a distinctive Millhaven visual language.
+- Interaction clarity: 2/2. Walkable exits have visible prompt language and threshold markers, and tests assert affordance metadata reaches runtime.
+- Server sync: 2/2. Server-backed physical movement still passes Temple -> Town Square -> Temple.
+- Performance: 2/2. Latest headed Town Square drive reports 94 draw calls and 52,066 triangles.
+
+Total: 10/12
+
+Remaining visual gap: this is readable now, not professional-final. The next pass should improve architectural finish and material hierarchy without changing the server-authority contract.

@@ -5,12 +5,14 @@ import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
 import {
   addBackdrop as addComponentBackdrop,
   addBox,
+  addExitThreshold,
   addGabledHouse,
   addGroundPlane,
   addLamp as addComponentLamp,
   addMarketStall as addComponentMarketStall,
   addPortalFrame,
-  addSurfaceRect
+  addSurfaceRect,
+  addTextBoard
 } from "./components/scene-components.js";
 
 const TEMPLE = {
@@ -85,8 +87,10 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
   addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
   addTownSpecSurfaces(root, materials, spec);
   const fountain = addTownSpecFountain(root, materials, spec.features.fountain);
+  addTownSpecSignpost(root, materials, spec.features.signpost);
   addTownSpecChunkRings(root, materials, spec);
   addTownSpecLandmarks(root, materials, spec);
+  addTownSpecExitAffordances(root, spec);
   addTownSpecProps(root, materials, spec);
 
   for (const [index, npc] of npcs.entries()) {
@@ -611,6 +615,39 @@ function addTownSpecFountain(root, materials, fountainSpec) {
   return { water, topBowl, topWater, fallingWater };
 }
 
+function addTownSpecSignpost(root, materials, signpostSpec) {
+  if (!signpostSpec) return null;
+  const group = new THREE.Group();
+  group.position.set(signpostSpec.x, 0, signpostSpec.z);
+  group.userData = { kind: "wayfinding-signpost" };
+  root.add(group);
+
+  addBox(group, materials.darkTimber, 0, signpostSpec.y / 2, 0, 0.16, signpostSpec.y, 0.16);
+  addBox(group, materials.darkTimber, 0, signpostSpec.y + 0.06, 0, 0.48, 0.12, 0.48);
+
+  const offsets = [
+    { x: 0, y: signpostSpec.y + 0.58, z: 0.02 },
+    { x: 0, y: signpostSpec.y + 0.16, z: 0.02 },
+    { x: 0, y: signpostSpec.y - 0.26, z: 0.02 },
+    { x: 0, y: signpostSpec.y - 0.68, z: 0.02 }
+  ];
+  for (const [index, sign] of signpostSpec.signs.entries()) {
+    const offset = offsets[index] ?? offsets[offsets.length - 1];
+    addTextBoard(group, sign.label, {
+      x: offset.x,
+      y: offset.y,
+      z: offset.z,
+      width: 1.86,
+      height: 0.42,
+      subtitle: sign.subtitle,
+      palette: sign.palette,
+      renderOrder: 10
+    });
+  }
+
+  return group;
+}
+
 function addTownSpecChunkRings(root, materials, spec) {
   for (const chunk of spec.chunkRings) {
     if (chunk.kind === "backdrop") {
@@ -642,6 +679,45 @@ function addTownSpecProps(root, materials, spec) {
   }
 }
 
+function addTownSpecExitAffordances(root, spec) {
+  for (const exit of spec.exits) {
+    const affordance = exit.affordance;
+    if (!affordance) continue;
+
+    const [x, y, z] = affordance.board.center;
+    const [width, height] = affordance.board.size;
+    addTextBoard(root, affordance.label, {
+      x,
+      y,
+      z,
+      width,
+      height,
+      subtitle: affordance.subtitle,
+      palette: affordance.palette,
+      rotationY: exitBoardRotation(exit.direction)
+    });
+
+    const [tx, , tz] = affordance.threshold.center;
+    const [tw, td] = affordance.threshold.size;
+    addExitThreshold(root, {
+      x: tx,
+      z: tz,
+      width: tw,
+      depth: td,
+      color: affordance.threshold.color,
+      opacity: 0.2
+    });
+  }
+}
+
+function exitBoardRotation(direction) {
+  if (direction === "NORTH") return 0;
+  if (direction === "SOUTH") return Math.PI;
+  if (direction === "EAST") return -Math.PI / 2;
+  if (direction === "WEST") return Math.PI / 2;
+  return 0;
+}
+
 function addGatehouseLandmark(root, materials, landmark) {
   const group = new THREE.Group();
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
@@ -650,6 +726,7 @@ function addGatehouseLandmark(root, materials, landmark) {
   for (const tower of landmark.towers) {
     addBox(group, materials.stone, tower.x, tower.height / 2, tower.z, tower.width, tower.height, tower.depth);
     addBox(group, materials.roof, tower.x, tower.height + 0.52, tower.z, tower.width + 0.6, 0.9, tower.depth + 0.4);
+    addBox(group, materials.darkStone, tower.x, tower.height * 0.52, tower.z - 0.12, tower.width * 0.52, tower.height * 0.62, 0.18);
   }
   addBox(group, materials.stone, landmark.lintel.x, 5.2, landmark.lintel.z, landmark.lintel.width, landmark.lintel.height, landmark.lintel.depth);
   addBox(group, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
@@ -682,8 +759,11 @@ function addTempleThresholdLandmark(root, materials, landmark) {
   }
   addBox(group, materials.sign, 0, 1.35, 20.0, 3.1, 0.22, 0.22);
   for (const column of landmark.columns) {
-    addBox(group, materials.stone, column.x, 1.55, column.z, 0.32, 3.1, 0.32);
+    addBox(group, materials.stone, column.x, 1.85, column.z, 0.42, 3.7, 0.42);
+    addBox(group, materials.stone, column.x, 3.88, column.z, 0.82, 0.32, 0.82);
   }
+  addBox(group, materials.stone, 0, 3.78, 20.55, 9.1, 0.42, 0.52);
+  addBox(group, materials.portalDark, 0, 1.88, 21.02, 5.4, 3.45, 0.32);
   addPortalFrame(root, materials, portalFrameSpec(landmark));
 }
 

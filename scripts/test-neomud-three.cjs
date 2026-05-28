@@ -108,6 +108,7 @@ async function main() {
       triggers.map((trigger) => trigger.direction).sort(),
       ["EAST", "NORTH", "SOUTH", "WEST"]
     );
+    assert.ok(triggers.every((trigger) => trigger.prompt && trigger.affordance?.label && trigger.affordance?.board));
     await saveScreenshot(page, "offline-town-square.png");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));

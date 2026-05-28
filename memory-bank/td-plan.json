@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T05:18:24.935Z",
+  "updated": "2026-05-28T05:50:34.878Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -235,8 +235,8 @@
       "description": "Replace the placeholder flat-backdrop feel with streets, building rows, stalls, fountain, portals, NPC zones, lighting, and generated materials that use the original room image as reference rather than as the whole illusion.",
       "type": "task",
       "priority": 0,
-      "status": "todo",
-      "status_type": "unstarted",
+      "status": "in-progress",
+      "status_type": "started",
       "parent": "neo-1fb2",
       "close_reason": "",
       "labels": [
@@ -263,10 +263,15 @@
           "id": 10,
           "body": "QA/design reset: current square still reads noisy and toy-scaled. Next bar is fewer, larger named landmarks tied to real room ids: Gate north, Market east, Temple south, Tavern/bar west. Use calm low-detail horizon and chunk-ring scenery rather than detailed pasted-room backdrops.",
           "created": "2026-05-28T04:04:29Z"
+        },
+        {
+          "id": 25,
+          "body": "Wayfinding/readability pass: larger Gate/Market/Tavern/Temple landmarks, calmer surfaces, visible exit boards, threshold markers, central signpost, and QA score updated to 10/12 for readability/server sync/perf while architecture/art finish remains rough.",
+          "created": "2026-05-28T05:50:06Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T04:04:29Z"
+      "updated": "2026-05-28T05:50:06Z"
     },
     {
       "id": "neo-1fb2.9",
@@ -518,6 +523,29 @@
       ],
       "created": "2026-05-28T05:17:47Z",
       "updated": "2026-05-28T05:17:59Z"
+    },
+    {
+      "id": "neo-1fb2.18",
+      "project": "NeoMud",
+      "title": "Add Town Square wayfinding and exit affordance pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 26,
+          "body": "Implemented central signpost, exit boards, threshold markers, larger landmark proportions, affordance validation, and browser assertions.",
+          "created": "2026-05-28T05:50:06Z"
+        }
+      ],
+      "created": "2026-05-28T05:50:06Z",
+      "updated": "2026-05-28T05:50:06Z"
     }
   ],
   "ready": [

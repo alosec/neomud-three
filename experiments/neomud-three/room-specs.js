@@ -20,14 +20,14 @@ export const TOWN_SQUARE_SPEC = {
     fogDensity: 0.006
   },
   surfaces: {
-    ground: { material: "cobble", width: 46, depth: 46 },
+    ground: { material: "packedDirt", width: 46, depth: 46 },
     paths: [
-      { id: "north-south-main", material: "road", x: 0, z: 0, width: 5.2, depth: 46 },
-      { id: "east-west-main", material: "road", x: 0, z: 0, width: 46, depth: 5.2 },
-      { id: "tavern-apron", material: "road", x: -14.3, z: 0, width: 9.2, depth: 7.4 },
-      { id: "market-apron", material: "road", x: 14.2, z: -1.8, width: 9.4, depth: 8.6 },
-      { id: "gate-approach", material: "road", x: 0, z: -14.5, width: 6.8, depth: 11.4 },
-      { id: "temple-approach", material: "road", x: 0, z: 16.0, width: 7.4, depth: 9.6 }
+      { id: "north-south-main", material: "road", x: 0, z: 0, width: 6.2, depth: 46 },
+      { id: "east-west-main", material: "road", x: 0, z: 0, width: 46, depth: 6.2 },
+      { id: "tavern-apron", material: "road", x: -14.0, z: 0, width: 11.4, depth: 9.6 },
+      { id: "market-apron", material: "road", x: 14.1, z: -1.2, width: 11.6, depth: 10.2 },
+      { id: "gate-approach", material: "road", x: 0, z: -15.0, width: 8.2, depth: 12.4 },
+      { id: "temple-approach", material: "road", x: 0, z: 16.2, width: 9.0, depth: 9.8 }
     ],
     curbs: [
       { x: 0, z: -22.3, width: 46, height: 0.16, depth: 0.32 },
@@ -69,13 +69,13 @@ export const TOWN_SQUARE_SPEC = {
       name: "North Gate",
       targetId: "town:gate",
       direction: "NORTH",
-      entrance: { x: 0, z: -21.0, width: 4.2 },
+      entrance: { x: 0, z: -21.0, width: 5.8 },
       towers: [
-        { x: -5.7, z: -21.6, width: 3.8, height: 6.4, depth: 3.5 },
-        { x: 5.7, z: -21.6, width: 3.8, height: 6.4, depth: 3.5 }
+        { x: -6.4, z: -21.6, width: 4.5, height: 8.1, depth: 4.6 },
+        { x: 6.4, z: -21.6, width: 4.5, height: 8.1, depth: 4.6 }
       ],
-      lintel: { x: 0, z: -21.8, width: 7.2, height: 2.0, depth: 2.6 },
-      portal: { x: 0, z: -22.22, width: 4.15, height: 3.64, depth: 0.34 }
+      lintel: { x: 0, z: -21.8, width: 9.3, height: 2.5, depth: 3.2 },
+      portal: { x: 0, z: -22.24, width: 5.45, height: 4.65, depth: 0.38 }
     },
     {
       id: "east-market",
@@ -84,12 +84,12 @@ export const TOWN_SQUARE_SPEC = {
       targetId: "town:market",
       direction: "EAST",
       building: {
-        x: 19.8,
-        z: -1.8,
+        x: 20.0,
+        z: -1.2,
         rotationY: -Math.PI / 2,
-        width: 7.2,
-        height: 4.4,
-        depth: 4.0,
+        width: 9.4,
+        height: 5.4,
+        depth: 5.7,
         floors: 2,
         roofMaterial: "roof",
         plasterMaterial: "plasterWarm",
@@ -98,9 +98,9 @@ export const TOWN_SQUARE_SPEC = {
         awning: "awningBlue"
       },
       stalls: [
-        { x: 14.8, z: -7.5, awningMaterial: "awningBlue" },
-        { x: 14.8, z: -3.95, awningMaterial: "awningRed" },
-        { x: 14.8, z: -0.4, awningMaterial: "awningGold" }
+        { x: 14.6, z: -7.6, awningMaterial: "awningBlue" },
+        { x: 14.6, z: -3.6, awningMaterial: "awningRed" },
+        { x: 14.6, z: 0.4, awningMaterial: "awningGold" }
       ]
     },
     {
@@ -110,12 +110,12 @@ export const TOWN_SQUARE_SPEC = {
       targetId: "town:temple",
       direction: "SOUTH",
       steps: [
-        { x: 0, y: 0.16, z: 19.1, width: 7.8, height: 0.32, depth: 1.35 },
-        { x: 0, y: 0.36, z: 20.05, width: 5.4, height: 0.28, depth: 1.08 }
+        { x: 0, y: 0.16, z: 18.85, width: 9.8, height: 0.32, depth: 1.48 },
+        { x: 0, y: 0.36, z: 19.9, width: 7.2, height: 0.28, depth: 1.18 }
       ],
       columns: [
-        { x: -3.25, z: 20.55 },
-        { x: 3.25, z: 20.55 }
+        { x: -4.15, z: 20.55 },
+        { x: 4.15, z: 20.55 }
       ]
     },
     {
@@ -125,12 +125,12 @@ export const TOWN_SQUARE_SPEC = {
       targetId: "town:tavern",
       direction: "WEST",
       building: {
-        x: -20.2,
+        x: -20.5,
         z: 0,
         rotationY: Math.PI / 2,
-        width: 8.6,
-        height: 5.1,
-        depth: 4.8,
+        width: 11.2,
+        height: 5.9,
+        depth: 6.2,
         floors: 2,
         roofMaterial: "roofRed",
         plasterMaterial: "plasterWarm",
@@ -138,12 +138,23 @@ export const TOWN_SQUARE_SPEC = {
         sign: true,
         awning: "awningRed"
       },
-      doorway: { x: -17.75, z: 0, width: 0.34, height: 3.1, depth: 2.9 },
-      sign: { x: -17.45, y: 4.2, z: 0, width: 0.16, height: 0.82, depth: 3.5 }
+      doorway: { x: -17.35, z: 0, width: 0.38, height: 3.65, depth: 3.8 },
+      sign: { x: -17.03, y: 4.95, z: 0, width: 0.18, height: 1.0, depth: 4.4 }
     }
   ],
   features: {
-    fountain: { x: 0, z: 0, radius: 2.25 }
+    fountain: { x: 0, z: 0, radius: 2.25 },
+    signpost: {
+      x: -3.85,
+      z: 3.25,
+      y: 2.35,
+      signs: [
+        { label: "Gate", subtitle: "North", palette: "green" },
+        { label: "Market", subtitle: "East", palette: "blue" },
+        { label: "Temple", subtitle: "South", palette: "gold" },
+        { label: "Tavern", subtitle: "West", palette: "red" }
+      ]
+    }
   },
   props: {
     lamps: [
@@ -161,28 +172,56 @@ export const TOWN_SQUARE_SPEC = {
       direction: "NORTH",
       targetId: "town:gate",
       prompt: "Leave through the North Gate",
-      trigger: { type: "box", center: [0, 1, -20.95], size: [5.4, 3, 1.9] }
+      trigger: { type: "box", center: [0, 1, -20.95], size: [6.8, 3, 1.9] },
+      affordance: {
+        label: "Gate",
+        subtitle: "North Road",
+        palette: "green",
+        board: { center: [0, 5.15, -19.85], size: [5.6, 1.05] },
+        threshold: { center: [0, 0.05, -20.4], size: [6.8, 1.35], color: 0xcfe9b9 }
+      }
     },
     {
       id: "exit-east-market",
       direction: "EAST",
       targetId: "town:market",
       prompt: "Enter the Market Hall",
-      trigger: { type: "box", center: [20.95, 1, 0], size: [1.9, 3, 5.4] }
+      trigger: { type: "box", center: [20.95, 1, 0], size: [1.9, 3, 6.4] },
+      affordance: {
+        label: "Market",
+        subtitle: "Stalls & Traders",
+        palette: "blue",
+        board: { center: [18.35, 4.85, 0], size: [4.8, 0.98] },
+        threshold: { center: [20.35, 0.05, 0], size: [1.35, 6.4], color: 0xbfe8f0 }
+      }
     },
     {
       id: "exit-south-temple",
       direction: "SOUTH",
       targetId: "town:temple",
       prompt: "Enter the Temple",
-      trigger: { type: "box", center: [0, 1, 20.95], size: [6.8, 3, 1.9] }
+      trigger: { type: "box", center: [0, 1, 20.95], size: [8.4, 3, 1.9] },
+      affordance: {
+        label: "Temple",
+        subtitle: "Dawn Sanctuary",
+        palette: "gold",
+        board: { center: [0, 5.15, 22.35], size: [4.4, 0.92] },
+        threshold: { center: [0, 0.05, 20.35], size: [8.4, 1.35], color: 0xf0c878 }
+      }
     },
     {
       id: "exit-west-tavern",
       direction: "WEST",
       targetId: "town:tavern",
       prompt: "Enter the Tavern",
-      trigger: { type: "box", center: [-20.95, 1, 0], size: [1.9, 3, 5.4] }
+      trigger: { type: "box", center: [-20.95, 1, 0], size: [1.9, 3, 6.6] },
+      affordance: {
+        label: "Tavern",
+        subtitle: "Common Room",
+        palette: "red",
+        board: { center: [-18.25, 5.05, 0], size: [5.2, 1.0] },
+        threshold: { center: [-20.35, 0.05, 0], size: [1.35, 6.6], color: 0xf1a36f }
+      }
     }
   ]
 };
