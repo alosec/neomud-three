@@ -190,3 +190,20 @@ Visual delta: added Prop Zoo shrub, grass tuft, and flower cluster components; a
 QA delta: added `scripts/test-neomud-three-room-shots.cjs` for fixed Temple nave/altar, Town Square plaza, and Tavern entry/bar screenshots. Current authored-room QA reports Temple 318 calls / 80,472 triangles / 7 textures / 286 geometries; Town Square 214 calls / 58,584 triangles / 18 textures / 139 geometries; Tavern 91 calls / 53,816 triangles / 20 textures / 48 geometries, with no console errors or failed requests.
 
 Remaining visual gap: further Town Square warmth should not be more foliage by default. The next pass should rebuild one named landmark with better authored proportions, material contrast, and lighting while preserving the current budget gate.
+
+## Score After West Tavern Landmark Pass
+
+- Navigation readability: 2/2. The west Tavern remains clearly readable from the fixed west anchor and still routes through the normal `town:tavern` physical trigger.
+- Scale believability: 1/2. The Tavern is larger, has a stronger roof mass, porch/frontage, and warmer lower windows, but the building is still assembled from simple low-poly blockout components.
+- Semantic match: 2/2. The west side now reads more like an actual Rusty Tankard exterior instead of a generic wall with a red strip.
+- Interaction clarity: 2/2. The existing Tavern board, doorway, threshold, and server-backed movement path remain intact.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes after the landmark pass.
+- Performance: 2/2. Latest full smoke Town Square budget reports 236 draw calls / 58,840 triangles / 18 textures / 147 geometries; fixed Town Square anchors report 125 calls / 54,834 triangles / 19 textures / 191 geometries.
+
+Total: 11/12
+
+Visual delta: added Prop Zoo-approved Tavern frontage, warm Tavern window, and projecting Tavern sign components; removed the generic full-width awning from the live Tavern landmark; enlarged the building/roof mass; and used instanced live-room window batches so the improved west landmark keeps four draw calls of headroom under the current full-smoke budget.
+
+QA delta: Material Lab, Prop Zoo, offline smoke, Town Square screenshots, authored-room screenshots, server-backed movement, spec validation, and diff hygiene all pass after this change.
+
+Remaining visual gap: the Tavern is a better landmark, but it still needs a cohesive trim/signage pass and the NPC/player art is still below the desired fantasy quality bar. The next landmark pass should target the south Temple facade or east Market Hall rather than adding more general props.

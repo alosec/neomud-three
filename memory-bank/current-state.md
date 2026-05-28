@@ -22,7 +22,7 @@ Playable Three.js lab:
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
 - Generated/approved material usage now flows through explicit material IDs and metadata in `render-assets.js` rather than undocumented texture calls. The first material lab is at `material-lab.html`.
 - The first reusable TownKit prop set is staged in `prop-zoo.html` with the player avatar as a scale reference.
-- Prop Zoo now includes warm/support props beyond landmark shells: tavern table/stool, runner rug, candle cluster, long planter, banner pole, crate stack, bench, altar, gatehouse, low-poly broadleaf context tree, shrub clump, grass tuft, and flower cluster.
+- Prop Zoo now includes warm/support props beyond landmark shells: tavern table/stool, runner rug, candle cluster, long planter, banner pole, crate stack, bench, altar, gatehouse, low-poly broadleaf context tree, shrub clump, grass tuft, flower cluster, Tavern frontage, warm Tavern window, and projecting Tavern sign.
 - HUD exit buttons, minimap movement, debug movement, and physical exit triggers now route through the same `move` command path when the server session is live.
 
 Cathedral status:
@@ -49,6 +49,7 @@ Town Square status:
 - The latest facade/palette pass removes the central signpost entirely, keeps wayfinding on the landmark boards/thresholds/compass, cools the plaza/road/ground material values, enlarges landmark roof silhouettes with a reusable gabled roof, adds tavern/market detail props, and trims lamps/dormers to keep Town Square under the current draw-call budget.
 - The south `town:temple` exit now has an authored Temple exterior instead of a token threshold: `south-temple-threshold` is a `primary-exit-landmark` with a `cathedral-facade` spec, broad steps, towers, buttresses, rose/stained-glass windows, and a physical doorway aligned to the existing trigger.
 - The current courtyard/foliage pass adds larger low-poly broadleaf trees inside the actual Town Square composition instead of only at the far edge, plus benches, planters, banners, crate stacks, shrubs, grass tufts, flower clusters, and collision for fountain/tree/dressing volumes.
+- The west Tavern landmark is now larger and less flat: the generic red awning was replaced with a Prop Zoo-approved frontage/porch, warm lower windows, heavier roof massing, and instanced live-room window batches to preserve budget headroom.
 - New Town Square screenshot QA anchors write fixed north/gate/tavern/market/temple views through `scripts/test-neomud-three-town-shots.cjs`.
 - Authored-room screenshot QA now writes fixed Temple nave/altar, Town Square plaza, and Tavern entry/bar views through `scripts/test-neomud-three-room-shots.cjs`.
 - The component layer now caches shared box geometries while still disposing scene geometries on room teardown, which keeps route-to-route render budgets meaningful.
@@ -98,12 +99,12 @@ Test status:
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 346 calls / 82,046 triangles / 7 textures / 286 geometries; Town Square 228 calls / 58,732 triangles / 18 textures / 139 geometries; Tavern 91 calls / 53,816 triangles / 21 textures / 48 geometries.
-- Latest server-backed QA reports Temple 346 calls / 82,046 triangles / 7 textures / 286 geometries; Town Square 227 calls / 58,720 triangles / 18 textures / 139 geometries; Tavern 91 calls / 53,816 triangles / 20 textures / 48 geometries.
-- Latest Town Square screenshot-anchor QA reports 125 calls / 54,834 triangles / 19 textures / 184 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 318 calls / 80,472 triangles / 7 textures / 286 geometries; Town Square 214 calls / 58,584 triangles / 18 textures / 139 geometries; Tavern 91 calls / 53,816 triangles / 20 textures / 48 geometries, with no console errors or failed requests.
+- Latest offline smoke reports Temple 346 calls / 82,046 triangles / 7 textures / 286 geometries; Town Square 236 calls / 58,840 triangles / 18 textures / 147 geometries; Tavern 91 calls / 53,816 triangles / 21 textures / 48 geometries.
+- Latest server-backed QA reports Temple 346 calls / 82,046 triangles / 7 textures / 286 geometries; Town Square 236 calls / 58,840 triangles / 18 textures / 147 geometries; Tavern 91 calls / 53,816 triangles / 20 textures / 48 geometries.
+- Latest Town Square screenshot-anchor QA reports 125 calls / 54,834 triangles / 19 textures / 191 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest authored-room screenshot QA reports Temple 318 calls / 80,472 triangles / 7 textures / 286 geometries; Town Square 222 calls / 58,692 triangles / 18 textures / 147 geometries; Tavern 91 calls / 53,816 triangles / 20 textures / 48 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest Prop Zoo QA reports 171 draw calls, 51,781 triangles, 32 textures, 144 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest Prop Zoo QA reports 196 draw calls, 52,041 triangles, 36 textures, 162 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.
 - Browser QA scripts write screenshots into ignored `experiments/neomud-three/qa/latest/`.
 - Manual Canary QA is currently pointed at `http://127.0.0.1:4183/experiments/neomud-three/`.

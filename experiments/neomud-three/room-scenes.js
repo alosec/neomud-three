@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
 import { TOWN_SQUARE_SPEC } from "./room-specs.js";
 import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
+import { addTownKitProp } from "./components/town-kit.js";
 import {
   addBackdrop as addComponentBackdrop,
   addBox,
@@ -2031,24 +2032,46 @@ function cloneDoubleSideMaterial(material) {
 function addTavernLandmark(root, materials, landmark) {
   const group = addGabledHouse(root, materials, resolveBuildingSpec(materials, landmark.building));
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
-  addBox(root, materials.darkTimber, -17.54, 3.0, -1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
-  addBox(root, materials.darkTimber, -17.54, 3.0, 1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
-  addTavernDetailProps(root, materials);
+  addTavernExteriorKit(group, materials, landmark.building);
 }
 
-function addTavernDetailProps(root, materials) {
-  for (const z of [-2.45, 2.45]) {
-    const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.36, 0.72, 18), materials.darkTimber);
-    barrel.position.set(-17.05, 0.36, z);
-    barrel.rotation.z = Math.PI / 2;
-    barrel.castShadow = true;
-    barrel.receiveShadow = true;
-    root.add(barrel);
-    addBox(root, materials.trimLight, -17.05, 0.36, z - 0.22, 0.06, 0.78, 0.05, { rotationY: Math.PI / 2 });
-    addBox(root, materials.trimLight, -17.05, 0.36, z + 0.22, 0.06, 0.78, 0.05, { rotationY: Math.PI / 2 });
-  }
-  addBox(root, materials.darkTimber, -16.85, 1.15, 0, 0.22, 2.3, 0.16, { rotationY: Math.PI / 2 });
-  addBox(root, materials.sign, -16.72, 2.15, 0, 0.1, 0.58, 1.8, { rotationY: Math.PI / 2 });
+function addTavernExteriorKit(root, materials, building = {}) {
+  const frontZ = (building.depth ?? 6.2) / 2 + 0.18;
+  addBox(root, materials.darkTimber, 0, 0.14, frontZ + 0.58, 5.7, 0.28, 1.16, { castShadow: false });
+  addBox(root, materials.trimLight, 0, 0.32, frontZ + 0.02, 4.2, 0.18, 0.5);
+  addTownKitProp(root, materials, "frontage.tavern", { z: frontZ + 0.06, scale: 1.12 });
+  addTavernExteriorWindows(root, materials, frontZ + 0.1);
+}
+
+function addTavernExteriorWindows(root, materials, z) {
+  const centers = [-3.1, 3.1];
+  addInstancedBoxes(
+    root,
+    materials.darkTimber,
+    centers.map((x) => ({ x, y: 1.34, z: z + 0.05, width: 1.3, height: 1.24, depth: 0.16 })),
+    "tavern-window-frame"
+  );
+  addInstancedBoxes(
+    root,
+    materials.windowDark,
+    centers.map((x) => ({ x, y: 1.34, z: z + 0.16, width: 1.02, height: 0.96, depth: 0.12 })),
+    "tavern-window-pane"
+  );
+  addInstancedBoxes(
+    root,
+    materials.trimLight,
+    centers.flatMap((x) => [
+      { x, y: 1.34, z: z + 0.24, width: 0.08, height: 1.04, depth: 0.1 },
+      { x, y: 1.34, z: z + 0.25, width: 1.06, height: 0.07, depth: 0.1 }
+    ]),
+    "tavern-window-mullions"
+  );
+  addInstancedBoxes(
+    root,
+    materials.darkTimber,
+    centers.map((x) => ({ x, y: 0.58, z: z + 0.34, width: 1.28, height: 0.24, depth: 0.34 })),
+    "tavern-window-planters"
+  );
 }
 
 function resolveBuildingSpec(materials, building) {

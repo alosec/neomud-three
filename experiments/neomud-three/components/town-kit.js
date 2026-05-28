@@ -11,8 +11,11 @@ export const TOWN_KIT_PROPS = [
   { id: "facade.gabled", label: "Gabled Facade", category: "architecture" },
   { id: "roof.gabled", label: "Gabled Roof", category: "architecture" },
   { id: "door.tavern", label: "Tavern Door", category: "architecture" },
+  { id: "frontage.tavern", label: "Tavern Frontage", category: "architecture" },
   { id: "window.small", label: "Small Window", category: "architecture" },
+  { id: "window.tavern.warm", label: "Warm Tavern Window", category: "architecture" },
   { id: "sign.hanging", label: "Hanging Sign", category: "wayfinding" },
+  { id: "sign.tavern.projecting", label: "Projecting Tavern Sign", category: "wayfinding" },
   { id: "stall.market", label: "Market Stall", category: "market" },
   { id: "table.tavern", label: "Tavern Table", category: "interior" },
   { id: "stool.tavern", label: "Tavern Stool", category: "interior" },
@@ -39,6 +42,8 @@ export function addTownKitProp(root, materials, id, options = {}) {
   group.userData = { propId: id };
   group.position.set(options.x ?? 0, options.y ?? 0, options.z ?? 0);
   group.rotation.y = options.rotationY ?? 0;
+  const scale = options.scale ?? 1;
+  group.scale.set(scale, scale, scale);
   root.add(group);
 
   switch (id) {
@@ -64,11 +69,20 @@ export function addTownKitProp(root, materials, id, options = {}) {
     case "door.tavern":
       addTavernDoor(group, materials);
       break;
+    case "frontage.tavern":
+      addTavernFrontage(group, materials);
+      break;
     case "window.small":
       addWindowSample(group, materials);
       break;
+    case "window.tavern.warm":
+      addWarmTavernWindow(group, materials);
+      break;
     case "sign.hanging":
       addHangingSign(group, materials);
+      break;
+    case "sign.tavern.projecting":
+      addProjectingTavernSign(group, materials);
       break;
     case "stall.market":
       addMarketStall(group, materials, { x: 0, z: 0, width: 3.0, depth: 1.55, awningMaterial: materials.awningBlue });
@@ -150,12 +164,36 @@ function addTavernDoor(root, materials) {
   addBox(root, materials.timber, 0, 0.36, -0.12, 1.38, 0.12, 0.16);
 }
 
+function addTavernFrontage(root, materials) {
+  addBox(root, materials.portalDark, 0, 1.28, 0.08, 2.1, 2.56, 0.18);
+  addBox(root, materials.darkTimber, -1.2, 1.42, 0.18, 0.24, 2.84, 0.28);
+  addBox(root, materials.darkTimber, 1.2, 1.42, 0.18, 0.24, 2.84, 0.28);
+  addBox(root, materials.timber, 0, 2.78, 0.18, 2.7, 0.26, 0.3);
+  addBox(root, materials.trimLight, 0, 0.18, 0.22, 2.45, 0.18, 0.42);
+  addBox(root, materials.sign, 0.48, 1.18, 0.24, 0.16, 0.16, 0.09);
+  addBox(root, materials.darkTimber, 0, 3.0, 0.62, 3.45, 0.2, 0.22);
+  addBox(root, materials.awningRed, 0, 2.72, 0.72, 3.35, 0.22, 1.14, { rotationX: -0.16 });
+  addBox(root, materials.darkTimber, -1.48, 1.44, 0.72, 0.13, 2.62, 0.13);
+  addBox(root, materials.darkTimber, 1.48, 1.44, 0.72, 0.13, 2.62, 0.13);
+}
+
 function addWindowSample(root, materials) {
   addBox(root, materials.trimLight, 0, 1.35, 0, 1.14, 1.36, 0.12);
   addBox(root, materials.windowDark, 0, 1.35, -0.05, 0.92, 1.12, 0.12);
   addBox(root, materials.timber, 0, 1.35, -0.13, 0.07, 1.22, 0.12);
   addBox(root, materials.timber, 0, 1.35, -0.14, 1.02, 0.065, 0.12);
   addBox(root, materials.timber, 0, 0.66, -0.12, 1.26, 0.12, 0.16);
+}
+
+function addWarmTavernWindow(root, materials) {
+  addBox(root, materials.darkTimber, 0, 1.45, 0.05, 1.42, 1.38, 0.16);
+  addBox(root, materials.windowDark, 0, 1.45, 0.16, 1.12, 1.06, 0.12);
+  addBox(root, materials.trimLight, 0, 1.45, 0.24, 0.08, 1.16, 0.1);
+  addBox(root, materials.trimLight, 0, 1.45, 0.25, 1.18, 0.08, 0.1);
+  addBox(root, materials.timber, 0, 0.76, 0.2, 1.55, 0.16, 0.24);
+  addBox(root, materials.darkTimber, 0, 0.56, 0.34, 1.34, 0.26, 0.38);
+  addBox(root, materials.foliageDark, -0.38, 0.78, 0.36, 0.54, 0.24, 0.26);
+  addBox(root, materials.foliage, 0.34, 0.8, 0.36, 0.58, 0.28, 0.28);
 }
 
 function addHangingSign(root, materials) {
@@ -169,6 +207,21 @@ function addHangingSign(root, materials) {
     width: 1.6,
     height: 0.44,
     subtitle: "Common Room",
+    palette: "red"
+  });
+}
+
+function addProjectingTavernSign(root, materials) {
+  addBox(root, materials.darkTimber, -0.72, 2.25, 0, 0.13, 1.45, 0.13);
+  addBox(root, materials.darkTimber, -0.03, 2.9, 0.02, 1.52, 0.12, 0.12);
+  addBox(root, materials.trimLight, 0.58, 2.58, 0.02, 0.08, 0.64, 0.08);
+  addTextBoard(root, "Rusty", {
+    x: 0.58,
+    y: 2.2,
+    z: 0.08,
+    width: 1.55,
+    height: 0.42,
+    subtitle: "Tankard",
     palette: "red"
   });
 }

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T09:38:39.953Z",
+  "updated": "2026-05-28T09:55:31.365Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1200,6 +1200,98 @@
       ],
       "created": "2026-05-28T09:26:02Z",
       "updated": "2026-05-28T09:38:26Z"
+    },
+    {
+      "id": "neo-1fb2.45",
+      "project": "NeoMud",
+      "title": "Stage Tavern exterior kit pieces in Prop Zoo",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 64,
+          "body": "Added Prop Zoo Tavern frontage, warm Tavern window, and projecting Tavern sign components.",
+          "created": "2026-05-28T09:53:32Z"
+        }
+      ],
+      "created": "2026-05-28T09:40:42Z",
+      "updated": "2026-05-28T09:53:46Z"
+    },
+    {
+      "id": "neo-1fb2.46",
+      "project": "NeoMud",
+      "title": "Rebuild west Tavern exterior from approved kit pieces",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 65,
+          "body": "Rebuilt the west Tavern landmark with a larger building mass, porch/frontage, and warm instanced windows from approved kit pieces.",
+          "created": "2026-05-28T09:53:59Z"
+        }
+      ],
+      "created": "2026-05-28T09:40:48Z",
+      "updated": "2026-05-28T09:54:14Z"
+    },
+    {
+      "id": "neo-1fb2.47",
+      "project": "NeoMud",
+      "title": "Preserve Town Square budgets while improving Tavern landmark",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 66,
+          "body": "Kept Town Square under budget after the Tavern pass: full smoke is 236/240 draw calls and 58,840/60,000 triangles.",
+          "created": "2026-05-28T09:54:28Z"
+        }
+      ],
+      "created": "2026-05-28T09:40:54Z",
+      "updated": "2026-05-28T09:54:41Z"
+    },
+    {
+      "id": "neo-1fb2.48",
+      "project": "NeoMud",
+      "title": "Update QA review and memory after Tavern landmark pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 67,
+          "body": "Updated memory bank and Town Square QA review with Tavern landmark pass status and latest QA metrics.",
+          "created": "2026-05-28T09:54:53Z"
+        }
+      ],
+      "created": "2026-05-28T09:41:01Z",
+      "updated": "2026-05-28T09:55:12Z"
     }
   ],
   "ready": [

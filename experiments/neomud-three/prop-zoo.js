@@ -48,11 +48,12 @@ addTextBoard(root, "Player Scale", {
   palette: "gold"
 });
 
+const columns = 6;
 for (const [index, prop] of TOWN_KIT_PROPS.entries()) {
-  const col = index % 5;
-  const row = Math.floor(index / 5);
-  const x = -4.2 + col * 4.35;
-  const z = -4.2 + row * 4.75;
+  const col = index % columns;
+  const row = Math.floor(index / columns);
+  const x = -6.4 + col * 4.2;
+  const z = -4.2 + row * 4.6;
   const station = new THREE.Group();
   station.position.set(x, 0, z);
   station.userData = { propId: prop.id, category: prop.category };
