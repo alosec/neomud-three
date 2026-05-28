@@ -65,9 +65,10 @@ Tavern status:
 - The Rusty Tankard is a cutaway stage with plank floor, side walls, low beams, bar counter, mugs, fireplace, tables/benches, a locked cellar hatch marker, and an open east threshold back to Town Square.
 - The interior is now scaled up, with additional stools, candles, shelves, a runner rug, and collision around tables, bar, and fireplace so the player cannot clip through the main furniture.
 - The room uses a room-specific camera rig override because the outdoor follow camera clips badly in interior spaces.
+- The latest readability pass warms the Tavern background/fog, adds hemisphere fill plus separate bar/table/fireplace light emphasis, and lowers/tightens the interior camera so screenshots prioritize the bar, fireplace, tables, and exit instead of the ceiling mass.
 - Barkeep Grom is rendered from NeoMud NPC/world/server data as an interactable standee behind the bar.
 - Offline and server-backed tests physically move Town Square -> Tavern -> Town Square and assert the Barkeep entity is present.
-- Visual quality is still blockout-grade, but it is now a real playable third room in the server-authoritative slice.
+- Visual quality is still blockout-grade, but it is now a warmer and more readable playable third room in the server-authoritative slice.
 
 Local app/server status:
 
@@ -100,10 +101,10 @@ Test status:
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 102 calls / 54,893 triangles / 22 textures / 59 geometries.
-- Latest server-backed QA reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 102 calls / 54,893 triangles / 21 textures / 59 geometries.
+- Latest offline smoke reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 101 calls / 54,881 triangles / 22 textures / 59 geometries.
+- Latest server-backed QA reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 101 calls / 54,881 triangles / 21 textures / 59 geometries.
 - Latest Town Square screenshot-anchor QA reports 136 calls / 55,911 triangles / 20 textures / 199 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 329 calls / 81,549 triangles / 7 textures / 297 geometries; Town Square 222 calls / 59,747 triangles / 19 textures / 155 geometries; Tavern 102 calls / 54,893 triangles / 21 textures / 59 geometries, with no console errors or failed requests.
+- Latest authored-room screenshot QA reports Temple 329 calls / 81,549 triangles / 7 textures / 297 geometries; Town Square 222 calls / 59,747 triangles / 19 textures / 155 geometries; Tavern 101 calls / 54,881 triangles / 21 textures / 59 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest Prop Zoo QA reports 207 draw calls, 53,118 triangles, 36 textures, 173 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.

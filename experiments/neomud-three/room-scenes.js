@@ -240,16 +240,16 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
     spawn: { position: new THREE.Vector3(TAVERN.spawnX, 0, 0), heading: -Math.PI / 2 },
     status: "The Rusty Tankard: larger authored tavern interior with blocking tables, bar, fireplace, trapdoor, and server-driven barkeep.",
     environment: {
-      background: 0x21140c,
-      fog: 0x21140c,
-      fogDensity: 0.018
+      background: 0x2b1a10,
+      fog: 0x2a170f,
+      fogDensity: 0.012
     },
     camera: {
-      distance: 6.85,
-      height: 3.75,
+      distance: 6.35,
+      height: 3.28,
       sideOffset: -0.18,
-      lookAhead: 2.55,
-      targetHeight: 1.28
+      lookAhead: 2.75,
+      targetHeight: 1.12
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -393,12 +393,24 @@ function addTavernInterior(root, materials, fireGroup) {
   addTavernTrapdoor(root, materials);
   addTavernExit(root, materials);
 
-  const roomLight = new THREE.PointLight(0xffa04f, 4.6, 13.2);
-  roomLight.position.set(-1.0, 3.8, -0.8);
+  const ambientFill = new THREE.HemisphereLight(0xffd8a8, 0x26160f, 0.82);
+  root.add(ambientFill);
+
+  const roomLight = new THREE.PointLight(0xffa85a, 5.8, 16.5);
+  roomLight.position.set(-1.0, 4.0, -0.8);
   root.add(roomLight);
-  const doorFill = new THREE.PointLight(0xd9e5ff, 1.2, 6.2);
+
+  const doorFill = new THREE.PointLight(0xd9e5ff, 1.7, 8.4);
   doorFill.position.set(TAVERN.halfX - 0.7, 2.8, 0);
   root.add(doorFill);
+
+  const barLight = new THREE.PointLight(0xffc27a, 2.2, 7.4);
+  barLight.position.set(TAVERN.barX + 1.8, 2.55, TAVERN.barZ - 2.5);
+  root.add(barLight);
+
+  const tableLight = new THREE.PointLight(0xffd39a, 1.6, 8.8);
+  tableLight.position.set(2.1, 2.35, 2.2);
+  root.add(tableLight);
 }
 
 function addTavernBar(root, materials) {
@@ -431,8 +443,8 @@ function addTavernFireplace(root, materials, fireGroup) {
     flame.rotation.z = -0.28;
     fireGroup.add(flame);
   }
-  const fireLight = new THREE.PointLight(0xff7d2f, 6.4, 8.6);
-  fireLight.position.set(TAVERN.fireplaceX + 1.2, 1.9, TAVERN.fireplaceZ);
+  const fireLight = new THREE.PointLight(0xff7d2f, 7.8, 10.5);
+  fireLight.position.set(TAVERN.fireplaceX + 1.35, 2.0, TAVERN.fireplaceZ);
   root.add(fireLight);
 }
 
