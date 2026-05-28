@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T12:06:52.685Z",
+  "updated": "2026-05-28T12:20:12.884Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1584,6 +1584,27 @@
       "comments": [],
       "created": "2026-05-28T12:01:43Z",
       "updated": "2026-05-28T12:06:24Z"
+    },
+    {
+      "id": "neo-8940",
+      "project": "NeoMud",
+      "title": "Improve Temple altar wall staging with reclaimed budget",
+      "description": "Use the Temple draw-call headroom from window batching for one authored altar-wall improvement: a dawn retable/shrine behind the altar using existing materials, fixed screenshots, and offline/server QA.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: added an authored dawn retable behind the Temple altar using existing materials, preserved movement/collision, restarted saturated local server, and verified offline/room/server QA within budget",
+      "labels": [
+        "neomud-three",
+        "qa",
+        "visual"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T12:10:58Z",
+      "updated": "2026-05-28T12:19:40Z"
     }
   ],
   "ready": [

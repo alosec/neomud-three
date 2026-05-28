@@ -1022,6 +1022,8 @@ function addArchedFrame(root, material, width, height, z, radius) {
 }
 
 function addAltar(root, materials, smokePuffs) {
+  addTempleAltarRetable(root, materials);
+
   const dais = new THREE.Mesh(new THREE.CylinderGeometry(5.4, 6.25, 0.44, 8), materials.trim);
   dais.position.set(0, 0.22, TEMPLE.altarZ);
   dais.rotation.y = Math.PI / 8;
@@ -1046,6 +1048,55 @@ function addAltar(root, materials, smokePuffs) {
   const altarLight = new THREE.PointLight(0xffc979, 8.6, 12);
   altarLight.position.set(0, 2.7, TEMPLE.altarZ);
   root.add(altarLight);
+}
+
+function addTempleAltarRetable(root, materials) {
+  const group = new THREE.Group();
+  group.position.set(0, 0, TEMPLE.southZ - 0.24);
+  group.userData = { visualRole: "temple-altar-retable" };
+  root.add(group);
+
+  const glow = new THREE.Mesh(archedWindowGeometry(4.55, 6.6, 36), materials.windowGlow);
+  glow.position.set(0, 1.22, -0.06);
+  glow.renderOrder = 1;
+  group.add(glow);
+
+  const glass = new THREE.Mesh(archedWindowGeometry(3.45, 5.72, 36), materials.glass);
+  glass.position.set(0, 1.62, -0.1);
+  glass.renderOrder = 2;
+  group.add(glass);
+
+  addBox(group, materials.trim, 0, 1.08, -0.02, 7.2, 0.28, 0.32);
+  addBox(group, materials.windowFrame, -2.35, 3.18, -0.06, 0.28, 4.2, 0.28);
+  addBox(group, materials.windowFrame, 2.35, 3.18, -0.06, 0.28, 4.2, 0.28);
+  addBox(group, materials.trim, -3.05, 2.55, -0.02, 0.32, 2.65, 0.3);
+  addBox(group, materials.trim, 3.05, 2.55, -0.02, 0.32, 2.65, 0.3);
+  addBox(group, materials.windowFrame, 0, 5.62, -0.06, 3.82, 0.16, 0.2);
+
+  const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffd36d, transparent: true, opacity: 0.86, side: THREE.DoubleSide });
+  const sun = new THREE.Mesh(new THREE.RingGeometry(0.48, 0.72, 32), sunMaterial);
+  sun.position.set(0, 4.35, -0.18);
+  group.add(sun);
+
+  for (let index = 0; index < 10; index++) {
+    const angle = (Math.PI * 2 * index) / 10;
+    const radius = 1.04;
+    addBox(
+      group,
+      materials.trim,
+      Math.cos(angle) * radius,
+      4.35 + Math.sin(angle) * radius,
+      -0.2,
+      0.72,
+      0.055,
+      0.075,
+      { rotationZ: angle }
+    );
+  }
+
+  const altarAccent = new THREE.PointLight(0xffd58a, 2.1, 7.2);
+  altarAccent.position.set(0, 4.2, TEMPLE.southZ - 1.2);
+  root.add(altarAccent);
 }
 
 function addIncense(root, smokePuffs, x, z) {
