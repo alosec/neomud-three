@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T13:06:53.362Z",
+  "updated": "2026-05-28T13:21:42.243Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1714,6 +1714,28 @@
       "comments": [],
       "created": "2026-05-28T13:01:10Z",
       "updated": "2026-05-28T13:06:41Z"
+    },
+    {
+      "id": "neo-45a8",
+      "project": "NeoMud",
+      "title": "Author North Gate room slice",
+      "description": "Replace the generic town:gate fallback with an authored Three.js North Gate stage using the real room graph, Town Guard NPC, physical SOUTH/NORTH triggers, collision, debug metadata, render budget, screenshots, and server-backed traversal coverage.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: authored town:gate as a playable North Gate room with guard, triggers, collision, screenshots, render budget, offline and server traversal QA",
+      "labels": [
+        "neomud-three",
+        "north-gate",
+        "qa",
+        "server"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T13:09:19Z",
+      "updated": "2026-05-28T13:21:26Z"
     }
   ],
   "ready": [

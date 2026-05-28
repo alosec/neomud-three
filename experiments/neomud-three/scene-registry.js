@@ -1,5 +1,5 @@
 import { WORLD_ROOT } from "./world-data.js";
-import { buildGenericRoom, buildTavernRoom, buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
+import { buildGenericRoom, buildNorthGateRoom, buildTavernRoom, buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
 
 export function buildRoomScene(context) {
   const { roomId, world, serverNpcs = [], serverItems = [], onExit } = context;
@@ -32,6 +32,17 @@ export function buildRoomScene(context) {
       npcs: serverNpcs.length
         ? serverNpcs
         : world.npcs.filter((npc) => npc.startRoomId === "town:tavern"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "town:gate") {
+    return buildNorthGateRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
+      npcs: serverNpcs.length
+        ? serverNpcs
+        : world.npcs.filter((npc) => npc.startRoomId === "town:gate"),
       roomItems: serverItems
     });
   }

@@ -65,6 +65,25 @@ const TAVERN_COLLIDERS = [
   }))
 ];
 
+const NORTH_GATE = {
+  width: 26,
+  depth: 42,
+  halfX: 13,
+  halfZ: 21,
+  southExitZ: 19.15,
+  northExitZ: -19.15,
+  exitHalfWidth: 3.4
+};
+
+const NORTH_GATE_COLLIDERS = [
+  { id: "west-watchtower", center: [-7.4, -8.8], size: [4.6, 6.2] },
+  { id: "east-watchtower", center: [7.4, -8.8], size: [4.6, 6.2] },
+  { id: "west-wall", center: [-10.8, -1.5], size: [1.3, 20.4] },
+  { id: "east-wall", center: [10.8, -1.5], size: [1.3, 20.4] },
+  { id: "guard-post", center: [-5.6, 7.2], size: [2.2, 2.2] },
+  { id: "supply-crates", center: [6.4, 6.8], size: [2.1, 1.55] }
+];
+
 const TEMPLE_COLLIDERS = [
   { id: "altar-dais", center: [0, TEMPLE.altarZ + 0.12], size: [6.0, 3.25] },
   { id: "left-incense-brazier", center: [-2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] },
@@ -318,6 +337,94 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       entityLayer.children.forEach((child, index) => {
         if (child.userData.kind === "npc") {
           child.position.y = Math.sin(performance.now() * 0.0016 + index) * 0.018;
+        }
+      });
+    }
+  };
+}
+
+export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = makeTownMaterials();
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  addNorthGateStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addNorthGateEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(0, 0, 12.8), heading: 0 },
+    status: "North Gate: authored fortified gate stage with town-side return, forest road threshold, guard post, and server-driven Town Guard.",
+    environment: {
+      background: 0xb8ced1,
+      fog: 0xb8ced1,
+      fogDensity: 0.008
+    },
+    camera: {
+      distance: 3.8,
+      height: 3.55,
+      sideOffset: 0,
+      lookAhead: 2.7,
+      targetHeight: 1.18
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "town:square") return { position: new THREE.Vector3(0, 0, 12.8), heading: 0 };
+      if (fromRoomId === "forest:edge") return { position: new THREE.Vector3(0, 0, -12.7), heading: Math.PI };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -NORTH_GATE.halfX + 0.55, NORTH_GATE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -NORTH_GATE.halfZ + 0.55, NORTH_GATE.halfZ - 0.55);
+      resolveColliderPushout(position, NORTH_GATE_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -NORTH_GATE.halfX + 0.55, NORTH_GATE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -NORTH_GATE.halfZ + 0.55, NORTH_GATE.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.z > NORTH_GATE.southExitZ && Math.abs(position.x) < NORTH_GATE.exitHalfWidth) return "town:square";
+      if (position.z < NORTH_GATE.northExitZ && Math.abs(position.x) < NORTH_GATE.exitHalfWidth) return "forest:edge";
+      return null;
+    },
+    debugTriggers() {
+      return northGateTriggers();
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(NORTH_GATE_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.55) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update(dt) {
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0015 + index) * 0.018;
         }
       });
     }
@@ -717,6 +824,261 @@ function addTavernEntities(root, materials, worldRoot, world, npcs, roomItems, i
       position: new THREE.Vector3(x, 0, z)
     });
   }
+}
+
+function addNorthGateStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.packedDirt, NORTH_GATE.width, NORTH_GATE.depth);
+  addInstancedSurfaceRects(root, materials, [
+    { material: "road", x: 0, z: 0, width: 6.4, depth: NORTH_GATE.depth, y: 0.022 },
+    { material: "plazaStone", x: 0, z: 13.8, width: 10.8, depth: 5.8, y: 0.034 },
+    { material: "plazaStone", x: 0, z: -11.8, width: 8.6, depth: 4.2, y: 0.034 }
+  ], "north-gate-surfaces");
+
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_edge.webp`, 0, 8.9, -24.4, 34, 19.2);
+  addNorthGateWalls(root, materials);
+  addNorthGateDressing(root, materials);
+  addNorthGateForestEdge(root, materials);
+  addNorthGateExitAffordances(root);
+
+  const ambientFill = new THREE.HemisphereLight(0xd9ecff, 0x6b6045, 0.92);
+  root.add(ambientFill);
+
+  const sun = new THREE.DirectionalLight(0xffdfaa, 2.4);
+  sun.position.set(-5.5, 12, 6.5);
+  root.add(sun);
+
+  const gateLight = new THREE.PointLight(0xffc070, 2.2, 10.5);
+  gateLight.position.set(0, 4.0, -8.8);
+  root.add(gateLight);
+}
+
+function addNorthGateWalls(root, materials) {
+  const stone = [];
+  const darkStone = [];
+  const trim = [];
+  const timber = [];
+  const windowSlits = [];
+
+  for (const side of [-1, 1]) {
+    const towerX = side * 7.4;
+    stone.push({ x: towerX, y: 3.95, z: -8.9, width: 4.6, height: 7.9, depth: 5.9 });
+    stone.push({ x: side * 11.6, y: 2.2, z: -0.2, width: 1.1, height: 4.4, depth: 19.4 });
+    darkStone.push({ x: towerX, y: 0.35, z: -6.0, width: 5.2, height: 0.7, depth: 0.62 });
+    trim.push({ x: towerX, y: 7.95, z: -5.92, width: 5.05, height: 0.22, depth: 0.26 });
+    trim.push({ x: side * 11.6, y: 4.55, z: -0.2, width: 1.38, height: 0.26, depth: 19.8 });
+    windowSlits.push({ x: towerX - side * 0.8, y: 4.35, z: -5.86, width: 0.16, height: 1.28, depth: 0.08 });
+    windowSlits.push({ x: towerX + side * 0.55, y: 4.35, z: -5.86, width: 0.16, height: 1.28, depth: 0.08 });
+  }
+
+  stone.push({ x: 0, y: 6.15, z: -9.35, width: 9.4, height: 2.35, depth: 3.0 });
+  darkStone.push({ x: 0, y: 2.45, z: -6.18, width: 5.8, height: 4.9, depth: 0.26 });
+  timber.push({ x: 0, y: 2.45, z: -5.96, width: 5.2, height: 3.9, depth: 0.22 });
+  for (const x of [-2.1, -1.4, -0.7, 0, 0.7, 1.4, 2.1]) {
+    timber.push({ x, y: 2.36, z: -5.7, width: 0.11, height: 3.72, depth: 0.12 });
+  }
+  for (const y of [1.2, 2.45, 3.7]) {
+    timber.push({ x: 0, y, z: -5.68, width: 4.85, height: 0.11, depth: 0.12 });
+  }
+  trim.push({ x: 0, y: 7.45, z: -5.98, width: 9.8, height: 0.28, depth: 0.28 });
+  trim.push({ x: 0, y: 0.18, z: -5.75, width: 7.2, height: 0.22, depth: 0.5 });
+
+  addInstancedBoxes(root, materials.stone, stone, "north-gate-room-stone");
+  addInstancedBoxes(root, materials.darkStone, darkStone, "north-gate-room-dark-stone");
+  addInstancedBoxes(root, materials.trimLight, trim, "north-gate-room-trim");
+  addInstancedBoxes(root, materials.darkTimber, timber, "north-gate-room-portcullis");
+  addInstancedBoxes(root, materials.windowDark, windowSlits, "north-gate-room-arrow-slits", { castShadow: false, receiveShadow: false });
+}
+
+function addNorthGateDressing(root, materials) {
+  const boxesByMaterial = new Map([
+    ["darkTimber", []],
+    ["timber", []],
+    ["trimLight", []],
+    ["awningBlue", []],
+    ["awningGold", []]
+  ]);
+  const add = (key, box) => boxesByMaterial.get(key).push(box);
+
+  add("darkTimber", { x: -5.6, y: 0.65, z: 7.2, width: 2.0, height: 1.3, depth: 1.35 });
+  add("timber", { x: -5.6, y: 1.42, z: 7.2, width: 2.25, height: 0.22, depth: 1.55 });
+  add("awningBlue", { x: -5.6, y: 2.08, z: 7.2, width: 2.55, height: 0.2, depth: 1.9 });
+  add("trimLight", { x: -5.6, y: 1.82, z: 6.36, width: 1.65, height: 0.32, depth: 0.14 });
+
+  for (const [x, z, w, d] of [[6.2, 6.85, 0.9, 0.7], [7.15, 7.25, 0.7, 0.62], [5.65, 8.05, 0.74, 0.58]]) {
+    add("timber", { x, y: 0.34, z, width: w, height: 0.68, depth: d });
+    add("darkTimber", { x, y: 0.72, z: z - d * 0.48, width: w * 1.08, height: 0.08, depth: 0.08 });
+  }
+
+  for (const [x, z, materialKey] of [[-4.8, -13.4, "awningBlue"], [4.8, -13.4, "awningGold"], [-9.8, 6.2, "awningGold"], [9.8, 6.2, "awningBlue"]]) {
+    add("darkTimber", { x, y: 1.25, z, width: 0.13, height: 2.5, depth: 0.13 });
+    add(materialKey, { x: x + 0.32, y: 2.0, z, width: 0.08, height: 0.9, depth: 0.58 });
+  }
+
+  for (const [key, boxes] of boxesByMaterial) {
+    addInstancedBoxes(root, material(materials, key), boxes, `north-gate-dressing-${key}`);
+  }
+
+  addTextBoard(root, "Forest Road", {
+    x: 0,
+    y: 5.25,
+    z: -5.5,
+    width: 4.2,
+    height: 0.74,
+    subtitle: "North",
+    palette: "green",
+    renderOrder: 9
+  });
+  addTextBoard(root, "Town Square", {
+    x: -6.8,
+    y: 2.65,
+    z: 14.2,
+    width: 2.6,
+    height: 0.48,
+    subtitle: "South",
+    palette: "gold",
+    renderOrder: 9
+  });
+}
+
+function addNorthGateForestEdge(root, materials) {
+  const trees = [
+    { x: -8.8, z: -17.8, scale: 1.18, rotationY: 0.25 },
+    { x: -5.6, z: -18.8, scale: 0.95, rotationY: -0.4 },
+    { x: 8.6, z: -17.5, scale: 1.16, rotationY: -0.2 },
+    { x: 5.3, z: -18.9, scale: 0.98, rotationY: 0.55 },
+    { x: -11.2, z: -13.7, scale: 0.9, rotationY: -0.1 },
+    { x: 11.0, z: -13.5, scale: 0.92, rotationY: 0.18 }
+  ];
+  addTownContextTrees(root, materials, trees);
+  addInstancedGeometry(
+    root,
+    new THREE.ConeGeometry(1, 1, 5),
+    materials.foliage,
+    [
+      { x: -3.8, y: 0.24, z: -16.2, scale: [0.2, 0.48, 0.2], rotationY: 0.2 },
+      { x: 3.5, y: 0.24, z: -16.4, scale: [0.22, 0.5, 0.22], rotationY: -0.5 },
+      { x: -6.4, y: 0.22, z: -14.8, scale: [0.18, 0.44, 0.18], rotationY: 0.8 },
+      { x: 6.0, y: 0.22, z: -14.6, scale: [0.18, 0.44, 0.18], rotationY: -0.7 }
+    ],
+    "north-gate-forest-grass"
+  );
+}
+
+function addNorthGateExitAffordances(root) {
+  for (const trigger of northGateTriggers()) {
+    const threshold = trigger.affordance.threshold;
+    addExitThreshold(root, {
+      x: threshold.center[0],
+      z: threshold.center[2],
+      width: threshold.size[0],
+      depth: threshold.size[1],
+      color: threshold.color,
+      opacity: 0.2
+    });
+  }
+}
+
+function addNorthGateEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const guardPlacement = {
+    "npc:town_guard": {
+      position: [-3.75, 0, 5.15],
+      heading: Math.PI * 0.08,
+      role: "Guard",
+      palette: "gold",
+      height: 3.25,
+      width: 1.82
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = guardPlacement[normalized.id] ?? {
+      position: [-3.75 + index * 1.1, 0, 5.15 - index * 0.75],
+      heading: Math.PI * 0.08,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 3,
+      width: placement.width ?? 1.68,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = 2.8 + index * 0.8;
+    const z = 5.4 - (index % 2) * 1.0;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Ground",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function northGateTriggers() {
+  return [
+    {
+      id: "exit-south-square",
+      direction: "SOUTH",
+      targetId: "town:square",
+      prompt: "Return to Town Square",
+      trigger: { type: "box", center: [0, 1, NORTH_GATE.southExitZ], size: [NORTH_GATE.exitHalfWidth * 2, 3, 1.6] },
+      affordance: {
+        label: "Town Square",
+        subtitle: "South",
+        threshold: { center: [0, 0.05, NORTH_GATE.southExitZ], size: [NORTH_GATE.exitHalfWidth * 2, 1.35], color: 0xf0c878 }
+      }
+    },
+    {
+      id: "exit-north-forest",
+      direction: "NORTH",
+      targetId: "forest:edge",
+      prompt: "Follow the Forest Road",
+      trigger: { type: "box", center: [0, 1, NORTH_GATE.northExitZ], size: [NORTH_GATE.exitHalfWidth * 2, 3, 1.6] },
+      affordance: {
+        label: "Forest",
+        subtitle: "North Road",
+        threshold: { center: [0, 0.05, NORTH_GATE.northExitZ], size: [NORTH_GATE.exitHalfWidth * 2, 1.35], color: 0xb9e0a1 }
+      }
+    }
+  ];
 }
 
 function addTempleShell(root, materials) {

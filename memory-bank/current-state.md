@@ -13,7 +13,7 @@ Playable Three.js lab:
 - The lab lives in `experiments/neomud-three/`.
 - `experiments/neomud-three/ART_DIRECTION.md` now defines the standing art rules: stylized theatrical fantasy dioramas, reusable materials/kits, controlled lighting, and screenshot-based QA.
 - It loads NeoMud default-world zone JSON from `maker/default_world_src`.
-- It builds a playable vertical slice across `town:temple`, `town:square`, and `town:tavern`.
+- It builds a playable vertical slice across `town:temple`, `town:square`, `town:gate`, and `town:tavern`.
 - By default, the lab connects to the Kotlin/JVM NeoMud server at `ws://127.0.0.1:8080/game`, logs in as an ephemeral guest, and treats `room_info` / `move_ok` as the authoritative room state.
 - `?offline=1` disables the server path and uses the static room graph fallback.
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
@@ -66,6 +66,15 @@ Town Square status:
 - The scene is more readable and less toy-like, but still not reconstructed as a convincing professional 3D place. Material hierarchy, authored player art, richer NPC staging, and chunked distant scenery remain active work.
 - Renderer QA now records render calls, triangles, texture count, and geometry count. The browser tests enforce current budgets for Temple and Town Square, and the headed playtest writes `experiments/neomud-three/qa/latest/report.json` with budget pass/fail details.
 
+North Gate status:
+
+- `town:gate` now has an authored Three.js room instead of the generic fallback shell.
+- The room uses real NeoMud exits: South returns to Town Square and North continues to Forest Edge. Physical triggers, debug trigger metadata, collision volumes, and server-backed traversal all use the same movement path as the rest of the slice.
+- The scene is a compact fortified gate stage with side walls, watchtowers, batched gate geometry, portcullis, arrow slits, guard booth, supply crates, banners, low-poly trees, forest threshold, and an existing forest-edge backdrop.
+- Town Guard is rendered from NeoMud NPC/world/server data as an interactable standee at the guard post.
+- The room has a tighter camera rig so the gate corridor does not clip behind the portcullis when looking toward the forest.
+- Visual quality is still first-pass, especially the flat forest backdrop and simple tower massing, but it is now a playable server-authoritative room instead of a generic shell.
+
 Tavern status:
 
 - `town:tavern` now has an authored Three.js interior instead of the generic fallback shell.
@@ -100,19 +109,19 @@ Test status:
 - `scripts/test-neomud-three.cjs` runs a local browser smoke test against the offline Three renderer at `?offline=1`.
 - `scripts/test-neomud-three-labs.cjs` runs Material Lab and Prop Zoo browser QA, screenshots both lab levels, checks render budgets, and verifies approved material/prop metadata.
 - `scripts/test-neomud-three-town-shots.cjs` captures fixed Town Square screenshot anchors for spawn north, north gate, west tavern, east market, and south temple, then writes `town-shots-report.json`.
-- `scripts/test-neomud-three-room-shots.cjs` captures fixed authored-room screenshot anchors for Temple nave/altar, Town Square plaza, and Tavern entry/bar, then writes `room-shots-report.json`.
-- The offline smoke test checks rendered triangles, avatar initialization, run animation activation, stable grounded Y with no procedural walk bob, default room data, forward movement, diagonal/strafe movement, jump/landing, Temple/Tavern collision pushout, Town Square trigger/prompt/affordance metadata, physical South -> Temple movement, console errors, and failed HTTP requests.
+- `scripts/test-neomud-three-room-shots.cjs` captures fixed authored-room screenshot anchors for Temple nave/altar, Town Square plaza, North Gate entry/forest road, and Tavern entry/bar, then writes `room-shots-report.json`.
+- The offline smoke test checks rendered triangles, avatar initialization, run animation activation, stable grounded Y with no procedural walk bob, default room data, forward movement, diagonal/strafe movement, jump/landing, Temple/Tavern collision pushout, Town Square and North Gate trigger/prompt/affordance metadata, physical room movement, console errors, and failed HTTP requests.
 - The offline smoke test also verifies Town Square entity metadata for Guildmaster Aldric and Old Wren, moves near Old Wren, opens the interaction panel, and checks dialogue content.
-- `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, crosses physical exit triggers for Temple -> Town Square -> Tavern -> Town Square -> Temple, asserts server-confirmed room transitions, and verifies server NPCs resolve to visible Town Square/Tavern entities.
+- `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, crosses physical exit triggers for Temple -> Town Square -> North Gate -> Town Square -> Tavern -> Town Square -> Temple, asserts server-confirmed room transitions, and verifies server NPCs resolve to visible Town Square/North Gate/Tavern entities.
 - If the server-backed test times out on auth with `Too many guest sessions`, restart the local `com.neomud.server.ApplicationKt` process and rerun the test; this is local session saturation rather than a renderer failure.
 - `scripts/validate-neomud-three-specs.mjs` checks that the authored Town Square render spec has physical trigger boxes and that every visual exit maps to the real NeoMud room graph.
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; Tavern 106 calls / 6,728 triangles / 21 textures / 59 geometries.
-- Latest server-backed QA reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; Tavern 106 calls / 6,728 triangles / 20 textures / 59 geometries.
+- Latest offline smoke reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; North Gate 39 calls / 3,224 triangles / 23 textures / 30 geometries; Tavern 106 calls / 6,728 triangles / 25 textures / 59 geometries.
+- Latest server-backed QA reports Temple 280 calls / 34,862 triangles / 6 textures / 196 geometries; Town Square 211 calls / 13,594 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 21 textures / 29 geometries; Tavern 106 calls / 6,728 triangles / 24 textures / 59 geometries.
 - Latest Town Square screenshot-anchor QA reports 133 calls / 10,058 triangles / 19 textures / 189 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 259 calls / 33,372 triangles / 6 textures / 196 geometries; Town Square 203 calls / 13,518 triangles / 18 textures / 148 geometries; Tavern 106 calls / 6,728 triangles / 20 textures / 59 geometries, with no console errors or failed requests.
+- Latest authored-room screenshot QA reports Temple 259 calls / 33,372 triangles / 6 textures / 196 geometries; Town Square 203 calls / 13,518 triangles / 18 textures / 148 geometries; North Gate 36 calls / 3,218 triangles / 21 textures / 29 geometries; Tavern 106 calls / 6,728 triangles / 23 textures / 59 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest Prop Zoo QA reports 246 draw calls, 4,977 triangles, 39 textures, 161 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.

@@ -20,6 +20,12 @@ const RENDER_BUDGETS = {
     textures: 32,
     geometries: 100
   },
+  "town:gate": {
+    calls: 150,
+    triangles: 60_000,
+    textures: 32,
+    geometries: 130
+  },
   "material-lab": {
     calls: 420,
     triangles: 120_000,

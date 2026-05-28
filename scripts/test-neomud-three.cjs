@@ -171,6 +171,57 @@ async function main() {
     assert.match(await page.locator("#panel-content").textContent(), /blood|Wardens/i);
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -20.2, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:gate",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "North Gate");
+    const gateTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      gateTriggers.map((trigger) => trigger.direction).sort(),
+      ["NORTH", "SOUTH"]
+    );
+    assert.ok(gateTriggers.some((trigger) => trigger.id === "exit-south-square" && trigger.targetId === "town:square"));
+    assert.ok(gateTriggers.some((trigger) => trigger.id === "exit-north-forest" && trigger.targetId === "forest:edge"));
+    const gateColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      gateColliders.some((collider) => collider.id === "west-watchtower"),
+      `expected North Gate watchtower collider, got ${JSON.stringify(gateColliders)}`
+    );
+    const gateEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      gateEntities.some((entity) => entity.id === "npc:town_guard" && /Town Guard/i.test(entity.name)),
+      `expected Town Guard entity in North Gate, got ${JSON.stringify(gateEntities)}`
+    );
+    await saveScreenshot(page, "offline-north-gate.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:gate"));
+    assertRenderBudget(assert, "town:gate", budgetReports.at(-1).stats);
+
+    const guard = gateEntities.find((entity) => entity.id === "npc:town_guard");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.1, z, heading: -Math.PI / 2 }), guard);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:town_guard",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Town Guard/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Town Guard");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 18.7, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:square",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -20.2, z: 0, heading: -Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

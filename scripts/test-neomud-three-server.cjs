@@ -93,6 +93,36 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:square"));
     assertRenderBudget(assert, "town:square", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -20.2, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:gate",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "North Gate");
+    const gateTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(gateTriggers.some((trigger) => trigger.id === "exit-south-square"));
+    assert.ok(gateTriggers.some((trigger) => trigger.id === "exit-north-forest"));
+    const gateEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      gateEntities.some((entity) => entity.id === "npc:town_guard" && /Town Guard/i.test(entity.name)),
+      `expected server Town Guard entity in North Gate, got ${JSON.stringify(gateEntities)}`
+    );
+    await saveScreenshot(page, "server-north-gate.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:gate"));
+    assertRenderBudget(assert, "town:gate", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 18.7, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:square",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -20.2, z: 0, heading: -Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(
@@ -137,7 +167,10 @@ async function main() {
 
     await page.keyboard.press("l");
     assert.equal(await page.locator("#panel-title").textContent(), "Game Log");
-    assert.match(await page.locator("#panel-content").textContent(), /Moved north to Town Square/i);
+    const logText = await page.locator("#panel-content").textContent();
+    assert.match(logText, /Moved south to Town Square/i);
+    assert.match(logText, /Moved west to The Rusty Tankard/i);
+    assert.match(logText, /Moved south to Temple of the Dawn/i);
 
     assert.deepEqual(failedRequests, []);
     assert.deepEqual(consoleErrors, []);
