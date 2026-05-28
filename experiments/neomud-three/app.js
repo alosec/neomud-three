@@ -452,6 +452,7 @@ function showPickupFeedback(message) {
   if (!pickupFeedback || !pickupFeedbackTitle || !pickupFeedbackDetail) return;
   const quantity = Math.max(1, message.quantity ?? 1);
   const itemName = message.itemName ?? selectedInteractable?.name ?? "item";
+  renderEngine.showPickupEffect({ position: player.position.clone(), isCoin: Boolean(message.isCoin) });
   pickupFeedbackTitle.textContent = message.isCoin ? "Coins gained" : "Item gained";
   pickupFeedbackDetail.textContent = message.isCoin
     ? `+${quantity} coin${quantity === 1 ? "" : "s"}`
@@ -1155,6 +1156,11 @@ function installDebugApi() {
     },
     get render() {
       return renderEngine.renderStats;
+    },
+    get effects() {
+      return {
+        pickup: renderEngine.pickupEffectCount
+      };
     },
     get avatar() {
       return player.userData.avatarInfo?.() ?? { loaded: false, loadFailed: true, activeAnimation: "missing" };

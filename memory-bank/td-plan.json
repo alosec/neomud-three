@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:26:30.835Z",
+  "updated": "2026-05-28T17:33:53.044Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2224,6 +2224,29 @@
       ],
       "created": "2026-05-28T17:21:48Z",
       "updated": "2026-05-28T17:26:19Z"
+    },
+    {
+      "id": "neo-1fb2.9.2",
+      "project": "NeoMud",
+      "title": "Add in-world pickup feedback marker",
+      "description": "Add a lightweight in-world confirmation effect for server-confirmed pickup_result so item/coin collection reads in the 3D view, not only in the DOM HUD.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.9",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 105,
+          "body": "Completed: pickup_result now triggers a transient 3D burst over the player through render-engine.js; debug API exposes active pickup effect count; server-backed QA asserts the in-world effect and HUD toast before writing server-hidden-cave-pickup.png.",
+          "created": "2026-05-28T17:33:30Z"
+        }
+      ],
+      "created": "2026-05-28T17:27:43Z",
+      "updated": "2026-05-28T17:33:38Z"
     }
   ],
   "ready": [

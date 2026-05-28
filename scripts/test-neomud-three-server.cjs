@@ -403,6 +403,7 @@ async function main() {
         { timeout: 5_000 }
       );
       await page.locator("#pickup-feedback:not(.hidden)").waitFor({ timeout: 5_000 });
+      await page.waitForFunction(() => window.__neomudThreeDebug.effects.pickup > 0, null, { timeout: 2_000 });
       const pickupFeedbackText = await page.locator("#pickup-feedback").textContent();
       assert.match(pickupFeedbackText, lootTarget.actionType === "PICKUP_ITEM" ? /Item gained/i : /Coins gained/i);
       await saveScreenshot(page, "server-hidden-cave-pickup.png");
@@ -434,6 +435,7 @@ async function main() {
         itemName: "QA pickup marker"
       }));
       await page.waitForFunction(() => window.__neomudThreeDebug.pickupFeedback.visible, null, { timeout: 2_000 });
+      await page.waitForFunction(() => window.__neomudThreeDebug.effects.pickup > 0, null, { timeout: 2_000 });
       await saveScreenshot(page, "server-hidden-cave-pickup.png");
     }
 
