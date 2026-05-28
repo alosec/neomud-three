@@ -20,6 +20,7 @@ export const TOWN_KIT_PROPS = [
   { id: "table.tavern", label: "Tavern Table", category: "interior" },
   { id: "stool.tavern", label: "Tavern Stool", category: "interior" },
   { id: "rug.runner", label: "Runner Rug", category: "interior" },
+  { id: "ground.trim.stone", label: "Stone Ground Trim", category: "surface" },
   { id: "candle.cluster", label: "Candle Cluster", category: "lighting" },
   { id: "planter.long", label: "Long Planter", category: "foliage" },
   { id: "shrub.clump", label: "Shrub Clump", category: "foliage" },
@@ -97,6 +98,9 @@ export function addTownKitProp(root, materials, id, options = {}) {
       break;
     case "rug.runner":
       addRunnerRug(group, materials);
+      break;
+    case "ground.trim.stone":
+      addGroundTrimSample(group, materials);
       break;
     case "candle.cluster":
       addCandleCluster(group, materials);
@@ -259,6 +263,16 @@ function addRunnerRug(root, materials) {
   addBox(root, materials.awningRed, 0, 0.035, 0, 3.2, 0.05, 1.08, { castShadow: false });
   addBox(root, materials.sign, 0, 0.072, -0.48, 3.3, 0.04, 0.08, { castShadow: false });
   addBox(root, materials.sign, 0, 0.072, 0.48, 3.3, 0.04, 0.08, { castShadow: false });
+}
+
+function addGroundTrimSample(root, materials) {
+  addBox(root, materials.plazaStone, 0, 0.025, 0, 3.1, 0.05, 2.05, { castShadow: false });
+  addBox(root, materials.pathEdge, 0, 0.07, -0.86, 2.8, 0.045, 0.1, { castShadow: false });
+  addBox(root, materials.pathEdge, 0, 0.07, 0.86, 2.8, 0.045, 0.1, { castShadow: false });
+  addBox(root, materials.darkStone, -0.86, 0.085, -0.18, 0.9, 0.04, 0.09, { castShadow: false, rotationY: 0.18 });
+  addBox(root, materials.darkStone, 0.64, 0.085, 0.36, 0.72, 0.04, 0.08, { castShadow: false, rotationY: -0.24 });
+  addBox(root, materials.foliageDark, -1.18, 0.1, 0.56, 0.42, 0.08, 0.22, { castShadow: false });
+  addBox(root, materials.awningGold, 1.14, 0.11, -0.52, 0.16, 0.06, 0.1, { castShadow: false, rotationY: 0.4 });
 }
 
 function addCandleCluster(root, materials) {

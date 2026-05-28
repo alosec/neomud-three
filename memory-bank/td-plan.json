@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T12:54:16.749Z",
+  "updated": "2026-05-28T12:59:05.973Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1670,6 +1670,28 @@
       "comments": [],
       "created": "2026-05-28T12:51:42Z",
       "updated": "2026-05-28T12:54:04Z"
+    },
+    {
+      "id": "neo-e4c1",
+      "project": "NeoMud",
+      "title": "Add restrained Town Square ground trim kit",
+      "description": "Add a reusable Prop Zoo ground/stone decal sample and apply a restrained instanced ground-detail pass to Town Square using approved materials. Keep exit readability and current budgets; rerun lab, smoke, screenshot, and server QA.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: added Prop Zoo stone ground trim and restrained instanced Town Square paver/scuff/moss/leaf details with lab, smoke, screenshot, and server QA passing",
+      "labels": [
+        "neomud-three",
+        "prop-zoo",
+        "qa",
+        "town-square"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T12:55:18Z",
+      "updated": "2026-05-28T12:58:52Z"
     }
   ],
   "ready": [

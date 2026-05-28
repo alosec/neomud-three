@@ -324,3 +324,20 @@ Optimization delta: road, plaza, and outer-ground surface rectangles now render 
 QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass after this change. Screenshot review confirms the plaza/road surfaces still render in the correct positions.
 
 Remaining visual gap: use the reclaimed calls on one authored improvement at a time, preferably landmark structure, NPC staging, or material trim. Do not spend the headroom on generic clutter.
+
+## Score After Ground Trim Kit Pass
+
+- Navigation readability: 2/2. The new paver chips, scuffs, moss, and leaf accents do not obscure Gate, Market, Temple, Tavern, NPCs, roads, or physical exit affordances.
+- Scale believability: 1/2. The ground has more handcrafted scale texture, but the building architecture is still the main blockout-quality gap.
+- Semantic match: 2/2. The detail supports a lived-in civic courtyard without adding unrelated decoration.
+- Interaction clarity: 2/2. Physical triggers, NPC proximity prompts, compass/HUD affordances, and collision volumes still pass.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes.
+- Performance: 2/2. Full-smoke Town Square reports 227 calls / 13,378 triangles / 18 textures / 146 geometries; fixed Town Square anchors report 133 calls / 10,058 triangles / 19 textures / 187 geometries.
+
+Total: 11/12
+
+Visual delta: added `ground.trim.stone` to Prop Zoo, then applied a restrained instanced ground-detail pass to the plaza and landmark thresholds. The details use approved materials only and are grouped by material.
+
+QA delta: `node --check` for changed files, spec validation, Prop Zoo/Material Lab QA, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed traversal all pass. Screenshot review confirms the trim reads as subtle surface wear rather than blocking clutter.
+
+Remaining visual gap: do not add more general ground noise by default. The next visual pass should target authored gate/temple/tavern architecture or NPC staging.

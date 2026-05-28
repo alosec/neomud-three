@@ -1571,6 +1571,7 @@ function addTownSpecProps(root, materials, spec) {
   addTownBenches(root, materials, spec.props.benches ?? []);
   addTownPlanters(root, materials, spec.props.planters ?? []);
   addTownFoliageDetails(root, materials, spec.props);
+  addTownGroundTrim(root, materials, spec.props.groundTrim ?? []);
   addTownBanners(root, materials, spec.props.banners ?? []);
   addTownCrateStacks(root, materials, spec.props.crateStacks ?? []);
 }
@@ -1726,6 +1727,30 @@ function addTownFoliageDetails(root, materials, props = {}) {
   }
   for (const [materialKey, flowers] of flowerGroups) {
     addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), material(materials, materialKey), flowers, `courtyard-flowers-${materialKey}`);
+  }
+}
+
+function addTownGroundTrim(root, materials, trimSpecs) {
+  if (!trimSpecs.length) return;
+  const byMaterial = new Map();
+  for (const trim of trimSpecs) {
+    const materialKey = trim.material ?? "pathEdge";
+    if (!byMaterial.has(materialKey)) byMaterial.set(materialKey, []);
+    byMaterial.get(materialKey).push({
+      x: trim.x,
+      y: trim.y ?? 0.066,
+      z: trim.z,
+      width: trim.width,
+      height: trim.height ?? 0.035,
+      depth: trim.depth,
+      rotationY: trim.rotationY ?? 0
+    });
+  }
+  for (const [materialKey, boxes] of byMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `courtyard-ground-trim-${materialKey}`, {
+      castShadow: false,
+      receiveShadow: false
+    });
   }
 }
 

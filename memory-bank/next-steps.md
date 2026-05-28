@@ -72,5 +72,5 @@ High leverage next work:
    - Do not keep solving warmth by adding more loose foliage; the next pass should improve a named landmark or authored gameplay staging.
    - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k; surface batching now leaves current Town Square full smoke at roughly 13.1k triangles and 223/240 draw calls. Keep spending that headroom deliberately.
    - The Temple window batching pass reclaimed more than 100 full-smoke draw calls, and the altar retable spends part of that headroom while keeping full smoke at 276 calls.
-   - Add the next Prop Zoo items only when they unlock that landmark pass: ground decal, stone trim, gate trim, stained-glass/window frame variant, or a better NPC staging prop.
+   - Stone ground trim is now in Prop Zoo and applied to Town Square; add the next Prop Zoo items only when they unlock that landmark pass: gate trim, stained-glass/window frame variant, or a better NPC staging prop.
    - Keep Town Square under the current render budget and update fixed screenshots.
