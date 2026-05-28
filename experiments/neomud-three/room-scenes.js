@@ -2383,6 +2383,7 @@ function addTavernInterior(root, materials, fireGroup) {
 
   addTavernCeilingComposition(root, materials);
   addTavernBar(root, materials);
+  addTavernBarkeepStaging(root, materials);
   addTavernFireplace(root, materials, fireGroup);
   addTavernTables(root, materials);
   addTavernWarmth(root, materials);
@@ -2448,6 +2449,54 @@ function addTavernBar(root, materials) {
     mug.castShadow = true;
     root.add(mug);
   }
+}
+
+function addTavernBarkeepStaging(root, materials) {
+  addTextBoard(root, "Barkeep", {
+    x: TAVERN.barX + 1.42,
+    y: 2.72,
+    z: TAVERN.barZ - 0.08,
+    width: 2.15,
+    height: 0.48,
+    subtitle: "Ale & Rumors",
+    palette: "red"
+  });
+
+  const serviceSpot = new THREE.Mesh(
+    new THREE.CircleGeometry(1.02, 28),
+    new THREE.MeshBasicMaterial({ color: 0xffc06a, transparent: true, opacity: 0.16, depthWrite: false })
+  );
+  serviceSpot.name = "tavern-barkeep-service-spot";
+  serviceSpot.position.set(TAVERN.barX + 1.62, 0.052, TAVERN.barZ - 0.08);
+  serviceSpot.rotation.x = -Math.PI / 2;
+  serviceSpot.renderOrder = 4;
+  root.add(serviceSpot);
+
+  const dark = [
+    { x: TAVERN.barX + 1.12, y: 1.94, z: TAVERN.barZ + 0.32, width: 0.72, height: 0.08, depth: 0.44 },
+    { x: TAVERN.barX + 1.42, y: 1.99, z: TAVERN.barZ - 0.78, width: 0.42, height: 0.08, depth: 0.32 },
+    { x: TAVERN.barX + 1.18, y: 2.22, z: TAVERN.barZ - 0.98, width: 0.08, height: 0.46, depth: 0.08 },
+    { x: TAVERN.barX + 1.18, y: 2.22, z: TAVERN.barZ - 0.32, width: 0.08, height: 0.46, depth: 0.08 },
+    { x: TAVERN.barX + 1.18, y: 2.22, z: TAVERN.barZ + 0.34, width: 0.08, height: 0.46, depth: 0.08 }
+  ];
+  const trim = [
+    { x: TAVERN.barX + 1.12, y: 1.995, z: TAVERN.barZ + 0.32, width: 0.58, height: 0.035, depth: 0.32 },
+    { x: TAVERN.barX + 1.42, y: 2.04, z: TAVERN.barZ - 0.78, width: 0.28, height: 0.035, depth: 0.22 },
+    { x: TAVERN.barX + 1.26, y: 2.5, z: TAVERN.barZ - 0.98, width: 0.28, height: 0.07, depth: 0.07 },
+    { x: TAVERN.barX + 1.26, y: 2.5, z: TAVERN.barZ - 0.32, width: 0.28, height: 0.07, depth: 0.07 },
+    { x: TAVERN.barX + 1.26, y: 2.5, z: TAVERN.barZ + 0.34, width: 0.28, height: 0.07, depth: 0.07 }
+  ];
+  const gold = [
+    { x: TAVERN.barX + 1.42, y: 2.08, z: TAVERN.barZ - 0.06, width: 0.12, height: 0.08, depth: 0.12 },
+    { x: TAVERN.barX + 1.6, y: 2.08, z: TAVERN.barZ + 0.12, width: 0.1, height: 0.08, depth: 0.1 }
+  ];
+  addInstancedBoxes(root, materials.darkTimber, dark, "tavern-barkeep-staging-dark");
+  addInstancedBoxes(root, materials.trimLight, trim, "tavern-barkeep-staging-trim");
+  addInstancedBoxes(root, materials.sign, gold, "tavern-barkeep-staging-gold", { castShadow: false });
+
+  const glow = new THREE.PointLight(0xffb46b, 1.35, 4.4);
+  glow.position.set(TAVERN.barX + 1.45, 2.25, TAVERN.barZ - 0.12);
+  root.add(glow);
 }
 
 function addTavernFireplace(root, materials, fireGroup) {

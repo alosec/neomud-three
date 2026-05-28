@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:34:33.132Z",
+  "updated": "2026-05-28T18:41:40.353Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2408,6 +2408,29 @@
       ],
       "created": "2026-05-28T18:31:49Z",
       "updated": "2026-05-28T18:34:14Z"
+    },
+    {
+      "id": "neo-1fb2.25.4",
+      "project": "NeoMud",
+      "title": "Improve Tavern Barkeep staging",
+      "description": "Make the Tavern bar/Barkeep interaction read as an authored affordance: add low-cost bar service details, a clear service/menu board, and stronger warm interaction staging using existing Tavern materials only.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.25",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 113,
+          "body": "Completed: Tavern bar now has a Barkeep board, service spot, tap handles, tray/ledger details, and a warm service light. Room-shot/offline/server QA pass; Tavern remains within budget at 114/120 calls in room shots and offline smoke.",
+          "created": "2026-05-28T18:41:09Z"
+        }
+      ],
+      "created": "2026-05-28T18:36:33Z",
+      "updated": "2026-05-28T18:41:22Z"
     }
   ],
   "ready": [
