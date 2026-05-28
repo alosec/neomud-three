@@ -31,10 +31,10 @@ High leverage next work:
    - Preserve the current exit readability and 240-call full-smoke budget, or explicitly justify a new budget before raising it.
 
 3a. Continue player avatar production.
-   - The current Xbot rig now has a fantasy overlay and should remain as the technical animation bridge.
+   - The visible player is now a compact instanced low-poly fantasy adventurer proxy. Xbot remains a hidden technical/reference asset, not the rendered character.
    - Do not swap to another random example model.
    - Next character work should be an authored or deliberately sourced skinned adventurer GLB with documented license, forward axis, scale, idle/walk/run clips, and fixed QA screenshots.
-   - If a full GLB is not practical yet, improve the overlay only when it clearly helps silhouette without breaking the room budgets.
+   - If a full GLB is not practical yet, improve the instanced proxy only when it clearly helps silhouette/proportions without spending the reclaimed room budget.
 
 4. Connect NeoMud gameplay surfaces.
    - Clicking/approaching an NPC should open a DOM interaction panel.
@@ -66,6 +66,6 @@ High leverage next work:
    - The south Temple facade has a subtle approved-glass glow pass; the first doorway glow attempt was rejected in screenshot QA because it looked like a visible rectangle.
    - The Tavern interior now has a warmer lighting/camera pass; further Tavern work should target wall/ceiling composition and material treatment rather than more loose furniture.
    - Do not keep solving warmth by adding more loose foliage; Town Square is now triangle-budget constrained.
-   - A first budget-reclaim pass lowered the Town Square full-smoke triangle count from 59,853 to 59,189. Continue reclaiming budget before larger landmark/character upgrades; the Xbot avatar still dominates triangle pressure.
+   - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k, creating real headroom for future room detail.
    - Add the next Prop Zoo items only when they unlock that landmark pass: conifer variant, ground decal, stone trim, gate trim, or stained-glass/window frame variant.
    - Keep Town Square under the current render budget and update fixed screenshots.

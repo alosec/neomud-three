@@ -82,8 +82,8 @@ async function main() {
       if (lab.id === "prop-zoo") {
         assert.ok(snapshot.props.length >= 10, `expected reusable prop set, got ${snapshot.props.length}`);
         assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
-        assert.equal(snapshot.avatar.visualTreatment, "xbot-adventurer-overlay-v1");
-        assert.equal(snapshot.avatar.overlay, true);
+        assert.equal(snapshot.avatar.visualTreatment, "procedural-adventurer-proxy-v2");
+        assert.equal(snapshot.avatar.proxy, true);
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });

@@ -10,11 +10,11 @@ It currently:
 - Authors Town Square through `TOWN_SQUARE_SPEC`, including named landmark specs and physical trigger volumes mapped back to real NeoMud exits.
 - Defines approved material IDs and metadata in `render-assets.js`; rooms consume material sets instead of arbitrary generated files.
 - Provides a material lab and prop zoo so generated textures/components can be reviewed before entering rooms.
-- Lets you walk a skinned humanoid avatar with sane movement: WASD/arrows turn and move, Q/E strafe, Shift runs, Space jumps, diagonals work. The old procedural walk bob has been removed; the visible gait now comes from the avatar animation clips.
+- Lets you walk a compact fantasy adventurer avatar with sane movement: WASD/arrows turn and move, Q/E strafe, Shift runs, Space jumps, diagonals work. The old procedural walk bob has been removed; the visible gait is driven by explicit walk/run animation state.
 - Shows a compact player HUD with HP and movement mode.
 - Adds simple authored collision volumes for the Temple altar/dais, Town Square fountain/dressing, and Tavern tables/bar/fireplace.
 - Uses transparent generated stained glass inside a physical window component.
-- Uses a vendored Three.js/Xbot GLTF player rig with `idle`, `walk`, and `run` clips through `AnimationMixer`, plus a lightweight fantasy-adventurer overlay for cloak, cowl, satchel, staff, and trim. This is a better prototype avatar, not the final authored character model.
+- Loads the vendored Three.js/Xbot GLTF as a hidden animation/reference asset, but renders a compact instanced low-poly fantasy adventurer as the visible player. This reclaims substantial triangle budget for the rooms; it is still not the final authored character model.
 
 Art direction rules live in `ART_DIRECTION.md`.
 The graphics production rules live in `../../memory-bank/graphics-production-contract.md`.

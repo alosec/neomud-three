@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T11:06:24.911Z",
+  "updated": "2026-05-28T11:28:49.245Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1503,6 +1503,23 @@
       "comments": [],
       "created": "2026-05-28T10:56:34Z",
       "updated": "2026-05-28T11:06:03Z"
+    },
+    {
+      "id": "neo-1fb2.59",
+      "project": "NeoMud",
+      "title": "Switch visible player to lower-cost fantasy adventurer proxy",
+      "description": "Stop rendering the high-poly Xbot example mesh by default. Use the authored procedural fantasy adventurer as the visible player, keep Xbot as an optional loaded animation/reference asset, preserve run/walk/jump QA, and reclaim render budget for scene quality.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: replaced visible Xbot mesh with compact instanced fantasy avatar proxy, preserved movement QA, and reclaimed major room triangle budget",
+      "labels": [],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T11:10:40Z",
+      "updated": "2026-05-28T11:28:20Z"
     }
   ],
   "ready": [

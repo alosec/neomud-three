@@ -12,7 +12,7 @@ export function makePlayerAvatar() {
   visualRoot.name = "Player visual root";
   root.add(visualRoot);
 
-  const rig = makeAdventurerRig(materials);
+  const rig = makeCompactAdventurerRig(materials);
   visualRoot.add(rig.group);
 
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.82, 48), materials.shadow);
@@ -33,16 +33,18 @@ export function makePlayerAvatar() {
     activeAction: null,
     activeName: "Loading",
     model: null,
-    skinnedOverlay: null
+    renderMode: "procedural"
   };
 
   root.userData.avatarInfo = () => ({
     loaded: state.loaded,
     loadFailed: state.loadFailed,
     activeAnimation: state.activeName,
-    model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer-fallback",
-    visualTreatment: state.loaded ? "xbot-adventurer-overlay-v1" : "procedural-adventurer-v1",
-    overlay: Boolean(state.skinnedOverlay),
+    model: "procedural-fantasy-adventurer",
+    animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
+    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v2" : "procedural-adventurer-v1",
+    overlay: false,
+    proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
   });
   root.userData.animate = (frame) => animateAvatar(state, frame);
@@ -58,8 +60,8 @@ function makeMaterials() {
     leather: new THREE.MeshStandardMaterial({ color: 0x6d4125, roughness: 0.76 }),
     darkLeather: new THREE.MeshStandardMaterial({ color: 0x24180f, roughness: 0.82 }),
     linen: new THREE.MeshStandardMaterial({ color: 0xd8c3a1, roughness: 0.88 }),
-    tunic: new THREE.MeshStandardMaterial({ color: 0x1e6673, roughness: 0.86 }),
-    cloak: new THREE.MeshStandardMaterial({ color: 0x174252, roughness: 0.9, side: THREE.DoubleSide }),
+    tunic: new THREE.MeshStandardMaterial({ color: 0x247b86, roughness: 0.86 }),
+    cloak: new THREE.MeshStandardMaterial({ color: 0x23606a, roughness: 0.9, side: THREE.DoubleSide }),
     gold: new THREE.MeshStandardMaterial({ color: 0xd4a54c, metalness: 0.24, roughness: 0.44 }),
     steel: new THREE.MeshStandardMaterial({ color: 0xb9c4c4, metalness: 0.38, roughness: 0.35 }),
     gem: new THREE.MeshStandardMaterial({ color: 0x73d4e7, emissive: 0x0f5160, emissiveIntensity: 0.32, roughness: 0.4 }),
@@ -74,6 +76,7 @@ async function loadSkinnedHero(state, materials) {
     model.name = "Xbot skinned player rig";
     model.scale.setScalar(1.48);
     model.rotation.y = Math.PI;
+    model.visible = false;
 
     styleSkinnedModel(model);
     model.traverse((child) => {
@@ -83,10 +86,6 @@ async function loadSkinnedHero(state, materials) {
       child.frustumCulled = false;
     });
 
-    state.visualRoot.add(model);
-    state.skinnedOverlay = makeSkinnedAdventurerOverlay(materials);
-    state.visualRoot.add(state.skinnedOverlay);
-    state.fallbackRig.group.visible = false;
     state.model = model;
     state.mixer = new THREE.AnimationMixer(model);
     state.actions = Object.fromEntries(
@@ -98,6 +97,7 @@ async function loadSkinnedHero(state, materials) {
     );
 
     state.loaded = true;
+    state.renderMode = "procedural-proxy";
     playSkinnedAction(state, "idle", 0);
   } catch (error) {
     state.loadFailed = true;
@@ -168,6 +168,36 @@ function makeSkinnedAdventurerOverlay(materials) {
   group.add(orb);
 
   return group;
+}
+
+function makeCompactAdventurerRig(materials) {
+  const group = new THREE.Group();
+  group.name = "Compact fantasy adventurer rig";
+  group.scale.setScalar(1.44);
+
+  const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const tunicMesh = new THREE.InstancedMesh(boxGeometry, materials.tunic, 3);
+  const leatherMesh = new THREE.InstancedMesh(boxGeometry, materials.darkLeather, 10);
+  const cloakMesh = new THREE.InstancedMesh(boxGeometry, materials.cloak, 4);
+  const skinMesh = new THREE.InstancedMesh(boxGeometry, materials.skin, 1);
+  const hairMesh = new THREE.InstancedMesh(boxGeometry, materials.hair, 2);
+  const goldMesh = new THREE.InstancedMesh(boxGeometry, materials.gold, 4);
+  const gem = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 8), materials.gem);
+  gem.castShadow = true;
+
+  for (const mesh of [tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh]) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  group.add(gem);
+
+  return {
+    compact: true,
+    group,
+    meshes: { tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh, gem },
+    dummy: new THREE.Object3D()
+  };
 }
 
 function addOverlayBoxBatch(root, material, boxes, name) {
@@ -361,6 +391,14 @@ function makeLeg(root, materials, side) {
 
 function animateAvatar(state, frame) {
   state.mixer?.update(frame.dt);
+  if (state.renderMode === "procedural-proxy") {
+    const actionName = !frame.grounded ? (frame.speed > 2.4 ? "run" : "idle") : frame.speed > 6.1 ? "run" : frame.speed > 0.35 ? "walk" : "idle";
+    playSkinnedAction(state, actionName, actionName === "run" ? 0.12 : 0.18);
+    if (state.actions.run) state.actions.run.timeScale = THREE.MathUtils.clamp(frame.speed / 7.8, 0.8, 1.45);
+    if (state.actions.walk) state.actions.walk.timeScale = THREE.MathUtils.clamp(frame.speed / 4.2, 0.75, 1.25);
+    animateProceduralAvatar(state, frame);
+    return;
+  }
   if (state.loaded) {
     updateSkinnedAnimation(state, frame);
     return;
@@ -406,6 +444,11 @@ function playSkinnedAction(state, actionName, fadeDuration) {
 }
 
 function animateProceduralAvatar(state, frame) {
+  if (state.fallbackRig.compact) {
+    animateCompactAdventurer(state, frame);
+    return;
+  }
+
   const { dt, speed, walkClock, grounded, verticalVelocity, strafeInput, turnInput } = frame;
   const rig = state.fallbackRig;
   const runAmount = THREE.MathUtils.clamp((speed - 4.8) / 3.3, 0, 1);
@@ -450,6 +493,72 @@ function animateProceduralAvatar(state, frame) {
   const shadowScale = grounded ? 1 - moveAmount * 0.05 : 0.66;
   state.shadow.scale.set(shadowScale * 1.14, shadowScale * 0.86, 1);
   state.shadow.material.opacity = grounded ? 0.22 : 0.12;
+}
+
+function animateCompactAdventurer(state, frame) {
+  const { dt, speed, walkClock, grounded, verticalVelocity, strafeInput, turnInput } = frame;
+  const rig = state.fallbackRig;
+  const { tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh, gem } = rig.meshes;
+  const runAmount = THREE.MathUtils.clamp((speed - 4.8) / 3.3, 0, 1);
+  const moveAmount = THREE.MathUtils.clamp(speed / 5.4, 0, 1);
+  const airborne = grounded ? 0 : 1;
+  const targetAnimation = !grounded ? "Jump" : speed > 6.1 ? "Run" : speed > 0.35 ? "Walk" : "Idle";
+  state.activeName = targetAnimation;
+
+  const clock = walkClock * (1.05 + runAmount * 0.55);
+  const stride = Math.sin(clock);
+  const counterStride = Math.sin(clock + Math.PI);
+  const strideSize = (0.42 + runAmount * 0.38) * moveAmount;
+  const armSize = (0.5 + runAmount * 0.36) * moveAmount;
+  rig.group.position.y = grounded ? 0 : 0.12 + Math.max(0, verticalVelocity) * 0.012;
+  rig.group.rotation.x = damp(rig.group.rotation.x, grounded ? -0.04 * moveAmount : 0.08, 14, dt);
+  rig.group.rotation.z = damp(rig.group.rotation.z, -strafeInput * 0.055 - turnInput * 0.04, 14, dt);
+
+  setInstanceBox(rig, tunicMesh, 0, 0, 1.26, -0.02, 0.68, 0.78, 0.42, 0, -stride * 0.04 * moveAmount, 0);
+  setInstanceBox(rig, tunicMesh, 1, 0, 0.82, -0.08, 0.46, 0.7, 0.36, -0.04, 0, 0);
+  setInstanceBox(rig, tunicMesh, 2, 0, 1.02, -0.34, 0.42, 0.7, 0.08, -0.06, 0, 0);
+
+  setInstanceBox(rig, skinMesh, 0, 0, 1.88, -0.06, 0.3, 0.38, 0.28, 0, -stride * 0.035 * moveAmount, 0);
+  setInstanceBox(rig, hairMesh, 0, 0, 2.06, -0.08, 0.34, 0.16, 0.3, -0.12, 0, 0);
+  setInstanceBox(rig, hairMesh, 1, 0, 1.9, 0.08, 0.34, 0.34, 0.12, 0.08, 0, 0);
+
+  setInstanceBox(rig, cloakMesh, 0, -0.2, 1.13, 0.26, 0.34, 1.28, 0.08, -0.12 - moveAmount * 0.1, 0.03, -0.05);
+  setInstanceBox(rig, cloakMesh, 1, 0.2, 1.13, 0.26, 0.34, 1.28, 0.08, -0.12 - moveAmount * 0.1, -0.03, 0.05);
+  setInstanceBox(rig, cloakMesh, 2, 0, 1.6, 0.12, 0.84, 0.16, 0.38, -0.06, 0, 0);
+  setInstanceBox(rig, cloakMesh, 3, 0, 1.95, 0.04, 0.42, 0.3, 0.32, -0.05, 0, 0);
+
+  setInstanceBox(rig, leatherMesh, 0, -0.48, 1.2, -0.02, 0.16, 0.72, 0.16, -stride * armSize + airborne * 0.18, 0, 0.12);
+  setInstanceBox(rig, leatherMesh, 1, 0.48, 1.2, -0.02, 0.16, 0.72, 0.16, stride * armSize + airborne * 0.18, 0, -0.16);
+  setInstanceBox(rig, leatherMesh, 2, -0.18, 0.43, 0, 0.19, 0.86, 0.2, stride * strideSize - airborne * 0.22, 0, -0.02);
+  setInstanceBox(rig, leatherMesh, 3, 0.18, 0.43, 0, 0.19, 0.86, 0.2, counterStride * strideSize - airborne * 0.22, 0, 0.02);
+  setInstanceBox(rig, leatherMesh, 4, -0.18, 0.08, -0.12, 0.26, 0.16, 0.36, 0.08, 0, 0);
+  setInstanceBox(rig, leatherMesh, 5, 0.18, 0.08, -0.12, 0.26, 0.16, 0.36, 0.08, 0, 0);
+  setInstanceBox(rig, leatherMesh, 6, 0, 1.0, -0.04, 0.82, 0.12, 0.46, 0, 0, 0);
+  setInstanceBox(rig, leatherMesh, 7, -0.48, 0.86, 0.08, 0.28, 0.34, 0.12, 0, 0, 0.16);
+  setInstanceBox(rig, leatherMesh, 8, 0.56, 1.12, -0.2, 0.06, 1.7, 0.06, -stride * 0.12 * moveAmount, 0, -0.2 - runAmount * 0.08);
+  setInstanceBox(rig, leatherMesh, 9, 0.56, 1.93, -0.2, 0.08, 0.12, 0.08, 0, 0, 0);
+
+  setInstanceBox(rig, goldMesh, 0, 0, 1.02, -0.3, 0.16, 0.16, 0.04, 0, 0, 0);
+  setInstanceBox(rig, goldMesh, 1, 0, 1.42, -0.28, 0.4, 0.06, 0.04, 0, 0, 0);
+  setInstanceBox(rig, goldMesh, 2, 0, 1.55, 0.34, 0.5, 0.055, 0.035, -0.05, 0, 0);
+  setInstanceBox(rig, goldMesh, 3, 0, 1.1, 0.35, 0.055, 0.82, 0.035, -0.08, 0, 0);
+  gem.position.set(0.56, 2.05, -0.2);
+
+  for (const mesh of [tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh]) {
+    mesh.instanceMatrix.needsUpdate = true;
+  }
+
+  const shadowScale = grounded ? 1 - moveAmount * 0.05 : 0.66;
+  state.shadow.scale.set(shadowScale * 1.14, shadowScale * 0.86, 1);
+  state.shadow.material.opacity = grounded ? 0.22 : 0.12;
+}
+
+function setInstanceBox(rig, mesh, index, x, y, z, width, height, depth, rotationX = 0, rotationY = 0, rotationZ = 0) {
+  rig.dummy.position.set(x, y, z);
+  rig.dummy.rotation.set(rotationX, rotationY, rotationZ);
+  rig.dummy.scale.set(width, height, depth);
+  rig.dummy.updateMatrix();
+  mesh.setMatrixAt(index, rig.dummy.matrix);
 }
 
 function addCapsule(root, material, x, y, z, radius, length) {

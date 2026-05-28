@@ -274,4 +274,19 @@ Optimization delta: reduced decorative fountain cylinder segment counts and batc
 
 QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass. The first post-change server-backed run hit local guest-auth saturation; restarting the local Kotlin server restored the gate.
 
-Remaining visual gap: Town Square still needs more budget work before larger visual upgrades. The current Xbot avatar is the dominant triangle cost, so future quality work should either accept a higher avatar budget deliberately or replace/compress that model with an authored lower-cost adventurer.
+Remaining visual gap: Town Square still needs more budget work before larger visual upgrades. The visible Xbot avatar was the dominant triangle cost at this point; that constraint was addressed in the subsequent compact avatar proxy pass.
+
+## Score After Compact Avatar Budget Pass
+
+- Navigation readability: 2/2. The compact player keeps the avatar visible as a scale reference without blocking Gate, Market, Temple, Tavern, NPC, or fountain readability.
+- Scale believability: 1/2. The proxy is coherent with the low-poly diorama style, but the blocky body is still placeholder character art.
+- Semantic match: 2/2. No Town Square semantic content changed.
+- Interaction clarity: 2/2. Physical exits, NPC proximity prompts, and HUD affordances still pass.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes.
+- Performance: 2/2. Latest Town Square full smoke reports 228 draw calls / 9,408 triangles / 18 textures / 147 geometries, down from the previous ~59k triangle range.
+
+Total: 11/12
+
+Visual/performance delta: stopped rendering the high-poly Xbot example mesh by default and replaced it with the compact instanced fantasy proxy. This makes the player less detailed but reclaims enough triangle budget for future room work.
+
+Remaining visual gap: this is a budget-corrected player proxy, not final art. Next Town Square upgrades can now spend headroom on better landmark architecture or NPC staging, but the player should eventually become a properly authored lower-cost character.
