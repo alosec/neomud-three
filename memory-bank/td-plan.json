@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T19:31:29.970Z",
+  "updated": "2026-05-28T19:42:14.405Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2523,6 +2523,29 @@
       ],
       "created": "2026-05-28T19:23:37Z",
       "updated": "2026-05-28T19:30:57Z"
+    },
+    {
+      "id": "neo-cc43",
+      "project": "NeoMud",
+      "title": "Add Tavern tabletop warmth",
+      "description": "Use instanced low-cost tableware/candle details on the existing Tavern tables to make the interior feel less empty. Preserve table collision, Barkeep staging, room camera, and Town Square/Tavern server traversal.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 118,
+          "body": "Completed: added instanced Tavern table runners, plates, mugs, and candles to the existing tables. Room-shot/offline/server QA pass; Tavern reports 89 calls / 9,026 triangles offline and 88 calls / 9,014 triangles server-backed.",
+          "created": "2026-05-28T19:41:26Z"
+        }
+      ],
+      "created": "2026-05-28T19:34:38Z",
+      "updated": "2026-05-28T19:41:47Z"
     }
   ],
   "ready": [

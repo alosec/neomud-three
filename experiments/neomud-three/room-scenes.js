@@ -2386,6 +2386,7 @@ function addTavernInterior(root, materials, fireGroup) {
   addTavernBarkeepStaging(root, materials);
   addTavernFireplace(root, materials, fireGroup);
   addTavernTables(root, materials);
+  addTavernTabletopDetails(root, materials);
   addTavernWarmth(root, materials);
   addTavernWallComposition(root, materials);
   addTavernTrapdoor(root, materials);
@@ -2536,6 +2537,45 @@ function addTavernTables(root, materials) {
   }
   addInstancedBoxes(root, materials.darkTimber, darkBoxes, "tavern-tables-dark");
   addInstancedBoxes(root, materials.timber, timberBoxes, "tavern-tables-timber");
+}
+
+function addTavernTabletopDetails(root, materials) {
+  const runners = [];
+  const plates = [];
+  const mugs = [];
+  const candleBodies = [];
+  const candleFlames = [];
+
+  for (const table of TAVERN_TABLES) {
+    const anchor = { x: table.x, z: table.z, rotationY: table.rotation };
+    runners.push(orientedBox(anchor, 0, 0.705, 0, 0.18, 0.035, 0.92));
+
+    for (const [localX, localZ] of [[-0.38, -0.24], [0.36, 0.22]]) {
+      const point = offsetPoint(anchor, localX, localZ);
+      plates.push({ x: point.x, y: 0.735, z: point.z, scale: [0.2, 1, 0.2], rotationY: table.rotation });
+    }
+
+    for (const [localX, localZ] of [[-0.48, 0.28], [0.48, -0.3]]) {
+      const point = offsetPoint(anchor, localX, localZ);
+      mugs.push({ x: point.x, y: 0.82, z: point.z, scale: [0.085, 0.18, 0.085], rotationY: table.rotation });
+    }
+
+    const candle = offsetPoint(anchor, 0, 0);
+    candleBodies.push({ x: candle.x, y: 0.86, z: candle.z, scale: [0.045, 0.2, 0.045] });
+    candleFlames.push({ x: candle.x, y: 1.08, z: candle.z, scale: [0.055, 0.13, 0.055] });
+  }
+
+  addInstancedBoxes(root, materials.awningRed, runners, "tavern-table-runners", { castShadow: false, receiveShadow: true });
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 0.035, 16), materials.trimLight, plates, "tavern-table-plates", {
+    castShadow: false,
+    receiveShadow: true
+  });
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 12), materials.sign, mugs, "tavern-table-mugs");
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 10), materials.trimLight, candleBodies, "tavern-table-candles");
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1.3, 8), materials.sign, candleFlames, "tavern-table-candle-flames", {
+    castShadow: false,
+    receiveShadow: false
+  });
 }
 
 function addTavernWarmth(root, materials) {
