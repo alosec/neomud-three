@@ -45,10 +45,10 @@ const RENDER_BUDGETS = {
     geometries: 260
   },
   "prop-zoo": {
-    calls: 260,
-    triangles: 100_000,
-    textures: 48,
-    geometries: 180
+    calls: 340,
+    triangles: 120_000,
+    textures: 56,
+    geometries: 240
   }
 };
 

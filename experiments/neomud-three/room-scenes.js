@@ -2690,6 +2690,9 @@ function addTownSpecProps(root, materials, spec) {
   addTownGroundTrim(root, materials, spec.props.groundTrim ?? []);
   addTownBanners(root, materials, spec.props.banners ?? []);
   addTownCrateStacks(root, materials, spec.props.crateStacks ?? []);
+  addTownNoticeBoards(root, materials, spec.props.noticeBoards ?? []);
+  addTownMarketCarts(root, materials, spec.props.marketCarts ?? []);
+  addTownFirewoodStacks(root, materials, spec.props.firewoodStacks ?? []);
 }
 
 function addTownLampCluster(root, materials, lamps) {
@@ -2898,6 +2901,146 @@ function addTownCrateStacks(root, materials, stacks) {
   }
   addInstancedBoxes(root, materials.timber, timberBoxes, "courtyard-crates-timber");
   addInstancedBoxes(root, materials.darkTimber, darkBoxes, "courtyard-crates-dark");
+}
+
+function addTownNoticeBoards(root, materials, boards) {
+  if (!boards.length) return;
+  const timberBoxes = [];
+  const darkBoxes = [];
+  const paperByMaterial = new Map();
+
+  for (const board of boards) {
+    darkBoxes.push(orientedBox(board, -0.88, 1.02, 0, 0.13, 2.04, 0.13));
+    darkBoxes.push(orientedBox(board, 0.88, 1.02, 0, 0.13, 2.04, 0.13));
+    timberBoxes.push(orientedBox(board, 0, 1.72, 0, 2.16, 1.12, 0.14));
+    darkBoxes.push(orientedBox(board, 0, 2.35, 0, 2.38, 0.16, 0.18));
+    darkBoxes.push(orientedBox(board, 0, 1.08, 0, 2.38, 0.16, 0.18));
+
+    for (const [materialKey, localX, localY, width, height] of [
+      ["trimLight", -0.54, 1.86, 0.44, 0.42],
+      ["sign", 0.08, 1.78, 0.5, 0.36],
+      ["awningBlue", 0.58, 1.9, 0.34, 0.28]
+    ]) {
+      if (!paperByMaterial.has(materialKey)) paperByMaterial.set(materialKey, []);
+      paperByMaterial.get(materialKey).push(orientedBox(board, localX, localY, -0.09, width, height, 0.04));
+    }
+
+    const label = offsetPoint(board, 0, -0.16);
+    addTextBoard(root, board.label ?? "Notices", {
+      x: label.x,
+      y: 2.18,
+      z: label.z,
+      width: 1.72,
+      height: 0.36,
+      subtitle: board.subtitle ?? "Work & Rumors",
+      palette: board.palette ?? "gold",
+      renderOrder: 11
+    });
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "courtyard-notice-dark");
+  addInstancedBoxes(root, materials.timber, timberBoxes, "courtyard-notice-timber");
+  for (const [materialKey, boxes] of paperByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `courtyard-notice-paper-${materialKey}`, {
+      castShadow: false,
+      receiveShadow: false
+    });
+  }
+}
+
+function addTownMarketCarts(root, materials, carts) {
+  if (!carts.length) return;
+  const darkBoxes = [];
+  const timberBoxes = [];
+  const produceByMaterial = new Map();
+  const awningsByMaterial = new Map();
+  const wheels = [];
+
+  for (const cart of carts) {
+    const awningMaterial = cart.awningMaterial ?? "awningGold";
+    if (!awningsByMaterial.has(awningMaterial)) awningsByMaterial.set(awningMaterial, []);
+    if (!produceByMaterial.has("foliage")) produceByMaterial.set("foliage", []);
+    if (!produceByMaterial.has("awningRed")) produceByMaterial.set("awningRed", []);
+    if (!produceByMaterial.has("awningBlue")) produceByMaterial.set("awningBlue", []);
+
+    darkBoxes.push(orientedBox(cart, 0, 0.62, 0, 2.05, 0.22, 1.18));
+    timberBoxes.push(orientedBox(cart, 0, 0.92, -0.66, 2.18, 0.34, 0.14));
+    timberBoxes.push(orientedBox(cart, 0, 0.92, 0.66, 2.18, 0.34, 0.14));
+    timberBoxes.push(orientedBox(cart, -1.16, 0.86, 0, 0.14, 0.38, 1.18));
+    timberBoxes.push(orientedBox(cart, 1.16, 0.86, 0, 0.14, 0.38, 1.18));
+    awningsByMaterial.get(awningMaterial).push(orientedBox(cart, 0, 1.62, 0, 2.45, 0.16, 1.5));
+
+    for (const localX of [-0.92, 0.92]) {
+      for (const localZ of [-0.54, 0.54]) {
+        darkBoxes.push(orientedBox(cart, localX, 1.34, localZ, 0.1, 1.02, 0.1));
+      }
+    }
+    darkBoxes.push(orientedBox(cart, -1.45, 0.48, 0, 0.7, 0.08, 0.08));
+    darkBoxes.push(orientedBox(cart, 1.45, 0.48, 0, 0.7, 0.08, 0.08));
+
+    for (const [localX, localZ] of [[-0.86, -0.72], [0.86, -0.72], [-0.86, 0.72], [0.86, 0.72]]) {
+      const point = offsetPoint(cart, localX, localZ);
+      wheels.push({
+        x: point.x,
+        y: 0.32,
+        z: point.z,
+        scale: [0.3, 0.3, 0.12],
+        rotationY: cart.rotationY ?? 0,
+        rotationZ: Math.PI / 2
+      });
+      timberBoxes.push(orientedBox(cart, localX, 0.32, localZ, 0.14, 0.44, 0.05));
+    }
+
+    produceByMaterial.get("foliage").push(orientedBox(cart, -0.48, 1.1, -0.08, 0.52, 0.26, 0.46));
+    produceByMaterial.get("awningRed").push(orientedBox(cart, 0.14, 1.08, 0.08, 0.46, 0.22, 0.42));
+    produceByMaterial.get("awningBlue").push(orientedBox(cart, 0.62, 1.08, -0.18, 0.38, 0.2, 0.36));
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "courtyard-market-cart-dark");
+  addInstancedBoxes(root, materials.timber, timberBoxes, "courtyard-market-cart-timber");
+  for (const [materialKey, boxes] of awningsByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `courtyard-market-cart-awning-${materialKey}`);
+  }
+  for (const [materialKey, boxes] of produceByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `courtyard-market-cart-produce-${materialKey}`);
+  }
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 16), materials.darkTimber, wheels, "courtyard-market-cart-wheels");
+}
+
+function addTownFirewoodStacks(root, materials, stacks) {
+  if (!stacks.length) return;
+  const darkBoxes = [];
+  const timberBoxes = [];
+  const moss = [];
+
+  for (const stack of stacks) {
+    darkBoxes.push(orientedBox(stack, 0, 0.16, 0, 1.72, 0.14, 0.76));
+    darkBoxes.push(orientedBox(stack, -0.82, 0.54, 0, 0.12, 0.92, 0.8));
+    darkBoxes.push(orientedBox(stack, 0.82, 0.54, 0, 0.12, 0.92, 0.8));
+    for (let index = 0; index < 8; index++) {
+      const x = -0.56 + (index % 4) * 0.38;
+      const y = 0.34 + Math.floor(index / 4) * 0.34;
+      const z = index % 2 === 0 ? -0.12 : 0.14;
+      const target = index % 3 === 0 ? timberBoxes : darkBoxes;
+      target.push(orientedBox(
+        { ...stack, rotationY: (stack.rotationY ?? 0) + (index % 2 === 0 ? 0.08 : -0.08) },
+        x,
+        y,
+        z,
+        0.34,
+        0.18,
+        0.58
+      ));
+    }
+    moss.push(orientedBox({ ...stack, rotationY: (stack.rotationY ?? 0) - 0.18 }, 0.22, 0.9, 0.14, 0.9, 0.08, 0.44));
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "courtyard-firewood-dark");
+  addInstancedBoxes(root, materials.timber, timberBoxes, "courtyard-firewood-timber");
+  addInstancedBoxes(root, materials.foliageDark, moss, "courtyard-firewood-moss", {
+    castShadow: false,
+    receiveShadow: false
+  });
 }
 
 function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, roomItems, interactables) {
@@ -3116,6 +3259,16 @@ function orientedBox(anchor, localX, y, localZ, width, height, depth) {
   };
 }
 
+function offsetPoint(anchor, localX, localZ) {
+  const rotationY = anchor.rotationY ?? 0;
+  const cos = Math.cos(rotationY);
+  const sin = Math.sin(rotationY);
+  return {
+    x: anchor.x + localX * cos + localZ * sin,
+    z: anchor.z - localX * sin + localZ * cos
+  };
+}
+
 function addInstancedBoxes(root, materialRef, boxes, visualRole, options = {}) {
   if (!boxes.length) return null;
   const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), materialRef, boxes.length);
@@ -3213,6 +3366,15 @@ function townCollidersFromSpec(spec) {
   }
   for (const [index, stack] of (spec.props?.crateStacks ?? []).entries()) {
     colliders.push({ id: `crate-stack-${index + 1}`, center: [stack.x, stack.z], size: [1.2, 1.0] });
+  }
+  for (const [index, board] of (spec.props?.noticeBoards ?? []).entries()) {
+    colliders.push({ id: `notice-board-${index + 1}`, center: [board.x, board.z], size: [2.2, 0.65] });
+  }
+  for (const [index, cart] of (spec.props?.marketCarts ?? []).entries()) {
+    colliders.push({ id: `market-cart-${index + 1}`, center: [cart.x, cart.z], size: [2.65, 1.7] });
+  }
+  for (const [index, stack] of (spec.props?.firewoodStacks ?? []).entries()) {
+    colliders.push({ id: `firewood-stack-${index + 1}`, center: [stack.x, stack.z], size: [1.75, 0.85] });
   }
   return colliders;
 }

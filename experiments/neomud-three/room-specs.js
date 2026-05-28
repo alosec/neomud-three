@@ -158,6 +158,10 @@ export const TOWN_SQUARE_SPEC = {
         { x: 11.2, z: -8.0, scale: 1.24, rotationY: 0.42 },
         { x: -11.4, z: 8.3, scale: 1.18, rotationY: 0.26 },
         { x: 11.4, z: 8.2, scale: 1.2, rotationY: -0.34 },
+        { x: -8.1, z: -11.6, scale: 1.32, rotationY: 0.58 },
+        { x: 8.2, z: -11.7, scale: 1.34, rotationY: -0.46 },
+        { x: -8.3, z: 11.2, scale: 1.24, rotationY: -0.64 },
+        { x: 8.2, z: 11.3, scale: 1.28, rotationY: 0.52 },
         { x: -6.0, z: 13.8, scale: 0.94, rotationY: 0.72 },
         { x: 6.1, z: 13.8, scale: 0.96, rotationY: -0.78 },
         { x: -6.8, z: -18.5, scale: 0.92, rotationY: 0.18 },
@@ -406,6 +410,17 @@ export const TOWN_SQUARE_SPEC = {
       { x: 16.4, z: -5.6, rotationY: 0.32 },
       { x: -17.6, z: 3.9, rotationY: -0.44 },
       { x: -17.8, z: -3.8, rotationY: 0.22 }
+    ],
+    noticeBoards: [
+      { x: -4.2, z: -7.1, rotationY: 0.18, label: "Notices", subtitle: "Work & Rumors" }
+    ],
+    marketCarts: [
+      { x: 13.5, z: -3.0, rotationY: -Math.PI / 2 + 0.08, awningMaterial: "awningGold" },
+      { x: 13.7, z: 4.25, rotationY: -Math.PI / 2 - 0.12, awningMaterial: "awningBlue" }
+    ],
+    firewoodStacks: [
+      { x: -16.7, z: -5.95, rotationY: Math.PI / 2 - 0.2 },
+      { x: -18.7, z: 5.55, rotationY: Math.PI / 2 + 0.24 }
     ]
   },
   exits: [

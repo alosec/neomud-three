@@ -17,6 +17,7 @@ export const TOWN_KIT_PROPS = [
   { id: "sign.hanging", label: "Hanging Sign", category: "wayfinding" },
   { id: "sign.tavern.projecting", label: "Projecting Tavern Sign", category: "wayfinding" },
   { id: "stall.market", label: "Market Stall", category: "market" },
+  { id: "cart.market", label: "Market Cart", category: "market" },
   { id: "table.tavern", label: "Tavern Table", category: "interior" },
   { id: "stool.tavern", label: "Tavern Stool", category: "interior" },
   { id: "rug.runner", label: "Runner Rug", category: "interior" },
@@ -29,9 +30,11 @@ export const TOWN_KIT_PROPS = [
   { id: "tree.plaza", label: "Plaza Tree", category: "foliage" },
   { id: "banner.pole", label: "Banner Pole", category: "wayfinding" },
   { id: "string.lanterns", label: "String Lanterns", category: "lighting" },
+  { id: "board.notice", label: "Notice Board", category: "wayfinding" },
   { id: "barrel", label: "Barrel", category: "prop" },
   { id: "crate", label: "Crate", category: "prop" },
   { id: "crate.stack", label: "Crate Stack", category: "prop" },
+  { id: "wood.stack", label: "Firewood Stack", category: "prop" },
   { id: "bench", label: "Bench", category: "prop" },
   { id: "lantern.post", label: "Post Lantern", category: "lighting" },
   { id: "altar.temple", label: "Temple Altar", category: "landmark" },
@@ -94,6 +97,9 @@ export function addTownKitProp(root, materials, id, options = {}) {
     case "stall.market":
       addMarketStall(group, materials, { x: 0, z: 0, width: 3.0, depth: 1.55, awningMaterial: materials.awningBlue });
       break;
+    case "cart.market":
+      addMarketCart(group, materials);
+      break;
     case "table.tavern":
       addTavernTable(group, materials);
       break;
@@ -130,6 +136,9 @@ export function addTownKitProp(root, materials, id, options = {}) {
     case "string.lanterns":
       addStringLanternSample(group, materials);
       break;
+    case "board.notice":
+      addNoticeBoard(group, materials);
+      break;
     case "barrel":
       addBarrel(group, materials);
       break;
@@ -138,6 +147,9 @@ export function addTownKitProp(root, materials, id, options = {}) {
       break;
     case "crate.stack":
       addCrateStack(group, materials);
+      break;
+    case "wood.stack":
+      addFirewoodStack(group, materials);
       break;
     case "bench":
       addBench(group, materials);
@@ -262,6 +274,70 @@ function addTavernTable(root, materials) {
   addBox(root, materials.timber, 0.55, 0.22, 0.32, 0.16, 0.44, 0.16);
   addBox(root, materials.timber, 0, 0.38, -0.82, 1.52, 0.22, 0.28);
   addBox(root, materials.timber, 0, 0.38, 0.82, 1.52, 0.22, 0.28);
+}
+
+function addMarketCart(root, materials) {
+  addBox(root, materials.darkTimber, 0, 0.62, 0, 2.05, 0.22, 1.18);
+  addBox(root, materials.timber, 0, 0.92, -0.66, 2.18, 0.34, 0.14);
+  addBox(root, materials.timber, 0, 0.92, 0.66, 2.18, 0.34, 0.14);
+  addBox(root, materials.timber, -1.16, 0.86, 0, 0.14, 0.38, 1.18);
+  addBox(root, materials.timber, 1.16, 0.86, 0, 0.14, 0.38, 1.18);
+  addBox(root, materials.awningGold, 0, 1.62, 0, 2.45, 0.16, 1.5, { rotationX: -0.08 });
+  addBox(root, materials.darkTimber, -0.92, 1.34, -0.54, 0.1, 1.02, 0.1);
+  addBox(root, materials.darkTimber, 0.92, 1.34, -0.54, 0.1, 1.02, 0.1);
+  addBox(root, materials.darkTimber, -0.92, 1.34, 0.54, 0.1, 1.02, 0.1);
+  addBox(root, materials.darkTimber, 0.92, 1.34, 0.54, 0.1, 1.02, 0.1);
+  addBox(root, materials.darkTimber, -1.45, 0.48, 0, 0.7, 0.08, 0.08);
+  addBox(root, materials.darkTimber, 1.45, 0.48, 0, 0.7, 0.08, 0.08);
+
+  for (const [x, z] of [[-0.86, -0.72], [0.86, -0.72], [-0.86, 0.72], [0.86, 0.72]]) {
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.12, 16), materials.darkTimber);
+    wheel.position.set(x, 0.32, z);
+    wheel.rotation.z = Math.PI / 2;
+    wheel.castShadow = true;
+    wheel.receiveShadow = true;
+    root.add(wheel);
+    addBox(root, materials.trimLight, x, 0.32, z, 0.14, 0.44, 0.05);
+  }
+
+  addBox(root, materials.foliage, -0.48, 1.1, -0.08, 0.52, 0.26, 0.46);
+  addBox(root, materials.awningRed, 0.14, 1.08, 0.08, 0.46, 0.22, 0.42);
+  addBox(root, materials.awningBlue, 0.62, 1.08, -0.18, 0.38, 0.2, 0.36);
+}
+
+function addNoticeBoard(root, materials) {
+  addBox(root, materials.darkTimber, -0.88, 1.02, 0, 0.13, 2.04, 0.13);
+  addBox(root, materials.darkTimber, 0.88, 1.02, 0, 0.13, 2.04, 0.13);
+  addBox(root, materials.timber, 0, 1.72, 0, 2.16, 1.12, 0.14);
+  addBox(root, materials.darkTimber, 0, 2.35, 0, 2.38, 0.16, 0.18);
+  addBox(root, materials.darkTimber, 0, 1.08, 0, 2.38, 0.16, 0.18);
+  addBox(root, materials.trimLight, -0.54, 1.86, -0.09, 0.44, 0.42, 0.04);
+  addBox(root, materials.sign, 0.08, 1.78, -0.09, 0.5, 0.36, 0.04);
+  addBox(root, materials.awningBlue, 0.58, 1.9, -0.09, 0.34, 0.28, 0.04);
+  addTextBoard(root, "Notices", {
+    x: 0,
+    y: 2.18,
+    z: 0.1,
+    width: 1.72,
+    height: 0.36,
+    subtitle: "Work & Rumors",
+    palette: "gold"
+  });
+}
+
+function addFirewoodStack(root, materials) {
+  addBox(root, materials.darkTimber, 0, 0.16, 0, 1.72, 0.14, 0.76);
+  addBox(root, materials.darkTimber, -0.82, 0.54, 0, 0.12, 0.92, 0.8);
+  addBox(root, materials.darkTimber, 0.82, 0.54, 0, 0.12, 0.92, 0.8);
+  for (let index = 0; index < 8; index++) {
+    const x = -0.56 + (index % 4) * 0.38;
+    const y = 0.34 + Math.floor(index / 4) * 0.34;
+    const z = index % 2 === 0 ? -0.12 : 0.14;
+    addBox(root, index % 3 === 0 ? materials.timber : materials.darkTimber, x, y, z, 0.34, 0.18, 0.58, {
+      rotationY: index % 2 === 0 ? 0.08 : -0.08
+    });
+  }
+  addBox(root, materials.foliageDark, 0.22, 0.9, 0.14, 0.9, 0.08, 0.44, { castShadow: false, rotationY: -0.18 });
 }
 
 function addTavernStool(root, materials) {
