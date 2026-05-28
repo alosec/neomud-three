@@ -23,8 +23,8 @@ High leverage next work:
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
-   - The first main-runtime GLB adapter now exists in `glb-room-runtime.js`; keep future Blender-authored rooms on that path instead of adding per-room GLB parsing glue.
-   - Promote the movement gym loader and room adapter into a named `WorldLoader` / `LevelParser` interface after the second room package lands.
+   - The first main-runtime GLB adapter now exists in `glb-room-runtime.js`; Temple and Tavern both use it. Keep future Blender-authored rooms on that path instead of adding per-room GLB parsing glue.
+   - Promote the movement gym loader and room adapter into a named `WorldLoader` / `LevelParser` interface before the third room package lands.
    - `level-debug.js` now has reusable parsed-metadata debug drawing for `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_`; next step is wiring it into main renderer debug hooks with toggles.
 
 2. Refine the Blender-authored Temple of the Dawn package.
@@ -87,11 +87,8 @@ High leverage next work:
    - Sunlit Clearing is now an authored sanctuary room with larger trees, flower/grass dressing, butterflies, fallen logs, west physical trigger, collision, fixed screenshots, and server-backed traversal. Further Clearing work should improve tree canopy composition and sanctuary affordance rather than adding hostile content.
    - The south Temple facade has a subtle approved-glass glow pass; the first doorway glow attempt was rejected in screenshot QA because it looked like a visible rectangle.
    - The south Temple forecourt now has spec-driven sun inlays, offering plinths, candle rows, low rails, and plinth collision. A follow-up batching pass reclaimed full-smoke Town Square to 212/240 calls, so the next Town Square visual work can target named landmark/interactable staging without raising budget.
-   - The Tavern interior now has a warmer lighting/camera pass; further Tavern work should target wall/ceiling composition and material treatment rather than more loose furniture.
-   - The Tavern wall/bar composition pass adds instanced bracing, shelves, bottle silhouettes, framed panels, and window/notice shapes; further Tavern work should refine furniture/player/NPC presentation rather than more flat wall dressing.
-   - The Tavern ceiling composition pass adds instanced planks, rafters, and small warm lantern accents using existing materials; further Tavern work should now improve Barkeep/player staging, furniture silhouettes, or interaction affordances.
-   - The Tavern Barkeep staging pass adds a service spot, Barkeep board, tap handles, tray/ledger details, and warm service light; repeated mugs and table/bench meshes are now instanced, lowering Tavern room-shot calls to 84 while preserving layout and collision. Future Tavern work can spend that headroom on named interaction affordances, not loose furniture.
-   - Tavern tables now have low-cost runners, plates, mugs, and candles. Further Tavern work should improve meaningful interactables, dialogue affordances, or audio/ambience rather than more table clutter.
+   - The Tavern interior is now a Blender-authored package with source image, level brief, `.blend`, GLB, manifest, GLB-derived collision, east exit trigger, and server-driven Barkeep overlay. Further Tavern work should happen in `town_tavern.blend` / `scripts/create-neomud-three-town-tavern.py`, not by reviving the procedural JS interior.
+   - Tavern visible meshes are batched by material during Blender export, lowering Tavern to 30 draw calls while preserving table/bar/fireplace collision and traversal. Future Tavern headroom should go to meaningful interactables, dialogue affordances, cellar/locked-exit treatment, or audio/ambience rather than loose clutter.
    - The first plaza warmth pass adds approved Prop Zoo plaza tree/string-lantern pieces, places additional large trees inside the courtyard composition, and keeps the front string-light strand out of the Temple-facing camera.
    - The first civic support pass adds approved Prop Zoo notice board, market cart, and firewood stack components into Town Square with collider coverage.
    - The courtyard garden composition pass adds larger main-ground tree clusters with oval garden beds, shrubs, and flowers through `TOWN_SQUARE_SPEC`; `garden.bed` is now also staged in Prop Zoo. Further warmth work should improve landmark-specific story dressing instead of adding more generic greenery.

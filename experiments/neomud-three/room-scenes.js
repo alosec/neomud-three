@@ -57,16 +57,6 @@ const TAVERN_TABLES = [
   { id: "table-southeast", x: 4.75, z: 3.82, rotation: -0.12, collider: { width: 2.35, depth: 1.78 } }
 ];
 
-const TAVERN_COLLIDERS = [
-  { id: "bar", center: [TAVERN.barX - 0.1, TAVERN.barZ], size: [1.78, 7.8] },
-  { id: "fireplace", center: [TAVERN.fireplaceX + 0.18, TAVERN.fireplaceZ], size: [1.45, 2.9] },
-  ...TAVERN_TABLES.map((table) => ({
-    id: table.id,
-    center: [table.x, table.z],
-    size: [table.collider.width, table.collider.depth]
-  }))
-];
-
 const MARKET = {
   width: 38,
   depth: 18,
@@ -439,11 +429,29 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   const materials = makeTownMaterials();
   const interactables = [];
   const entityLayer = new THREE.Group();
-  const fire = new THREE.Group();
+  const flameMeshes = [];
+  const glbRuntime = buildGlbRoomRuntime({
+    root,
+    packageInfo: LEVEL_PACKAGES["town:tavern"],
+    fallbackSpawn: { position: new THREE.Vector3(TAVERN.spawnX, 0, 0), heading: -Math.PI / 2 },
+    fallbackBounds: {
+      minX: -TAVERN.halfX + 0.55,
+      maxX: TAVERN.halfX - 0.55,
+      minZ: -TAVERN.halfZ + 0.55,
+      maxZ: TAVERN.halfZ - 0.55
+    },
+    status: "The Rusty Tankard: Blender-authored GLB tavern package with blocking tables, bar, fireplace, trapdoor, and server-driven Barkeep overlay.",
+    environment: {
+      background: 0x2b1a10,
+      fog: 0x2a170f,
+      fogDensity: 0.012
+    },
+    configureScene: (scene) => configureBlenderTavernScene(scene, flameMeshes),
+    floorColliderId: "world-floor",
+    colliderRadius: 0.42,
+    landmarkId: "town-tavern-glb"
+  });
   root.add(entityLayer);
-  root.add(fire);
-
-  addTavernInterior(root, materials, fire);
 
   const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
     disposeObjectTree(entityLayer);
@@ -454,13 +462,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   syncEntities();
 
   return {
-    spawn: { position: new THREE.Vector3(TAVERN.spawnX, 0, 0), heading: -Math.PI / 2 },
-    status: "The Rusty Tankard: larger authored tavern interior with blocking tables, bar, fireplace, trapdoor, and server-driven barkeep.",
-    environment: {
-      background: 0x2b1a10,
-      fog: 0x2a170f,
-      fogDensity: 0.012
-    },
+    ...glbRuntime,
     camera: {
       distance: 6.35,
       height: 3.28,
@@ -470,34 +472,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
     },
     syncEntities,
     spawnFor(fromRoomId) {
-      return fromRoomId === "town:square"
-        ? { position: new THREE.Vector3(TAVERN.spawnX, 0, 0), heading: -Math.PI / 2 }
-        : this.spawn;
-    },
-    clamp(position) {
-      position.x = THREE.MathUtils.clamp(position.x, -TAVERN.halfX + 0.55, TAVERN.halfX - 0.55);
-      position.z = THREE.MathUtils.clamp(position.z, -TAVERN.halfZ + 0.55, TAVERN.halfZ - 0.55);
-      resolveColliderPushout(position, TAVERN_COLLIDERS, 0.42);
-      position.x = THREE.MathUtils.clamp(position.x, -TAVERN.halfX + 0.55, TAVERN.halfX - 0.55);
-      position.z = THREE.MathUtils.clamp(position.z, -TAVERN.halfZ + 0.55, TAVERN.halfZ - 0.55);
-    },
-    exitAt(position) {
-      return position.x > TAVERN.exitX && Math.abs(position.z) < TAVERN.exitHalfZ ? "town:square" : null;
-    },
-    debugTriggers() {
-      return [
-        {
-          id: "exit-east-square",
-          direction: "EAST",
-          targetId: "town:square",
-          prompt: "Return to Town Square",
-          trigger: { type: "box", center: [TAVERN.exitX + 0.18, 1, 0], size: [1.2, 3, TAVERN.exitHalfZ * 2] },
-          affordance: {
-            label: "Town Square",
-            subtitle: "East Door"
-          }
-        }
-      ];
+      return glbRuntime.spawn;
     },
     debugEntities() {
       return interactables.map((entity) => ({
@@ -509,9 +484,6 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
         x: entity.position.x,
         z: entity.position.z
       }));
-    },
-    debugColliders() {
-      return debugColliders(TAVERN_COLLIDERS, 0.42);
     },
     nearestInteractable(position, maxDistance = 2.45) {
       let nearest = null;
@@ -525,10 +497,12 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       }
       return nearest;
     },
-    update() {
-      fire.children.forEach((child, index) => {
-        if (child.material?.opacity) {
-          child.material.opacity = 0.46 + Math.sin(performance.now() * 0.007 + index) * 0.13;
+    update(dt) {
+      glbRuntime.update?.(dt);
+      flameMeshes.forEach((mesh, index) => {
+        if (mesh.material?.opacity) mesh.material.opacity = 0.5 + Math.sin(performance.now() * 0.007 + index) * 0.14;
+        if (mesh.material?.emissiveIntensity !== undefined) {
+          mesh.material.emissiveIntensity = 1.0 + Math.sin(performance.now() * 0.006 + index) * 0.24;
         }
       });
       entityLayer.children.forEach((child, index) => {
@@ -6213,6 +6187,47 @@ function configureBlenderTempleScene(scene) {
       }
     }
   });
+}
+
+function configureBlenderTavernScene(scene, flameMeshes = []) {
+  scene.name = "town-tavern-blender-level";
+  scene.traverse((object) => {
+    if (!object.isMesh) return;
+    object.castShadow = object.name.startsWith("VIS_");
+    object.receiveShadow = object.name.startsWith("VIS_");
+    if (!object.material) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if ("roughness" in material) material.roughness = Math.max(material.roughness ?? 0.78, 0.66);
+      if (object.name.includes("_flame") || object.name.includes("_glow") || object.name.includes("_bottle_")) {
+        material.transparent = true;
+        material.depthWrite = false;
+      }
+      if (object.name.includes("fire_flame")) {
+        material.side = THREE.DoubleSide;
+        if ("emissive" in material) {
+          material.emissive = new THREE.Color(0xff4d18);
+          material.emissiveIntensity = Math.max(material.emissiveIntensity ?? 0, 1.0);
+        }
+        flameMeshes.push(object);
+      }
+    }
+  });
+
+  const ambientFill = new THREE.HemisphereLight(0xffd8a8, 0x26160f, 0.78);
+  scene.add(ambientFill);
+
+  const roomLight = new THREE.PointLight(0xffa85a, 4.8, 16.5);
+  roomLight.position.set(-1.0, 4.0, -0.8);
+  scene.add(roomLight);
+
+  const fireLight = new THREE.PointLight(0xff7d2f, 6.2, 10.5);
+  fireLight.position.set(TAVERN.fireplaceX + 1.35, 2.0, TAVERN.fireplaceZ);
+  scene.add(fireLight);
+
+  const doorFill = new THREE.PointLight(0xd9e5ff, 1.45, 8.4);
+  doorFill.position.set(TAVERN.halfX - 0.7, 2.8, 0);
+  scene.add(doorFill);
 }
 
 function resolveColliderPushout(position, colliders, radius = 0.38) {

@@ -141,6 +141,22 @@ authors the navigable level package, GLB carries `VIS_`, `COL_`, `SPAWN_`,
 `TRG_`, `CAMERA_`, and `LIGHTS_` metadata, and the Three.js client loads the
 package as the primary `town:temple` runtime scene.
 
+The second main-runtime room package is The Rusty Tankard:
+
+```text
+brief:  experiments/neomud-three/assets/source/scenes/town_tavern/level-brief.json
+image:  experiments/neomud-three/assets/source/scenes/town_tavern/source.webp
+source: experiments/neomud-three/assets/source/scenes/town_tavern/town_tavern.blend
+build:  experiments/neomud-three/assets/build/levels/town_tavern.glb
+script: scripts/create-neomud-three-town-tavern.py
+check:  node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_tavern.glb
+```
+
+This proves the shared GLB runtime adapter is not Temple-specific. Tavern uses
+GLB-authored shell geometry, bar, fireplace, tables, locked trapdoor, collision,
+spawn, and east exit trigger, while server/world Barkeep rendering remains a
+runtime overlay.
+
 ## Commands
 
 Create or refresh the source `.blend` and exported `.glb`:
@@ -148,6 +164,7 @@ Create or refresh the source `.blend` and exported `.glb`:
 ```bash
 blender --background --python scripts/create-neomud-three-movement-gym.py
 blender --background --python scripts/create-neomud-three-town-temple.py
+blender --background --python scripts/create-neomud-three-town-tavern.py
 ```
 
 Validate the exported GLB:
@@ -155,6 +172,7 @@ Validate the exported GLB:
 ```bash
 node scripts/validate-neomud-three-gltf.mjs --profile=movement-gym experiments/neomud-three/assets/build/levels/movement_gym.glb
 node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_temple.glb
+node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_tavern.glb
 ```
 
 ## Runtime Parser

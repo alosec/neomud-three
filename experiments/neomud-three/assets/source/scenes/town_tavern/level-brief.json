@@ -1,0 +1,72 @@
+{
+  "id": "town:tavern",
+  "slug": "town_tavern",
+  "name": "The Rusty Tankard",
+  "sourceImage": "source.webp",
+  "sourceImageOriginal": "maker/default_world_src/assets/images/rooms/town_tavern.webp",
+  "sourceImageSize": [1024, 572],
+  "roomData": {
+    "zoneFile": "maker/default_world_src/world/town.zone.json",
+    "exits": {
+      "EAST": "town:square",
+      "DOWN": "town:cellar"
+    },
+    "lockedExits": {
+      "DOWN": 10
+    }
+  },
+  "intent": {
+    "pipeline": "source-image-to-playable-level-package",
+    "interpretation": "Use the existing NeoMud tavern image and room text as source direction, then author a conventional GLB interior package with separate collision and gameplay markers.",
+    "style": "warm low-poly theatrical tavern interior",
+    "target": "A larger readable tavern stage with east door to Town Square, west bar and Barkeep staging, fireplace, tables that block movement, and a visible locked cellar trapdoor."
+  },
+  "spatialLayout": {
+    "mainArea": "rectangular cutaway tavern room",
+    "playerEntrance": "east door facing west into the room",
+    "landmark": "long bar on the west side with Barkeep Grom overlayed from server state",
+    "sideFeatures": [
+      "roaring fireplace on the west-south wall",
+      "scarred tables and benches around the room",
+      "low ceiling beams and lanterns",
+      "locked cellar trapdoor in the floor"
+    ],
+    "exitAffordances": [
+      {
+        "direction": "EAST",
+        "targetRoom": "town:square",
+        "visual": "open framed door on the east wall"
+      }
+    ]
+  },
+  "runtimePackage": {
+    "blenderSource": "town_tavern.blend",
+    "glb": "../../../build/levels/town_tavern.glb",
+    "requiredPrefixes": ["VIS_", "COL_", "SPAWN_", "TRG_", "CAMERA_", "LIGHTS_"],
+    "collision": [
+      "COL_world_floor",
+      "COL_bar",
+      "COL_fireplace",
+      "COL_table_northwest",
+      "COL_table_northeast",
+      "COL_table_southwest",
+      "COL_table_southeast"
+    ],
+    "spawns": ["SPAWN_player"],
+    "triggers": ["TRG_exit_east_square"]
+  },
+  "qaAcceptance": [
+    "GLB validates with the room profile.",
+    "Tavern runtime loads from the reusable GLB room adapter.",
+    "Tavern debug landmarks report a blender-level source with manifest and source brief.",
+    "Tavern east trigger routes to town:square.",
+    "Table, bar, and fireplace collision remain present.",
+    "Barkeep Grom still renders from NeoMud server/world data as an interactable overlay.",
+    "Chrome Canary offline, room-shot, lab, town-shot, and server-backed QA pass."
+  ],
+  "knownLimits": [
+    "The Barkeep remains a runtime standee overlay rather than a GLB-authored character.",
+    "The locked cellar trapdoor is visual-only in this pass; the original NeoMud locked DOWN exit is not converted into a physical interaction yet.",
+    "Materials are authored as stylized Blender colors pending a later generated texture/material-family pass."
+  ]
+}

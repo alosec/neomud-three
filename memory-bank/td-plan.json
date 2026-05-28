@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T21:19:57.409Z",
+  "updated": "2026-05-28T21:36:38.843Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2793,6 +2793,25 @@
       "comments": [],
       "created": "2026-05-28T21:17:19Z",
       "updated": "2026-05-28T21:19:45Z"
+    },
+    {
+      "id": "neo-1fb2.77",
+      "project": "NeoMud",
+      "title": "Promote Tavern to Blender-authored GLB room package",
+      "description": "Create a source-image-to-GLB package for town:tavern with source image, brief, Blender source, exported room GLB, manifest, profile validation, runtime LEVEL_PACKAGES entry, preloading, GLB adapter integration, preserved Barkeep/NPC overlay, table/bar/fireplace collision, east exit trigger, and Chrome Canary/server QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: created Blender-authored Tavern room package, batched visible GLB meshes by material, wired through GLB adapter with Barkeep overlay, and verified offline/room/lab/town/server QA",
+      "labels": [
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T21:23:00Z",
+      "updated": "2026-05-28T21:36:26Z"
     }
   ]
 }

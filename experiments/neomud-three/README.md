@@ -7,6 +7,7 @@ It currently:
 - Loads all default-world zone JSON so it can resolve cross-zone exits later.
 - Uses existing room graph data as the gameplay/navigation spine.
 - Loads Temple of the Dawn from a Blender-authored cathedral room package with `VIS_` render geometry, `COL_` collision, `SPAWN_` player marker, and `TRG_` north exit metadata.
+- Loads The Rusty Tankard from a Blender-authored tavern room package with GLB-authored floor/walls/bar/fireplace/tables/trapdoor, `COL_` table/bar/fireplace collision, `SPAWN_` player marker, and `TRG_` east exit metadata. Server/world Barkeep rendering remains a runtime overlay.
 - Authors Town Square through `TOWN_SQUARE_SPEC`, including named landmark specs and physical trigger volumes mapped back to real NeoMud exits.
 - Authors North Gate as a fortified gate stage with Town Guard, physical South/North triggers, and a tighter corridor camera.
 - Authors Forest Edge as a compact forest threshold with Forest Rat, physical South/North triggers, and lightweight tree/log/stone collision.
@@ -91,4 +92,11 @@ Blender-authored Temple of the Dawn package:
 ```bash
 blender --background --python scripts/create-neomud-three-town-temple.py
 node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_temple.glb
+```
+
+Blender-authored Rusty Tankard package:
+
+```bash
+blender --background --python scripts/create-neomud-three-town-tavern.py
+node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_tavern.glb
 ```

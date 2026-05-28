@@ -661,6 +661,16 @@ async function main() {
     assert.equal((await page.locator("#room-name").textContent()).trim(), "The Rusty Tankard");
     const tavernTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.ok(tavernTriggers.some((trigger) => trigger.id === "exit-east-square"));
+    const tavernLandmarks = await page.evaluate(() => window.__neomudThreeDebug.room.landmarks);
+    assert.ok(
+      tavernLandmarks.some((landmark) =>
+        landmark.id === "town-tavern-glb" &&
+        landmark.kind === "blender-level" &&
+        landmark.manifest?.endsWith("town_tavern.manifest.json") &&
+        landmark.sourceBrief?.endsWith("town_tavern/level-brief.json")
+      ),
+      `expected Tavern to use Blender GLB level package, got ${JSON.stringify(tavernLandmarks)}`
+    );
     const tavernColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
     assert.ok(
       tavernColliders.some((collider) => collider.id === "table-northwest"),

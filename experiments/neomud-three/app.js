@@ -151,10 +151,10 @@ main().catch((error) => {
 async function main() {
   world = await loadWorld();
   worldCount.textContent = `${world.rooms.size} rooms, ${world.npcs.length} NPCs, ${world.zones.length} zones`;
-  roomCount.textContent = "Playable vertical slice: Temple -> Town Square";
+  roomCount.textContent = "Playable vertical slice: Temple -> Town Square -> Tavern";
   await Promise.all([
     preloadGeneratedAssets("starter"),
-    preloadBlenderLevel(LEVEL_PACKAGES["town:temple"].url)
+    ...Object.values(LEVEL_PACKAGES).map((levelPackage) => preloadBlenderLevel(levelPackage.url))
   ]);
   renderEngine.setRoomDebugVisible(roomDebugVisible);
 

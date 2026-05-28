@@ -1,0 +1,62 @@
+{
+  "id": "town:tavern",
+  "slug": "town_tavern",
+  "name": "The Rusty Tankard",
+  "packageVersion": 1,
+  "profile": "room",
+  "sourceImage": "../../source/scenes/town_tavern/source.webp",
+  "sourceBrief": "../../source/scenes/town_tavern/level-brief.json",
+  "sourceBlend": "../../source/scenes/town_tavern/town_tavern.blend",
+  "runtimeGlb": "town_tavern.glb",
+  "files": {
+    "sourceImageBytes": 51606,
+    "sourceBlendBytes": 139944,
+    "runtimeGlbBytes": 237224
+  },
+  "validator": {
+    "script": "scripts/validate-neomud-three-gltf.mjs",
+    "profile": "room",
+    "nodes": 22,
+    "meshes": 19,
+    "materials": 12,
+    "prefixes": {
+      "VIS_": 11,
+      "COL_": 7,
+      "NAV_": 0,
+      "SPAWN_": 1,
+      "TRG_": 1,
+      "PICKUP_": 0,
+      "ENEMY_": 0,
+      "PATH_": 0,
+      "CAMERA_": 1,
+      "LIGHTS_": 1
+    }
+  },
+  "runtimeQa": {
+    "offlineTavernBudget": {
+      "drawCalls": 30,
+      "triangles": 6882,
+      "textures": 48,
+      "geometries": 21
+    },
+    "serverTavernBudget": {
+      "drawCalls": 30,
+      "triangles": 6882,
+      "textures": 47,
+      "geometries": 21
+    },
+    "checks": [
+      "GLB room profile validation",
+      "offline smoke",
+      "fixed room shots",
+      "lab QA",
+      "town screenshot QA",
+      "server-backed traversal"
+    ]
+  },
+  "knownLimits": [
+    "The Barkeep is still a runtime server/world-data overlay, not a GLB-authored character.",
+    "The locked cellar trapdoor is represented visually but is not a physical locked-exit interaction yet.",
+    "Materials are first-pass Blender-authored stylized colors pending generated texture family integration."
+  ]
+}
