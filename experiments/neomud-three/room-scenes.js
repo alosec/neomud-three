@@ -61,55 +61,115 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
 }
 
 export function buildTownSquareRoom({ root, worldRoot, npcs }) {
-  const cobble = texture(`${ASSET_ROOT}/cobblestone-millhaven.png`, [4, 4]);
-  const cobbleMat = new THREE.MeshStandardMaterial({ map: cobble, roughness: 0.85, metalness: 0.02 });
-  const stone = new THREE.MeshStandardMaterial({ color: 0x786e5d, roughness: 0.72 });
-  const water = new THREE.MeshStandardMaterial({ color: 0x5ea6bd, roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 });
+  const cobble = texture(`${ASSET_ROOT}/cobblestone-millhaven.png`, [7, 7]);
+  const materials = makeTownMaterials(cobble);
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), cobbleMat);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(34, 34), materials.cobble);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   root.add(floor);
 
-  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(1.45, 1.65, 0.42, 48), stone);
+  addTownRoads(root, materials);
+
+  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(1.95, 2.25, 0.48, 56), materials.stone);
   fountainBase.position.y = 0.21;
   fountainBase.castShadow = true;
   root.add(fountainBase);
 
-  const waterBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.22, 1.22, 0.08, 48), water);
-  waterBasin.position.y = 0.48;
+  const waterBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.68, 1.68, 0.08, 56), materials.water);
+  waterBasin.position.y = 0.52;
   root.add(waterBasin);
 
-  const fountainColumn = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.34, 1.05, 32), stone);
-  fountainColumn.position.y = 1.0;
+  const fountainColumn = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 32), materials.stone);
+  fountainColumn.position.y = 1.1;
   fountainColumn.castShadow = true;
   root.add(fountainColumn);
 
-  const spray = new THREE.PointLight(0x8edbff, 2.5, 8);
-  spray.position.set(0, 1.8, 0);
+  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.58, 0.18, 40), materials.stone);
+  topBowl.position.y = 1.78;
+  topBowl.castShadow = true;
+  root.add(topBowl);
+
+  const spray = new THREE.PointLight(0xaee8ff, 4.4, 10);
+  spray.position.set(0, 2.1, 0);
   root.add(spray);
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_square.webp`, 0, 3.1, -8.9, 12, 6.75);
-  addTownFacades(root);
-  addTownPortal(root, "Temple", new THREE.Vector3(0, 1.2, 8.4), "town:temple");
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_square.webp`, 0, 5.2, -18.5, 22, 12.4);
+  addTownSquareStructures(root, materials);
+  addTownPortal(root, "Gate", new THREE.Vector3(0, 1.35, -15.7), "town:gate", 0);
+  addTownPortal(root, "Market", new THREE.Vector3(15.7, 1.35, 0), "town:market", -Math.PI / 2);
+  addTownPortal(root, "Temple", new THREE.Vector3(0, 1.35, 15.7), "town:temple", Math.PI);
+  addTownPortal(root, "Tavern", new THREE.Vector3(-15.7, 1.35, 0), "town:tavern", Math.PI / 2);
 
   for (const [index, npc] of npcs.entries()) {
-    addNpcSprite(root, `${worldRoot}/assets/images/npcs/${npc.id.replace(":", "_")}.webp`, -1.1 + index * 2.1, 0, -1.85, npc.name);
+    const angle = -0.9 + index * 0.75;
+    addNpcSprite(root, `${worldRoot}/assets/images/npcs/${npc.id.replace(":", "_")}.webp`, Math.sin(angle) * 4.4, 0, Math.cos(angle) * 4.4, npc.name);
   }
 
   return {
-    spawn: new THREE.Vector3(0, 0, 6.2),
-    status: "Town Square vertical slice: cobblestone plaza, fountain, NPC billboards, temple exit trigger",
+    spawn: { position: new THREE.Vector3(0, 0, 12.8), heading: 0 },
+    status: "Town Square: expanded navigable plaza with fountain, roads, stalls, buildings, and four NeoMud graph exits",
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "town:temple") return { position: new THREE.Vector3(0, 0, 13.0), heading: 0 };
+      if (fromRoomId === "town:market") return { position: new THREE.Vector3(13.0, 0, 0), heading: -Math.PI / 2 };
+      if (fromRoomId === "town:tavern") return { position: new THREE.Vector3(-13.0, 0, 0), heading: Math.PI / 2 };
+      if (fromRoomId === "town:gate") return { position: new THREE.Vector3(0, 0, -13.0), heading: Math.PI };
+      return this.spawn;
+    },
     clamp(position) {
-      position.x = THREE.MathUtils.clamp(position.x, -7.3, 7.3);
-      position.z = THREE.MathUtils.clamp(position.z, -7.2, 7.4);
+      position.x = THREE.MathUtils.clamp(position.x, -15.6, 15.6);
+      position.z = THREE.MathUtils.clamp(position.z, -15.6, 15.6);
     },
     exitAt(position) {
-      return position.z > 7.0 && Math.abs(position.x) < 1.4 ? "town:temple" : null;
+      if (position.z > 15.1 && Math.abs(position.x) < 2.1) return "town:temple";
+      if (position.z < -15.1 && Math.abs(position.x) < 2.1) return "town:gate";
+      if (position.x > 15.1 && Math.abs(position.z) < 2.1) return "town:market";
+      if (position.x < -15.1 && Math.abs(position.z) < 2.1) return "town:tavern";
+      return null;
     },
     update(dt) {
       waterBasin.rotation.z += dt * 0.25;
+      topBowl.rotation.y += dt * 0.2;
     }
+  };
+}
+
+export function buildGenericRoom({ root, room, worldRoot, rooms }) {
+  const materials = makeGenericMaterials(room);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), materials.floor);
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  root.add(floor);
+
+  if (room.backgroundImage) {
+    addBackdrop(root, `${worldRoot}${room.backgroundImage}`, 0, 3.3, -8.6, 12.2, 6.85);
+  }
+
+  addGenericExitPortals(root, room, rooms, materials);
+
+  const fill = new THREE.PointLight(0xffdca0, 2.1, 12);
+  fill.position.set(0, 4.2, 1.5);
+  root.add(fill);
+
+  return {
+    spawn: { position: new THREE.Vector3(0, 0, 5.7), heading: 0 },
+    status: `NeoMud room shell: ${room.name} uses the real room graph, description, image reference, and exits`,
+    spawnFor(fromRoomId) {
+      const entry = Object.entries(room.exits ?? {}).find(([, targetId]) => targetId === fromRoomId);
+      return entry ? spawnForEntryDirection(entry[0]) : this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -7.5, 7.5);
+      position.z = THREE.MathUtils.clamp(position.z, -7.5, 7.5);
+    },
+    exitAt(position) {
+      if (position.z < -7.25 && Math.abs(position.x) < 1.9) return room.exits?.NORTH ?? null;
+      if (position.z > 7.25 && Math.abs(position.x) < 1.9) return room.exits?.SOUTH ?? null;
+      if (position.x > 7.25 && Math.abs(position.z) < 1.9) return room.exits?.EAST ?? null;
+      if (position.x < -7.25 && Math.abs(position.z) < 1.9) return room.exits?.WEST ?? null;
+      return null;
+    },
+    update() {}
   };
 }
 
@@ -423,6 +483,186 @@ function addBackdrop(root, path, x, y, z, width, height) {
   root.add(mesh);
 }
 
+function makeGenericMaterials(room) {
+  const sound = room.departSound ?? "";
+  const floorColor = sound.includes("wood")
+    ? 0x5b3a21
+    : sound.includes("marble")
+      ? 0x9d9584
+      : sound.includes("dirt")
+        ? 0x6b4b2c
+        : sound.includes("cobblestone")
+          ? 0x766447
+          : 0x5d5a52;
+
+  return {
+    floor: new THREE.MeshStandardMaterial({ color: floorColor, roughness: 0.84 }),
+    portal: new THREE.MeshStandardMaterial({ color: 0x4b311b, emissive: 0x241308, emissiveIntensity: 0.48, roughness: 0.62 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0xc79d56, emissive: 0x2c1c08, emissiveIntensity: 0.16, roughness: 0.6 })
+  };
+}
+
+function addGenericExitPortals(root, room, rooms, materials) {
+  for (const [direction, targetId] of Object.entries(room.exits ?? {})) {
+    const spec = portalSpec(direction);
+    if (!spec) continue;
+    const target = rooms.get(targetId);
+    const group = new THREE.Group();
+    group.position.copy(spec.position);
+    group.rotation.y = spec.rotationY;
+    root.add(group);
+    addLocalBox(group, materials.portal, 0, 1.25, 0, 2.4, 2.5, 0.2);
+    addLocalBox(group, materials.trim, 0, 2.62, -0.08, 1.7, 0.28, 0.1);
+    group.userData.label = target?.name ?? targetId;
+  }
+}
+
+function portalSpec(direction) {
+  if (direction === "NORTH") return { position: new THREE.Vector3(0, 0, -7.8), rotationY: 0 };
+  if (direction === "SOUTH") return { position: new THREE.Vector3(0, 0, 7.8), rotationY: Math.PI };
+  if (direction === "EAST") return { position: new THREE.Vector3(7.8, 0, 0), rotationY: -Math.PI / 2 };
+  if (direction === "WEST") return { position: new THREE.Vector3(-7.8, 0, 0), rotationY: Math.PI / 2 };
+  return null;
+}
+
+function spawnForEntryDirection(direction) {
+  if (direction === "NORTH") return { position: new THREE.Vector3(0, 0, -5.7), heading: Math.PI };
+  if (direction === "SOUTH") return { position: new THREE.Vector3(0, 0, 5.7), heading: 0 };
+  if (direction === "EAST") return { position: new THREE.Vector3(5.7, 0, 0), heading: -Math.PI / 2 };
+  if (direction === "WEST") return { position: new THREE.Vector3(-5.7, 0, 0), heading: Math.PI / 2 };
+  return { position: new THREE.Vector3(0, 0, 5.7), heading: 0 };
+}
+
+function makeTownMaterials(cobble) {
+  return {
+    cobble: new THREE.MeshStandardMaterial({ map: cobble, roughness: 0.85, metalness: 0.02 }),
+    road: new THREE.MeshStandardMaterial({ color: 0x6e5b42, roughness: 0.88 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0x827762, roughness: 0.72 }),
+    water: new THREE.MeshStandardMaterial({ color: 0x5ea6bd, roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 }),
+    timber: new THREE.MeshStandardMaterial({ color: 0x5a341f, roughness: 0.78 }),
+    plaster: new THREE.MeshStandardMaterial({ color: 0xb8a57f, roughness: 0.86 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x3d5a68, roughness: 0.82 }),
+    awningRed: new THREE.MeshStandardMaterial({ color: 0xa24532, roughness: 0.76 }),
+    awningBlue: new THREE.MeshStandardMaterial({ color: 0x385d7a, roughness: 0.76 }),
+    sign: new THREE.MeshStandardMaterial({ color: 0xd2ad62, roughness: 0.58, metalness: 0.04 })
+  };
+}
+
+function addTownRoads(root, materials) {
+  for (const [width, height, x, z] of [
+    [4.2, 34, 0, 0],
+    [34, 4.2, 0, 0],
+    [2.0, 19, -6.5, -7.2],
+    [2.0, 17, 6.4, 6.5]
+  ]) {
+    const road = new THREE.Mesh(new THREE.PlaneGeometry(width, height), materials.road);
+    road.position.set(x, 0.018, z);
+    road.rotation.x = -Math.PI / 2;
+    road.receiveShadow = true;
+    root.add(road);
+  }
+}
+
+function addTownSquareStructures(root, materials) {
+  addGatehouse(root, materials);
+  addTavernFacade(root, materials);
+  addMarketRow(root, materials);
+  addTempleSteps(root, materials);
+
+  const houses = [
+    [-10.8, -9.7, 0.24, 2.6, 3.2, 2.2],
+    [-11.9, 8.6, -0.18, 2.4, 2.7, 2.0],
+    [10.8, -10.1, -0.24, 2.7, 3.0, 2.2],
+    [11.7, 8.8, 0.2, 2.2, 2.5, 1.8],
+    [-6.7, -13.1, 0.08, 3.0, 2.5, 1.8],
+    [6.9, -13.0, -0.08, 3.0, 2.5, 1.8]
+  ];
+
+  for (const house of houses) addTimberHouse(root, materials, ...house);
+
+  addLamp(root, materials, -4.2, -4.6);
+  addLamp(root, materials, 4.2, -4.6);
+  addLamp(root, materials, -4.2, 4.6);
+  addLamp(root, materials, 4.2, 4.6);
+}
+
+function addTimberHouse(root, materials, x, z, rotY, width, height, depth) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = rotY;
+  root.add(group);
+
+  addLocalBox(group, materials.plaster, 0, height / 2, 0, width, height, depth);
+  addLocalBox(group, materials.timber, 0, 0.12, depth / 2 + 0.04, width + 0.18, 0.24, 0.12);
+  addLocalBox(group, materials.timber, -width / 2 + 0.18, height / 2, depth / 2 + 0.06, 0.16, height, 0.12);
+  addLocalBox(group, materials.timber, width / 2 - 0.18, height / 2, depth / 2 + 0.06, 0.16, height, 0.12);
+  addLocalBox(group, materials.timber, 0, height - 0.28, depth / 2 + 0.06, width, 0.18, 0.12);
+
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(width, depth) * 0.68, 1.0, 4), materials.roof);
+  roof.position.set(0, height + 0.46, 0);
+  roof.rotation.y = Math.PI / 4;
+  roof.castShadow = true;
+  group.add(roof);
+
+  addLocalBox(group, materials.timber, 0, 0.86, depth / 2 + 0.11, 0.66, 1.2, 0.08);
+  addLocalBox(group, materials.sign, width * 0.28, 1.55, depth / 2 + 0.12, 0.52, 0.42, 0.06);
+}
+
+function addGatehouse(root, materials) {
+  addLocalBox(root, materials.stone, -3.8, 2.2, -15.6, 2.2, 4.4, 2.2);
+  addLocalBox(root, materials.stone, 3.8, 2.2, -15.6, 2.2, 4.4, 2.2);
+  addLocalBox(root, materials.roof, -3.8, 4.8, -15.6, 2.6, 0.8, 2.6);
+  addLocalBox(root, materials.roof, 3.8, 4.8, -15.6, 2.6, 0.8, 2.6);
+  addLocalBox(root, materials.timber, 0, 3.45, -15.8, 4.8, 0.56, 0.38);
+}
+
+function addTavernFacade(root, materials) {
+  addTimberHouse(root, materials, -15.0, -3.4, Math.PI / 2, 4.2, 3.2, 2.2);
+  addLocalBox(root, materials.sign, -14.3, 2.55, -0.7, 0.12, 0.78, 1.7);
+  addLocalBox(root, materials.awningRed, -14.15, 2.08, -4.1, 0.16, 0.5, 2.4);
+}
+
+function addMarketRow(root, materials) {
+  for (let i = 0; i < 4; i++) {
+    const z = -6.2 + i * 3.1;
+    addMarketStall(root, materials, 12.5, z, -Math.PI / 2, i % 2 ? materials.awningBlue : materials.awningRed);
+  }
+}
+
+function addMarketStall(root, materials, x, z, rotY, awningMaterial) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = rotY;
+  root.add(group);
+  addLocalBox(group, materials.timber, 0, 0.48, 0, 2.1, 0.34, 0.84);
+  addLocalBox(group, materials.timber, -0.92, 1.18, -0.34, 0.09, 1.46, 0.09);
+  addLocalBox(group, materials.timber, 0.92, 1.18, -0.34, 0.09, 1.46, 0.09);
+  const awning = new THREE.Mesh(new THREE.BoxGeometry(2.42, 0.18, 1.25), awningMaterial);
+  awning.position.set(0, 1.94, -0.1);
+  awning.rotation.x = -0.16;
+  awning.castShadow = true;
+  group.add(awning);
+}
+
+function addTempleSteps(root, materials) {
+  addLocalBox(root, materials.stone, 0, 0.16, 14.2, 6.0, 0.32, 1.2);
+  addLocalBox(root, materials.stone, 0, 0.36, 15.05, 4.4, 0.28, 1.0);
+  addLocalBox(root, materials.sign, 0, 1.2, 14.9, 2.4, 0.22, 0.22);
+}
+
+function addLamp(root, materials, x, z) {
+  addLocalBox(root, materials.timber, x, 1.05, z, 0.12, 2.1, 0.12);
+  const lamp = new THREE.PointLight(0xffbf62, 1.8, 5.4);
+  lamp.position.set(x, 2.25, z);
+  root.add(lamp);
+  const flame = new THREE.Mesh(
+    new THREE.SphereGeometry(0.18, 12, 8),
+    new THREE.MeshBasicMaterial({ color: 0xffc66d, transparent: true, opacity: 0.84 })
+  );
+  flame.position.copy(lamp.position);
+  root.add(flame);
+}
+
 function addTownFacades(root) {
   const wood = new THREE.MeshStandardMaterial({ color: 0x65422a, roughness: 0.8 });
   const roof = new THREE.MeshStandardMaterial({ color: 0x425d6c, roughness: 0.85 });
@@ -443,15 +683,16 @@ function addTownFacades(root) {
   }
 }
 
-function addTownPortal(root, label, position, targetId) {
-  const portal = new THREE.Mesh(
-    new THREE.BoxGeometry(2.3, 2.8, 0.18),
-    new THREE.MeshStandardMaterial({ color: 0x46321e, emissive: 0x1d140d, emissiveIntensity: 0.7 })
-  );
-  portal.position.copy(position);
-  portal.castShadow = true;
-  portal.userData.targetId = targetId;
-  root.add(portal);
+function addTownPortal(root, label, position, targetId, rotY = 0) {
+  const group = new THREE.Group();
+  group.position.copy(position);
+  group.rotation.y = rotY;
+  group.userData.targetId = targetId;
+  group.userData.label = label;
+  root.add(group);
+
+  addLocalBox(group, new THREE.MeshStandardMaterial({ color: 0x46321e, emissive: 0x1d140d, emissiveIntensity: 0.45 }), 0, 0, 0, 2.35, 2.5, 0.22);
+  addLocalBox(group, new THREE.MeshStandardMaterial({ color: 0xd2ad62, emissive: 0x3a260a, emissiveIntensity: 0.28 }), 0, 1.52, -0.16, 1.45, 0.32, 0.12);
 }
 
 function addNpcSprite(root, path, x, y, z, name) {

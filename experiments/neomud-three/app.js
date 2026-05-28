@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { WORLD_ROOT, loadWorld } from "./world-data.js";
-import { buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
+import { buildGenericRoom, buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
 import { makePlayerAvatar } from "./player-avatar.js";
 
 const canvas = document.querySelector("#scene");
@@ -177,8 +177,14 @@ function setRoom(roomId, options = {}) {
       onExit: (targetId) => setRoom(targetId, { fromRoomId: roomId, snapCamera: true })
     });
   } else {
-    setRoom("town:square", { fromRoomId, snapCamera: true });
-    return;
+    roomRuntime = buildGenericRoom({
+      THREE,
+      root: worldRoot,
+      room,
+      rooms: world.rooms,
+      worldRoot: WORLD_ROOT,
+      onExit: (targetId) => setRoom(targetId, { fromRoomId: roomId, snapCamera: true })
+    });
   }
 
   const spawn = roomRuntime.spawnFor?.(fromRoomId) ?? roomRuntime.spawn;
