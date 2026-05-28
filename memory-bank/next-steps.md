@@ -38,7 +38,7 @@ High leverage next work:
 
 5. Expand the test harness with real gameplay gates.
    - Assert physical exit traversal from temple to square through the live server, not only debug movement.
-   - Add visual screenshots for temple and square after major renderer changes.
+   - Keep the authored-room screenshot suite current for Temple, Town Square, and Tavern after major renderer changes.
    - Add collision and spawn-heading checks for each authored room.
    - Keep adding fixed screenshot anchors before major visual passes, not after the fact.
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
@@ -53,7 +53,8 @@ High leverage next work:
    - Keep all generated project assets under `experiments/neomud-three/assets/generated/`.
 
 8. Next concrete visual pass.
-   - Build the next foliage kit in Prop Zoo: conifer variant, shrub clump, flower planter, grass tuft, and ground decal.
-   - Add that kit to Town Square while preserving screenshot readability.
-   - Then pick one landmark, preferably the west Tavern exterior, and rebuild it from approved TownKit pieces.
+   - The first small foliage kit is now staged in Prop Zoo and applied to Town Square with instanced shrubs, grass tufts, and flower clusters.
+   - Do not keep solving warmth by adding more loose foliage; Town Square is now triangle-budget constrained.
+   - Pick one landmark, preferably the west Tavern exterior or the south Temple facade, and rebuild it from approved TownKit pieces with better silhouette, trim, and lighting.
+   - Add the next Prop Zoo items only when they unlock that landmark pass: conifer variant, ground decal, tavern door/sign variant, stone trim, or stained-glass/window frame variant.
    - Keep Town Square under the current render budget and update fixed screenshots.

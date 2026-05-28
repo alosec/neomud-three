@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T09:12:03.308Z",
+  "updated": "2026-05-28T09:38:39.953Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1085,6 +1085,121 @@
       ],
       "created": "2026-05-28T08:54:03Z",
       "updated": "2026-05-28T09:11:38Z"
+    },
+    {
+      "id": "neo-1fb2.40",
+      "project": "NeoMud",
+      "title": "Add fixed screenshot QA anchors for Temple and Tavern",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 59,
+          "body": "Added scripts/test-neomud-three-room-shots.cjs with Temple/Town/Tavern fixed screenshots and budget checks.",
+          "created": "2026-05-28T09:37:26Z"
+        }
+      ],
+      "created": "2026-05-28T09:26:02Z",
+      "updated": "2026-05-28T09:37:34Z"
+    },
+    {
+      "id": "neo-1fb2.41",
+      "project": "NeoMud",
+      "title": "Expand Prop Zoo foliage kit with shrubs grass and flower planters",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 60,
+          "body": "Added Prop Zoo shrub, grass tuft, and flower cluster props.",
+          "created": "2026-05-28T09:37:39Z"
+        }
+      ],
+      "created": "2026-05-28T09:26:02Z",
+      "updated": "2026-05-28T09:37:47Z"
+    },
+    {
+      "id": "neo-1fb2.42",
+      "project": "NeoMud",
+      "title": "Apply instanced foliage detail pass without raising Town Square budget",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 61,
+          "body": "Added instanced Town Square shrubs, grass tufts, and flower clusters; optimized plaza frames to keep budget under limit.",
+          "created": "2026-05-28T09:37:55Z"
+        }
+      ],
+      "created": "2026-05-28T09:26:02Z",
+      "updated": "2026-05-28T09:38:01Z"
+    },
+    {
+      "id": "neo-1fb2.43",
+      "project": "NeoMud",
+      "title": "Add small warmth and path detail to Temple and Tavern screenshots",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 62,
+          "body": "Room-shot screenshots now cover Temple nave/altar and Tavern entry/bar; foliage/detail pass validated with screenshots.",
+          "created": "2026-05-28T09:38:08Z"
+        }
+      ],
+      "created": "2026-05-28T09:26:02Z",
+      "updated": "2026-05-28T09:38:14Z"
+    },
+    {
+      "id": "neo-1fb2.44",
+      "project": "NeoMud",
+      "title": "Update memory bank and QA review after foliage detail pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 63,
+          "body": "Updated memory bank and QA review after foliage detail pass.",
+          "created": "2026-05-28T09:38:20Z"
+        }
+      ],
+      "created": "2026-05-28T09:26:02Z",
+      "updated": "2026-05-28T09:38:26Z"
     }
   ],
   "ready": [

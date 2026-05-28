@@ -173,3 +173,20 @@ Visual delta: moved trees into the actual courtyard composition, replaced the co
 QA delta: added `scripts/test-neomud-three-town-shots.cjs` for fixed Town Square screenshots and updated smoke tests to cover stable grounded walking, HP HUD, Temple altar collision, and Tavern table collision.
 
 Remaining visual gap: the scene is warmer and less barren, but the trees are still procedural low-poly placeholders. The next art-quality pass should create a fuller approved foliage kit in Prop Zoo, then add shrubs/flowers/ground decals without changing the room layout.
+
+## Score After Foliage Detail And Room-Shot QA Pass
+
+- Navigation readability: 2/2. Gate, Market, Temple, and Tavern remain readable in the fixed Town Square anchors; added shrubs/flowers/grass do not block exit paths or primary landmarks.
+- Scale believability: 1/2. Planters, shrubs, flowers, benches, and larger trees add stronger courtyard scale cues, but the scene still reads as a stylized prototype rather than finished environment art.
+- Semantic match: 2/2. Town Square now feels less barren while preserving the civic courtyard, fountain, Tavern, Temple, Market, Gate, Guildmaster, and Old Wren composition.
+- Interaction clarity: 2/2. Physical exits, NPC proximity prompts, and collision metadata still pass offline and server-backed tests.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes after the foliage detail pass.
+- Performance: 2/2. Latest full smoke Town Square budget reports 228 draw calls / 58,732 triangles / 18 textures / 139 geometries; fixed Town Square anchors report 125 calls / 54,834 triangles / 19 textures / 184 geometries.
+
+Total: 11/12
+
+Visual delta: added Prop Zoo shrub, grass tuft, and flower cluster components; applied them to Town Square as instanced detail around planters, benches, trees, and plaza edges; and optimized repeated plaza surface frames into one instanced batch so the full smoke budget stayed under the existing 240 draw-call limit.
+
+QA delta: added `scripts/test-neomud-three-room-shots.cjs` for fixed Temple nave/altar, Town Square plaza, and Tavern entry/bar screenshots. Current authored-room QA reports Temple 318 calls / 80,472 triangles / 7 textures / 286 geometries; Town Square 214 calls / 58,584 triangles / 18 textures / 139 geometries; Tavern 91 calls / 53,816 triangles / 20 textures / 48 geometries, with no console errors or failed requests.
+
+Remaining visual gap: further Town Square warmth should not be more foliage by default. The next pass should rebuild one named landmark with better authored proportions, material contrast, and lighting while preserving the current budget gate.

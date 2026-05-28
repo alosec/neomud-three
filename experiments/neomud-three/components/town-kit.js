@@ -19,6 +19,9 @@ export const TOWN_KIT_PROPS = [
   { id: "rug.runner", label: "Runner Rug", category: "interior" },
   { id: "candle.cluster", label: "Candle Cluster", category: "lighting" },
   { id: "planter.long", label: "Long Planter", category: "foliage" },
+  { id: "shrub.clump", label: "Shrub Clump", category: "foliage" },
+  { id: "grass.tuft", label: "Grass Tuft", category: "foliage" },
+  { id: "flower.cluster", label: "Flower Cluster", category: "foliage" },
   { id: "banner.pole", label: "Banner Pole", category: "wayfinding" },
   { id: "barrel", label: "Barrel", category: "prop" },
   { id: "crate", label: "Crate", category: "prop" },
@@ -84,6 +87,15 @@ export function addTownKitProp(root, materials, id, options = {}) {
       break;
     case "planter.long":
       addLongPlanter(group, materials);
+      break;
+    case "shrub.clump":
+      addShrubClump(group, materials);
+      break;
+    case "grass.tuft":
+      addGrassTuft(group, materials);
+      break;
+    case "flower.cluster":
+      addFlowerCluster(group, materials);
       break;
     case "banner.pole":
       addBannerPole(group, materials);
@@ -205,6 +217,48 @@ function addLongPlanter(root, materials) {
   addBox(root, materials.timber, 0, 0.55, 0, 3.0, 0.16, 1.06);
   addBox(root, materials.foliageDark, -0.62, 0.82, 0, 1.12, 0.46, 0.72);
   addBox(root, materials.foliage, 0.58, 0.88, 0.05, 1.24, 0.54, 0.82);
+}
+
+function addShrubClump(root, materials) {
+  const left = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55, 0), materials.foliageDark);
+  left.position.set(-0.32, 0.44, 0);
+  left.scale.set(1.05, 0.58, 0.86);
+  const right = new THREE.Mesh(new THREE.DodecahedronGeometry(0.48, 0), materials.foliage);
+  right.position.set(0.28, 0.5, 0.08);
+  right.scale.set(0.92, 0.64, 0.84);
+  for (const mesh of [left, right]) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    root.add(mesh);
+  }
+}
+
+function addGrassTuft(root, materials) {
+  for (let index = 0; index < 7; index++) {
+    const blade = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.54 + (index % 3) * 0.08, 5), materials.foliage);
+    const angle = (Math.PI * 2 * index) / 7;
+    blade.position.set(Math.cos(angle) * 0.16, 0.24, Math.sin(angle) * 0.16);
+    blade.rotation.z = 0.18 * Math.cos(angle);
+    blade.rotation.x = 0.18 * Math.sin(angle);
+    blade.castShadow = true;
+    root.add(blade);
+  }
+}
+
+function addFlowerCluster(root, materials) {
+  addShrubClump(root, materials);
+  const flowers = [
+    [-0.32, 0.82, 0.1, materials.awningGold],
+    [0.12, 0.86, -0.12, materials.awningRed],
+    [0.34, 0.78, 0.16, materials.awningBlue],
+    [-0.02, 0.92, 0.2, materials.awningGold]
+  ];
+  for (const [x, y, z, materialRef] of flowers) {
+    const flower = new THREE.Mesh(new THREE.DodecahedronGeometry(0.075, 0), materialRef);
+    flower.position.set(x, y, z);
+    flower.castShadow = true;
+    root.add(flower);
+  }
 }
 
 function addBannerPole(root, materials) {

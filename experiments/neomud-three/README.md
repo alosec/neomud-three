@@ -40,6 +40,7 @@ node scripts/validate-neomud-three-specs.mjs
 node scripts/test-neomud-three.cjs
 node scripts/test-neomud-three-labs.cjs
 node scripts/test-neomud-three-town-shots.cjs
+node scripts/test-neomud-three-room-shots.cjs
 node scripts/test-neomud-three-server.cjs
 ```
 
@@ -60,4 +61,10 @@ Fixed Town Square screenshot anchors:
 
 ```bash
 NEOMUD_THREE_BROWSER_CHANNEL=chrome-canary node scripts/test-neomud-three-town-shots.cjs
+```
+
+Fixed authored-room screenshot anchors:
+
+```bash
+NEOMUD_THREE_BROWSER_CHANNEL=chrome-canary node scripts/test-neomud-three-room-shots.cjs
 ```

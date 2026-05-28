@@ -1113,22 +1113,26 @@ function addTownSpecSurfaces(root, materials, spec) {
   for (const path of spec.surfaces.paths) {
     addSurfaceRect(root, material(materials, path.material), path);
   }
+  const surfaceFrameBoxes = [];
   for (const plaza of spec.surfaces.plazas ?? []) {
     addSurfaceRect(root, material(materials, plaza.material), plaza);
-    addSurfaceFrame(root, materials.pathEdge, plaza);
+    surfaceFrameBoxes.push(...surfaceFrameBoxesFor(plaza));
   }
+  addInstancedBoxes(root, materials.pathEdge, surfaceFrameBoxes, "plaza-surface-frames", { castShadow: false });
   for (const curb of spec.surfaces.curbs) {
     addBox(root, materials.darkStone, curb.x, curb.height / 2, curb.z, curb.width, curb.height, curb.depth);
   }
 }
 
-function addSurfaceFrame(root, material, surface) {
+function surfaceFrameBoxesFor(surface) {
   const y = (surface.y ?? 0.03) + 0.022;
   const thickness = 0.12;
-  addBox(root, material, surface.x, y, surface.z - surface.depth / 2, surface.width, 0.045, thickness, { castShadow: false });
-  addBox(root, material, surface.x, y, surface.z + surface.depth / 2, surface.width, 0.045, thickness, { castShadow: false });
-  addBox(root, material, surface.x - surface.width / 2, y, surface.z, thickness, 0.045, surface.depth, { castShadow: false });
-  addBox(root, material, surface.x + surface.width / 2, y, surface.z, thickness, 0.045, surface.depth, { castShadow: false });
+  return [
+    { x: surface.x, y, z: surface.z - surface.depth / 2, width: surface.width, height: 0.045, depth: thickness, rotationY: 0 },
+    { x: surface.x, y, z: surface.z + surface.depth / 2, width: surface.width, height: 0.045, depth: thickness, rotationY: 0 },
+    { x: surface.x - surface.width / 2, y, z: surface.z, width: thickness, height: 0.045, depth: surface.depth, rotationY: 0 },
+    { x: surface.x + surface.width / 2, y, z: surface.z, width: thickness, height: 0.045, depth: surface.depth, rotationY: 0 }
+  ];
 }
 
 function addTownSpecFountain(root, materials, fountainSpec) {
@@ -1352,6 +1356,7 @@ function addTownSpecProps(root, materials, spec) {
   addTownLampCluster(root, materials, spec.props.lamps ?? []);
   addTownBenches(root, materials, spec.props.benches ?? []);
   addTownPlanters(root, materials, spec.props.planters ?? []);
+  addTownFoliageDetails(root, materials, spec.props);
   addTownBanners(root, materials, spec.props.banners ?? []);
   addTownCrateStacks(root, materials, spec.props.crateStacks ?? []);
 }
@@ -1405,6 +1410,48 @@ function addTownPlanters(root, materials, planters) {
   boxesByMaterial.forEach(([mat, boxes], index) => addInstancedBoxes(root, mat, boxes, `courtyard-planters-${index}`));
 }
 
+function addTownFoliageDetails(root, materials, props = {}) {
+  const shrubs = (props.shrubs ?? []).map((shrub) => ({
+    x: shrub.x,
+    y: 0.46 * (shrub.scale ?? 1),
+    z: shrub.z,
+    scale: [0.82 * (shrub.scale ?? 1), 0.46 * (shrub.scale ?? 1), 0.72 * (shrub.scale ?? 1)],
+    rotationY: shrub.rotationY ?? 0
+  }));
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliageDark, shrubs, "courtyard-shrub-clumps");
+
+  const grass = (props.grassTufts ?? []).map((tuft) => ({
+    x: tuft.x,
+    y: 0.22 * (tuft.scale ?? 1),
+    z: tuft.z,
+    scale: [0.18 * (tuft.scale ?? 1), 0.44 * (tuft.scale ?? 1), 0.18 * (tuft.scale ?? 1)],
+    rotationY: tuft.rotationY ?? 0
+  }));
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1, 5), materials.foliage, grass, "courtyard-grass-tufts");
+
+  const flowerGroups = new Map();
+  for (const flower of props.flowerClusters ?? []) {
+    const materialKey = flower.material ?? "awningGold";
+    if (!flowerGroups.has(materialKey)) flowerGroups.set(materialKey, []);
+    const count = flower.count ?? 5;
+    for (let index = 0; index < count; index++) {
+      const angle = (Math.PI * 2 * index) / count + (flower.rotationY ?? 0);
+      const radius = (flower.radius ?? 0.34) * (0.45 + (index % 3) * 0.25);
+      const scale = flower.scale ?? 1;
+      flowerGroups.get(materialKey).push({
+        x: flower.x + Math.cos(angle) * radius,
+        y: 0.36 * scale,
+        z: flower.z + Math.sin(angle) * radius,
+        scale: [0.12 * scale, 0.12 * scale, 0.12 * scale],
+        rotationY: angle
+      });
+    }
+  }
+  for (const [materialKey, flowers] of flowerGroups) {
+    addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), material(materials, materialKey), flowers, `courtyard-flowers-${materialKey}`);
+  }
+}
+
 function addTownBanners(root, materials, banners) {
   if (!banners.length) return;
   const poles = [];
@@ -1426,7 +1473,6 @@ function addTownCrateStacks(root, materials, stacks) {
   if (!stacks.length) return;
   const timberBoxes = [];
   const darkBoxes = [];
-  const signBoxes = [];
   for (const stack of stacks) {
     timberBoxes.push(orientedBox(stack, -0.28, 0.32, 0, 0.72, 0.64, 0.58));
     darkBoxes.push(orientedBox(stack, -0.28, 0.32, -0.32, 0.8, 0.08, 0.06));
@@ -1652,7 +1698,7 @@ function orientedBox(anchor, localX, y, localZ, width, height, depth) {
   };
 }
 
-function addInstancedBoxes(root, materialRef, boxes, visualRole) {
+function addInstancedBoxes(root, materialRef, boxes, visualRole, options = {}) {
   if (!boxes.length) return null;
   const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), materialRef, boxes.length);
   const dummy = new THREE.Object3D();
@@ -1663,8 +1709,32 @@ function addInstancedBoxes(root, materialRef, boxes, visualRole) {
     dummy.updateMatrix();
     mesh.setMatrixAt(index, dummy.matrix);
   });
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
+  mesh.castShadow = options.castShadow ?? true;
+  mesh.receiveShadow = options.receiveShadow ?? true;
+  mesh.userData = { visualRole };
+  root.add(mesh);
+  return mesh;
+}
+
+function addInstancedGeometry(root, geometry, materialRef, transforms, visualRole, options = {}) {
+  if (!transforms.length) {
+    geometry.dispose?.();
+    return null;
+  }
+  const mesh = new THREE.InstancedMesh(geometry, materialRef, transforms.length);
+  const dummy = new THREE.Object3D();
+  transforms.forEach((transform, index) => {
+    const [sx, sy, sz] = Array.isArray(transform.scale)
+      ? transform.scale
+      : [transform.scale ?? 1, transform.scale ?? 1, transform.scale ?? 1];
+    dummy.position.set(transform.x, transform.y, transform.z);
+    dummy.rotation.set(transform.rotationX ?? 0, transform.rotationY ?? 0, transform.rotationZ ?? 0);
+    dummy.scale.set(sx, sy, sz);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(index, dummy.matrix);
+  });
+  mesh.castShadow = options.castShadow ?? true;
+  mesh.receiveShadow = options.receiveShadow ?? true;
   mesh.userData = { visualRole };
   root.add(mesh);
   return mesh;

@@ -325,6 +325,38 @@ export const TOWN_SQUARE_SPEC = {
       { x: -12.8, z: 8.6, width: 2.8, depth: 0.9, rotationY: -0.2 },
       { x: 12.8, z: 8.6, width: 2.8, depth: 0.9, rotationY: 0.2 }
     ],
+    shrubs: [
+      { x: -15.4, z: -10.7, scale: 0.92, rotationY: 0.4 },
+      { x: -10.7, z: -12.2, scale: 0.72, rotationY: -0.2 },
+      { x: 15.2, z: -10.5, scale: 0.9, rotationY: -0.3 },
+      { x: 10.6, z: -12.5, scale: 0.7, rotationY: 0.1 },
+      { x: -15.7, z: 10.8, scale: 0.82, rotationY: -0.4 },
+      { x: 15.6, z: 10.5, scale: 0.84, rotationY: 0.3 },
+      { x: -6.8, z: 13.7, scale: 0.64, rotationY: 0.6 },
+      { x: 6.9, z: 13.8, scale: 0.66, rotationY: -0.7 }
+    ],
+    grassTufts: [
+      { x: -18.2, z: -13.4, scale: 0.72, rotationY: 0.1 },
+      { x: -16.1, z: -15.1, scale: 0.64, rotationY: 0.9 },
+      { x: 17.7, z: -13.7, scale: 0.74, rotationY: -0.6 },
+      { x: 15.5, z: -15.4, scale: 0.62, rotationY: 0.2 },
+      { x: -18.0, z: 13.2, scale: 0.68, rotationY: -0.4 },
+      { x: -15.2, z: 15.1, scale: 0.58, rotationY: 0.7 },
+      { x: 17.9, z: 13.5, scale: 0.7, rotationY: -0.8 },
+      { x: 15.4, z: 15.5, scale: 0.6, rotationY: 0.4 },
+      { x: -10.1, z: -18.4, scale: 0.55, rotationY: 1.0 },
+      { x: 10.2, z: -18.3, scale: 0.58, rotationY: -1.0 },
+      { x: -10.5, z: 18.4, scale: 0.58, rotationY: 0.1 },
+      { x: 10.5, z: 18.3, scale: 0.58, rotationY: -0.1 }
+    ],
+    flowerClusters: [
+      { x: -12.8, z: -8.3, material: "awningGold", radius: 0.46, count: 6, scale: 0.85 },
+      { x: 12.8, z: -8.3, material: "awningRed", radius: 0.46, count: 6, scale: 0.85 },
+      { x: -12.8, z: 8.6, material: "awningBlue", radius: 0.46, count: 6, scale: 0.85 },
+      { x: 12.8, z: 8.6, material: "awningGold", radius: 0.46, count: 6, scale: 0.85 },
+      { x: -5.2, z: 8.2, material: "awningRed", radius: 0.34, count: 4, scale: 0.7 },
+      { x: 5.2, z: 8.2, material: "awningBlue", radius: 0.34, count: 4, scale: 0.7 }
+    ],
     banners: [
       { x: -4.7, z: -18.7, material: "awningBlue", height: 2.6 },
       { x: 4.7, z: -18.7, material: "awningBlue", height: 2.6 },
