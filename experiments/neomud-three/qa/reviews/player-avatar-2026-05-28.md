@@ -53,3 +53,17 @@ Visual delta: replaced the cube-like head treatment with separate face and hood 
 QA delta: the proxy v3 pass preserved the no-bob movement baseline and passed offline, lab, screenshot-anchor, and server-backed traversal tests. The current next constraint is Town Square draw-call headroom, not avatar triangle cost.
 
 Remaining visual gap: this is still a proxy. Further visual upgrades should either source/author a real adventurer GLB with compatible animation clips or be very selective proxy improvements that do not push Town Square over the 240-call full-smoke budget.
+
+## Score After Proxy v4 Silhouette Pass
+
+- Animation continuity: 1/2. The visible player still uses procedural limb motion while Xbot remains loaded only as a hidden reference asset. Offline smoke still validates run activation, stable grounded Y, jumping, and server-backed traversal.
+- Silhouette: 1/2. The cowl/cape side mass, eye/nose detail, chest strap, shoulder trim, staff band, and slightly larger scale improve readability in Town Square and Forest Edge screenshots. The model still reads as a low-poly proxy rather than final character art.
+- Art direction match: 1/2. The v4 proxy is more consistent with the stylized diorama than the raw example rig, but final quality still requires an authored/sourced skinned adventurer GLB or a more intentional custom model.
+- Performance: 2/2. Latest offline smoke reports Temple 280 calls / 35,006 triangles, Town Square 211 calls / 13,738 triangles, Forest Edge 42 calls / 4,414 triangles, and Tavern 106 calls / 6,872 triangles. All authored rooms remain inside their budgets.
+- QA coverage: 2/2. Offline smoke, Prop Zoo lab QA, authored-room screenshots, Town Square screenshot anchors, and server-backed movement now assert `visualTreatment: procedural-adventurer-proxy-v4` / `proxy: true` and pass.
+
+Total: 7/10
+
+Visual delta: added more readable face detail, broader cloak/cowl silhouette, side cape panels, a chest strap, shoulder trim, extra staff/gear accents, and a slightly larger scale while preserving the no-bob movement baseline.
+
+Remaining visual gap: this remains a pragmatic proxy. The next major avatar task should be a documented-license skinned adventurer GLB with compatible idle/walk/run clips, not another random example model.

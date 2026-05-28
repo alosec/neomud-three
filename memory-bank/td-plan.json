@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T13:43:22.545Z",
+  "updated": "2026-05-28T13:56:39.560Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -503,10 +503,15 @@
           "id": 74,
           "body": "Added a visible adventurer overlay to the active Xbot rig while preserving idle/walk/run AnimationMixer clips. Still in-progress because final authored player GLB remains unresolved.",
           "created": "2026-05-28T10:27:40Z"
+        },
+        {
+          "id": 75,
+          "body": "Proxy v4 pass shipped: stronger cowl/cape/face/gear silhouette and slightly larger scale; still unresolved for final quality until a real authored/sourced skinned adventurer GLB is available.",
+          "created": "2026-05-28T13:56:16Z"
         }
       ],
       "created": "2026-05-28T04:32:49Z",
-      "updated": "2026-05-28T10:27:40Z"
+      "updated": "2026-05-28T13:56:16Z"
     },
     {
       "id": "neo-1fb2.15",
@@ -1779,6 +1784,27 @@
       "comments": [],
       "created": "2026-05-28T13:36:43Z",
       "updated": "2026-05-28T13:43:07Z"
+    },
+    {
+      "id": "neo-1fb2.14.1",
+      "project": "NeoMud",
+      "title": "Avatar proxy v4 silhouette polish",
+      "description": "Improve the visible procedural adventurer without swapping to another example model: clearer face/hood/shoulders, better cape/staff proportions, stronger readable fantasy silhouette in gameplay screenshots, preserve current movement/run/jump behavior and budgets.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.14",
+      "close_reason": "done: upgraded visible avatar to procedural-adventurer-proxy-v4 with clearer face/cowl/cape/gear silhouette, preserved no-bob movement and passed lab/offline/room/town/server QA",
+      "labels": [
+        "avatar",
+        "neomud-three",
+        "visual-qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T13:49:34Z",
+      "updated": "2026-05-28T13:56:01Z"
     }
   ],
   "ready": [
