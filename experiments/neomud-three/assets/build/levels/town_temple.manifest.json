@@ -10,17 +10,17 @@
   "runtimeGlb": "town_temple.glb",
   "files": {
     "sourceImageBytes": 74634,
-    "sourceBlendBytes": 166897,
-    "runtimeGlbBytes": 408464
+    "sourceBlendBytes": 173930,
+    "runtimeGlbBytes": 438752
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 23,
-    "meshes": 20,
-    "materials": 14,
+    "nodes": 25,
+    "meshes": 22,
+    "materials": 16,
     "prefixes": {
-      "VIS_": 12,
+      "VIS_": 14,
       "COL_": 7,
       "NAV_": 0,
       "SPAWN_": 1,
@@ -34,10 +34,10 @@
   },
   "runtimeQa": {
     "offlineTempleBudget": {
-      "drawCalls": 29,
-      "triangles": 8272,
+      "drawCalls": 33,
+      "triangles": 9098,
       "textures": 1,
-      "geometries": 19
+      "geometries": 21
     },
     "checks": [
       "cathedral asset lab",
@@ -51,7 +51,8 @@
   },
   "knownLimits": [
     "Materials are first-pass Blender-authored stylized colors, not final generated texture families.",
-    "The package now uses isolated pew and wall-window bay asset candidates plus material-batched visible room meshes, but the altar and incense fixtures still need asset-level QA.",
+    "The package now uses isolated pew, wall-window bay, and altar/incense asset candidates plus material-batched visible room meshes.",
+    "Stained-glass floor-light patches are subdued, but still procedural and should become a dedicated lighting/effects pass later.",
     "The old procedural Temple builder remains in code as a temporary removal candidate."
   ]
 }

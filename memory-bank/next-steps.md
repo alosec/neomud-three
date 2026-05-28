@@ -35,8 +35,8 @@ High leverage next work:
    - Treat `experiments/neomud-three/assets/source/scenes/town_temple/level-brief.json` as the Temple production contract.
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
-   - Use isolated asset QA for each fixture before room integration. `cathedral.pew` and `cathedral.wall_window_bay` are the first candidates; the next targets are `cathedral.altar_retable` and `cathedral.incense_brazier`.
-   - Do not accept the current altar and incense as final. The next Temple fixture pass should build a reusable altar/retable candidate in isolation, with a better focal object, layered frame depth, cloth hierarchy, candles, and smoke/brazier staging.
+   - Use isolated asset QA for each fixture before room integration. `cathedral.pew`, `cathedral.wall_window_bay`, and `cathedral.altar_incense_fixture` are the first accepted playable-prototype candidates.
+   - Do not accept the current altar and incense as final art. The next Temple fixture/material pass should improve stained-glass texture fidelity, smoke softness, altar material hierarchy, or lighting with screenshot evidence.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
    - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
 

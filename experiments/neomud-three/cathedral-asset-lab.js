@@ -4,6 +4,7 @@ import { instantiateBlenderLevel, preloadBlenderLevel } from "./level-loader.js"
 
 const PEW_URL = "./assets/build/props/cathedral_pew.glb";
 const WINDOW_BAY_URL = "./assets/build/props/cathedral_window_bay.glb";
+const ALTAR_INCENSE_URL = "./assets/build/props/cathedral_altar_incense.glb";
 
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -16,11 +17,11 @@ renderer.toneMappingExposure = 1.08;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xbecbd1);
-scene.fog = new THREE.Fog(0xbecbd1, 30, 76);
+scene.fog = new THREE.Fog(0xbecbd1, 34, 86);
 
 const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 120);
-camera.position.set(10.5, 8.4, 15.5);
-camera.lookAt(0, 1.0, 0);
+camera.position.set(12.0, 9.2, 21.5);
+camera.lookAt(0, 1.4, 1.8);
 
 const root = new THREE.Group();
 root.rotation.y = -0.12;
@@ -39,7 +40,7 @@ const groundMaterial = new THREE.MeshStandardMaterial({
   roughness: 0.9,
   metalness: 0
 });
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(30, 20), groundMaterial);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(34, 28), groundMaterial);
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -0.025;
 ground.receiveShadow = true;
@@ -78,7 +79,9 @@ async function loadAssets() {
   try {
     await preloadBlenderLevel(PEW_URL);
     await preloadBlenderLevel(WINDOW_BAY_URL);
+    await preloadBlenderLevel(ALTAR_INCENSE_URL);
     addWindowBayStation();
+    addAltarIncenseStation();
     addPewStation({ id: "front", label: "Pew Front", x: -8, z: -2.7, rotationY: 0 });
     addPewStation({ id: "side", label: "Pew Side", x: -1.4, z: -2.7, rotationY: Math.PI / 2 });
     addPewStation({ id: "three-quarter", label: "Pew 3/4", x: 5.5, z: -2.7, rotationY: -Math.PI / 5 });
@@ -96,7 +99,8 @@ async function loadAssets() {
     });
     assetSummaries = [
       buildAssetSummary("cathedral.pew", PEW_URL),
-      buildAssetSummary("cathedral.wall_window_bay", WINDOW_BAY_URL)
+      buildAssetSummary("cathedral.wall_window_bay", WINDOW_BAY_URL),
+      buildAssetSummary("cathedral.altar_incense_fixture", ALTAR_INCENSE_URL)
     ];
     assetSummary = assetSummaries[0];
     labReady = true;
@@ -104,6 +108,39 @@ async function loadAssets() {
     loadError = error?.message ?? String(error);
     throw error;
   }
+}
+
+function addAltarIncenseStation() {
+  const station = new THREE.Group();
+  station.name = "cathedral-altar-incense-station";
+  station.position.set(0, 0, 10.2);
+  root.add(station);
+
+  const { scene: altar } = instantiateBlenderLevel(ALTAR_INCENSE_URL, { hideAuthoringNodes: true });
+  configureFixtureScene(altar);
+  altar.rotation.y = Math.PI;
+  station.add(altar);
+
+  const sidePreview = new THREE.Group();
+  sidePreview.position.set(9.4, 0, -3.6);
+  sidePreview.rotation.y = -Math.PI / 2.45;
+  station.add(sidePreview);
+  const { scene: angledAltar } = instantiateBlenderLevel(ALTAR_INCENSE_URL, { hideAuthoringNodes: true });
+  configureFixtureScene(angledAltar);
+  angledAltar.rotation.y = Math.PI;
+  angledAltar.scale.setScalar(0.46);
+  sidePreview.add(angledAltar);
+
+  addTextBoard(root, "Altar + Incense Candidate", {
+    x: 0,
+    y: 8.7,
+    z: 12.45,
+    width: 4.8,
+    height: 0.48,
+    subtitle: "front + angled preview",
+    palette: "gold",
+    renderOrder: 20
+  });
 }
 
 function addWindowBayStation() {
@@ -157,6 +194,18 @@ function addPewStation({ id, label, x, z, rotationY }) {
     subtitle: "isolated",
     palette: "green",
     renderOrder: 20
+  });
+}
+
+function configureFixtureScene(fixture) {
+  fixture.traverse((object) => {
+    if (!object.isMesh) return;
+    object.castShadow = object.name.startsWith("VIS_");
+    object.receiveShadow = object.name.startsWith("VIS_");
+    if (object.material) {
+      object.material = object.material.clone();
+      object.material.roughness = Math.max(object.material.roughness ?? 0.72, 0.68);
+    }
   });
 }
 

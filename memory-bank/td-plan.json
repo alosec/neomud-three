@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T22:22:55.440Z",
+  "updated": "2026-05-28T22:36:13.411Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2896,17 +2896,36 @@
       "description": "Create isolated Blender-authored asset candidates for the Temple altar/re-table and incense braziers, validate them in the cathedral asset lab, integrate only after screenshot QA, and preserve Temple room render budgets.",
       "type": "task",
       "priority": 0,
-      "status": "todo",
-      "status_type": "unstarted",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-1fb2",
-      "close_reason": "",
+      "close_reason": "done: added isolated cathedral altar/incense Blender/GLB package, manifest, asset-lab station/assertions, Temple integration, and passed lab/room/offline/server QA",
       "labels": [
         "pipeline"
       ],
       "blockers": [],
       "comments": [],
       "created": "2026-05-28T22:22:45Z",
-      "updated": "2026-05-28T22:22:45Z"
+      "updated": "2026-05-28T22:36:01Z"
+    },
+    {
+      "id": "neo-1fb2.83",
+      "project": "NeoMud",
+      "title": "Soften Temple stained-glass floor-light patches",
+      "description": "Replace saturated stained-glass floor patches with low-contrast light materials so nave/altar screenshots read as colored light rather than stray blue geometry.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: replaced saturated Temple floor-light patches with subdued cast-light materials and passed fixed screenshot QA",
+      "labels": [
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T22:31:38Z",
+      "updated": "2026-05-28T22:36:01Z"
     }
   ]
 }

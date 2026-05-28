@@ -33,8 +33,7 @@ Do not run another broad "improve cathedral" pass. Work fixture by fixture:
 
 - `cathedral.pew`
 - `cathedral.wall_window_bay`
-- `cathedral.altar_retable`
-- `cathedral.incense_brazier`
+- `cathedral.altar_incense_fixture`
 - `cathedral.floor_material`
 - `cathedral.nave_composition`
 
@@ -68,3 +67,18 @@ wall backer, recess, lancet arch frame, sill, reveals, mullions, inset colored
 glass lancets, and a restrained floor-light patch. It remains a playable
 prototype because the glass is still procedural color geometry, not a final
 painted/generated stained-glass material.
+
+## Current Third Candidate
+
+`cathedral.altar_incense_fixture` now has:
+
+- Source script: `scripts/create-neomud-three-cathedral-altar-fixture.py`
+- Source blend: `experiments/neomud-three/assets/source/props/cathedral_altar_incense/cathedral_altar_incense.blend`
+- Runtime GLB: `experiments/neomud-three/assets/build/props/cathedral_altar_incense.glb`
+- Manifest: `experiments/neomud-three/assets/build/props/cathedral_altar_incense.manifest.json`
+- Browser QA: `experiments/neomud-three/cathedral-asset-lab.html`
+
+The first candidate replaces the flat black re-table blockout with a tiered
+dais/table, draped cloth, arched re-table panels, a dawn medallion, paired
+incense bowls, ember cues, and smoke geometry. It is accepted as a playable
+prototype, not final cathedral art.

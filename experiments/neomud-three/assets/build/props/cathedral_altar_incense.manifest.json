@@ -1,0 +1,49 @@
+{
+  "id": "cathedral.altar_incense_fixture",
+  "slug": "cathedral_altar_incense",
+  "name": "Cathedral Altar And Incense Fixture",
+  "packageVersion": 1,
+  "profile": "landmark",
+  "sourceBlend": "../../source/props/cathedral_altar_incense/cathedral_altar_incense.blend",
+  "runtimeGlb": "cathedral_altar_incense.glb",
+  "files": {
+    "sourceBlendBytes": 121822,
+    "runtimeGlbBytes": 79812
+  },
+  "validator": {
+    "script": "scripts/validate-neomud-three-gltf.mjs",
+    "profile": "landmark",
+    "nodes": 37,
+    "meshes": 35,
+    "materials": 9,
+    "prefixes": {
+      "VIS_": 32,
+      "COL_": 3,
+      "NAV_": 0,
+      "SPAWN_": 0,
+      "TRG_": 0,
+      "PICKUP_": 0,
+      "ENEMY_": 0,
+      "PATH_": 0,
+      "CAMERA_": 1,
+      "LIGHTS_": 1
+    }
+  },
+  "runtimeQa": {
+    "cathedralAssetLabBudget": {
+      "drawCalls": 254,
+      "triangles": 5038,
+      "textures": 8,
+      "geometries": 206
+    },
+    "checks": [
+      "GLB landmark profile validation",
+      "Cathedral Asset Lab screenshot QA"
+    ]
+  },
+  "knownLimits": [
+    "This is the first asset-level altar/incense candidate, not final cathedral altar art.",
+    "Retable glass uses procedural colored lancet panels rather than a generated stained-glass texture.",
+    "Smoke is still low-poly translucent geometry and should be revisited as a dedicated effect after fixture composition stabilizes."
+  ]
+}

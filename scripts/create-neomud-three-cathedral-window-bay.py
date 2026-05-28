@@ -39,6 +39,7 @@ def build_asset():
     glass_blue = temple.material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
     glass_red = temple.material("MAT_temple_glass_red", (0.88, 0.13, 0.16, 0.64), roughness=0.28, alpha=0.64, emission=(0.72, 0.06, 0.07, 1), emission_strength=0.18)
     glass_gold = temple.material("MAT_temple_glass_gold", (1.0, 0.68, 0.14, 0.62), roughness=0.32, alpha=0.62, emission=(0.9, 0.42, 0.04, 1), emission_strength=0.18)
+    light_blue = temple.material("MAT_temple_floor_light_cool", (0.55, 0.72, 1.0, 0.18), roughness=0.95, alpha=0.18, emission=(0.22, 0.34, 0.75, 1), emission_strength=0.03)
     collision = temple.material("MAT_debug_collision", (0.1, 0.28, 0.95, 0.18), alpha=0.18)
 
     temple.add_cathedral_window_bay(
@@ -52,7 +53,7 @@ def build_asset():
         glass_blue,
         glass_red,
         glass_gold,
-        glass_blue,
+        light_blue,
     )
     temple.cube3("COL_window_bay_wall_footprint", 0, 3.2, 0, 0.8, 6.4, 4.8, collision, kind="collision", collider="box", collider_id="cathedral-window-bay-footprint")
     temple.marker3("CAMERA_window_bay_three_quarter", 8.4, 3.2, 6.4, "camera_zone", camera_id="window_bay_three_quarter")

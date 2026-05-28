@@ -289,6 +289,34 @@ def lancet_prism_x3(name, x, y, z, thickness, width, height, mat, kind="visible"
     return prism_x3(name, x, y, z, thickness, lancet_profile(width, height), mat, kind=kind, **props)
 
 
+def prism_z3(name, x, y, z, depth, profile_points, mat, kind="visible", **props):
+    """Extrude a local x/y profile along z for wall-facing fixtures."""
+    vertices = []
+    for side in [-depth / 2, depth / 2]:
+        for local_x, local_y in profile_points:
+            vertices.append((x + local_x, y + local_y, z + side))
+
+    count = len(profile_points)
+    faces = [tuple(range(count)), tuple(range(count, count * 2))]
+    for index in range(count):
+        faces.append((index, count + index, count + (index + 1) % count, (index + 1) % count))
+
+    return mesh3(name, vertices, faces, mat, kind=kind, **props)
+
+
+def lancet_prism_z3(name, x, y, z, depth, width, height, mat, kind="visible", **props):
+    return prism_z3(name, x, y, z, depth, lancet_profile(width, height), mat, kind=kind, **props)
+
+
+def circle_panel_z3(name, x, y, z, radius, mat, segments=24, kind="visible", **props):
+    vertices = [(x, y, z)]
+    for index in range(segments):
+        theta = 2 * math.pi * index / segments
+        vertices.append((x + math.cos(theta) * radius, y + math.sin(theta) * radius, z))
+    faces = [tuple(range(segments + 1))]
+    return mesh3(name, vertices, faces, mat, kind=kind, **props)
+
+
 def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue, glass_red, glass_gold, light_material):
     """Build one reusable wall/window bay in side-wall coordinates.
 
@@ -339,6 +367,50 @@ def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue
     )
 
 
+def add_cathedral_altar_incense_fixture(fixture_id, x, z, stone, trim, dark, cloth, gold, glass_blue, glass_red, glass_gold, smoke):
+    """Build the altar end as a reusable reviewed fixture.
+
+    This replaces the old stack of rectangular wall bars with one staged altar:
+    tiered dais, readable table, arched re-table, dawn medallion, and two
+    incense braziers with separate silhouettes.
+    """
+    # Dais and altar table.
+    cube3(f"VIS_altar_{fixture_id}_lower_dais", x, 0.18, z + 0.05, 9.6, 0.36, 5.7, stone, semantic="cathedral_altar_lower_dais")
+    cube3(f"VIS_altar_{fixture_id}_upper_dais", x, 0.48, z + 0.42, 7.45, 0.32, 4.45, trim, semantic="cathedral_altar_upper_dais")
+    cube3(f"VIS_altar_{fixture_id}_table_plinth", x, 0.92, z - 0.16, 4.9, 0.74, 1.7, stone, semantic="cathedral_altar_table")
+    cube3(f"VIS_altar_{fixture_id}_table_top", x, 1.36, z - 0.16, 5.35, 0.24, 2.02, trim, semantic="cathedral_altar_table_top")
+    cube3(f"VIS_altar_{fixture_id}_cloth_front", x, 1.06, z - 1.22, 4.55, 0.96, 0.09, cloth, semantic="cathedral_altar_cloth")
+    cube3(f"VIS_altar_{fixture_id}_cloth_left_fold", x - 2.05, 0.92, z - 1.16, 0.16, 0.78, 0.16, gold, semantic="cathedral_altar_cloth_trim")
+    cube3(f"VIS_altar_{fixture_id}_cloth_right_fold", x + 2.05, 0.92, z - 1.16, 0.16, 0.78, 0.16, gold, semantic="cathedral_altar_cloth_trim")
+    cube3(f"VIS_altar_{fixture_id}_cloth_bottom_trim", x, 0.55, z - 1.17, 4.22, 0.12, 0.12, gold, semantic="cathedral_altar_cloth_trim")
+
+    # Back wall re-table: broad silhouette first, then inset arched panels.
+    cube3(f"VIS_altar_{fixture_id}_retable_backer", x, 4.2, z + 2.35, 10.4, 7.1, 0.38, trim, semantic="cathedral_altar_retable")
+    lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_center_shadow_arch", x, 1.92, z + 2.02, 0.2, 3.05, 5.92, dark, semantic="cathedral_altar_retable_recess")
+    lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_left_shadow_arch", x - 2.55, 2.02, z + 2.04, 0.18, 1.95, 5.18, dark, semantic="cathedral_altar_retable_recess")
+    lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_right_shadow_arch", x + 2.55, 2.02, z + 2.04, 0.18, 1.95, 5.18, dark, semantic="cathedral_altar_retable_recess")
+    lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_center_arch", x, 2.05, z + 1.91, 0.18, 2.55, 5.65, glass_gold, semantic="cathedral_altar_lancet")
+    lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_left_arch", x - 2.55, 2.15, z + 1.94, 0.17, 1.55, 4.92, glass_red, semantic="cathedral_altar_lancet")
+    lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_right_arch", x + 2.55, 2.15, z + 1.94, 0.17, 1.55, 4.92, glass_blue, semantic="cathedral_altar_lancet")
+    cube3(f"VIS_altar_{fixture_id}_retable_left_outer_frame", x - 4.45, 4.12, z + 1.78, 0.18, 5.65, 0.18, gold, semantic="cathedral_altar_retable_frame")
+    cube3(f"VIS_altar_{fixture_id}_retable_right_outer_frame", x + 4.45, 4.12, z + 1.78, 0.18, 5.65, 0.18, gold, semantic="cathedral_altar_retable_frame")
+    cube3(f"VIS_altar_{fixture_id}_retable_left_mullion", x - 1.2, 4.58, z + 1.78, 0.16, 4.46, 0.15, trim, semantic="cathedral_altar_mullion")
+    cube3(f"VIS_altar_{fixture_id}_retable_right_mullion", x + 1.2, 4.58, z + 1.78, 0.16, 4.46, 0.15, trim, semantic="cathedral_altar_mullion")
+    cube3(f"VIS_altar_{fixture_id}_retable_base_rail", x, 1.78, z + 1.74, 9.1, 0.24, 0.18, gold, semantic="cathedral_altar_retable_rail")
+    cube3(f"VIS_altar_{fixture_id}_retable_crown_rail", x, 7.22, z + 1.72, 5.75, 0.28, 0.18, gold, semantic="cathedral_altar_retable_crown")
+    circle_panel_z3(f"VIS_altar_{fixture_id}_dawn_medallion", x, 6.68, z + 1.58, 0.52, gold, semantic="cathedral_dawn_medallion")
+
+    # Incense fixtures are deliberately low and separate from the table so they
+    # can get their own collision and visual QA.
+    for side, label in [(-1, "left"), (1, "right")]:
+        bx = x + side * 3.42
+        cylinder3(f"VIS_altar_{fixture_id}_{label}_incense_stem", bx, 0.82, z - 0.78, 0.13, 1.12, 12, dark, semantic="cathedral_incense_brazier")
+        cone3(f"VIS_altar_{fixture_id}_{label}_incense_bowl", bx, 1.45, z - 0.78, 0.52, 0.34, 0.34, 16, trim, semantic="cathedral_incense_brazier")
+        cylinder3(f"VIS_altar_{fixture_id}_{label}_incense_coal", bx, 1.66, z - 0.78, 0.3, 0.08, 14, glass_red, semantic="cathedral_incense_coal")
+        cone3(f"VIS_altar_{fixture_id}_{label}_smoke_lower", bx + side * 0.04, 2.16, z - 0.76, 0.35, 0.18, 1.05, 12, smoke, rotation_y=side * 0.25, semantic="cathedral_incense_smoke")
+        cone3(f"VIS_altar_{fixture_id}_{label}_smoke_upper", bx - side * 0.08, 2.95, z - 0.7, 0.26, 0.08, 1.2, 12, smoke, rotation_y=-side * 0.2, semantic="cathedral_incense_smoke")
+
+
 def build_level():
     reset_scene()
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -356,6 +428,8 @@ def build_level():
     glass_blue = material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
     glass_red = material("MAT_temple_glass_red", (0.88, 0.13, 0.16, 0.64), roughness=0.28, alpha=0.64, emission=(0.72, 0.06, 0.07, 1), emission_strength=0.18)
     glass_gold = material("MAT_temple_glass_gold", (1.0, 0.68, 0.14, 0.62), roughness=0.32, alpha=0.62, emission=(0.9, 0.42, 0.04, 1), emission_strength=0.18)
+    floor_light_blue = material("MAT_temple_floor_light_cool", (0.55, 0.72, 1.0, 0.18), roughness=0.95, alpha=0.18, emission=(0.22, 0.34, 0.75, 1), emission_strength=0.03)
+    floor_light_gold = material("MAT_temple_floor_light_warm", (1.0, 0.78, 0.38, 0.16), roughness=0.96, alpha=0.16, emission=(0.72, 0.38, 0.06, 1), emission_strength=0.025)
     collision = material("MAT_debug_collision", (0.1, 0.28, 0.95, 0.18), alpha=0.18)
     trigger = material("MAT_debug_trigger", (1.0, 0.72, 0.1, 0.22), alpha=0.22)
 
@@ -392,7 +466,7 @@ def build_level():
                 glass_blue,
                 glass_red,
                 glass_gold,
-                glass_gold if index % 3 == 0 else glass_blue,
+                floor_light_gold if index % 3 == 0 else floor_light_blue,
             )
 
     # Entry doorway and exit trigger.
@@ -404,20 +478,20 @@ def build_level():
     cube3("TRG_exit_north_square", 0, 1.4, -37.15, 4.8, 2.8, 1.4, trigger, kind="trigger", trigger_type="exit", direction="NORTH", target_room="town:square", prompt="Return to Town Square")
 
     # Altar end.
-    cube3("VIS_altar_dais_marble", 0, 0.35, 18.55, 7.2, 0.7, 4.15, trim, semantic="altar_dais")
-    cube3("VIS_altar_table_stone", 0, 1.2, 19.05, 3.8, 1.0, 1.45, limestone, semantic="altar_table")
-    cube3("VIS_altar_cloth_front", 0, 1.26, 19.8, 3.95, 0.74, 0.08, cloth, semantic="altar_cloth")
-    cube3("VIS_altar_retable_base", 0, 4.0, 21.65, 9.4, 6.7, 0.36, trim, semantic="altar_retable")
-    cube3("VIS_altar_retable_shadow", 0, 4.05, 21.42, 7.15, 4.85, 0.18, dark, semantic="altar_retable_recess")
-    cube3("VIS_altar_retable_glass_blue", -2.1, 4.25, 21.25, 1.22, 3.85, 0.13, glass_blue, semantic="altar_stained_glass")
-    cube3("VIS_altar_retable_glass_gold", 0, 4.25, 21.2, 1.22, 3.85, 0.13, glass_gold, semantic="altar_stained_glass")
-    cube3("VIS_altar_retable_glass_red", 2.1, 4.25, 21.25, 1.22, 3.85, 0.13, glass_red, semantic="altar_stained_glass")
-    cube3("VIS_altar_retable_crown", 0, 7.35, 21.33, 4.6, 0.48, 0.18, glass_gold, semantic="altar_dawn_crown")
-    cube3("VIS_altar_side_lancet_west", -5.6, 4.2, 21.42, 1.15, 4.6, 0.18, glass_red, semantic="altar_side_lancet")
-    cube3("VIS_altar_side_lancet_east", 5.6, 4.2, 21.42, 1.15, 4.6, 0.18, glass_blue, semantic="altar_side_lancet")
-    for x in [-3.0, 3.0]:
-        cylinder3(f"VIS_incense_brazier_{'left' if x < 0 else 'right'}", x, 0.72, 18.2, 0.34, 1.12, 12, dark, semantic="incense_brazier")
-        cone3(f"VIS_incense_smoke_{'left' if x < 0 else 'right'}", x, 2.0, 18.2, 0.58, 0.12, 2.1, 12, smoke, semantic="incense_smoke")
+    add_cathedral_altar_incense_fixture(
+        "main",
+        0,
+        18.7,
+        limestone,
+        trim,
+        dark,
+        cloth,
+        glass_gold,
+        glass_blue,
+        glass_red,
+        glass_gold,
+        smoke,
+    )
 
     # Pews and runner.
     cube3("VIS_dawn_runner", 0, 0.018, -8.6, 3.1, 0.04, 43.0, cloth, semantic="center_runner")
