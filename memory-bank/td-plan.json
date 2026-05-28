@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T12:34:14.944Z",
+  "updated": "2026-05-28T12:49:38.379Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1626,6 +1626,28 @@
       "comments": [],
       "created": "2026-05-28T12:27:57Z",
       "updated": "2026-05-28T12:33:47Z"
+    },
+    {
+      "id": "neo-48fd",
+      "project": "NeoMud",
+      "title": "Improve compact player avatar silhouette",
+      "description": "Improve the current compact procedural avatar without returning to a heavy GLB: better hood/face, cloak panels, hands, proportions, and trim. Update visualTreatment, tests, QA review, and run Prop Zoo/smoke/screenshot/server QA.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: improved compact avatar silhouette with hood/face separation, cloak panels, hands, slimmer proportions, and QA-updated v3 visual treatment",
+      "labels": [
+        "avatar",
+        "neomud-three",
+        "qa",
+        "visual"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T12:39:44Z",
+      "updated": "2026-05-28T12:49:28Z"
     }
   ],
   "ready": [

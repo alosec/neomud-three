@@ -33,10 +33,10 @@ High leverage next work:
    - Preserve the current exit readability and 240-call full-smoke budget, or explicitly justify a new budget before raising it.
 
 3a. Continue player avatar production.
-   - The visible player is now a compact instanced low-poly fantasy adventurer proxy. Xbot remains a hidden technical/reference asset, not the rendered character.
+   - The visible player is now a v3 compact low-poly fantasy adventurer proxy with better hood/face separation, hands, cloak panels, and slimmer proportions. Xbot remains a hidden technical/reference asset, not the rendered character.
    - Do not swap to another random example model.
    - Next character work should be an authored or deliberately sourced skinned adventurer GLB with documented license, forward axis, scale, idle/walk/run clips, and fixed QA screenshots.
-   - If a full GLB is not practical yet, improve the instanced proxy only when it clearly helps silhouette/proportions without spending the reclaimed room budget.
+   - If a full GLB is not practical yet, improve the proxy only when it clearly helps silhouette/proportions without spending the reclaimed room budget.
 
 4. Connect NeoMud gameplay surfaces.
    - Clicking/approaching an NPC should open a DOM interaction panel.
@@ -70,7 +70,7 @@ High leverage next work:
    - The Tavern wall/bar composition pass adds instanced bracing, shelves, bottle silhouettes, framed panels, and window/notice shapes; further Tavern work should refine furniture/player/NPC presentation rather than more flat wall dressing.
    - The first plaza warmth pass adds approved Prop Zoo plaza tree/string-lantern pieces, places additional large trees inside the courtyard composition, and keeps the front string-light strand out of the Temple-facing camera.
    - Do not keep solving warmth by adding more loose foliage; the next pass should improve a named landmark or authored gameplay staging.
-   - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k, and the first plaza warmth pass spends only part of that headroom while keeping full smoke at roughly 12.5k triangles.
+   - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k; current Town Square full smoke is roughly 13.1k triangles but 235/240 draw calls, so draw calls are the limiting budget for the next town pass.
    - The Temple window batching pass reclaimed more than 100 full-smoke draw calls, and the altar retable spends part of that headroom while keeping full smoke at 276 calls.
    - Add the next Prop Zoo items only when they unlock that landmark pass: ground decal, stone trim, gate trim, stained-glass/window frame variant, or a better NPC staging prop.
    - Keep Town Square under the current render budget and update fixed screenshots.

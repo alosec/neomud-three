@@ -42,7 +42,7 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v2" : "procedural-adventurer-v1",
+    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v3" : "procedural-adventurer-v1",
     overlay: false,
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
@@ -173,29 +173,43 @@ function makeSkinnedAdventurerOverlay(materials) {
 function makeCompactAdventurerRig(materials) {
   const group = new THREE.Group();
   group.name = "Compact fantasy adventurer rig";
-  group.scale.setScalar(1.44);
+  group.scale.setScalar(1.42);
 
   const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const tunicMesh = new THREE.InstancedMesh(boxGeometry, materials.tunic, 3);
   const leatherMesh = new THREE.InstancedMesh(boxGeometry, materials.darkLeather, 10);
   const cloakMesh = new THREE.InstancedMesh(boxGeometry, materials.cloak, 4);
-  const skinMesh = new THREE.InstancedMesh(boxGeometry, materials.skin, 1);
+  const skinMesh = new THREE.InstancedMesh(boxGeometry, materials.skin, 2);
   const hairMesh = new THREE.InstancedMesh(boxGeometry, materials.hair, 2);
   const goldMesh = new THREE.InstancedMesh(boxGeometry, materials.gold, 4);
+  const face = new THREE.Mesh(new THREE.SphereGeometry(0.19, 14, 10), materials.skin);
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.27, 14, 10, 0, Math.PI * 2, 0, Math.PI * 0.68), materials.cloak);
   const gem = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 8), materials.gem);
-  gem.castShadow = true;
+  const cloakPanels = new THREE.Group();
+  cloakPanels.name = "Compact adventurer cloak panels";
+  cloakPanels.position.set(0, 1.32, 0.28);
+  const leftPanel = makeCloakPanel(materials.cloak, -1);
+  const rightPanel = makeCloakPanel(materials.cloak, 1);
+  leftPanel.scale.set(0.82, 0.8, 1);
+  rightPanel.scale.set(0.82, 0.8, 1);
+  cloakPanels.add(leftPanel, rightPanel);
 
   for (const mesh of [tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh]) {
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     group.add(mesh);
   }
-  group.add(gem);
+  for (const mesh of [face, hood, gem]) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  group.add(cloakPanels);
 
   return {
     compact: true,
     group,
-    meshes: { tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh, gem },
+    meshes: { tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh, face, hood, gem, cloakPanels },
     dummy: new THREE.Object3D()
   };
 }
@@ -498,7 +512,7 @@ function animateProceduralAvatar(state, frame) {
 function animateCompactAdventurer(state, frame) {
   const { dt, speed, walkClock, grounded, verticalVelocity, strafeInput, turnInput } = frame;
   const rig = state.fallbackRig;
-  const { tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh, gem } = rig.meshes;
+  const { tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh, face, hood, gem, cloakPanels } = rig.meshes;
   const runAmount = THREE.MathUtils.clamp((speed - 4.8) / 3.3, 0, 1);
   const moveAmount = THREE.MathUtils.clamp(speed / 5.4, 0, 1);
   const airborne = grounded ? 0 : 1;
@@ -514,35 +528,44 @@ function animateCompactAdventurer(state, frame) {
   rig.group.rotation.x = damp(rig.group.rotation.x, grounded ? -0.04 * moveAmount : 0.08, 14, dt);
   rig.group.rotation.z = damp(rig.group.rotation.z, -strafeInput * 0.055 - turnInput * 0.04, 14, dt);
 
-  setInstanceBox(rig, tunicMesh, 0, 0, 1.26, -0.02, 0.68, 0.78, 0.42, 0, -stride * 0.04 * moveAmount, 0);
-  setInstanceBox(rig, tunicMesh, 1, 0, 0.82, -0.08, 0.46, 0.7, 0.36, -0.04, 0, 0);
-  setInstanceBox(rig, tunicMesh, 2, 0, 1.02, -0.34, 0.42, 0.7, 0.08, -0.06, 0, 0);
+  setInstanceBox(rig, tunicMesh, 0, 0, 1.27, -0.02, 0.58, 0.8, 0.38, -0.02, -stride * 0.04 * moveAmount, 0);
+  setInstanceBox(rig, tunicMesh, 1, 0, 0.82, -0.08, 0.42, 0.68, 0.34, -0.04, 0, 0);
+  setInstanceBox(rig, tunicMesh, 2, 0, 1.03, -0.32, 0.34, 0.72, 0.07, -0.06, 0, 0);
 
-  setInstanceBox(rig, skinMesh, 0, 0, 1.88, -0.06, 0.3, 0.38, 0.28, 0, -stride * 0.035 * moveAmount, 0);
-  setInstanceBox(rig, hairMesh, 0, 0, 2.06, -0.08, 0.34, 0.16, 0.3, -0.12, 0, 0);
-  setInstanceBox(rig, hairMesh, 1, 0, 1.9, 0.08, 0.34, 0.34, 0.12, 0.08, 0, 0);
+  face.position.set(0, 1.86, -0.11);
+  face.rotation.set(-0.04, -stride * 0.035 * moveAmount, 0);
+  face.scale.set(0.86, 1.04, 0.84);
+  hood.position.set(0, 1.97, -0.02);
+  hood.rotation.set(-0.1, -stride * 0.035 * moveAmount, 0);
+  hood.scale.set(1.06, 0.76, 0.94);
+  setInstanceBox(rig, skinMesh, 0, -0.5, 0.88, -0.08, 0.12, 0.16, 0.12, -stride * armSize + airborne * 0.18, 0, 0.12);
+  setInstanceBox(rig, skinMesh, 1, 0.5, 0.88, -0.08, 0.12, 0.16, 0.12, stride * armSize + airborne * 0.18, 0, -0.16);
+  setInstanceBox(rig, hairMesh, 0, 0, 2.08, 0.05, 0.38, 0.1, 0.28, -0.1, 0, 0);
+  setInstanceBox(rig, hairMesh, 1, 0, 1.83, 0.14, 0.3, 0.38, 0.08, 0.08, 0, 0);
 
-  setInstanceBox(rig, cloakMesh, 0, -0.2, 1.13, 0.26, 0.34, 1.28, 0.08, -0.12 - moveAmount * 0.1, 0.03, -0.05);
-  setInstanceBox(rig, cloakMesh, 1, 0.2, 1.13, 0.26, 0.34, 1.28, 0.08, -0.12 - moveAmount * 0.1, -0.03, 0.05);
-  setInstanceBox(rig, cloakMesh, 2, 0, 1.6, 0.12, 0.84, 0.16, 0.38, -0.06, 0, 0);
-  setInstanceBox(rig, cloakMesh, 3, 0, 1.95, 0.04, 0.42, 0.3, 0.32, -0.05, 0, 0);
+  setInstanceBox(rig, cloakMesh, 0, -0.24, 1.17, 0.24, 0.22, 1.12, 0.08, -0.12 - moveAmount * 0.1, 0.03, -0.1);
+  setInstanceBox(rig, cloakMesh, 1, 0.24, 1.17, 0.24, 0.22, 1.12, 0.08, -0.12 - moveAmount * 0.1, -0.03, 0.1);
+  setInstanceBox(rig, cloakMesh, 2, 0, 1.6, 0.12, 0.78, 0.16, 0.34, -0.06, 0, 0);
+  setInstanceBox(rig, cloakMesh, 3, 0, 1.95, 0.04, 0.36, 0.24, 0.28, -0.05, 0, 0);
 
-  setInstanceBox(rig, leatherMesh, 0, -0.48, 1.2, -0.02, 0.16, 0.72, 0.16, -stride * armSize + airborne * 0.18, 0, 0.12);
-  setInstanceBox(rig, leatherMesh, 1, 0.48, 1.2, -0.02, 0.16, 0.72, 0.16, stride * armSize + airborne * 0.18, 0, -0.16);
-  setInstanceBox(rig, leatherMesh, 2, -0.18, 0.43, 0, 0.19, 0.86, 0.2, stride * strideSize - airborne * 0.22, 0, -0.02);
-  setInstanceBox(rig, leatherMesh, 3, 0.18, 0.43, 0, 0.19, 0.86, 0.2, counterStride * strideSize - airborne * 0.22, 0, 0.02);
+  setInstanceBox(rig, leatherMesh, 0, -0.44, 1.22, -0.02, 0.13, 0.68, 0.14, -stride * armSize + airborne * 0.18, 0, 0.12);
+  setInstanceBox(rig, leatherMesh, 1, 0.44, 1.22, -0.02, 0.13, 0.68, 0.14, stride * armSize + airborne * 0.18, 0, -0.16);
+  setInstanceBox(rig, leatherMesh, 2, -0.16, 0.43, 0, 0.16, 0.86, 0.18, stride * strideSize - airborne * 0.22, 0, -0.02);
+  setInstanceBox(rig, leatherMesh, 3, 0.16, 0.43, 0, 0.16, 0.86, 0.18, counterStride * strideSize - airborne * 0.22, 0, 0.02);
   setInstanceBox(rig, leatherMesh, 4, -0.18, 0.08, -0.12, 0.26, 0.16, 0.36, 0.08, 0, 0);
   setInstanceBox(rig, leatherMesh, 5, 0.18, 0.08, -0.12, 0.26, 0.16, 0.36, 0.08, 0, 0);
   setInstanceBox(rig, leatherMesh, 6, 0, 1.0, -0.04, 0.82, 0.12, 0.46, 0, 0, 0);
-  setInstanceBox(rig, leatherMesh, 7, -0.48, 0.86, 0.08, 0.28, 0.34, 0.12, 0, 0, 0.16);
+  setInstanceBox(rig, leatherMesh, 7, -0.44, 0.88, 0.09, 0.28, 0.32, 0.12, 0, 0, 0.16);
   setInstanceBox(rig, leatherMesh, 8, 0.56, 1.12, -0.2, 0.06, 1.7, 0.06, -stride * 0.12 * moveAmount, 0, -0.2 - runAmount * 0.08);
   setInstanceBox(rig, leatherMesh, 9, 0.56, 1.93, -0.2, 0.08, 0.12, 0.08, 0, 0, 0);
 
-  setInstanceBox(rig, goldMesh, 0, 0, 1.02, -0.3, 0.16, 0.16, 0.04, 0, 0, 0);
-  setInstanceBox(rig, goldMesh, 1, 0, 1.42, -0.28, 0.4, 0.06, 0.04, 0, 0, 0);
-  setInstanceBox(rig, goldMesh, 2, 0, 1.55, 0.34, 0.5, 0.055, 0.035, -0.05, 0, 0);
-  setInstanceBox(rig, goldMesh, 3, 0, 1.1, 0.35, 0.055, 0.82, 0.035, -0.08, 0, 0);
+  setInstanceBox(rig, goldMesh, 0, 0, 1.02, -0.28, 0.15, 0.16, 0.04, 0, 0, 0);
+  setInstanceBox(rig, goldMesh, 1, 0, 1.42, -0.26, 0.36, 0.055, 0.04, 0, 0, 0);
+  setInstanceBox(rig, goldMesh, 2, 0, 1.55, 0.34, 0.42, 0.055, 0.035, -0.05, 0, 0);
+  setInstanceBox(rig, goldMesh, 3, 0, 1.05, 0.36, 0.048, 0.84, 0.035, -0.08, 0, 0);
   gem.position.set(0.56, 2.05, -0.2);
+  cloakPanels.rotation.x = -0.12 - moveAmount * 0.14 + Math.max(0, verticalVelocity) * 0.012;
+  cloakPanels.rotation.z = Math.sin(clock * 0.65) * 0.035 * moveAmount;
 
   for (const mesh of [tunicMesh, leatherMesh, cloakMesh, skinMesh, hairMesh, goldMesh]) {
     mesh.instanceMatrix.needsUpdate = true;

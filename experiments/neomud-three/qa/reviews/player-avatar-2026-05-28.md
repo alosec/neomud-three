@@ -37,3 +37,19 @@ Visual delta: stopped rendering the high-poly Xbot example mesh by default. Adde
 QA delta: the visible avatar change reduces triangle pressure across the authored slice while preserving run activation, stable grounded Y, jumping, and server-backed room traversal.
 
 Remaining visual gap: this is a necessary performance/consistency correction, not the final character solution. The next character step should be either an authored lower-cost skinned adventurer GLB or a higher-quality instanced/procedural character with better proportions and readable front-facing detail.
+
+## Score After Proxy v3 Silhouette Pass
+
+- Animation continuity: 1/2. The visible player still uses procedural limb motion while Xbot remains loaded only as a hidden reference asset. Offline smoke still validates run activation, stable grounded Y, and jumping.
+- Silhouette: 1/2. The face/hood separation, visible hands, slimmer body, and split cloak panels are clearer in Prop Zoo and Town Square screenshots. The model still reads as a low-poly placeholder rather than final character art.
+- Art direction match: 1/2. The v3 proxy fits the stylized diorama better than the soldier/example rig, but it still needs either an authored GLB or a more intentional character design pass.
+- Performance: 2/2. Latest offline smoke reports Temple 280 calls / 34,862 triangles, Town Square 235 calls / 13,084 triangles, and Tavern 106 calls / 6,728 triangles. Town Square remains within budget but draw calls are now tight.
+- QA coverage: 2/2. Offline smoke, Prop Zoo lab QA, authored-room screenshots, Town Square screenshot anchors, and server-backed movement now assert `visualTreatment: procedural-adventurer-proxy-v3` / `proxy: true` and pass.
+
+Total: 7/10
+
+Visual delta: replaced the cube-like head treatment with separate face and hood meshes, added visible hands, split the cloak into animated side panels, and slimmed the torso/limbs so the avatar reads less like a block pawn from the rear camera.
+
+QA delta: the proxy v3 pass preserved the no-bob movement baseline and passed offline, lab, screenshot-anchor, and server-backed traversal tests. The current next constraint is Town Square draw-call headroom, not avatar triangle cost.
+
+Remaining visual gap: this is still a proxy. Further visual upgrades should either source/author a real adventurer GLB with compatible animation clips or be very selective proxy improvements that do not push Town Square over the 240-call full-smoke budget.
