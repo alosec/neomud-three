@@ -6180,13 +6180,34 @@ function configureBlenderTempleScene(scene) {
             material.emissiveIntensity = Math.max(material.emissiveIntensity ?? 0, 0.24);
           }
         }
-        if (object.name.includes("_glass_") || object.name.includes("_light_band_")) {
+        if (object.name.includes("_glass_") || object.name.includes("_light_band_") || object.name.includes("_floor_light_")) {
           material.transparent = true;
           material.depthWrite = false;
         }
       }
     }
   });
+
+  const ambientFill = new THREE.HemisphereLight(0xffe2bd, 0x2d231b, 0.44);
+  ambientFill.name = "temple-runtime-warm-ambient-fill";
+  scene.add(ambientFill);
+
+  const altarLight = new THREE.PointLight(0xffba6f, 2.45, 24.0);
+  altarLight.name = "temple-runtime-altar-warm-light";
+  altarLight.position.set(0, 4.35, 16.2);
+  scene.add(altarLight);
+
+  const naveFill = new THREE.PointLight(0xb8d4ff, 0.82, 23.0);
+  naveFill.name = "temple-runtime-entry-cool-fill";
+  naveFill.position.set(0, 4.0, -24.0);
+  scene.add(naveFill);
+
+  for (const [side, name] of [[-1, "west"], [1, "east"]]) {
+    const windowLight = new THREE.PointLight(0x8fb8ff, 0.48, 15.5);
+    windowLight.name = `temple-runtime-${name}-window-cool-light`;
+    windowLight.position.set(side * 10.8, 4.8, -9.0);
+    scene.add(windowLight);
+  }
 }
 
 function configureBlenderTavernScene(scene, flameMeshes = []) {
