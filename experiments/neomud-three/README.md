@@ -14,7 +14,7 @@ It currently:
 - Shows a compact player HUD with HP and movement mode.
 - Adds simple authored collision volumes for the Temple altar/dais, Town Square fountain/dressing, and Tavern tables/bar/fireplace.
 - Uses transparent generated stained glass inside a physical window component.
-- Uses a vendored Three.js/Xbot GLTF player rig with `idle`, `walk`, and `run` clips through `AnimationMixer`; this is animation placeholder art, not the accepted player character direction.
+- Uses a vendored Three.js/Xbot GLTF player rig with `idle`, `walk`, and `run` clips through `AnimationMixer`, plus a lightweight fantasy-adventurer overlay for cloak, cowl, satchel, staff, and trim. This is a better prototype avatar, not the final authored character model.
 
 Art direction rules live in `ART_DIRECTION.md`.
 The graphics production rules live in `../../memory-bank/graphics-production-contract.md`.

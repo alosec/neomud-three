@@ -6,7 +6,8 @@ https://threejs.org/examples/models/gltf/Xbot.glb
 
 It is the active technical player rig because it provides a Mixamo-style skinned
 humanoid with `idle`, `walk`, and `run` animation clips. The current material
-styling pushes it toward a fantasy-adventurer placeholder, but this should be
+styling and `xbot-adventurer-overlay-v1` add a cloak/cowl/satchel/staff
+silhouette so it reads less like a bare example mesh, but this should still be
 replaced with a proper authored NeoMud character model.
 
 `Soldier.glb` was briefly used from the official Three.js example assets:

@@ -32,7 +32,8 @@ export function makePlayerAvatar() {
     actions: {},
     activeAction: null,
     activeName: "Loading",
-    model: null
+    model: null,
+    skinnedOverlay: null
   };
 
   root.userData.avatarInfo = () => ({
@@ -40,11 +41,13 @@ export function makePlayerAvatar() {
     loadFailed: state.loadFailed,
     activeAnimation: state.activeName,
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer-fallback",
+    visualTreatment: state.loaded ? "xbot-adventurer-overlay-v1" : "procedural-adventurer-v1",
+    overlay: Boolean(state.skinnedOverlay),
     error: state.loadError
   });
   root.userData.animate = (frame) => animateAvatar(state, frame);
 
-  loadSkinnedHero(state);
+  loadSkinnedHero(state, materials);
   return root;
 }
 
@@ -64,7 +67,7 @@ function makeMaterials() {
   };
 }
 
-async function loadSkinnedHero(state) {
+async function loadSkinnedHero(state, materials) {
   try {
     const gltf = await new GLTFLoader().loadAsync(PLAYER_MODEL_URL);
     const model = gltf.scene;
@@ -81,6 +84,8 @@ async function loadSkinnedHero(state) {
     });
 
     state.visualRoot.add(model);
+    state.skinnedOverlay = makeSkinnedAdventurerOverlay(materials);
+    state.visualRoot.add(state.skinnedOverlay);
     state.fallbackRig.group.visible = false;
     state.model = model;
     state.mixer = new THREE.AnimationMixer(model);
@@ -100,6 +105,102 @@ async function loadSkinnedHero(state) {
     state.activeName = "Idle";
     console.warn(`Player GLTF failed to load; using fallback avatar: ${state.loadError}`);
   }
+}
+
+function makeSkinnedAdventurerOverlay(materials) {
+  const group = new THREE.Group();
+  group.name = "Xbot fantasy adventurer overlay";
+
+  const cape = new THREE.Group();
+  cape.name = "Adventurer cloak";
+  cape.position.set(0, 1.45, 0.34);
+  group.add(cape);
+  const leftCape = makeCloakPanel(materials.cloak, -1);
+  const rightCape = makeCloakPanel(materials.cloak, 1);
+  leftCape.scale.set(0.74, 0.92, 1);
+  rightCape.scale.set(0.74, 0.92, 1);
+  cape.add(leftCape, rightCape);
+
+  const tabard = makeTabardPanel(materials.tunic);
+  tabard.position.set(0, 1.24, -0.32);
+  tabard.scale.set(0.86, 0.86, 1);
+  group.add(tabard);
+
+  addOverlayBoxBatch(group, materials.gold, [
+    { x: 0, y: 1.03, z: 0.3, width: 0.18, height: 0.16, depth: 0.055 },
+    { x: -0.46, y: 1.04, z: 0.085, width: 0.12, height: 0.05, depth: 0.03 }
+  ], "adventurer-gold-trim");
+  addOverlayBoxBatch(group, materials.gem, [
+    { x: 0, y: 1.28, z: 0.39, width: 0.12, height: 0.16, depth: 0.04 }
+  ], "adventurer-gem-trim");
+  addOverlayBoxBatch(group, materials.darkLeather, [
+    { x: 0, y: 1.02, z: -0.03, width: 0.82, height: 0.14, depth: 0.48, rotationX: -0.03 },
+    { x: 0.5, y: 1.22, z: -0.18, width: 0.052, height: 1.55, depth: 0.052, rotationZ: -0.16 }
+  ], "adventurer-leather-gear");
+  addOverlayBoxBatch(group, materials.steel, [
+    { x: -0.48, y: 1.48, z: -0.03, width: 0.3, height: 0.14, depth: 0.26 },
+    { x: 0.48, y: 1.48, z: -0.03, width: 0.3, height: 0.14, depth: 0.26 }
+  ], "adventurer-shoulders");
+
+
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.62), materials.cloak);
+  hood.name = "Adventurer hood";
+  hood.position.set(0, 1.95, -0.01);
+  hood.rotation.x = -0.12;
+  hood.scale.set(1.08, 0.78, 1.02);
+  hood.castShadow = true;
+  group.add(hood);
+  addOverlayBoxBatch(group, materials.cloak, [
+    { x: 0, y: 1.6, z: 0.02, width: 0.98, height: 0.16, depth: 0.42 },
+    { x: 0, y: 1.47, z: 0.22, width: 0.84, height: 0.12, depth: 0.24, rotationX: -0.08 }
+  ], "adventurer-shoulder-cowl");
+
+  const satchel = new THREE.Group();
+  satchel.name = "Adventurer satchel";
+  satchel.position.set(-0.46, 0.96, 0.16);
+  satchel.rotation.z = 0.18;
+  group.add(satchel);
+  addBox(satchel, materials.leather, 0, 0, 0, 0.28, 0.34, 0.12);
+
+  const orb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 18, 12), materials.gem);
+  orb.position.set(0.5, 2.02, -0.18);
+  orb.castShadow = true;
+  group.add(orb);
+
+  return group;
+}
+
+function addOverlayBoxBatch(root, material, boxes, name) {
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, boxes.length);
+  const dummy = new THREE.Object3D();
+  for (const [index, box] of boxes.entries()) {
+    dummy.position.set(box.x, box.y, box.z);
+    dummy.rotation.set(box.rotationX ?? 0, box.rotationY ?? 0, box.rotationZ ?? 0);
+    dummy.scale.set(box.width, box.height, box.depth);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(index, dummy.matrix);
+  }
+  mesh.name = name;
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  root.add(mesh);
+  return mesh;
+}
+
+function makeTabardPanel(material) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-0.34, 0.38);
+  shape.lineTo(0.34, 0.38);
+  shape.lineTo(0.25, -0.58);
+  shape.lineTo(0, -0.74);
+  shape.lineTo(-0.25, -0.58);
+  shape.lineTo(-0.34, 0.38);
+
+  const panel = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
+  panel.name = "Adventurer tabard";
+  panel.castShadow = true;
+  panel.receiveShadow = true;
+  return panel;
 }
 
 function styleSkinnedModel(model) {

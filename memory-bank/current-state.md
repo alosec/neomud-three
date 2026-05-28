@@ -18,7 +18,7 @@ Playable Three.js lab:
 - `?offline=1` disables the server path and uses the static room graph fallback.
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
-- The player avatar uses a vendored Three.js/Xbot GLTF skinned humanoid rig with `idle`, `walk`, and `run` clips driven by `AnimationMixer`. This is an animation placeholder, not accepted player art. The earlier official Three.js `Soldier.glb` probe was rejected because it read as military, and the next character pass needs the graphics production contract instead of another random example model swap.
+- The player avatar uses a vendored Three.js/Xbot GLTF skinned humanoid rig with `idle`, `walk`, and `run` clips driven by `AnimationMixer`. It now has `xbot-adventurer-overlay-v1`: a lightweight cloak/cowl/satchel/staff/trim overlay that improves the fantasy silhouette while preserving the skinned walk/run clips. This is a better prototype avatar, not final accepted player art. The earlier official Three.js `Soldier.glb` probe was rejected because it read as military, and the next character pass still needs the graphics production contract instead of another random example model swap.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
 - Generated/approved material usage now flows through explicit material IDs and metadata in `render-assets.js` rather than undocumented texture calls. The first material lab is at `material-lab.html`.
 - The first reusable TownKit prop set is staged in `prop-zoo.html` with the player avatar as a scale reference.
@@ -82,7 +82,7 @@ Known rough edges:
 - Collision is clamp/trigger based, not mesh or navmesh based.
 - The window alpha asset is useful, but the cathedral window component still needs better proportions, trim, and lighting direction.
 - Town Square still needs a disciplined art-direction pass: the latest pass fixed the missing south Temple landmark, but the scene remains blockout-quality. Landmark forms need authored proportions, stronger material/style rules, richer side-specific detail, and NPC/dialogue staging that looks less like sprite standees.
-- Player character art is explicitly unresolved. Xbot proves the animation/movement architecture but fails the desired fantasy identity and visual quality bar.
+- Player character art is still unresolved for final quality. Xbot plus the adventurer overlay proves the animation/movement architecture and reads more fantasy than before, but it is still not a proper authored NeoMud skinned character.
 - HTML-in-Canvas is not integrated into gameplay yet. The current lab uses normal DOM overlays plus Three.js.
 - Inventory catalog data and starter inventory are read from server messages, but combat, interaction prompts, dialogue, and multiplayer presence are not yet expressed as convincing in-world 3D affordances.
 
@@ -100,12 +100,12 @@ Test status:
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
 - Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest offline smoke reports Temple 346 calls / 82,046 triangles / 7 textures / 286 geometries; Town Square 219 calls / 58,746 triangles / 19 textures / 144 geometries; Tavern 91 calls / 53,816 triangles / 22 textures / 48 geometries.
-- Latest server-backed QA reports Temple 346 calls / 82,046 triangles / 7 textures / 286 geometries; Town Square 219 calls / 58,746 triangles / 19 textures / 144 geometries; Tavern 91 calls / 53,816 triangles / 21 textures / 48 geometries.
-- Latest Town Square screenshot-anchor QA reports 125 calls / 54,834 triangles / 20 textures / 188 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest authored-room screenshot QA reports Temple 318 calls / 80,472 triangles / 7 textures / 286 geometries; Town Square 211 calls / 58,670 triangles / 19 textures / 144 geometries; Tavern 91 calls / 53,816 triangles / 21 textures / 48 geometries, with no console errors or failed requests.
+- Latest offline smoke reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 102 calls / 54,893 triangles / 22 textures / 59 geometries.
+- Latest server-backed QA reports Temple 357 calls / 83,123 triangles / 7 textures / 297 geometries; Town Square 230 calls / 59,823 triangles / 19 textures / 155 geometries; Tavern 102 calls / 54,893 triangles / 21 textures / 59 geometries.
+- Latest Town Square screenshot-anchor QA reports 136 calls / 55,911 triangles / 20 textures / 199 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest authored-room screenshot QA reports Temple 329 calls / 81,549 triangles / 7 textures / 297 geometries; Town Square 222 calls / 59,747 triangles / 19 textures / 155 geometries; Tavern 102 calls / 54,893 triangles / 21 textures / 59 geometries, with no console errors or failed requests.
 - Latest Material Lab QA reports 195 draw calls, 6,094 triangles, 49 textures, 76 geometries, no console errors, no failed requests, and a passing budget report.
-- Latest Prop Zoo QA reports 196 draw calls, 52,041 triangles, 36 textures, 162 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest Prop Zoo QA reports 207 draw calls, 53,118 triangles, 36 textures, 173 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.
 - Browser QA scripts write screenshots into ignored `experiments/neomud-three/qa/latest/`.
 - Manual Canary QA is currently pointed at `http://127.0.0.1:4183/experiments/neomud-three/`.

@@ -30,6 +30,12 @@ High leverage next work:
    - Expand the current low-poly tree into a fuller approved foliage kit from Prop Zoo.
    - Preserve the current exit readability and 240-call full-smoke budget, or explicitly justify a new budget before raising it.
 
+3a. Continue player avatar production.
+   - The current Xbot rig now has a fantasy overlay and should remain as the technical animation bridge.
+   - Do not swap to another random example model.
+   - Next character work should be an authored or deliberately sourced skinned adventurer GLB with documented license, forward axis, scale, idle/walk/run clips, and fixed QA screenshots.
+   - If a full GLB is not practical yet, improve the overlay only when it clearly helps silhouette without breaking the room budgets.
+
 4. Connect NeoMud gameplay surfaces.
    - Clicking/approaching an NPC should open a DOM interaction panel.
    - Exits should show in-world affordances plus the current UI buttons.
