@@ -592,9 +592,22 @@ function addTownSpecSurfaces(root, materials, spec) {
   for (const path of spec.surfaces.paths) {
     addSurfaceRect(root, material(materials, path.material), path);
   }
+  for (const plaza of spec.surfaces.plazas ?? []) {
+    addSurfaceRect(root, material(materials, plaza.material), plaza);
+    addSurfaceFrame(root, materials.pathEdge, plaza);
+  }
   for (const curb of spec.surfaces.curbs) {
     addBox(root, materials.darkStone, curb.x, curb.height / 2, curb.z, curb.width, curb.height, curb.depth);
   }
+}
+
+function addSurfaceFrame(root, material, surface) {
+  const y = (surface.y ?? 0.03) + 0.022;
+  const thickness = 0.12;
+  addBox(root, material, surface.x, y, surface.z - surface.depth / 2, surface.width, 0.045, thickness, { castShadow: false });
+  addBox(root, material, surface.x, y, surface.z + surface.depth / 2, surface.width, 0.045, thickness, { castShadow: false });
+  addBox(root, material, surface.x - surface.width / 2, y, surface.z, thickness, 0.045, surface.depth, { castShadow: false });
+  addBox(root, material, surface.x + surface.width / 2, y, surface.z, thickness, 0.045, surface.depth, { castShadow: false });
 }
 
 function addTownSpecFountain(root, materials, fountainSpec) {

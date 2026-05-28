@@ -84,3 +84,18 @@ Total: 11/12
 Visual delta: removed always-on NPC nameboards, moved/reduced the central signpost, removed duplicate market/tavern building labels, and added simple staging props around Guildmaster Aldric and Old Wren.
 
 Remaining visual gap: label clutter is reduced, but the plaza still needs stronger art direction: more convincing ground/road value hierarchy, better facade detail, and less billboard-like character presentation.
+
+## Score After Material Hierarchy Pass
+
+- Navigation readability: 2/2. The central plaza, road network, threshold stoops, and landmark boards still make exits readable.
+- Scale believability: 1/2. Paved plaza/stoops help the room read as designed space, but buildings and sprites remain prototype-grade.
+- Semantic match: 2/2. Town Square now has clearer civic plaza structure around the fountain, with roads and named thresholds.
+- Interaction clarity: 2/2. Entity proximity prompts and physical exit triggers still pass.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Temple and server NPC entity checks still pass.
+- Performance: 2/2. Latest headed Town Square drive reports 145 draw calls and 54,576 triangles.
+
+Total: 11/12
+
+Material delta: added deterministic procedural packed-dirt, gravel-road, and plaza-paver materials; added explicit fountain plaza and landmark stoop surfaces; added shallow paver borders to separate foreground plaza, route network, and building thresholds.
+
+Remaining visual gap: surface hierarchy is clearer, but the palette is still too yellow/tan overall and the scene still needs stronger facade/roof art direction.

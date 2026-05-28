@@ -29,6 +29,13 @@ export const TOWN_SQUARE_SPEC = {
       { id: "gate-approach", material: "road", x: 0, z: -15.0, width: 8.2, depth: 12.4 },
       { id: "temple-approach", material: "road", x: 0, z: 16.2, width: 9.0, depth: 9.8 }
     ],
+    plazas: [
+      { id: "fountain-plaza", material: "plazaStone", x: 0, z: 0, y: 0.03, width: 12.8, depth: 12.8 },
+      { id: "tavern-stoop", material: "plazaStone", x: -17.1, z: 0, y: 0.034, width: 4.1, depth: 6.8 },
+      { id: "market-stoop", material: "plazaStone", x: 17.0, z: -1.2, y: 0.034, width: 4.2, depth: 7.4 },
+      { id: "gate-stoop", material: "plazaStone", x: 0, z: -18.9, y: 0.034, width: 7.8, depth: 3.8 },
+      { id: "temple-stoop", material: "plazaStone", x: 0, z: 18.8, y: 0.034, width: 8.8, depth: 3.1 }
+    ],
     curbs: [
       { x: 0, z: -22.3, width: 46, height: 0.16, depth: 0.32 },
       { x: 0, z: 22.3, width: 46, height: 0.16, depth: 0.32 },

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T06:41:25.748Z",
+  "updated": "2026-05-28T06:55:23.192Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -278,10 +278,15 @@
           "id": 35,
           "body": "Town Square readability now depends less on floating labels: NPC labels are proximity/panel driven, signpost is out of central view, and NPCs have local staging. Still needs material/ground/facade art-direction work.",
           "created": "2026-05-28T06:41:06Z"
+        },
+        {
+          "id": 37,
+          "body": "Material hierarchy pass separated field, roads, plaza, and thresholds. Next Town Square work should reduce the yellow/tan palette and improve facade/roof silhouettes.",
+          "created": "2026-05-28T06:55:03Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T06:41:06Z"
+      "updated": "2026-05-28T06:55:03Z"
     },
     {
       "id": "neo-1fb2.9",
@@ -646,6 +651,29 @@
       ],
       "created": "2026-05-28T06:40:51Z",
       "updated": "2026-05-28T06:41:06Z"
+    },
+    {
+      "id": "neo-1fb2.22",
+      "project": "NeoMud",
+      "title": "Improve Town Square material hierarchy",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 36,
+          "body": "Implemented deterministic procedural town surface materials, explicit plaza/stoop surfaces with borders, and verified offline/server/headed QA. Visual hierarchy is clearer, but palette remains too yellow and facades still need art-direction work.",
+          "created": "2026-05-28T06:55:03Z"
+        }
+      ],
+      "created": "2026-05-28T06:54:40Z",
+      "updated": "2026-05-28T06:55:03Z"
     }
   ],
   "ready": [
