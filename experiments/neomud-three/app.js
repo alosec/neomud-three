@@ -705,22 +705,62 @@ function characterPanel() {
 }
 
 function inventoryPanel() {
-  const equipped = new Set(Object.values(playerProfile.equipment));
-  const items = playerProfile.inventoryIds
-    .map((itemId) => world.catalogs.itemsById.get(itemId))
-    .filter(Boolean);
+  const entries = inventoryEntries();
+  const coins = serverState.coins ?? playerProfile.coins ?? null;
+  const equippedCount = entries.filter((entry) => entry.equipped).length;
 
   return htmlFragment(`
+    <div class="stat-grid">
+      <div class="stat"><strong>${entries.length}</strong><span>Stacks</span></div>
+      <div class="stat"><strong>${equippedCount}</strong><span>Equipped</span></div>
+      <div class="stat"><strong>${escapeHtml(formatCoins(coins))}</strong><span>Coins</span></div>
+    </div>
     <div class="list">
-      ${items.map((item) => `
+      ${entries.map(({ item, quantity, equipped, slot }) => `
         <div class="list-card">
-          <small>${equipped.has(item.id) ? "equipped" : item.type}</small>
+          <small>${escapeHtml(equipped ? `equipped ${slot || ""}`.trim() : item.type ?? "item")}${quantity > 1 ? ` / x${quantity}` : ""}</small>
           <strong>${escapeHtml(item.name)}</strong>
           <span class="muted">${escapeHtml(item.description)}</span>
         </div>
       `).join("")}
     </div>
   `);
+}
+
+function inventoryEntries() {
+  if (serverState.inventory.length) {
+    return serverState.inventory
+      .map((entry) => {
+        const itemId = entry.itemId ?? entry.id;
+        const item = world.catalogs.itemsById.get(itemId) ?? { id: itemId, name: itemId, description: "", type: "item" };
+        const equippedSlot = entry.slot || equippedSlotFor(itemId);
+        return {
+          item,
+          quantity: entry.quantity ?? 1,
+          equipped: Boolean(entry.equipped || equippedSlot),
+          slot: equippedSlot
+        };
+      })
+      .filter((entry) => entry.item?.id);
+  }
+
+  const equipped = new Set(Object.values(playerProfile.equipment));
+  return playerProfile.inventoryIds
+    .map((itemId) => {
+      const item = world.catalogs.itemsById.get(itemId);
+      if (!item) return null;
+      return {
+        item,
+        quantity: 1,
+        equipped: equipped.has(item.id),
+        slot: equippedSlotFor(item.id, playerProfile.equipment)
+      };
+    })
+    .filter(Boolean);
+}
+
+function equippedSlotFor(itemId, equipment = serverState.equipment) {
+  return Object.entries(equipment ?? {}).find(([, equippedItemId]) => equippedItemId === itemId)?.[0] ?? "";
 }
 
 function spellsPanel() {
@@ -814,6 +854,21 @@ function interactionPanel() {
 function serverActionLabel(entity) {
   if (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS") return "Pick up";
   return "Use";
+}
+
+function formatCoins(coins = null) {
+  if (!coins) return "0c";
+  const parts = [];
+  if ((coins.platinum ?? 0) > 0) parts.push(`${coins.platinum}p`);
+  if ((coins.gold ?? 0) > 0) parts.push(`${coins.gold}g`);
+  if ((coins.silver ?? 0) > 0) parts.push(`${coins.silver}s`);
+  if ((coins.copper ?? 0) > 0 || !parts.length) parts.push(`${coins.copper ?? 0}c`);
+  return parts.join(" ");
+}
+
+function coinTotal(coins = null) {
+  if (!coins) return 0;
+  return (coins.copper ?? 0) + (coins.silver ?? 0) * 100 + (coins.gold ?? 0) * 10_000 + (coins.platinum ?? 0) * 1_000_000;
 }
 
 function helpPanel() {
@@ -1123,6 +1178,14 @@ function installDebugApi() {
           quantity: item.quantity ?? item.count ?? 1
         })),
         roomCoins: serverState.roomCoins,
+        inventoryItems: serverState.inventory.map((item) => ({
+          id: item.itemId ?? item.id ?? "",
+          quantity: item.quantity ?? 1,
+          equipped: Boolean(item.equipped),
+          slot: item.slot ?? ""
+        })),
+        coins: serverState.coins,
+        coinTotal: coinTotal(serverState.coins),
         mapRooms: serverState.mapRooms.length,
         inventory: serverState.inventory.length
       };

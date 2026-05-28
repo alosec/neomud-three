@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:05:30.199Z",
+  "updated": "2026-05-28T17:13:27.771Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2150,6 +2150,34 @@
       ],
       "created": "2026-05-28T16:57:13Z",
       "updated": "2026-05-28T17:05:16Z"
+    },
+    {
+      "id": "neo-1fb2.73",
+      "project": "NeoMud",
+      "title": "Render authoritative inventory after pickup",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 101,
+          "body": "Scope: replace the Three inventory panel ID-only view with server inventory quantities, equipment, and coins; expose debug inventory state; verify live cave pickup updates inventory UI and state.",
+          "created": "2026-05-28T17:07:54Z"
+        },
+        {
+          "id": 102,
+          "body": "Completed: inventory panel now renders server stacks, equipped slots, and coins; debug API exposes inventory items/coin totals; server QA verifies Inventory panel/state after live Hidden Cave pickup.",
+          "created": "2026-05-28T17:13:13Z"
+        }
+      ],
+      "created": "2026-05-28T17:07:46Z",
+      "updated": "2026-05-28T17:13:15Z"
     }
   ],
   "ready": [

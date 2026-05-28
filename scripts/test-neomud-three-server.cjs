@@ -366,8 +366,11 @@ async function main() {
     if (lootTarget) {
       const beforeLootState = await page.evaluate(() => {
         const coins = window.__neomudThreeDebug.server.roomCoins ?? {};
+        const playerCoins = window.__neomudThreeDebug.server.coins ?? {};
         return {
           items: window.__neomudThreeDebug.server.roomItems.length,
+          inventory: window.__neomudThreeDebug.server.inventoryItems.length,
+          playerCoinTotal: (playerCoins.copper ?? 0) + (playerCoins.silver ?? 0) * 100 + (playerCoins.gold ?? 0) * 10_000 + (playerCoins.platinum ?? 0) * 1_000_000,
           coinTotal: (coins.copper ?? 0) + (coins.silver ?? 0) * 100 + (coins.gold ?? 0) * 10_000 + (coins.platinum ?? 0) * 1_000_000
         };
       });
@@ -399,6 +402,26 @@ async function main() {
         { actionType: lootTarget.actionType, before: beforeLootState },
         { timeout: 5_000 }
       );
+      await page.keyboard.press("i");
+      assert.equal(await page.locator("#panel-title").textContent(), "Inventory");
+      const inventoryText = await page.locator("#panel-content").textContent();
+      assert.match(inventoryText, /Stacks/i);
+      assert.match(inventoryText, /Coins/i);
+      if (lootTarget.actionType === "PICKUP_ITEM") {
+        assert.match(inventoryText, new RegExp(lootTarget.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"));
+        await page.waitForFunction(
+          ({ itemId, before }) => window.__neomudThreeDebug.server.inventoryItems.some((item) => item.id === itemId)
+            || window.__neomudThreeDebug.server.inventoryItems.length > before.inventory,
+          { itemId: lootTarget.itemId || lootTarget.id, before: beforeLootState },
+          { timeout: 5_000 }
+        );
+      } else {
+        await page.waitForFunction(
+          (before) => window.__neomudThreeDebug.server.coinTotal > before.playerCoinTotal,
+          beforeLootState,
+          { timeout: 5_000 }
+        );
+      }
       await page.keyboard.press("Escape");
     }
 
