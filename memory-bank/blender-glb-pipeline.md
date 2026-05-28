@@ -178,7 +178,14 @@ node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-th
 Validate the full runtime package registry and manifests:
 
 ```bash
+node scripts/refresh-neomud-three-packages.mjs --check
 node scripts/validate-neomud-three-packages.mjs
+```
+
+After exporting a package, refresh its manifest before validating:
+
+```bash
+node scripts/refresh-neomud-three-packages.mjs
 ```
 
 The package validator checks every `LEVEL_PACKAGES` entry against its manifest,
@@ -232,8 +239,9 @@ The current movement gym lab QA proves:
 2. Promote `level-debug.js` into renderer/debug hooks with user-facing toggles
    for parsed colliders, trigger volumes, spawn points, path nodes, pickup/enemy
    markers, camera zones, and lights.
-3. Generate or refresh `*.manifest.json` automatically from Blender/export and
-   QA reports instead of hand-editing manifest counts.
+3. Extend `refresh-neomud-three-packages.mjs` to pull current QA budget numbers
+   from `qa/latest/*-report.json`; GLB counts and file sizes are already
+   generated, but QA budget metadata is still manually preserved.
 4. Add glTF Transform inspection/optimization once the first main-runtime import is
    working.
 5. Add KTX2/Basis texture compression when generated materials become part of

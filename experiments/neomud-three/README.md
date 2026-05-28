@@ -47,6 +47,7 @@ Smoke test from the repo root:
 
 ```bash
 node scripts/validate-neomud-three-specs.mjs
+node scripts/refresh-neomud-three-packages.mjs --check
 node scripts/validate-neomud-three-packages.mjs
 node scripts/test-neomud-three.cjs
 node scripts/test-neomud-three-labs.cjs
@@ -100,5 +101,6 @@ Blender-authored Rusty Tankard package:
 ```bash
 blender --background --python scripts/create-neomud-three-town-tavern.py
 node scripts/validate-neomud-three-gltf.mjs --profile=room experiments/neomud-three/assets/build/levels/town_tavern.glb
+node scripts/refresh-neomud-three-packages.mjs
 node scripts/validate-neomud-three-packages.mjs
 ```

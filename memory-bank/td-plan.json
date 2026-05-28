@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T21:43:46.987Z",
+  "updated": "2026-05-28T21:51:13.382Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2831,6 +2831,25 @@
       "comments": [],
       "created": "2026-05-28T21:42:41Z",
       "updated": "2026-05-28T21:43:31Z"
+    },
+    {
+      "id": "neo-1fb2.79",
+      "project": "NeoMud",
+      "title": "Automate GLB package manifest refresh",
+      "description": "Add a manifest refresh command that uses LEVEL_PACKAGES, source briefs, source files, and actual GLB summaries to regenerate/check package manifest file sizes and node/mesh/material/prefix counts. Factor shared package/GLB utilities so refresh and validate use the same parsing rules.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added shared package utilities and refresh/check command for GLB package manifests; verified refresh, package, GLB, spec, and diff checks",
+      "labels": [
+        "pipeline"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T21:48:43Z",
+      "updated": "2026-05-28T21:51:00Z"
     }
   ]
 }
