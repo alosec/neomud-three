@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T19:42:14.405Z",
+  "updated": "2026-05-28T20:08:15.786Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -418,10 +418,15 @@
           "id": 42,
           "body": "Render budget gate shipped: tests now assert per-room render calls, triangles, textures, and geometries; headed playtest writes qa/latest/report.json. Geometry disposal on room/entity rebuild fixed retained geometry count in routed Town Square playtest from 498 to 222.",
           "created": "2026-05-28T07:25:06Z"
+        },
+        {
+          "id": 119,
+          "body": "Process reset: future visual/gameplay work should cite a pass contract and QA evidence instead of broad make-it-better scope.",
+          "created": "2026-05-28T20:05:02Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T07:25:06Z"
+      "updated": "2026-05-28T20:05:02Z"
     },
     {
       "id": "neo-1fb2.12",
@@ -2546,6 +2551,50 @@
       ],
       "created": "2026-05-28T19:34:38Z",
       "updated": "2026-05-28T19:41:47Z"
+    },
+    {
+      "id": "neo-1fb2.14.3",
+      "project": "NeoMud",
+      "title": "Player avatar proxy v6 silhouette pass",
+      "description": "Improve the active compact procedural adventurer proxy without replacing it with another example model: stronger hood/face/back silhouette, cloak/gear detail, and low-cost equipment while preserving run/walk/jump QA and room budgets.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.14",
+      "close_reason": "done: committed and pushed procedural-adventurer-proxy-v6 silhouette pass after node --check, diff check, lab QA, and offline smoke passed",
+      "labels": [],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T19:48:16Z",
+      "updated": "2026-05-28T20:05:06Z"
+    },
+    {
+      "id": "neo-1fb2.74",
+      "project": "NeoMud",
+      "title": "Adopt pass-based production workflow",
+      "description": "Replace ad hoc visual iteration with a required pass contract: one target, one hypothesis, explicit constraints, screenshot anchors, render budget, server/offline QA, review note, and clean Git boundary before the next pass.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "qa",
+        "workflow"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 120,
+          "body": "Completed: added production workflow pass contract, linked methodical workflow and next steps, updated current state/avatar review, and refreshed td-plan snapshot.",
+          "created": "2026-05-28T20:08:00Z"
+        }
+      ],
+      "created": "2026-05-28T20:04:51Z",
+      "updated": "2026-05-28T20:08:00Z"
     }
   ],
   "ready": [

@@ -1,6 +1,10 @@
 # Methodical Workflow
 
-Updated: 2026-05-27
+Updated: 2026-05-28
+
+The detailed pass contract now lives in `memory-bank/production-workflow.md`.
+Use that document before starting any non-trivial visual, gameplay, renderer, or
+asset pass.
 
 Use two loops, and keep them separate:
 
@@ -52,3 +56,14 @@ Minimum bar before pushing:
 - Headed playtest script is run for meaningful movement/camera/visual changes.
 - Manual Canary check after meaningful visual or input changes.
 - Memory bank updated when architecture, workflow, or current rough edges change.
+
+Pass discipline:
+
+- One pass changes one target and records one hypothesis.
+- Screenshot anchors are evidence, not decoration.
+- Render stats must stay within the room/lab budget or the budget change must be
+  explicit and justified.
+- New generated assets go through material lab; new reusable components go
+  through prop zoo before room placement.
+- Do not widen room count until at least one core room reaches production
+  candidate quality.

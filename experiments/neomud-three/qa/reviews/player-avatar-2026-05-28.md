@@ -67,3 +67,17 @@ Total: 7/10
 Visual delta: added more readable face detail, broader cloak/cowl silhouette, side cape panels, a chest strap, shoulder trim, extra staff/gear accents, and a slightly larger scale while preserving the no-bob movement baseline.
 
 Remaining visual gap: this remains a pragmatic proxy. The next major avatar task should be a documented-license skinned adventurer GLB with compatible idle/walk/run clips, not another random example model.
+
+## Score After Proxy v6 Silhouette Pass
+
+- Animation continuity: 1/2. The visible player still uses procedural limb motion while Xbot remains loaded only as a hidden reference asset. Offline smoke still validates run activation, stable grounded Y, jumping, and traversal behavior.
+- Silhouette: 1/2. Extra hood/face pieces, hair/skin detail, cloak shoulder mass, back gear, gold trim, and small steel accents improve the third-person read. The character remains a low-poly proxy rather than final authored player art.
+- Art direction match: 1/2. The v6 proxy is closer to the stylized diorama language than the original example rig, but it is not a production candidate character.
+- Performance: 2/2. The pass stays within the current instanced-proxy approach and passed Prop Zoo/lab QA plus offline smoke without adding room-level budget pressure.
+- QA coverage: 2/2. Static JS checks, diff check, Prop Zoo/Material Lab QA, and offline smoke now assert `visualTreatment: procedural-adventurer-proxy-v6` / `proxy: true` and pass.
+
+Total: 7/10
+
+Visual delta: added low-cost face/hood/skin/hair detail, extra cloak shoulder mass, back gear panels, additional gold trim, and a small steel equipment batch while keeping the proxy instanced and compatible with the existing run/walk/jump test coverage.
+
+Remaining visual gap: stop doing incremental proxy polish unless it fixes a concrete screenshot failure. The correct next major avatar step remains a documented-license skinned fantasy adventurer GLB or an authored character model with compatible clips, known axis/scale, and fixed QA views.

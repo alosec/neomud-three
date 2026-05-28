@@ -3,6 +3,8 @@
 High leverage next work:
 
 0. Use the new production pipeline for all visual work.
+   - Treat `memory-bank/production-workflow.md` as the operating contract.
+   - One pass must name one target, one problem, one hypothesis, constraints, and evidence.
    - Read `experiments/neomud-three/ART_DIRECTION.md` before visual edits.
    - Put new generated materials through `material-lab.html`.
    - Put new reusable components through `prop-zoo.html`.
@@ -38,7 +40,7 @@ High leverage next work:
    - Preserve the current exit readability and 240-call full-smoke budget, or explicitly justify a new budget before raising it.
 
 3a. Continue player avatar production.
-   - The visible player is now a v5 compact low-poly fantasy adventurer proxy with better hood/face separation, hands, darker palette, rear cloak structure, shoulder pieces, stronger gold trim, eye/nose detail, staff/gear accents, and slimmer proportions. Xbot remains a hidden technical/reference asset, not the rendered character.
+   - The visible player is now a v6 compact low-poly fantasy adventurer proxy with better hood/face separation, hands, darker palette, rear cloak structure, shoulder pieces, stronger gold trim, eye/nose detail, staff/gear accents, back gear, cloak shoulder mass, small steel details, and slimmer proportions. Xbot remains a hidden technical/reference asset, not the rendered character.
    - Do not swap to another random example model.
    - Next character work should be an authored or deliberately sourced skinned adventurer GLB with documented license, forward axis, scale, idle/walk/run clips, and fixed QA screenshots.
    - If a full GLB is not practical yet, improve the proxy only when it clearly helps silhouette/proportions without spending the reclaimed room budget.
