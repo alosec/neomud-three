@@ -5277,9 +5277,20 @@ function addTownSpecChunkRings(root, materials, spec) {
       addInstancedSurfaceRects(root, materials, chunk.surfaces, `${chunk.id}-surfaces`);
     }
     if (chunk.kind === "wall-runs") {
-      for (const run of chunk.runs) {
-        addBox(root, material(materials, chunk.material), run.x, run.height / 2, run.z, run.width, run.height, run.depth, { castShadow: false });
-      }
+      addInstancedBoxes(
+        root,
+        material(materials, chunk.material),
+        chunk.runs.map((run) => ({
+          x: run.x,
+          y: run.height / 2,
+          z: run.z,
+          width: run.width,
+          height: run.height,
+          depth: run.depth
+        })),
+        `${chunk.id}-runs`,
+        { castShadow: false }
+      );
     }
     if (chunk.kind === "context-buildings") {
       for (const building of chunk.buildings) {
@@ -5292,8 +5303,23 @@ function addTownSpecChunkRings(root, materials, spec) {
       }
     }
     if (chunk.kind === "context-masses") {
-      for (const mass of chunk.masses) {
-        addBox(root, material(materials, mass.material), mass.x, mass.y, mass.z, mass.width, mass.height, mass.depth, { castShadow: mass.castShadow ?? true });
+      const boxesByMaterial = new Map();
+      for (const mass of chunk.masses ?? []) {
+        const materialKey = mass.material ?? "stone";
+        if (!boxesByMaterial.has(materialKey)) boxesByMaterial.set(materialKey, []);
+        boxesByMaterial.get(materialKey).push({
+          x: mass.x,
+          y: mass.y,
+          z: mass.z,
+          width: mass.width,
+          height: mass.height,
+          depth: mass.depth
+        });
+      }
+      for (const [materialKey, boxes] of boxesByMaterial) {
+        addInstancedBoxes(root, material(materials, materialKey), boxes, `${chunk.id}-${materialKey}`, {
+          castShadow: boxes.some((box) => box.castShadow ?? true)
+        });
       }
     }
     if (chunk.kind === "tree-line") {
@@ -6423,15 +6449,17 @@ function addTempleThresholdLandmark(root, materials, landmark) {
   };
   root.add(group);
 
+  const stoneBoxes = [];
   for (const step of landmark.steps) {
-    addBox(group, materials.stone, step.x, step.y, step.z, step.width, step.height, step.depth);
+    stoneBoxes.push({ x: step.x, y: step.y, z: step.z, width: step.width, height: step.height, depth: step.depth });
   }
   addBox(group, materials.plazaStone, 0, 0.07, 21.2, 11.5, 0.12, 3.25, { castShadow: false });
   for (const column of landmark.columns) {
-    addBox(group, materials.stone, column.x, 1.88, column.z, 0.56, 3.76, 0.56);
-    addBox(group, materials.stone, column.x, 3.96, column.z, 0.94, 0.34, 0.94);
+    stoneBoxes.push({ x: column.x, y: 1.88, z: column.z, width: 0.56, height: 3.76, depth: 0.56 });
+    stoneBoxes.push({ x: column.x, y: 3.96, z: column.z, width: 0.94, height: 0.34, depth: 0.94 });
   }
-  addBox(group, materials.stone, 0, 3.85, 20.55, 9.8, 0.46, 0.58);
+  stoneBoxes.push({ x: 0, y: 3.85, z: 20.55, width: 9.8, height: 0.46, depth: 0.58 });
+  addInstancedBoxes(group, materials.stone, stoneBoxes, "south-temple-threshold-stone");
   addTempleExteriorFacade(group, materials, landmark.exterior);
 }
 
@@ -6439,37 +6467,49 @@ function addTempleExteriorFacade(root, materials, exterior = {}) {
   const facade = exterior.facade ?? { x: 0, y: 3.7, z: 23.25, width: 15.2, height: 7.4, depth: 1.1 };
   const frontZ = facade.z - facade.depth / 2 - 0.045;
 
-  addBox(root, materials.stone, facade.x, facade.y, facade.z, facade.width, facade.height, facade.depth);
-  addBox(root, materials.darkStone, facade.x, 0.62, frontZ + 0.1, facade.width + 0.7, 0.58, 0.44);
-  addBox(root, materials.trimLight, facade.x, facade.height - 0.28, frontZ, facade.width + 0.5, 0.34, 0.34);
+  const stoneBoxes = [
+    { x: facade.x, y: facade.y, z: facade.z, width: facade.width, height: facade.height, depth: facade.depth }
+  ];
+  const darkStoneBoxes = [
+    { x: facade.x, y: 0.62, z: frontZ + 0.1, width: facade.width + 0.7, height: 0.58, depth: 0.44 }
+  ];
+  const trimLightBoxes = [
+    { x: facade.x, y: facade.height - 0.28, z: frontZ, width: facade.width + 0.5, height: 0.34, depth: 0.34 }
+  ];
+  const roofBoxes = [];
 
   for (const aisle of exterior.sideAisles ?? []) {
-    addBox(root, materials.stone, aisle.x, aisle.y, aisle.z, aisle.width, aisle.height, aisle.depth);
-    addBox(root, materials.roof, aisle.x, aisle.height + 0.28, aisle.z, aisle.width + 0.55, 0.56, aisle.depth + 0.55);
+    stoneBoxes.push({ x: aisle.x, y: aisle.y, z: aisle.z, width: aisle.width, height: aisle.height, depth: aisle.depth });
+    roofBoxes.push({ x: aisle.x, y: aisle.height + 0.28, z: aisle.z, width: aisle.width + 0.55, height: 0.56, depth: aisle.depth + 0.55 });
   }
 
   for (const tower of exterior.towers ?? []) {
-    addBox(root, materials.stone, tower.x, tower.y, tower.z, tower.width, tower.height, tower.depth);
-    addBox(root, materials.darkStone, tower.x, 0.62, frontZ, tower.width + 0.35, 0.56, 0.48);
-    addBox(root, materials.trimLight, tower.x, tower.height - 0.45, frontZ, tower.width + 0.4, 0.28, 0.32);
+    stoneBoxes.push({ x: tower.x, y: tower.y, z: tower.z, width: tower.width, height: tower.height, depth: tower.depth });
+    darkStoneBoxes.push({ x: tower.x, y: 0.62, z: frontZ, width: tower.width + 0.35, height: 0.56, depth: 0.48 });
+    trimLightBoxes.push({ x: tower.x, y: tower.height - 0.45, z: frontZ, width: tower.width + 0.4, height: 0.28, depth: 0.32 });
   }
 
   for (const buttress of exterior.buttresses ?? []) {
-    addBox(root, materials.darkStone, buttress.x, buttress.y, buttress.z, buttress.width, buttress.height, buttress.depth);
-    addBox(root, materials.trimLight, buttress.x, buttress.height + 0.13, buttress.z - 0.1, buttress.width + 0.22, 0.26, buttress.depth + 0.18);
+    darkStoneBoxes.push({ x: buttress.x, y: buttress.y, z: buttress.z, width: buttress.width, height: buttress.height, depth: buttress.depth });
+    trimLightBoxes.push({ x: buttress.x, y: buttress.height + 0.13, z: buttress.z - 0.1, width: buttress.width + 0.22, height: 0.26, depth: buttress.depth + 0.18 });
   }
 
   const door = exterior.door ?? { x: 0, y: 2.1, z: frontZ, width: 4.8, height: 4.2, depth: 0.32 };
   addBox(root, materials.portalDark, door.x, door.y, door.z, door.width, door.height, door.depth);
-  addBox(root, materials.darkStone, door.x - door.width / 2 - 0.24, door.y, door.z - 0.04, 0.34, door.height + 0.35, 0.38);
-  addBox(root, materials.darkStone, door.x + door.width / 2 + 0.24, door.y, door.z - 0.04, 0.34, door.height + 0.35, 0.38);
-  addBox(root, materials.trimLight, door.x, door.y + door.height / 2 + 0.12, door.z - 0.04, door.width + 0.82, 0.32, 0.4);
+  darkStoneBoxes.push({ x: door.x - door.width / 2 - 0.24, y: door.y, z: door.z - 0.04, width: 0.34, height: door.height + 0.35, depth: 0.38 });
+  darkStoneBoxes.push({ x: door.x + door.width / 2 + 0.24, y: door.y, z: door.z - 0.04, width: 0.34, height: door.height + 0.35, depth: 0.38 });
+  trimLightBoxes.push({ x: door.x, y: door.y + door.height / 2 + 0.12, z: door.z - 0.04, width: door.width + 0.82, height: 0.32, depth: 0.4 });
 
   const pediment = exterior.pediment;
   if (pediment) {
     addTriangularPediment(root, materials.stone, pediment);
-    addBox(root, materials.trimLight, pediment.x, pediment.y + 0.16, pediment.z - pediment.depth / 2 - 0.04, pediment.width + 0.45, 0.24, 0.28);
+    trimLightBoxes.push({ x: pediment.x, y: pediment.y + 0.16, z: pediment.z - pediment.depth / 2 - 0.04, width: pediment.width + 0.45, height: 0.24, depth: 0.28 });
   }
+
+  addInstancedBoxes(root, materials.stone, stoneBoxes, "south-temple-facade-stone");
+  addInstancedBoxes(root, materials.darkStone, darkStoneBoxes, "south-temple-facade-dark");
+  addInstancedBoxes(root, materials.trimLight, trimLightBoxes, "south-temple-facade-trim");
+  addInstancedBoxes(root, materials.roof, roofBoxes, "south-temple-facade-roofs");
 
   for (const windowSpec of exterior.windows ?? []) {
     addTempleExteriorWindow(root, materials, windowSpec);
@@ -6478,16 +6518,18 @@ function addTempleExteriorFacade(root, materials, exterior = {}) {
   addTempleExteriorGlow(root, materials, exterior);
 
   const towerLookup = new Map((exterior.towers ?? []).map((tower) => [tower.x, tower]));
-  for (const spire of exterior.spires ?? []) {
+  const spires = (exterior.spires ?? []).map((spire) => {
     const tower = towerLookup.get(spire.x);
     const towerTop = tower ? tower.y + tower.height / 2 : facade.y + facade.height / 2;
-    const mesh = new THREE.Mesh(new THREE.ConeGeometry(spire.radius, spire.height, 4), materials.roof);
-    mesh.position.set(spire.x, towerTop + spire.height / 2, spire.z);
-    mesh.rotation.y = Math.PI / 4;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    root.add(mesh);
-  }
+    return {
+      x: spire.x,
+      y: towerTop + spire.height / 2,
+      z: spire.z,
+      scale: [spire.radius, spire.height, spire.radius],
+      rotationY: Math.PI / 4
+    };
+  });
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1, 4), materials.roof, spires, "south-temple-facade-spires");
 }
 
 function addTempleExteriorGlow(root, materials, exterior) {

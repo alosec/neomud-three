@@ -90,6 +90,14 @@ export function addGabledHouse(root, materials, spec) {
   root.add(group);
 
   const totalHeight = height + (floors - 1) * 1.25;
+  const darkTimberMaterial = materials.darkTimber ?? materials.timber;
+  const portalMaterial = materials.portalDark ?? darkTimberMaterial;
+  const trimMaterial = materials.trimLight ?? materials.sign;
+  const timberBoxes = [];
+  const darkTimberBoxes = [];
+  const trimBoxes = [];
+  const windowDarkBoxes = [];
+
   addBox(
     group,
     [plasterMaterial, plasterMaterial, plasterMaterial, plasterMaterial, facadeMaterial, plasterMaterial],
@@ -100,28 +108,28 @@ export function addGabledHouse(root, materials, spec) {
     totalHeight,
     depth
   );
-  addBox(group, materials.darkTimber ?? materials.timber, 0, 0.13, depth / 2 + 0.06, width + 0.22, 0.26, 0.12);
-  addBox(group, materials.timber, -width / 2 + 0.2, totalHeight / 2, depth / 2 + 0.08, 0.16, totalHeight, 0.14);
-  addBox(group, materials.timber, width / 2 - 0.2, totalHeight / 2, depth / 2 + 0.08, 0.16, totalHeight, 0.14);
-  addBox(group, materials.timber, 0, totalHeight - 0.3, depth / 2 + 0.08, width, 0.18, 0.14);
-  addBox(group, materials.timber, 0, totalHeight * 0.48, depth / 2 + 0.09, width * 0.86, 0.12, 0.12);
+  darkTimberBoxes.push({ x: 0, y: 0.13, z: depth / 2 + 0.06, width: width + 0.22, height: 0.26, depth: 0.12 });
+  timberBoxes.push({ x: -width / 2 + 0.2, y: totalHeight / 2, z: depth / 2 + 0.08, width: 0.16, height: totalHeight, depth: 0.14 });
+  timberBoxes.push({ x: width / 2 - 0.2, y: totalHeight / 2, z: depth / 2 + 0.08, width: 0.16, height: totalHeight, depth: 0.14 });
+  timberBoxes.push({ x: 0, y: totalHeight - 0.3, z: depth / 2 + 0.08, width, height: 0.18, depth: 0.14 });
+  timberBoxes.push({ x: 0, y: totalHeight * 0.48, z: depth / 2 + 0.09, width: width * 0.86, height: 0.12, depth: 0.12 });
 
-  addFacadeWindow(group, materials, -width * 0.26, totalHeight * 0.66, depth / 2 + 0.13, 0.58, 0.72);
-  addFacadeWindow(group, materials, width * 0.26, totalHeight * 0.66, depth / 2 + 0.13, 0.58, 0.72);
+  addFacadeWindowBoxes({ timberBoxes, trimBoxes, windowDarkBoxes }, -width * 0.26, totalHeight * 0.66, depth / 2 + 0.13, 0.58, 0.72);
+  addFacadeWindowBoxes({ timberBoxes, trimBoxes, windowDarkBoxes }, width * 0.26, totalHeight * 0.66, depth / 2 + 0.13, 0.58, 0.72);
   if (floors > 1) {
-    addFacadeWindow(group, materials, -width * 0.26, totalHeight * 0.38, depth / 2 + 0.13, 0.5, 0.58);
-    addFacadeWindow(group, materials, width * 0.26, totalHeight * 0.38, depth / 2 + 0.13, 0.5, 0.58);
+    addFacadeWindowBoxes({ timberBoxes, trimBoxes, windowDarkBoxes }, -width * 0.26, totalHeight * 0.38, depth / 2 + 0.13, 0.5, 0.58);
+    addFacadeWindowBoxes({ timberBoxes, trimBoxes, windowDarkBoxes }, width * 0.26, totalHeight * 0.38, depth / 2 + 0.13, 0.5, 0.58);
   }
-  addBox(group, materials.portalDark ?? materials.darkTimber ?? materials.timber, 0, 0.92, depth / 2 + 0.13, 0.88, 1.48, 0.1);
-  addBox(group, materials.trimLight ?? materials.sign, 0, 1.7, depth / 2 + 0.16, 1.1, 0.12, 0.12);
+  addBox(group, portalMaterial, 0, 0.92, depth / 2 + 0.13, 0.88, 1.48, 0.1);
+  trimBoxes.push({ x: 0, y: 1.7, z: depth / 2 + 0.16, width: 1.1, height: 0.12, depth: 0.12 });
 
   const roof = new THREE.Mesh(createGabledRoofGeometry(width + 1.05, depth + 0.9, roofHeight), roofMaterial);
   roof.position.set(0, totalHeight, 0);
   roof.castShadow = true;
   roof.receiveShadow = true;
   group.add(roof);
-  addBox(group, materials.darkTimber ?? materials.timber, 0, totalHeight + roofHeight * 0.55, depth / 2 + 0.04, width + 0.62, 0.12, 0.16);
-  addBox(group, materials.darkTimber ?? materials.timber, 0, totalHeight + roofHeight * 0.55, -depth / 2 - 0.04, width + 0.62, 0.12, 0.16);
+  darkTimberBoxes.push({ x: 0, y: totalHeight + roofHeight * 0.55, z: depth / 2 + 0.04, width: width + 0.62, height: 0.12, depth: 0.16 });
+  darkTimberBoxes.push({ x: 0, y: totalHeight + roofHeight * 0.55, z: -depth / 2 - 0.04, width: width + 0.62, height: 0.12, depth: 0.16 });
 
   if (chimney) {
     addBox(group, materials.darkStone ?? materials.timber, -width * 0.34, totalHeight + roofHeight * 0.78, -depth * 0.18, 0.42, 1.35, 0.42);
@@ -132,8 +140,13 @@ export function addGabledHouse(root, materials, spec) {
     const offset = dormers === 1 ? 0 : -width * 0.18 + index * width * 0.36;
     addBox(group, facadeMaterial, offset, totalHeight + 0.55, depth / 2 + 0.42, 0.78, 0.58, 0.18);
     addBox(group, roofMaterial, offset, totalHeight + 0.92, depth / 2 + 0.42, 0.98, 0.24, 0.28);
-    addFacadeWindow(group, materials, offset, totalHeight + 0.52, depth / 2 + 0.54, 0.38, 0.34);
+    addFacadeWindowBoxes({ timberBoxes, trimBoxes, windowDarkBoxes }, offset, totalHeight + 0.52, depth / 2 + 0.54, 0.38, 0.34);
   }
+
+  addInstancedBoxes(group, timberBoxes, materials.timber, { visualRole: "gabled-house-timber" });
+  addInstancedBoxes(group, darkTimberBoxes, darkTimberMaterial, { visualRole: "gabled-house-dark-timber" });
+  addInstancedBoxes(group, trimBoxes, trimMaterial, { visualRole: "gabled-house-trim" });
+  addInstancedBoxes(group, windowDarkBoxes, materials.windowDark ?? materials.sign, { visualRole: "gabled-house-window-dark" });
 
   if (sign) {
     if (label) {
@@ -159,11 +172,29 @@ export function addGabledHouse(root, materials, spec) {
   return group;
 }
 
-function addFacadeWindow(root, materials, x, y, z, width, height) {
-  addBox(root, materials.trimLight ?? materials.sign, x, y, z, width + 0.16, height + 0.16, 0.07);
-  addBox(root, materials.windowDark ?? materials.sign, x, y, z + 0.03, width, height, 0.08);
-  addBox(root, materials.timber, x, y, z + 0.08, 0.06, height + 0.04, 0.09);
-  addBox(root, materials.timber, x, y, z + 0.09, width + 0.04, 0.055, 0.09);
+function addFacadeWindowBoxes(targets, x, y, z, width, height) {
+  targets.trimBoxes.push({ x, y, z, width: width + 0.16, height: height + 0.16, depth: 0.07 });
+  targets.windowDarkBoxes.push({ x, y, z: z + 0.03, width, height, depth: 0.08 });
+  targets.timberBoxes.push({ x, y, z: z + 0.08, width: 0.06, height: height + 0.04, depth: 0.09 });
+  targets.timberBoxes.push({ x, y, z: z + 0.09, width: width + 0.04, height: 0.055, depth: 0.09 });
+}
+
+function addInstancedBoxes(root, boxes, material, options = {}) {
+  if (!boxes.length) return null;
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, boxes.length);
+  const dummy = new THREE.Object3D();
+  boxes.forEach((box, index) => {
+    dummy.position.set(box.x, box.y, box.z);
+    dummy.rotation.set(box.rotationX ?? 0, box.rotationY ?? 0, box.rotationZ ?? 0);
+    dummy.scale.set(box.width, box.height, box.depth);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(index, dummy.matrix);
+  });
+  mesh.castShadow = options.castShadow ?? true;
+  mesh.receiveShadow = options.receiveShadow ?? true;
+  mesh.userData = { visualRole: options.visualRole ?? "instanced-boxes" };
+  root.add(mesh);
+  return mesh;
 }
 
 function createGabledRoofGeometry(width, depth, height) {

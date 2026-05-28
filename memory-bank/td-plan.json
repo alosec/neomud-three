@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T19:01:55.128Z",
+  "updated": "2026-05-28T19:20:59.939Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2477,6 +2477,29 @@
       ],
       "created": "2026-05-28T18:52:54Z",
       "updated": "2026-05-28T19:01:39Z"
+    },
+    {
+      "id": "neo-ccd5",
+      "project": "NeoMud",
+      "title": "Reclaim Town Square draw-call headroom",
+      "description": "Batch repeated Town Square visual elements so the room has budget for more authored landmark/detail work. Preserve the current screenshots, movement, collision, and server traversal. Target at least 15 calls reclaimed from the 237/240 full-smoke state.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 116,
+          "body": "Completed: batched Town Square wall runs/context masses, south Temple threshold/facade boxes, and reusable gabled-house facade/window/timber details. Full-smoke Town Square dropped from 237/240 calls after the forecourt pass to 212/240; fixed Town shots pass at 114 calls; authored-room/offline/server/lab QA pass; Prop Zoo drops to 286 calls.",
+          "created": "2026-05-28T19:20:12Z"
+        }
+      ],
+      "created": "2026-05-28T19:03:19Z",
+      "updated": "2026-05-28T19:20:37Z"
     }
   ],
   "ready": [
