@@ -147,6 +147,41 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:magic_shop"));
     assertRenderBudget(assert, "town:magic_shop", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 11.05, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:forge",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Grimjaw's Forge");
+    const forgeTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(forgeTriggers.some((trigger) => trigger.id === "exit-west-magic-shop"));
+    const forgeEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    const forgeServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      forgeEntities.map((entity) => entity.id).sort(),
+      forgeServerNpcs.map((npc) => npc.id).sort(),
+      `expected Forge rendered entities to mirror live server NPCs: server=${JSON.stringify(forgeServerNpcs)} rendered=${JSON.stringify(forgeEntities)}`
+    );
+    assert.ok(
+      forgeEntities.some((entity) => entity.id === "npc:grimjaw" && /Grimjaw the Artificer/i.test(entity.name)),
+      `expected server Grimjaw entity in Forge, got ${JSON.stringify(forgeEntities)}`
+    );
+    await saveScreenshot(page, "server-forge.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:forge"));
+    assertRenderBudget(assert, "town:forge", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -11.1, z: 0, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:magic_shop",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -11.1, z: 0, heading: -Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T15:39:46.834Z",
+  "updated": "2026-05-28T15:54:22.467Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1954,6 +1954,34 @@
       ],
       "created": "2026-05-28T15:27:27Z",
       "updated": "2026-05-28T15:39:34Z"
+    },
+    {
+      "id": "neo-1fb2.66",
+      "project": "NeoMud",
+      "title": "Author Grimjaw Forge room",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 87,
+          "body": "Scope: replace town:forge generic fallback with authored Grimjaw forge room, Grimjaw entity, west physical exit to Magic Shop, collision, screenshots, offline smoke, and server-backed traversal.",
+          "created": "2026-05-28T15:40:47Z"
+        },
+        {
+          "id": 88,
+          "body": "Completed: authored Grimjaw Forge room with Grimjaw the Artificer, west physical exit to Magic Shop, fixture collisions, fixed screenshots, offline smoke, and server-backed traversal QA.",
+          "created": "2026-05-28T15:54:02Z"
+        }
+      ],
+      "created": "2026-05-28T15:40:47Z",
+      "updated": "2026-05-28T15:54:02Z"
     }
   ],
   "ready": [

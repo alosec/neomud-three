@@ -111,12 +111,31 @@ const MAGIC_SHOP = {
 const MAGIC_SHOP_COLLIDERS = [
   { id: "north-shelves", center: [0, -8.15], size: [23.2, 1.45] },
   { id: "south-shelves", center: [0, 8.15], size: [23.2, 1.45] },
-  { id: "east-rune-doorframe", center: [11.6, 0], size: [1.0, 5.9] },
   { id: "display-case", center: [-0.7, 3.55], size: [4.65, 1.35] },
   { id: "counter", center: [4.25, -3.45], size: [4.2, 1.35] },
   { id: "orb-dais", center: [2.25, 0.65], size: [1.45, 1.45] },
   { id: "scroll-table", center: [-5.3, -3.65], size: [2.4, 1.35] },
   { id: "potion-cabinet", center: [-6.8, 4.75], size: [2.0, 1.15] }
+];
+
+const FORGE = {
+  width: 25,
+  depth: 18,
+  halfX: 12.5,
+  halfZ: 9,
+  westExitX: -11.55,
+  exitHalfZ: 2.65
+};
+
+const FORGE_COLLIDERS = [
+  { id: "north-benches", center: [-0.6, -8.15], size: [19.5, 1.45] },
+  { id: "south-racks", center: [-0.5, 8.15], size: [19.8, 1.45] },
+  { id: "forge-furnace", center: [8.65, 0], size: [2.75, 5.1] },
+  { id: "main-anvil", center: [2.65, 1.15], size: [2.15, 1.45] },
+  { id: "left-workbench", center: [-4.8, -4.55], size: [3.35, 1.35] },
+  { id: "right-workbench", center: [-4.35, 4.45], size: [3.25, 1.35] },
+  { id: "obsidian-bin", center: [4.55, 5.15], size: [1.75, 1.55] },
+  { id: "wraith-vial-shelf", center: [5.05, -5.85], size: [3.8, 0.92] }
 ];
 
 const NORTH_GATE = {
@@ -675,6 +694,114 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
   };
 }
 
+export function buildForgeRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = { ...makeTownMaterials(), ...makeForgeMaterials() };
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  const forge = addGrimjawForgeStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addForgeEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(-8.45, 0, 0), heading: Math.PI / 2 },
+    status: "Grimjaw's Forge: authored artificer workshop with furnace, anvils, material bins, Grimjaw, and a real west exit.",
+    environment: {
+      background: 0x1b120d,
+      fog: 0x26130c,
+      fogDensity: 0.024
+    },
+    camera: {
+      distance: 5.35,
+      height: 3.12,
+      sideOffset: -0.62,
+      lookAhead: 2.72,
+      targetHeight: 1.1
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "town:magic_shop") return { position: new THREE.Vector3(-8.45, 0, 0), heading: Math.PI / 2 };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -FORGE.halfX + 0.55, FORGE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -FORGE.halfZ + 0.55, FORGE.halfZ - 0.55);
+      resolveColliderPushout(position, FORGE_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -FORGE.halfX + 0.55, FORGE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -FORGE.halfZ + 0.55, FORGE.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.x < FORGE.westExitX && Math.abs(position.z) < FORGE.exitHalfZ) return "town:magic_shop";
+      return null;
+    },
+    debugTriggers() {
+      return [
+        {
+          id: "exit-west-magic-shop",
+          direction: "WEST",
+          targetId: "town:magic_shop",
+          prompt: "Return to the Magic Shop",
+          trigger: { type: "box", center: [FORGE.westExitX - 0.15, 1, 0], size: [1.2, 3, FORGE.exitHalfZ * 2] },
+          affordance: {
+            label: "Magic Shop",
+            subtitle: "West"
+          }
+        }
+      ];
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(FORGE_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.55) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update() {
+      forge.flames.children.forEach((child, index) => {
+        child.scale.y = child.userData.baseScaleY + Math.sin(performance.now() * 0.009 + index) * 0.09;
+        if (child.material?.opacity) {
+          child.material.opacity = 0.48 + Math.sin(performance.now() * 0.01 + index * 1.7) * 0.16;
+        }
+      });
+      forge.sparks.children.forEach((child, index) => {
+        child.position.y = child.userData.baseY + Math.sin(performance.now() * 0.0025 + index) * 0.16;
+        child.position.x = child.userData.baseX + Math.sin(performance.now() * 0.002 + index * 0.8) * 0.07;
+      });
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0017 + index) * 0.016;
+        }
+      });
+    }
+  };
+}
+
 export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
   const materials = makeTownMaterials();
   const interactables = [];
@@ -995,9 +1122,9 @@ function addMarketStage(root, materials, worldRoot) {
     { material: "plazaStone", x: 0, z: 6.05, width: MARKET.width - 2.4, depth: 2.5, y: 0.03 }
   ], "market-street-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_market.webp`, MARKET.eastExitX + 8.2, 6.1, 0, 22, 12.4, {
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_market.webp`, MARKET.eastExitX + 8.2, 5.6, 0, 18, 8.8, {
     rotationY: -Math.PI / 2,
-    opacity: 0.44
+    opacity: 0.045
   });
 
   addMarketShopfronts(root, materials);
@@ -1587,6 +1714,308 @@ function addMagicShopEntities(root, materials, worldRoot, world, npcs, roomItems
       id: normalized.id,
       name: normalized.name,
       role: "Emporium",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function makeForgeMaterials() {
+  return {
+    forgeFloor: new THREE.MeshStandardMaterial({ color: 0x3b3029, roughness: 0.86, metalness: 0.02 }),
+    forgeWall: new THREE.MeshStandardMaterial({ color: 0x3a2922, roughness: 0.88, metalness: 0 }),
+    sootBrick: new THREE.MeshStandardMaterial({ color: 0x241916, roughness: 0.9, metalness: 0.02 }),
+    ironDark: new THREE.MeshStandardMaterial({ color: 0x34383a, roughness: 0.48, metalness: 0.72 }),
+    hotMetal: new THREE.MeshStandardMaterial({ color: 0xffb35c, emissive: 0xff5b1f, emissiveIntensity: 1.1, roughness: 0.38, metalness: 0.45 }),
+    obsidian: new THREE.MeshStandardMaterial({ color: 0x15131a, roughness: 0.36, metalness: 0.2 }),
+    pelt: new THREE.MeshStandardMaterial({ color: 0x6c4a32, roughness: 0.92, metalness: 0 }),
+    vialGlow: new THREE.MeshBasicMaterial({ color: 0x8be8ff, transparent: true, opacity: 0.66 }),
+    emberGlow: new THREE.MeshBasicMaterial({ color: 0xff7337, transparent: true, opacity: 0.72, depthWrite: false }),
+    flameGold: new THREE.MeshBasicMaterial({ color: 0xffcf73, transparent: true, opacity: 0.68, depthWrite: false }),
+    sparkGlow: new THREE.MeshBasicMaterial({ color: 0xffe0a0, transparent: true, opacity: 0.8, depthWrite: false })
+  };
+}
+
+function addGrimjawForgeStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.forgeFloor, FORGE.width, FORGE.depth);
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_forge.webp`, FORGE.halfX + 0.2, 4.85, 0, 13.4, 7.55, {
+    rotationY: -Math.PI / 2,
+    opacity: 0.28
+  });
+
+  addForgeArchitecture(root, materials);
+  const flames = addForgeFurnace(root, materials);
+  addForgeWorkstations(root, materials);
+  const sparks = addForgeSparks(root, materials);
+  addForgeExitAffordances(root);
+
+  const ambientFill = new THREE.HemisphereLight(0xffc792, 0x20110b, 0.68);
+  root.add(ambientFill);
+
+  const furnaceLight = new THREE.PointLight(0xff6a28, 4.1, 14);
+  furnaceLight.position.set(7.85, 2.55, 0);
+  root.add(furnaceLight);
+
+  const benchLight = new THREE.PointLight(0xffbd74, 1.35, 7.5);
+  benchLight.position.set(-2.8, 2.45, -4.6);
+  root.add(benchLight);
+
+  const coolVialLight = new THREE.PointLight(0x7adfff, 0.95, 5.8);
+  coolVialLight.position.set(5.0, 2.3, -5.65);
+  root.add(coolVialLight);
+
+  return { flames, sparks };
+}
+
+function addForgeArchitecture(root, materials) {
+  const walls = [
+    { x: 0, y: 2.7, z: -8.85, width: FORGE.width, height: 5.4, depth: 0.32 },
+    { x: 0, y: 2.7, z: 8.85, width: FORGE.width, height: 5.4, depth: 0.32 },
+    { x: 12.38, y: 2.85, z: 0, width: 0.32, height: 5.7, depth: FORGE.depth },
+    { x: -12.38, y: 2.7, z: -4.9, width: 0.3, height: 5.4, depth: 8.1 },
+    { x: -12.38, y: 2.7, z: 4.9, width: 0.3, height: 5.4, depth: 8.1 }
+  ];
+  const trim = [
+    { x: 0, y: 0.14, z: -8.55, width: FORGE.width, height: 0.22, depth: 0.24 },
+    { x: 0, y: 0.14, z: 8.55, width: FORGE.width, height: 0.22, depth: 0.24 },
+    { x: 0, y: 5.18, z: -8.52, width: FORGE.width, height: 0.2, depth: 0.24 },
+    { x: 0, y: 5.18, z: 8.52, width: FORGE.width, height: 0.2, depth: 0.24 },
+    { x: -11.95, y: 2.7, z: -2.95, width: 0.22, height: 5.4, depth: 0.24 },
+    { x: -11.95, y: 2.7, z: 2.95, width: 0.22, height: 5.4, depth: 0.24 },
+    { x: 11.95, y: 2.7, z: -5.7, width: 0.24, height: 5.4, depth: 0.24 },
+    { x: 11.95, y: 2.7, z: 5.7, width: 0.24, height: 5.4, depth: 0.24 }
+  ];
+  const overhead = [];
+  for (const x of [-8, -4, 0, 4, 8]) overhead.push({ x, y: 4.86, z: 0, width: 0.32, height: 0.28, depth: FORGE.depth - 0.5 });
+
+  addInstancedBoxes(root, materials.forgeWall, walls, "forge-walls");
+  addInstancedBoxes(root, materials.darkTimber, trim, "forge-wall-trim");
+  addInstancedBoxes(root, materials.darkTimber, overhead, "forge-overhead-beams");
+}
+
+function addForgeFurnace(root, materials) {
+  const group = new THREE.Group();
+  group.userData.visualRole = "forge-furnace";
+  root.add(group);
+
+  addBox(group, materials.sootBrick, 8.7, 1.25, 0, 2.35, 2.5, 4.75);
+  addBox(group, materials.sootBrick, 8.2, 2.85, 0, 1.25, 1.2, 3.55);
+  addBox(group, materials.emberGlow, 7.46, 1.16, 0, 0.08, 1.18, 2.55, { castShadow: false });
+  addBox(group, materials.hotMetal, 7.28, 0.67, -0.86, 0.4, 0.18, 0.7, { castShadow: false });
+  addBox(group, materials.hotMetal, 7.23, 0.67, 0.12, 0.36, 0.18, 0.72, { castShadow: false });
+  addBox(group, materials.hotMetal, 7.31, 0.67, 1.02, 0.44, 0.18, 0.64, { castShadow: false });
+
+  const flameSpecs = [
+    { x: 7.18, y: 1.25, z: -0.75, scale: [0.28, 0.86, 0.05], color: "emberGlow" },
+    { x: 7.12, y: 1.42, z: 0, scale: [0.36, 1.12, 0.05], color: "flameGold" },
+    { x: 7.18, y: 1.2, z: 0.82, scale: [0.24, 0.78, 0.05], color: "emberGlow" }
+  ];
+  const flames = new THREE.Group();
+  flames.userData.visualRole = "forge-flames";
+  group.add(flames);
+  for (const spec of flameSpecs) {
+    const flame = new THREE.Mesh(
+      new THREE.PlaneGeometry(1, 1),
+      materials[spec.color].clone()
+    );
+    flame.position.set(spec.x, spec.y, spec.z);
+    flame.rotation.y = -Math.PI / 2;
+    flame.scale.set(...spec.scale);
+    flame.userData.baseScaleY = spec.scale[1];
+    flame.castShadow = false;
+    flame.receiveShadow = false;
+    flames.add(flame);
+  }
+
+  const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.6, 2.6, 12), materials.sootBrick);
+  chimney.position.set(8.78, 4.45, 0);
+  chimney.castShadow = true;
+  group.add(chimney);
+
+  return flames;
+}
+
+function addForgeWorkstations(root, materials) {
+  const benches = [
+    { x: -4.8, y: 0.58, z: -4.55, width: 3.45, height: 0.72, depth: 1.22 },
+    { x: -4.35, y: 0.58, z: 4.45, width: 3.35, height: 0.72, depth: 1.22 },
+    { x: 4.8, y: 0.58, z: -5.78, width: 3.65, height: 0.62, depth: 0.82 }
+  ];
+  const benchTops = benches.map((bench) => ({ ...bench, y: 1.02, height: 0.18, width: bench.width + 0.18, depth: bench.depth + 0.14 }));
+  addInstancedBoxes(root, materials.darkTimber, benches, "forge-benches");
+  addInstancedBoxes(root, materials.timber, benchTops, "forge-bench-tops");
+
+  addForgeAnvil(root, materials, 2.65, 1.15, 0.05);
+  addForgeAnvil(root, materials, -0.65, -3.4, -0.3, 0.72);
+
+  const racks = [];
+  for (const z of [-7.72, 7.72]) {
+    for (const x of [-7.8, -4.8, -1.8, 1.2]) {
+      racks.push({ x, y: 1.45, z, width: 1.7, height: 0.12, depth: 0.18 });
+      racks.push({ x, y: 2.25, z, width: 1.7, height: 0.12, depth: 0.18 });
+      racks.push({ x: x - 0.72, y: 1.82, z, width: 0.1, height: 1.45, depth: 0.2 });
+      racks.push({ x: x + 0.72, y: 1.82, z, width: 0.1, height: 1.45, depth: 0.2 });
+    }
+  }
+  addInstancedBoxes(root, materials.darkTimber, racks, "forge-wall-racks");
+
+  const blades = [];
+  const ingots = [];
+  for (const x of [-8.25, -6.9, -5.55, -3.25, -1.9, -0.45, 1.0]) {
+    blades.push({ x, y: 1.58, z: -7.52, width: 0.12, height: 0.78, depth: 0.06, rotationY: 0.05 });
+    blades.push({ x: x + 0.4, y: 2.38, z: 7.52, width: 0.1, height: 0.72, depth: 0.06, rotationY: -0.08 });
+  }
+  for (const x of [-5.7, -4.8, -3.9, -4.3, 2.8, 3.45, 4.1]) {
+    ingots.push({ x, y: 1.19, z: x < 0 ? -4.62 : 1.35, width: 0.58, height: 0.16, depth: 0.24, rotationY: x * 0.2 });
+  }
+  addInstancedBoxes(root, materials.ironDark, blades, "forge-hanging-blades");
+  addInstancedBoxes(root, materials.hotMetal, ingots, "forge-ingots", { castShadow: false });
+
+  addBox(root, materials.darkTimber, 4.55, 0.4, 5.15, 1.7, 0.8, 1.5);
+  addInstancedGeometry(root, new THREE.OctahedronGeometry(1, 0), materials.obsidian, [
+    { x: 4.08, y: 0.95, z: 4.78, scale: 0.22 },
+    { x: 4.58, y: 1.02, z: 5.25, scale: 0.18 },
+    { x: 5.08, y: 0.92, z: 4.95, scale: 0.2 },
+    { x: 4.75, y: 1.1, z: 5.68, scale: 0.16 }
+  ], "forge-obsidian-bin", { castShadow: false });
+
+  const vials = [-0.9, -0.3, 0.3, 0.9].map((offset) => ({
+    x: 5.05 + offset,
+    y: 1.17,
+    z: -5.95,
+    scale: [0.08, 0.18, 0.08]
+  }));
+  addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), materials.vialGlow, vials, "forge-vials", {
+    castShadow: false,
+    receiveShadow: false
+  });
+
+  const pelts = [
+    { x: -0.4, y: 3.7, z: -8.42, width: 1.6, height: 0.08, depth: 1.1, rotationY: 0.08 },
+    { x: 2.25, y: 3.55, z: 8.42, width: 1.4, height: 0.08, depth: 0.98, rotationY: -0.12 },
+    { x: -7.5, y: 3.45, z: 8.42, width: 1.3, height: 0.08, depth: 0.9, rotationY: 0.1 }
+  ];
+  addInstancedBoxes(root, materials.pelt, pelts, "forge-hanging-pelts");
+}
+
+function addForgeAnvil(root, materials, x, z, rotationY = 0, scale = 1) {
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = rotationY;
+  group.scale.setScalar(scale);
+  root.add(group);
+  addBox(group, materials.ironDark, 0, 0.52, 0, 1.12, 0.34, 0.52);
+  addBox(group, materials.ironDark, -0.5, 0.64, 0, 0.48, 0.18, 0.32);
+  addBox(group, materials.ironDark, 0.54, 0.64, 0, 0.42, 0.16, 0.26);
+  addBox(group, materials.sootBrick, 0, 0.18, 0, 0.48, 0.36, 0.42);
+}
+
+function addForgeSparks(root, materials) {
+  const group = new THREE.Group();
+  group.userData.visualRole = "forge-sparks";
+  root.add(group);
+  const points = [
+    [6.95, 1.95, -0.8],
+    [7.2, 2.28, -0.3],
+    [6.98, 2.58, 0.35],
+    [7.15, 2.12, 0.92],
+    [6.82, 2.85, 0.1],
+    [7.35, 2.48, -1.05]
+  ];
+  for (const [x, y, z] of points) {
+    const spark = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.055, 0.055), materials.sparkGlow);
+    spark.position.set(x, y, z);
+    spark.userData.baseX = x;
+    spark.userData.baseY = y;
+    spark.castShadow = false;
+    spark.receiveShadow = false;
+    group.add(spark);
+  }
+  return group;
+}
+
+function addForgeExitAffordances(root) {
+  addTextBoard(root, "Magic Shop", {
+    x: -10.75,
+    y: 2.58,
+    z: -2.96,
+    width: 2.34,
+    height: 0.42,
+    subtitle: "West",
+    palette: "blue",
+    renderOrder: 10
+  });
+  addExitThreshold(root, { x: FORGE.westExitX, z: 0, width: 1.1, depth: FORGE.exitHalfZ * 2, color: 0xffad5a, opacity: 0.18 });
+}
+
+function addForgeEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const placements = {
+    "npc:grimjaw": {
+      position: [5.2, 0, -2.15],
+      heading: -Math.PI / 2,
+      role: "Artificer",
+      palette: "red",
+      width: 1.75,
+      height: 3.05
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = placements[normalized.id] ?? {
+      position: [2.4 - index * 1.0, 0, 1.8 + index * 0.7],
+      heading: -Math.PI / 2,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 3,
+      width: placement.width ?? 1.68,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -2.5 + index * 0.9;
+    const z = index % 2 === 0 ? 4.15 : -4.25;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Forge",
       prompt: `Inspect: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
@@ -3261,13 +3690,20 @@ function addArch(root, z, materials) {
   root.add(rib);
 }
 
-function addBackdrop(root, path, x, y, z, width, height) {
+function addBackdrop(root, path, x, y, z, width, height, options = {}) {
   const map = texture(path);
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
-    new THREE.MeshStandardMaterial({ map, roughness: 0.9, side: THREE.DoubleSide })
+    new THREE.MeshStandardMaterial({
+      map,
+      roughness: 0.9,
+      side: THREE.DoubleSide,
+      transparent: options.opacity !== undefined,
+      opacity: options.opacity ?? 1
+    })
   );
   mesh.position.set(x, y, z);
+  mesh.rotation.y = options.rotationY ?? 0;
   mesh.castShadow = true;
   root.add(mesh);
 }

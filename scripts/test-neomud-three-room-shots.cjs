@@ -18,6 +18,8 @@ const ANCHORS = [
   { id: "market-forge", roomId: "town:market", filename: "room-shot-market-forge.png", x: 7.4, z: 0.2, heading: Math.PI / 2 },
   { id: "magic-entry", roomId: "town:magic_shop", filename: "room-shot-magic-entry.png", x: -8.4, z: 0, heading: Math.PI / 2 },
   { id: "magic-counter", roomId: "town:magic_shop", filename: "room-shot-magic-counter.png", x: -1.8, z: 0.4, heading: Math.PI / 2 },
+  { id: "forge-entry", roomId: "town:forge", filename: "room-shot-forge-entry.png", x: -8.45, z: 0, heading: Math.PI / 2 },
+  { id: "forge-furnace", roomId: "town:forge", filename: "room-shot-forge-furnace.png", x: -1.8, z: 0.2, heading: Math.PI / 2 },
   { id: "north-gate-entry", roomId: "town:gate", filename: "room-shot-north-gate-entry.png", x: 0, z: 12.8, heading: 0 },
   { id: "north-gate-forest", roomId: "town:gate", filename: "room-shot-north-gate-forest.png", x: 0, z: -10.8, heading: 0 },
   { id: "forest-edge-entry", roomId: "forest:edge", filename: "room-shot-forest-edge-entry.png", x: 0, z: 13.1, heading: 0 },

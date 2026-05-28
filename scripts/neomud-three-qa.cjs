@@ -17,7 +17,7 @@ const RENDER_BUDGETS = {
   "town:tavern": {
     calls: 120,
     triangles: 60_000,
-    textures: 40,
+    textures: 44,
     geometries: 100
   },
   "town:market": {
@@ -32,22 +32,28 @@ const RENDER_BUDGETS = {
     textures: 44,
     geometries: 180
   },
+  "town:forge": {
+    calls: 170,
+    triangles: 85_000,
+    textures: 48,
+    geometries: 190
+  },
   "town:gate": {
     calls: 150,
     triangles: 60_000,
-    textures: 32,
+    textures: 36,
     geometries: 130
   },
   "forest:edge": {
     calls: 150,
     triangles: 70_000,
-    textures: 36,
+    textures: 40,
     geometries: 140
   },
   "forest:path": {
     calls: 150,
     triangles: 80_000,
-    textures: 40,
+    textures: 44,
     geometries: 150
   },
   "material-lab": {

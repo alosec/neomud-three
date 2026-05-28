@@ -2,6 +2,7 @@ import { WORLD_ROOT } from "./world-data.js";
 import {
   buildForestEdgeRoom,
   buildForestPathRoom,
+  buildForgeRoom,
   buildGenericRoom,
   buildMagicShopRoom,
   buildMarketRoom,
@@ -56,6 +57,15 @@ export function buildRoomScene(context) {
       ...context,
       worldRoot: WORLD_ROOT,
       npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:magic_shop"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "town:forge") {
+    return buildForgeRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:forge"),
       roomItems: serverItems
     });
   }
