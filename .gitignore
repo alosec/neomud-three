@@ -30,6 +30,7 @@ Thumbs.db
 # Kotlin
 *.class
 .kotlin/
+kotlin-js-store/
 
 # Node
 node_modules/

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>NeoMud Local</title>
+</head>
+<body>
+    <script>
+        sessionStorage.setItem('__NEOMUD_CONFIG__', JSON.stringify({
+            serverHost: '127.0.0.1',
+            serverPort: 8080,
+            useTls: false,
+            serverPath: '/game',
+            skipMarketplace: true,
+            worldName: "Warden's Reckoning",
+            worldVersion: 'local',
+            creatorName: 'roomsmith-games'
+        }));
+        location.replace('./index.html');
+    </script>
+</body>
+</html>

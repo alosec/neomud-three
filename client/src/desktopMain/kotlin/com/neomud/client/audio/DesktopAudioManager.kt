@@ -23,9 +23,9 @@ class DesktopAudioManager : PlatformAudioManager {
 
     init {
         val prefs = java.util.prefs.Preferences.userNodeForPackage(DesktopAudioManager::class.java)
-        masterVolume = prefs.getFloat("volume_master", 1f)
-        sfxVolume = prefs.getFloat("volume_sfx", 1f)
-        bgmVolume = prefs.getFloat("volume_bgm", 0.5f)
+        masterVolume = prefs.getFloat("volume_master", 1f).coerceIn(0f, 1f)
+        sfxVolume = prefs.getFloat("volume_sfx", 1f).coerceIn(0f, 1f)
+        bgmVolume = prefs.getFloat("volume_bgm", 0.5f).coerceIn(0f, 1f)
     }
 
     override fun playSfx(serverBaseUrl: String, soundId: String, category: String) {

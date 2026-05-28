@@ -48,6 +48,7 @@ private val logger = LoggerFactory.getLogger("NeoMud")
 
 /** Parsed CLI configuration, with environment variable fallbacks. */
 data class ServerConfig(
+    val host: String = System.getenv("NEOMUD_HOST") ?: "127.0.0.1",
     val port: Int = System.getenv("NEOMUD_PORT")?.toIntOrNull() ?: GameConfig.Server.PORT,
     val worldFile: String = System.getenv("NEOMUD_WORLD") ?: "",
     val dbPath: String = System.getenv("NEOMUD_DB") ?: "neomud.db",
@@ -57,6 +58,7 @@ data class ServerConfig(
 )
 
 fun parseArgs(args: Array<String>): ServerConfig {
+    var host: String? = null
     var port: Int? = null
     var worldFile: String? = null
     var dbPath: String? = null
@@ -74,6 +76,14 @@ fun parseArgs(args: Array<String>): ServerConfig {
                 port = args.getOrNull(i)?.toIntOrNull()
                 if (port == null) {
                     System.err.println("Error: --port requires a numeric value")
+                    exitProcess(1)
+                }
+            }
+            "--host" -> {
+                i++
+                host = args.getOrNull(i)
+                if (host == null) {
+                    System.err.println("Error: --host requires a bind host")
                     exitProcess(1)
                 }
             }
@@ -113,6 +123,7 @@ fun parseArgs(args: Array<String>): ServerConfig {
 
     val base = ServerConfig()
     return base.copy(
+        host = host ?: base.host,
         port = port ?: base.port,
         worldFile = worldFile ?: base.worldFile,
         dbPath = dbPath ?: base.dbPath,
@@ -127,6 +138,7 @@ ${NeoMudVersion.DISPLAY}
 Usage: java -jar neomud-server.jar [options]
 
 Options:
+  --host <host>           Bind host (default: 127.0.0.1, env: NEOMUD_HOST)
   --port, -p <port>       Server port (default: ${GameConfig.Server.PORT}, env: NEOMUD_PORT)
   --world, -w <path>      World bundle .nmd file (default: bundled world, env: NEOMUD_WORLD)
   --db <path>             SQLite database path (default: neomud.db, env: NEOMUD_DB)
@@ -194,8 +206,8 @@ fun printBanner(config: ServerConfig, worldFile: File) {
     println(banner)
     println()
     logger.info("${NeoMudVersion.DISPLAY}")
-    logger.info("WebSocket:  ws://0.0.0.0:${config.port}/game")
-    logger.info("Health:     http://0.0.0.0:${config.port}/health")
+    logger.info("WebSocket:  ws://${config.host}:${config.port}/game")
+    logger.info("Health:     http://${config.host}:${config.port}/health")
     logger.info("World:      ${worldFile.name} (${worldFile.length() / 1024}KB)")
     logger.info("Database:   ${config.dbPath}")
     if (config.admins.isNotEmpty()) {
@@ -234,7 +246,7 @@ fun main(args: Array<String>) {
     val worldFile = resolveWorldFile(config.worldFile)
     printBanner(config, worldFile)
 
-    val server = embeddedServer(Netty, port = config.port, host = "0.0.0.0") {
+    val server = embeddedServer(Netty, port = config.port, host = config.host) {
         module(
             jdbcUrl = "jdbc:sqlite:${config.dbPath}",
             worldFile = worldFile.absolutePath,

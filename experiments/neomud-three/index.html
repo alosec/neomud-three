@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeoMud Three Lab</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="app">
+    <canvas id="scene"></canvas>
+    <div class="crosshair" id="crosshair"></div>
+
+    <section class="room-panel" id="room-panel">
+      <div class="eyebrow">NeoMud Three Lab</div>
+      <h1 id="room-name">Loading...</h1>
+      <p id="room-description"></p>
+      <div class="exits" id="room-exits"></div>
+    </section>
+
+    <section class="mode-panel" id="mode-panel">
+      <button class="play-button" id="play-button" type="button">Play</button>
+      <span class="mode-label" id="mode-label">Menu</span>
+    </section>
+
+    <nav class="hud-bar" id="hud-bar" aria-label="Game panels">
+      <button type="button" data-panel="character" aria-label="Character">C</button>
+      <button type="button" data-panel="inventory" aria-label="Inventory">I</button>
+      <button type="button" data-panel="spells" aria-label="Spells">K</button>
+      <button type="button" data-panel="map" aria-label="Map">M</button>
+      <button type="button" data-panel="log" aria-label="Log">L</button>
+      <button type="button" data-panel="help" aria-label="Help">?</button>
+    </nav>
+
+    <section class="atlas-panel">
+      <div class="eyebrow">World</div>
+      <div id="world-count">Loading world...</div>
+      <div id="room-count">-</div>
+      <div class="nav-cluster" aria-label="Navigation">
+        <div class="mini-map" id="mini-map"></div>
+        <div class="compass" id="compass" aria-label="Compass">
+          <span class="compass-cardinal north">N</span>
+          <span class="compass-cardinal east">E</span>
+          <span class="compass-cardinal south">S</span>
+          <span class="compass-cardinal west">W</span>
+          <span class="compass-needle" id="compass-needle"></span>
+        </div>
+      </div>
+      <div class="hint" id="status-text">WASD or arrow keys to walk. Cross the north doorway.</div>
+    </section>
+
+    <section class="game-panel hidden" id="game-panel" aria-live="polite">
+      <header class="game-panel-header">
+        <div>
+          <div class="eyebrow" id="panel-eyebrow">NeoMud</div>
+          <h2 id="panel-title">Panel</h2>
+        </div>
+        <button class="panel-close" id="panel-close" type="button" aria-label="Close panel">x</button>
+      </header>
+      <div class="game-panel-content" id="panel-content"></div>
+    </section>
+  </main>
+
+  <template id="nameplate-template">
+    <button class="nameplate" type="button"></button>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
