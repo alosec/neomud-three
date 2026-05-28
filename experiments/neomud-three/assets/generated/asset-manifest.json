@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "assetRoot": "/experiments/neomud-three/assets/generated",
+  "policy": {
+    "runtimeRegistry": "experiments/neomud-three/render-assets.js",
+    "projectBoundOutputs": "Generated images are copied or converted into this folder before renderer use.",
+    "preferredTextureFormat": "webp for opaque new assets; png for alpha/cutout assets until the pipeline adds KTX2/Basis."
+  },
+  "assets": [
+    {
+      "id": "templeMarbleFloor",
+      "file": "temple-marble-floor.png",
+      "kind": "tileable-material",
+      "use": ["cathedral-floor"],
+      "preloadGroup": "starter"
+    },
+    {
+      "id": "templeLimestoneWall",
+      "file": "temple-limestone-wall.png",
+      "kind": "tileable-material",
+      "use": ["cathedral-wall", "stone-trim"],
+      "preloadGroup": "starter"
+    },
+    {
+      "id": "templeAltarCloth",
+      "file": "temple-altar-cloth.png",
+      "kind": "tileable-material",
+      "use": ["altar", "cloth"],
+      "preloadGroup": "starter"
+    },
+    {
+      "id": "templeStainedGlassAlpha",
+      "file": "temple-stained-glass-alpha.png",
+      "kind": "transparent-cutout",
+      "use": ["cathedral-window"],
+      "preloadGroup": "starter"
+    },
+    {
+      "id": "millhavenCobblestone",
+      "file": "cobblestone-millhaven.png",
+      "kind": "tileable-material",
+      "use": ["town-plaza", "street"],
+      "preloadGroup": "starter"
+    },
+    {
+      "id": "townPlasterTimber",
+      "file": "town-plaster-timber.webp",
+      "kind": "facade-material",
+      "source": "built-in imagegen, converted from PNG to WebP with cwebp -q 88",
+      "prompt": "Square seamless warm plaster and dark timber framing texture for a painterly fantasy game facade, no windows, no doors, no text.",
+      "use": ["town-facade", "timber-house"],
+      "preloadGroup": "starter"
+    },
+    {
+      "id": "townHorizonDay",
+      "file": "town-horizon-day.webp",
+      "kind": "horizon-backdrop",
+      "source": "built-in imagegen, converted from PNG to WebP with cwebp -q 82",
+      "prompt": "Simple spacious painterly RPG horizon: mostly bright blue sky, soft white clouds, rolling green hills, tiny distant treeline and faint road, no close buildings or characters.",
+      "use": ["town-skyline", "temple-exterior-preview"],
+      "preloadGroup": "starter"
+    }
+  ]
+}

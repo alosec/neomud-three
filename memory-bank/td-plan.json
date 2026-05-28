@@ -1,0 +1,365 @@
+{
+  "updated": "2026-05-28T04:05:09.223Z",
+  "project": "NeoMud",
+  "tdWorld": {
+    "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
+    "binary": "/Users/alex/.local/bin/td"
+  },
+  "tasks": [
+    {
+      "id": "neo-1fb2",
+      "project": "NeoMud",
+      "title": "NeoMud Three practical reset",
+      "description": "Turn the current Three.js proof of concept into a server-backed game client architecture: Kotlin server authority, normalized client game state, renderer engine, scene registry, reusable components, generated asset pipeline, gameplay surfaces, and repeatable QA.",
+      "type": "epic",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "",
+      "close_reason": "",
+      "labels": [
+        "architecture",
+        "neomud-three",
+        "td"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T03:06:46Z",
+      "updated": "2026-05-28T03:06:46Z"
+    },
+    {
+      "id": "neo-1fb2.1",
+      "project": "NeoMud",
+      "title": "Keep Kotlin server as authoritative game spine",
+      "description": "Document and preserve the boundary where /game WebSocket messages own auth, current room, movement legality, NPC/player presence, inventory, combat, dialogue, tutorials, and interactables. Renderer may cache and predict but must reconcile to server messages.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "architecture",
+        "neomud-three",
+        "server"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 2,
+          "body": "Server authority boundary is implemented in the protocol adapter and documented in memory-bank/architecture.md; preserve as an invariant.",
+          "created": "2026-05-28T03:09:39Z"
+        }
+      ],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:09:39Z"
+    },
+    {
+      "id": "neo-1fb2.2",
+      "project": "NeoMud",
+      "title": "Extract normalized client game state and command router",
+      "description": "Create a small state store and command router so UI, physical exits, minimap, hotkeys, and future interactions dispatch to server-backed commands or explicit offline fallback through one path.",
+      "type": "task",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "architecture",
+        "client",
+        "neomud-three"
+      ],
+      "blockers": [
+        "neo-1fb2.1"
+      ],
+      "comments": [],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:09:26Z"
+    },
+    {
+      "id": "neo-1fb2.3",
+      "project": "NeoMud",
+      "title": "Extract persistent Three render engine",
+      "description": "Move renderer, scene, camera rig, lights, render loop, current room group disposal, resize, and debug hooks out of app.js without changing current play behavior.",
+      "type": "task",
+      "priority": 1,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "renderer"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:09:26Z"
+    },
+    {
+      "id": "neo-1fb2.4",
+      "project": "NeoMud",
+      "title": "Add scene registry and RoomRenderSpec layer",
+      "description": "Normalize NeoMud room data plus server overlays into render specs, then resolve room ids/kinds to scene builders through a registry instead of hard-coded if/else branches.",
+      "type": "task",
+      "priority": 1,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "renderer",
+        "rooms"
+      ],
+      "blockers": [
+        "neo-1fb2.2",
+        "neo-1fb2.3"
+      ],
+      "comments": [
+        {
+          "id": 4,
+          "body": "Added initial scene-registry.js so app.js resolves room scenes through one registry instead of hard-coded builders; RoomRenderSpec remains next.",
+          "created": "2026-05-28T03:18:28Z"
+        }
+      ],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:18:28Z"
+    },
+    {
+      "id": "neo-1fb2.5",
+      "project": "NeoMud",
+      "title": "Build generated asset manifest and material manager",
+      "description": "Centralize generated texture/cutout metadata, texture repeat scale, transparency mode, color space, caching, and intended component use.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done",
+      "labels": [
+        "assets",
+        "imagegen",
+        "neomud-three"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 3,
+          "body": "Added experiments/neomud-three/render-assets.js with generated asset manifest, texture cache, and temple/town material factories.",
+          "created": "2026-05-28T03:18:28Z"
+        },
+        {
+          "id": 9,
+          "body": "Added project asset manifest plus starter material registry/preload path. New townPlasterTimber and quieter townHorizonDay assets are project-local WebP outputs copied/converted from built-in imagegen.",
+          "created": "2026-05-28T04:04:29Z"
+        },
+        {
+          "id": 11,
+          "body": "Added project asset manifest plus starter material registry/preload path. New townPlasterTimber and quieter townHorizonDay assets are project-local WebP outputs copied/converted from built-in imagegen.",
+          "created": "2026-05-28T04:04:47Z"
+        }
+      ],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T04:04:47Z"
+    },
+    {
+      "id": "neo-1fb2.6",
+      "project": "NeoMud",
+      "title": "Create reusable Three component kit",
+      "description": "Introduce reusable components for floors, walls, portals, arches, stained-glass windows, buildings, stalls, signs, lights, billboards, NPC markers, and in-world interactable affordances.",
+      "type": "task",
+      "priority": 1,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "components",
+        "neomud-three",
+        "renderer"
+      ],
+      "blockers": [
+        "neo-1fb2.3",
+        "neo-1fb2.5"
+      ],
+      "comments": [
+        {
+          "id": 5,
+          "body": "Added components/scene-components.js and moved Town Square toward reusable boxes, ground planes, backdrops, gabled houses, stalls, portal frames, and lamps.",
+          "created": "2026-05-28T03:18:28Z"
+        }
+      ],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:18:28Z"
+    },
+    {
+      "id": "neo-1fb2.7",
+      "project": "NeoMud",
+      "title": "Make Temple of the Dawn the visual quality bar",
+      "description": "Rebuild the cathedral on top of components with convincing scale, window framing, transparent stained glass, readable portal, altar, incense, warm lighting, and color patches on the marble floor.",
+      "type": "task",
+      "priority": 1,
+      "status": "todo",
+      "status_type": "unstarted",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "quality",
+        "temple"
+      ],
+      "blockers": [
+        "neo-1fb2.4",
+        "neo-1fb2.6"
+      ],
+      "comments": [],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:07:50Z"
+    },
+    {
+      "id": "neo-1fb2.8",
+      "project": "NeoMud",
+      "title": "Rebuild Town Square as a physical 3D place",
+      "description": "Replace the placeholder flat-backdrop feel with streets, building rows, stalls, fountain, portals, NPC zones, lighting, and generated materials that use the original room image as reference rather than as the whole illusion.",
+      "type": "task",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "unstarted",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "quality",
+        "town"
+      ],
+      "blockers": [
+        "neo-1fb2.4",
+        "neo-1fb2.6"
+      ],
+      "comments": [
+        {
+          "id": 6,
+          "body": "Upgraded Town Square footprint, spawn framing, environment background, roads, perimeter, civic rows, market stalls, lamps, portals, and NPC staging; still not final quality bar.",
+          "created": "2026-05-28T03:18:28Z"
+        },
+        {
+          "id": 7,
+          "body": "QA/design reset: current square still reads noisy and toy-scaled. Next bar is fewer, larger named landmarks tied to real room ids: Gate north, Market east, Temple south, Tavern/bar west. Use calm low-detail horizon and chunk-ring scenery rather than detailed pasted-room backdrops.",
+          "created": "2026-05-28T04:04:08Z"
+        },
+        {
+          "id": 10,
+          "body": "QA/design reset: current square still reads noisy and toy-scaled. Next bar is fewer, larger named landmarks tied to real room ids: Gate north, Market east, Temple south, Tavern/bar west. Use calm low-detail horizon and chunk-ring scenery rather than detailed pasted-room backdrops.",
+          "created": "2026-05-28T04:04:29Z"
+        }
+      ],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T04:04:29Z"
+    },
+    {
+      "id": "neo-1fb2.9",
+      "project": "NeoMud",
+      "title": "Connect gameplay surfaces to 3D affordances",
+      "description": "Map server messages for NPCs, room items, tutorials, dialogue, combat, inventory, locked exits, and interactables to in-world objects or focused DOM panels.",
+      "type": "task",
+      "priority": 1,
+      "status": "backlog",
+      "status_type": "backlog",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "gameplay",
+        "neomud-three"
+      ],
+      "blockers": [
+        "neo-1fb2.2",
+        "neo-1fb2.6"
+      ],
+      "comments": [],
+      "created": "2026-05-28T03:07:22Z",
+      "updated": "2026-05-28T03:07:50Z"
+    },
+    {
+      "id": "neo-1fb2.10",
+      "project": "NeoMud",
+      "title": "Run HTML-in-Canvas projection spike after components stabilize",
+      "description": "Use real HTML for in-world boards/books/dialogue surfaces only after room components and hit testing are stable; keep accessibility and input alignment explicit.",
+      "type": "task",
+      "priority": 2,
+      "status": "backlog",
+      "status_type": "backlog",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "experiment",
+        "hic",
+        "neomud-three"
+      ],
+      "blockers": [
+        "neo-1fb2.6",
+        "neo-1fb2.9"
+      ],
+      "comments": [],
+      "created": "2026-05-28T03:07:23Z",
+      "updated": "2026-05-28T03:07:50Z"
+    },
+    {
+      "id": "neo-1fb2.11",
+      "project": "NeoMud",
+      "title": "Maintain repeatable QA gates",
+      "description": "Keep node --check, offline smoke, server-backed guest/movement test, screenshot output, and manual Canary QA as required gates before pushes.",
+      "type": "task",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 8,
+          "body": "QA note: offline Playwright smoke passes. Server-backed test can pass after restarting guest sessions, but the local server hit the Too many guest sessions state during this pass; this should be made deterministic before treating server QA as robust.",
+          "created": "2026-05-28T04:04:08Z"
+        }
+      ],
+      "created": "2026-05-28T03:07:23Z",
+      "updated": "2026-05-28T04:04:08Z"
+    }
+  ],
+  "ready": [
+    {
+      "id": "neo-1fb2",
+      "title": "NeoMud Three practical reset",
+      "priority": 0,
+      "project": "NeoMud",
+      "status": "in-progress"
+    },
+    {
+      "id": "neo-1fb2.2",
+      "title": "Extract normalized client game state and command router",
+      "priority": 0,
+      "project": "NeoMud",
+      "status": "in-progress"
+    },
+    {
+      "id": "neo-1fb2.11",
+      "title": "Maintain repeatable QA gates",
+      "priority": 0,
+      "project": "NeoMud",
+      "status": "in-progress"
+    },
+    {
+      "id": "neo-1fb2.3",
+      "title": "Extract persistent Three render engine",
+      "priority": 1,
+      "project": "NeoMud",
+      "status": "in-progress"
+    }
+  ]
+}

@@ -30,9 +30,10 @@ Cathedral status:
 
 Town Square status:
 
-- Town Square is rough but playable.
-- It has cobblestone floor, fountain, basic facades, a temple portal, and interim NPC billboards sourced from existing NeoMud art.
-- It is not yet reconstructed as a convincing full 3D place.
+- Town Square is rough but playable and still below the quality bar.
+- The latest pass reduces the HUD in play mode, adds an asset manifest/material manager, uses a calmer generated hills/sky horizon, and shifts away from many tiny perimeter houses toward fewer named landmarks.
+- The west side now treats `town:tavern` as a larger tavern/bar entrance instead of a tiny decorative facade.
+- The scene is still not reconstructed as a convincing full 3D place. Building scale, entrance affordances, material noise, NPC integration, and chunked distant scenery remain active work.
 
 Local app/server status:
 
@@ -46,6 +47,7 @@ Known rough edges:
 - The renderer is still prototype architecture, with room-specific scene builders instead of a general room/component system. The new authority boundary is real, but the rendering system itself still needs a proper registry/component pass.
 - Collision is clamp/trigger based, not mesh or navmesh based.
 - The window alpha asset is useful, but the cathedral window component still needs better proportions, trim, and lighting direction.
+- Town Square still needs a disciplined authored-layout pass: fewer larger buildings, stronger silhouettes, lower-noise ground textures, and side-specific landmarks that correspond to real NeoMud rooms.
 - HTML-in-Canvas is not integrated into gameplay yet. The current lab uses normal DOM overlays plus Three.js.
 - Inventory catalog data and starter inventory are read from server messages, but combat, interaction prompts, dialogue, and multiplayer presence are not yet expressed as convincing in-world 3D affordances.
 

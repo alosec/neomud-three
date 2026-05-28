@@ -1,8 +1,9 @@
 import * as THREE from "three";
-import { WORLD_ROOT, loadWorld, sortedDirections } from "./world-data.js";
+import { loadWorld, sortedDirections } from "./world-data.js";
 import { connectNeoMud, defaultNeoMudServerUrl, offlineRequested } from "./neomud-protocol.js";
-import { buildGenericRoom, buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
+import { buildRoomScene } from "./scene-registry.js";
 import { makePlayerAvatar } from "./player-avatar.js";
+import { preloadGeneratedAssets } from "./render-assets.js";
 
 const canvas = document.querySelector("#scene");
 const roomName = document.querySelector("#room-name");
@@ -12,8 +13,8 @@ const roomCount = document.querySelector("#room-count");
 const worldCount = document.querySelector("#world-count");
 const statusText = document.querySelector("#status-text");
 const playButton = document.querySelector("#play-button");
+const menuButton = document.querySelector("#menu-button");
 const modeLabel = document.querySelector("#mode-label");
-const hudBar = document.querySelector("#hud-bar");
 const panel = document.querySelector("#game-panel");
 const panelEyebrow = document.querySelector("#panel-eyebrow");
 const panelTitle = document.querySelector("#panel-title");
@@ -158,6 +159,7 @@ async function main() {
   world = await loadWorld();
   worldCount.textContent = `${world.rooms.size} rooms, ${world.npcs.length} NPCs, ${world.zones.length} zones`;
   roomCount.textContent = "Playable vertical slice: Temple -> Town Square";
+  await preloadGeneratedAssets("starter");
 
   setRoom("town:temple", { snapCamera: true });
   setInputMode("menu");
@@ -176,11 +178,8 @@ async function main() {
   document.addEventListener("pointerlockchange", handlePointerLockChange);
   canvas.addEventListener("click", requestPlayMode);
   playButton.addEventListener("click", requestPlayMode);
+  menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
   panelClose.addEventListener("click", closePanel);
-  hudBar.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-panel]");
-    if (button) openPanel(button.dataset.panel);
-  });
 
   renderer.setAnimationLoop(render);
 }
@@ -430,33 +429,17 @@ function setRoom(roomId, options = {}) {
   currentRoomId = roomId;
   worldRoot.clear();
 
-  if (roomId === "town:temple") {
-    roomRuntime = buildTempleRoom({
-      THREE,
-      root: worldRoot,
-      worldRoot: WORLD_ROOT,
-      onExit: (targetId) => enterExitTarget(targetId)
-    });
-  } else if (roomId === "town:square") {
-    roomRuntime = buildTownSquareRoom({
-      THREE,
-      root: worldRoot,
-      worldRoot: WORLD_ROOT,
-      npcs: serverCanDriveMovement() && serverState.npcs.length
-        ? serverState.npcs
-        : world.npcs.filter((npc) => npc.startRoomId === "town:square"),
-      onExit: (targetId) => enterExitTarget(targetId)
-    });
-  } else {
-    roomRuntime = buildGenericRoom({
-      THREE,
-      root: worldRoot,
-      room,
-      rooms: world.rooms,
-      worldRoot: WORLD_ROOT,
-      onExit: (targetId) => enterExitTarget(targetId)
-    });
-  }
+  roomRuntime = buildRoomScene({
+    THREE,
+    root: worldRoot,
+    roomId,
+    room,
+    world,
+    serverNpcs: serverCanDriveMovement() ? serverState.npcs : [],
+    onExit: (targetId) => enterExitTarget(targetId)
+  });
+  if (!roomRuntime) return;
+  applyEnvironment(roomRuntime.environment);
 
   const spawn = roomRuntime.spawnFor?.(fromRoomId) ?? roomRuntime.spawn;
   const spawnPosition = spawn.position ?? spawn;
@@ -570,9 +553,7 @@ function closePanel() {
 }
 
 function updatePanelButtons() {
-  for (const button of hudBar.querySelectorAll("[data-panel]")) {
-    button.classList.toggle("active", button.dataset.panel === activePanel);
-  }
+  menuButton.classList.toggle("active", Boolean(activePanel));
 }
 
 function renderPanel(panelId) {
@@ -580,6 +561,9 @@ function renderPanel(panelId) {
   panelEyebrow.textContent = "NeoMud";
   panelTitle.textContent = panelTitleFor(panelId);
   panelContent.replaceChildren(panelContentFor(panelId, room));
+  for (const button of panelContent.querySelectorAll("[data-panel-target]")) {
+    button.addEventListener("click", () => openPanel(button.dataset.panelTarget));
+  }
   for (const button of panelContent.querySelectorAll("[data-room-target]")) {
     button.addEventListener("click", () => {
       requestMove(button.dataset.roomDirection, button.dataset.roomTarget);
@@ -600,12 +584,38 @@ function panelTitleFor(panelId) {
 }
 
 function panelContentFor(panelId, room) {
-  if (panelId === "character") return characterPanel();
-  if (panelId === "inventory") return inventoryPanel();
-  if (panelId === "spells") return spellsPanel();
-  if (panelId === "map") return mapPanel(room);
-  if (panelId === "log") return logPanel(room);
-  return helpPanel();
+  const content = document.createDocumentFragment();
+  content.append(menuTabs(panelId));
+  if (panelId === "character") content.append(characterPanel());
+  else if (panelId === "inventory") content.append(inventoryPanel());
+  else if (panelId === "spells") content.append(spellsPanel());
+  else if (panelId === "map") content.append(mapPanel(room));
+  else if (panelId === "log") content.append(logPanel(room));
+  else content.append(helpPanel());
+  return content;
+}
+
+function menuTabs(activeId) {
+  const labels = {
+    character: "Character",
+    inventory: "Inventory",
+    spells: "Spells",
+    map: "Map",
+    log: "Log",
+    help: "Help"
+  };
+  const nav = document.createElement("nav");
+  nav.className = "menu-tabs";
+  nav.setAttribute("aria-label", "Menu sections");
+  nav.replaceChildren(...panelOrder.map((panelId) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.panelTarget = panelId;
+    button.textContent = labels[panelId];
+    button.classList.toggle("active", panelId === activeId);
+    return button;
+  }));
+  return nav;
 }
 
 function characterPanel() {
@@ -705,7 +715,7 @@ function helpPanel() {
     <div class="list">
       <div class="list-card"><strong>Play mode</strong><span class="muted">Click Play or the scene to lock the mouse. Escape releases it.</span></div>
       <div class="list-card"><strong>Movement</strong><span class="muted">W/S move, A/D turn, Q/E strafe, Shift runs. Diagonals work.</span></div>
-      <div class="list-card"><strong>Panels</strong><span class="muted">C character, I inventory, K spells, M map, L log, ? help. Tab cycles panels.</span></div>
+      <div class="list-card"><strong>Panels</strong><span class="muted">Use Menu for the world atlas, character sheet, inventory, spells, and log. Tab cycles sections; hotkeys remain hidden accelerators.</span></div>
     </div>
   `);
 }
@@ -743,6 +753,14 @@ function updateMiniMap(room) {
 
 function updateCompass() {
   compassNeedle.style.transform = `translate(-50%, -50%) rotate(${movement.heading}rad)`;
+}
+
+function applyEnvironment(environment = {}) {
+  const background = environment.background ?? 0x100c08;
+  const fog = environment.fog ?? background;
+  const fogDensity = environment.fogDensity ?? 0.018;
+  scene.background = new THREE.Color(background);
+  scene.fog = new THREE.FogExp2(fog, fogDensity);
 }
 
 function shortDirection(direction) {

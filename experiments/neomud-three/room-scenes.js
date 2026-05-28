@@ -1,8 +1,14 @@
 import * as THREE from "three";
-
-const ASSET_ROOT = "/experiments/neomud-three/assets/generated";
-const textureLoader = new THREE.TextureLoader();
-textureLoader.setCrossOrigin("anonymous");
+import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
+import {
+  addBackdrop as addComponentBackdrop,
+  addBox,
+  addGabledHouse,
+  addGroundPlane,
+  addLamp as addComponentLamp,
+  addMarketStall as addComponentMarketStall,
+  addPortalFrame
+} from "./components/scene-components.js";
 
 const TEMPLE = {
   width: 28,
@@ -21,6 +27,11 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
   const runtime = {
     spawn: { position: new THREE.Vector3(0, 0, 18.5), heading: 0 },
     status: "Cathedral-scale Temple: huge marble nave, vaulted stone shell, recessed Gothic stained glass, raised altar, north portal",
+    environment: {
+      background: 0x100c08,
+      fog: 0x120d09,
+      fogDensity: 0.018
+    },
     spawnFor(fromRoomId) {
       return fromRoomId === "town:square"
         ? { position: new THREE.Vector3(0, 0, -35.1), heading: Math.PI }
@@ -61,13 +72,9 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
 }
 
 export function buildTownSquareRoom({ root, worldRoot, npcs }) {
-  const cobble = texture(`${ASSET_ROOT}/cobblestone-millhaven.png`, [7, 7]);
-  const materials = makeTownMaterials(cobble);
+  const materials = makeTownMaterials();
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(34, 34), materials.cobble);
-  floor.rotation.x = -Math.PI / 2;
-  floor.receiveShadow = true;
-  root.add(floor);
+  addGroundPlane(root, materials.cobble, 46, 46);
 
   addTownRoads(root, materials);
 
@@ -94,12 +101,12 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
   spray.position.set(0, 2.1, 0);
   root.add(spray);
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_square.webp`, 0, 5.2, -18.5, 22, 12.4);
+  addTownHorizon(root, worldRoot);
   addTownSquareStructures(root, materials);
-  addTownPortal(root, "Gate", new THREE.Vector3(0, 1.35, -15.7), "town:gate", 0);
-  addTownPortal(root, "Market", new THREE.Vector3(15.7, 1.35, 0), "town:market", -Math.PI / 2);
-  addTownPortal(root, "Temple", new THREE.Vector3(0, 1.35, 15.7), "town:temple", Math.PI);
-  addTownPortal(root, "Tavern", new THREE.Vector3(-15.7, 1.35, 0), "town:tavern", Math.PI / 2);
+  addTownPortal(root, materials, "Gate", new THREE.Vector3(0, 0, -21.0), "town:gate", 0);
+  addTownPortal(root, materials, "Market", new THREE.Vector3(21.0, 0, 0), "town:market", -Math.PI / 2);
+  addTownPortal(root, materials, "Temple", new THREE.Vector3(0, 0, 21.0), "town:temple", Math.PI);
+  addTownPortal(root, materials, "Tavern", new THREE.Vector3(-21.0, 0, 0), "town:tavern", Math.PI / 2);
 
   for (const [index, npc] of npcs.entries()) {
     const angle = -0.9 + index * 0.75;
@@ -107,24 +114,29 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
   }
 
   return {
-    spawn: { position: new THREE.Vector3(0, 0, 12.8), heading: 0 },
-    status: "Town Square: expanded navigable plaza with fountain, roads, stalls, buildings, and four NeoMud graph exits",
+    spawn: { position: new THREE.Vector3(0, 0, 12.2), heading: 0 },
+    status: "Town Square: physical Millhaven plaza with expanded streets, fountain, market stalls, timber buildings, NPC zones, and four server-backed exits",
+    environment: {
+      background: 0xc3d7df,
+      fog: 0xc3d7df,
+      fogDensity: 0.006
+    },
     spawnFor(fromRoomId) {
-      if (fromRoomId === "town:temple") return { position: new THREE.Vector3(0, 0, 13.0), heading: 0 };
-      if (fromRoomId === "town:market") return { position: new THREE.Vector3(13.0, 0, 0), heading: -Math.PI / 2 };
-      if (fromRoomId === "town:tavern") return { position: new THREE.Vector3(-13.0, 0, 0), heading: Math.PI / 2 };
-      if (fromRoomId === "town:gate") return { position: new THREE.Vector3(0, 0, -13.0), heading: Math.PI };
+      if (fromRoomId === "town:temple") return { position: new THREE.Vector3(0, 0, 12.2), heading: 0 };
+      if (fromRoomId === "town:market") return { position: new THREE.Vector3(12.2, 0, 0), heading: -Math.PI / 2 };
+      if (fromRoomId === "town:tavern") return { position: new THREE.Vector3(-12.2, 0, 0), heading: Math.PI / 2 };
+      if (fromRoomId === "town:gate") return { position: new THREE.Vector3(0, 0, -12.2), heading: Math.PI };
       return this.spawn;
     },
     clamp(position) {
-      position.x = THREE.MathUtils.clamp(position.x, -15.6, 15.6);
-      position.z = THREE.MathUtils.clamp(position.z, -15.6, 15.6);
+      position.x = THREE.MathUtils.clamp(position.x, -21.1, 21.1);
+      position.z = THREE.MathUtils.clamp(position.z, -21.1, 21.1);
     },
     exitAt(position) {
-      if (position.z > 15.1 && Math.abs(position.x) < 2.1) return "town:temple";
-      if (position.z < -15.1 && Math.abs(position.x) < 2.1) return "town:gate";
-      if (position.x > 15.1 && Math.abs(position.z) < 2.1) return "town:market";
-      if (position.x < -15.1 && Math.abs(position.z) < 2.1) return "town:tavern";
+      if (position.z > 20.45 && Math.abs(position.x) < 2.4) return "town:temple";
+      if (position.z < -20.45 && Math.abs(position.x) < 2.4) return "town:gate";
+      if (position.x > 20.45 && Math.abs(position.z) < 2.4) return "town:market";
+      if (position.x < -20.45 && Math.abs(position.z) < 2.4) return "town:tavern";
       return null;
     },
     update(dt) {
@@ -154,6 +166,11 @@ export function buildGenericRoom({ root, room, worldRoot, rooms }) {
   return {
     spawn: { position: new THREE.Vector3(0, 0, 5.7), heading: 0 },
     status: `NeoMud room shell: ${room.name} uses the real room graph, description, image reference, and exits`,
+    environment: {
+      background: 0x120d09,
+      fog: 0x120d09,
+      fogDensity: 0.02
+    },
     spawnFor(fromRoomId) {
       const entry = Object.entries(room.exits ?? {}).find(([, targetId]) => targetId === fromRoomId);
       return entry ? spawnForEntryDirection(entry[0]) : this.spawn;
@@ -428,11 +445,22 @@ function addIncense(root, smokePuffs, x, z) {
 }
 
 function addNorthDoor(root, materials) {
+  const exterior = new THREE.Mesh(
+    new THREE.PlaneGeometry(4.4, 7.25),
+    new THREE.MeshBasicMaterial({
+      map: texture("townHorizonDay"),
+      color: 0xfff4df,
+      side: THREE.DoubleSide
+    })
+  );
+  exterior.position.set(0, 3.58, TEMPLE.northZ - 0.08);
+  root.add(exterior);
+
   const portal = new THREE.Mesh(
     archedWindowGeometry(4.05, 7.35, 36),
-    new THREE.MeshStandardMaterial({ color: 0x050403, emissive: 0x101820, emissiveIntensity: 0.9, roughness: 0.7 })
+    new THREE.MeshBasicMaterial({ color: 0xffdda0, transparent: true, opacity: 0.18, side: THREE.DoubleSide })
   );
-  portal.position.set(0, 0.08, TEMPLE.northZ - 0.03);
+  portal.position.set(0, 0.08, TEMPLE.northZ - 0.02);
   root.add(portal);
 
   const frame = new THREE.Group();
@@ -534,27 +562,14 @@ function spawnForEntryDirection(direction) {
   return { position: new THREE.Vector3(0, 0, 5.7), heading: 0 };
 }
 
-function makeTownMaterials(cobble) {
-  return {
-    cobble: new THREE.MeshStandardMaterial({ map: cobble, roughness: 0.85, metalness: 0.02 }),
-    road: new THREE.MeshStandardMaterial({ color: 0x6e5b42, roughness: 0.88 }),
-    stone: new THREE.MeshStandardMaterial({ color: 0x827762, roughness: 0.72 }),
-    water: new THREE.MeshStandardMaterial({ color: 0x5ea6bd, roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 }),
-    timber: new THREE.MeshStandardMaterial({ color: 0x5a341f, roughness: 0.78 }),
-    plaster: new THREE.MeshStandardMaterial({ color: 0xb8a57f, roughness: 0.86 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x3d5a68, roughness: 0.82 }),
-    awningRed: new THREE.MeshStandardMaterial({ color: 0xa24532, roughness: 0.76 }),
-    awningBlue: new THREE.MeshStandardMaterial({ color: 0x385d7a, roughness: 0.76 }),
-    sign: new THREE.MeshStandardMaterial({ color: 0xd2ad62, roughness: 0.58, metalness: 0.04 })
-  };
-}
-
 function addTownRoads(root, materials) {
   for (const [width, height, x, z] of [
-    [4.2, 34, 0, 0],
-    [34, 4.2, 0, 0],
-    [2.0, 19, -6.5, -7.2],
-    [2.0, 17, 6.4, 6.5]
+    [5.2, 46, 0, 0],
+    [46, 5.2, 0, 0],
+    [2.2, 24, -8.1, -8.5],
+    [2.2, 22, 8.2, 8.2],
+    [12.5, 2.8, -14.6, -7.3],
+    [12.5, 2.8, 14.6, 6.6]
   ]) {
     const road = new THREE.Mesh(new THREE.PlaneGeometry(width, height), materials.road);
     road.position.set(x, 0.018, z);
@@ -564,27 +579,57 @@ function addTownRoads(root, materials) {
   }
 }
 
+function addTownHorizon(root, worldRoot) {
+  addComponentBackdrop(root, "townHorizonDay", 0, 13.6, -48, 136, 44, { opacity: 0.94, unlit: true });
+}
+
 function addTownSquareStructures(root, materials) {
+  addPerimeterCurbs(root, materials);
+  addDistantPerimeter(root, materials);
+  addFountainApron(root, materials);
   addGatehouse(root, materials);
   addTavernFacade(root, materials);
   addMarketRow(root, materials);
   addTempleSteps(root, materials);
 
-  const houses = [
-    [-10.8, -9.7, 0.24, 2.6, 3.2, 2.2],
-    [-11.9, 8.6, -0.18, 2.4, 2.7, 2.0],
-    [10.8, -10.1, -0.24, 2.7, 3.0, 2.2],
-    [11.7, 8.8, 0.2, 2.2, 2.5, 1.8],
-    [-6.7, -13.1, 0.08, 3.0, 2.5, 1.8],
-    [6.9, -13.0, -0.08, 3.0, 2.5, 1.8]
+  for (const [x, z] of [
+    [-6.1, -5.5],
+    [6.1, -5.5],
+    [-6.1, 5.5],
+    [6.1, 5.5],
+    [-14.4, 8.8],
+    [14.4, -8.8]
+  ]) {
+    addComponentLamp(root, materials, x, z, { intensity: 1.45, distance: 5.2 });
+  }
+}
+
+function addPerimeterCurbs(root, materials) {
+  addBox(root, materials.darkStone, 0, 0.08, -22.3, 46, 0.16, 0.32);
+  addBox(root, materials.darkStone, 0, 0.08, 22.3, 46, 0.16, 0.32);
+  addBox(root, materials.darkStone, -22.3, 0.08, 0, 0.32, 0.16, 46);
+  addBox(root, materials.darkStone, 22.3, 0.08, 0, 0.32, 0.16, 46);
+}
+
+function addFountainApron(root, materials) {
+  const apron = new THREE.Mesh(new THREE.CylinderGeometry(5.15, 5.6, 0.12, 8), materials.stone);
+  apron.position.y = 0.06;
+  apron.rotation.y = Math.PI / 8;
+  apron.receiveShadow = true;
+  root.add(apron);
+}
+
+function addDistantPerimeter(root, materials) {
+  const wallRuns = [
+    [0, -25.1, 34, 1.25, 0.8],
+    [0, 25.1, 34, 1.25, 0.8],
+    [-25.1, 0, 0.8, 1.25, 34],
+    [25.1, 0, 0.8, 1.25, 34]
   ];
 
-  for (const house of houses) addTimberHouse(root, materials, ...house);
-
-  addLamp(root, materials, -4.2, -4.6);
-  addLamp(root, materials, 4.2, -4.6);
-  addLamp(root, materials, -4.2, 4.6);
-  addLamp(root, materials, 4.2, 4.6);
+  for (const [x, z, width, height, depth] of wallRuns) {
+    addBox(root, materials.stone, x, height / 2, z, width, height, depth, { castShadow: false });
+  }
 }
 
 function addTimberHouse(root, materials, x, z, rotY, width, height, depth) {
@@ -593,7 +638,16 @@ function addTimberHouse(root, materials, x, z, rotY, width, height, depth) {
   group.rotation.y = rotY;
   root.add(group);
 
-  addLocalBox(group, materials.plaster, 0, height / 2, 0, width, height, depth);
+  addLocalBox(
+    group,
+    [materials.plaster, materials.plaster, materials.plaster, materials.plaster, materials.plasterFacade, materials.plaster],
+    0,
+    height / 2,
+    0,
+    width,
+    height,
+    depth
+  );
   addLocalBox(group, materials.timber, 0, 0.12, depth / 2 + 0.04, width + 0.18, 0.24, 0.12);
   addLocalBox(group, materials.timber, -width / 2 + 0.18, height / 2, depth / 2 + 0.06, 0.16, height, 0.12);
   addLocalBox(group, materials.timber, width / 2 - 0.18, height / 2, depth / 2 + 0.06, 0.16, height, 0.12);
@@ -610,90 +664,83 @@ function addTimberHouse(root, materials, x, z, rotY, width, height, depth) {
 }
 
 function addGatehouse(root, materials) {
-  addLocalBox(root, materials.stone, -3.8, 2.2, -15.6, 2.2, 4.4, 2.2);
-  addLocalBox(root, materials.stone, 3.8, 2.2, -15.6, 2.2, 4.4, 2.2);
-  addLocalBox(root, materials.roof, -3.8, 4.8, -15.6, 2.6, 0.8, 2.6);
-  addLocalBox(root, materials.roof, 3.8, 4.8, -15.6, 2.6, 0.8, 2.6);
-  addLocalBox(root, materials.timber, 0, 3.45, -15.8, 4.8, 0.56, 0.38);
+  addBox(root, materials.stone, -5.7, 3.2, -21.6, 3.8, 6.4, 3.5);
+  addBox(root, materials.stone, 5.7, 3.2, -21.6, 3.8, 6.4, 3.5);
+  addBox(root, materials.stone, 0, 5.2, -21.8, 7.2, 2.0, 2.6);
+  addBox(root, materials.roof, -5.7, 6.92, -21.6, 4.4, 0.9, 3.9);
+  addBox(root, materials.roof, 5.7, 6.92, -21.6, 4.4, 0.9, 3.9);
+  addBox(root, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
+  addBox(root, materials.portalDark, 0, 1.82, -22.22, 4.15, 3.64, 0.34);
 }
 
 function addTavernFacade(root, materials) {
-  addTimberHouse(root, materials, -15.0, -3.4, Math.PI / 2, 4.2, 3.2, 2.2);
-  addLocalBox(root, materials.sign, -14.3, 2.55, -0.7, 0.12, 0.78, 1.7);
-  addLocalBox(root, materials.awningRed, -14.15, 2.08, -4.1, 0.16, 0.5, 2.4);
+  addGabledHouse(root, materials, {
+    x: -20.2,
+    z: 0,
+    rotationY: Math.PI / 2,
+    width: 8.6,
+    height: 5.1,
+    depth: 4.8,
+    floors: 2,
+    roofMaterial: materials.roofRed,
+    plasterMaterial: materials.plasterWarm,
+    facadeMaterial: materials.plasterFacadeWarm,
+    sign: true,
+    awning: materials.awningRed
+  });
+  addBox(root, materials.portalDark, -17.75, 1.55, 0, 0.34, 3.1, 2.9, { rotationY: Math.PI / 2 });
+  addBox(root, materials.sign, -17.45, 4.2, 0, 0.16, 0.82, 3.5, { rotationY: Math.PI / 2 });
+  addBox(root, materials.darkTimber, -17.54, 3.0, -1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
+  addBox(root, materials.darkTimber, -17.54, 3.0, 1.72, 0.18, 3.0, 0.22, { rotationY: Math.PI / 2 });
 }
 
 function addMarketRow(root, materials) {
-  for (let i = 0; i < 4; i++) {
-    const z = -6.2 + i * 3.1;
-    addMarketStall(root, materials, 12.5, z, -Math.PI / 2, i % 2 ? materials.awningBlue : materials.awningRed);
-  }
-}
+  addGabledHouse(root, materials, {
+    x: 19.8,
+    z: -1.8,
+    rotationY: -Math.PI / 2,
+    width: 7.2,
+    height: 4.4,
+    depth: 4.0,
+    floors: 2,
+    roofMaterial: materials.roof,
+    plasterMaterial: materials.plasterWarm,
+    facadeMaterial: materials.plasterFacade,
+    sign: true,
+    awning: materials.awningBlue
+  });
 
-function addMarketStall(root, materials, x, z, rotY, awningMaterial) {
-  const group = new THREE.Group();
-  group.position.set(x, 0, z);
-  group.rotation.y = rotY;
-  root.add(group);
-  addLocalBox(group, materials.timber, 0, 0.48, 0, 2.1, 0.34, 0.84);
-  addLocalBox(group, materials.timber, -0.92, 1.18, -0.34, 0.09, 1.46, 0.09);
-  addLocalBox(group, materials.timber, 0.92, 1.18, -0.34, 0.09, 1.46, 0.09);
-  const awning = new THREE.Mesh(new THREE.BoxGeometry(2.42, 0.18, 1.25), awningMaterial);
-  awning.position.set(0, 1.94, -0.1);
-  awning.rotation.x = -0.16;
-  awning.castShadow = true;
-  group.add(awning);
+  for (let i = 0; i < 3; i++) {
+    const z = -7.5 + i * 3.55;
+    addComponentMarketStall(root, materials, {
+      x: 14.8,
+      z,
+      rotationY: -Math.PI / 2,
+      awningMaterial: [materials.awningBlue, materials.awningRed, materials.awningGold][i % 3],
+      width: 3.0,
+      depth: 1.5
+    });
+  }
 }
 
 function addTempleSteps(root, materials) {
-  addLocalBox(root, materials.stone, 0, 0.16, 14.2, 6.0, 0.32, 1.2);
-  addLocalBox(root, materials.stone, 0, 0.36, 15.05, 4.4, 0.28, 1.0);
-  addLocalBox(root, materials.sign, 0, 1.2, 14.9, 2.4, 0.22, 0.22);
+  addBox(root, materials.stone, 0, 0.16, 19.1, 7.8, 0.32, 1.35);
+  addBox(root, materials.stone, 0, 0.36, 20.05, 5.4, 0.28, 1.08);
+  addBox(root, materials.sign, 0, 1.35, 20.0, 3.1, 0.22, 0.22);
+  addBox(root, materials.stone, -3.25, 1.55, 20.55, 0.32, 3.1, 0.32);
+  addBox(root, materials.stone, 3.25, 1.55, 20.55, 0.32, 3.1, 0.32);
 }
 
-function addLamp(root, materials, x, z) {
-  addLocalBox(root, materials.timber, x, 1.05, z, 0.12, 2.1, 0.12);
-  const lamp = new THREE.PointLight(0xffbf62, 1.8, 5.4);
-  lamp.position.set(x, 2.25, z);
-  root.add(lamp);
-  const flame = new THREE.Mesh(
-    new THREE.SphereGeometry(0.18, 12, 8),
-    new THREE.MeshBasicMaterial({ color: 0xffc66d, transparent: true, opacity: 0.84 })
-  );
-  flame.position.copy(lamp.position);
-  root.add(flame);
-}
-
-function addTownFacades(root) {
-  const wood = new THREE.MeshStandardMaterial({ color: 0x65422a, roughness: 0.8 });
-  const roof = new THREE.MeshStandardMaterial({ color: 0x425d6c, roughness: 0.85 });
-  for (const side of [-1, 1]) {
-    for (let i = 0; i < 4; i++) {
-      const house = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.1, 1.2), wood);
-      house.position.set(side * (5.4 + i * 0.35), 1.05, -5.8 + i * 3.3);
-      house.rotation.y = side * 0.25;
-      house.castShadow = true;
-      root.add(house);
-
-      const cap = new THREE.Mesh(new THREE.ConeGeometry(1.22, 0.8, 4), roof);
-      cap.position.copy(house.position).add(new THREE.Vector3(0, 1.42, 0));
-      cap.rotation.y = Math.PI / 4;
-      cap.castShadow = true;
-      root.add(cap);
-    }
-  }
-}
-
-function addTownPortal(root, label, position, targetId, rotY = 0) {
-  const group = new THREE.Group();
-  group.position.copy(position);
-  group.rotation.y = rotY;
-  group.userData.targetId = targetId;
-  group.userData.label = label;
-  root.add(group);
-
-  addLocalBox(group, new THREE.MeshStandardMaterial({ color: 0x46321e, emissive: 0x1d140d, emissiveIntensity: 0.45 }), 0, 0, 0, 2.35, 2.5, 0.22);
-  addLocalBox(group, new THREE.MeshStandardMaterial({ color: 0xd2ad62, emissive: 0x3a260a, emissiveIntensity: 0.28 }), 0, 1.52, -0.16, 1.45, 0.32, 0.12);
+function addTownPortal(root, materials, label, position, targetId, rotY = 0) {
+  return addPortalFrame(root, materials, {
+    label,
+    targetId,
+    x: position.x,
+    z: position.z,
+    rotationY: rotY,
+    width: label === "Temple" ? 3.4 : label === "Tavern" ? 3.85 : 2.85,
+    height: label === "Gate" ? 3.45 : label === "Tavern" ? 3.5 : 3.0
+  });
 }
 
 function addNpcSprite(root, path, x, y, z, name) {
@@ -702,40 +749,4 @@ function addNpcSprite(root, path, x, y, z, name) {
   sprite.position.set(x, 1.2, z);
   sprite.scale.set(1.45, 1.45, 1);
   root.add(sprite);
-}
-
-function makeTempleMaterials() {
-  const glassMap = texture(`${ASSET_ROOT}/temple-stained-glass-alpha.png`);
-
-  return {
-    marble: new THREE.MeshStandardMaterial({ map: texture(`${ASSET_ROOT}/temple-marble-floor.png`, [3.2, 5.6]), roughness: 0.34, metalness: 0.02 }),
-    stone: new THREE.MeshStandardMaterial({ map: texture(`${ASSET_ROOT}/temple-limestone-wall.png`, [2, 2]), roughness: 0.84 }),
-    glass: new THREE.MeshStandardMaterial({
-      map: glassMap,
-      emissiveMap: glassMap,
-      emissive: 0xffffff,
-      emissiveIntensity: 1.05,
-      transparent: true,
-      alphaTest: 0.035,
-      depthWrite: false,
-      roughness: 0.2,
-      side: THREE.DoubleSide
-    }),
-    altar: new THREE.MeshStandardMaterial({ map: texture(`${ASSET_ROOT}/temple-altar-cloth.png`, [1, 1]), roughness: 0.62 }),
-    trim: new THREE.MeshStandardMaterial({ color: 0xbeb39c, roughness: 0.65 }),
-    windowFrame: new THREE.MeshStandardMaterial({ color: 0x58452f, metalness: 0.18, roughness: 0.52 }),
-    windowReveal: new THREE.MeshStandardMaterial({ color: 0xa79b83, roughness: 0.86 }),
-    windowGlow: new THREE.MeshBasicMaterial({ color: 0xffd58f, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide })
-  };
-}
-
-function texture(path, repeat = null) {
-  const map = textureLoader.load(path);
-  map.colorSpace = THREE.SRGBColorSpace;
-  if (repeat) {
-    map.wrapS = THREE.RepeatWrapping;
-    map.wrapT = THREE.RepeatWrapping;
-    map.repeat.set(repeat[0], repeat[1]);
-  }
-  return map;
 }

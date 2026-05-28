@@ -31,7 +31,6 @@ input {
 .room-panel,
 .atlas-panel,
 .mode-panel,
-.hud-bar,
 .game-panel {
   position: fixed;
   z-index: 5;
@@ -45,9 +44,14 @@ input {
 
 .room-panel {
   left: 20px;
-  bottom: 20px;
-  width: min(520px, calc(100vw - 40px));
-  padding: 18px 18px 16px;
+  top: 78px;
+  width: auto;
+  max-width: min(260px, calc(100vw - 40px));
+  padding: 9px 10px 10px;
+  background:
+    linear-gradient(180deg, rgba(16, 13, 9, 0.64), rgba(8, 6, 4, 0.46)),
+    rgba(8, 6, 4, 0.42);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32);
 }
 
 .mode-panel {
@@ -62,21 +66,12 @@ input {
 .atlas-panel {
   right: 20px;
   top: 20px;
-  width: 220px;
-  padding: 14px;
+  width: 162px;
+  padding: 9px;
 }
 
-.hud-bar {
-  left: 50%;
-  bottom: 20px;
-  display: flex;
-  gap: 6px;
-  padding: 8px;
-  transform: translateX(-50%);
-}
-
-.hud-bar button,
 .play-button,
+.menu-button,
 .panel-close {
   display: grid;
   min-width: 34px;
@@ -88,15 +83,16 @@ input {
   cursor: pointer;
 }
 
-.hud-bar button:hover,
-.hud-bar button.active,
 .play-button:hover,
+.menu-button:hover,
+.menu-button.active,
 .panel-close:hover {
   border-color: #f4ce78;
   color: #fff4c7;
 }
 
 .mode-label {
+  display: none;
   min-width: 44px;
   color: #d8ceb6;
   font-size: 12px;
@@ -143,10 +139,58 @@ body[data-input-mode="play"] .crosshair {
   opacity: 1;
 }
 
-body[data-input-mode="play"] .hud-bar,
 body[data-input-mode="play"] .mode-panel {
-  opacity: 0.34;
+  opacity: 0;
   pointer-events: none;
+}
+
+body[data-input-mode="play"] .room-panel {
+  top: 18px;
+  width: auto;
+  max-width: min(240px, calc(100vw - 40px));
+  padding: 7px 10px;
+  border-color: rgba(244, 206, 120, 0.22);
+  background: rgba(9, 7, 5, 0.42);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+body[data-input-mode="play"] .room-panel h1 {
+  margin: 0;
+  font-size: 13px;
+}
+
+body[data-input-mode="play"] .atlas-panel {
+  top: 18px;
+  right: 18px;
+  width: 58px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+body[data-input-mode="play"] .atlas-panel .eyebrow,
+body[data-input-mode="play"] #world-count,
+body[data-input-mode="play"] #room-count,
+body[data-input-mode="play"] .mini-map,
+body[data-input-mode="play"] .hint {
+  display: none;
+}
+
+body[data-input-mode="play"] .nav-cluster {
+  display: block;
+  margin: 0;
+}
+
+body[data-input-mode="play"] .compass {
+  width: 58px;
+  height: 58px;
+  background:
+    radial-gradient(circle at center, rgba(255, 237, 185, 0.12), rgba(26, 19, 10, 0.36) 44%, rgba(8, 6, 4, 0.58));
 }
 
 .game-panel {
@@ -188,6 +232,29 @@ body[data-input-mode="play"] .mode-panel {
   padding: 12px 14px 14px;
 }
 
+.menu-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.menu-tabs button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(204, 168, 85, 0.28);
+  color: #d9ceb5;
+  background: rgba(18, 13, 8, 0.58);
+  cursor: pointer;
+}
+
+.menu-tabs button:hover,
+.menu-tabs button.active {
+  border-color: rgba(244, 206, 120, 0.72);
+  color: #fff4c7;
+  background: rgba(72, 47, 20, 0.72);
+}
+
 .eyebrow {
   margin-bottom: 6px;
   color: #9fdf8a;
@@ -198,8 +265,8 @@ body[data-input-mode="play"] .mode-panel {
 }
 
 h1 {
-  margin: 0 0 8px;
-  font-size: 28px;
+  margin: 0 0 5px;
+  font-size: 18px;
   line-height: 1.05;
   letter-spacing: 0;
 }
@@ -207,15 +274,23 @@ h1 {
 p {
   margin: 0;
   color: #d9ceb5;
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.room-panel p {
+  display: none;
+}
+
+.room-panel .eyebrow {
+  display: none;
 }
 
 .exits {
-  display: flex;
+  display: none;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
+  gap: 6px;
+  margin-top: 9px;
 }
 
 .exit-button,
@@ -227,9 +302,10 @@ p {
 }
 
 .exit-button {
-  min-width: 72px;
-  min-height: 34px;
-  padding: 0 12px;
+  min-width: 0;
+  min-height: 28px;
+  padding: 0 9px;
+  font-size: 12px;
 }
 
 .exit-button:hover,
@@ -245,12 +321,19 @@ p {
   line-height: 1.4;
 }
 
+.atlas-panel .eyebrow,
+#world-count,
+#room-count,
+.hint {
+  display: none;
+}
+
 .nav-cluster {
   display: grid;
-  grid-template-columns: 1fr 76px;
-  gap: 10px;
+  grid-template-columns: 78px 58px;
+  gap: 8px;
   align-items: center;
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .mini-map {
@@ -284,8 +367,8 @@ p {
 
 .compass {
   position: relative;
-  width: 76px;
-  height: 76px;
+  width: 58px;
+  height: 58px;
   border: 1px solid rgba(204, 168, 85, 0.34);
   border-radius: 50%;
   background:
@@ -302,29 +385,29 @@ p {
 
 .compass-cardinal {
   color: #cdbf9e;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
 }
 
 .compass-cardinal.north {
-  top: 11px;
+  top: 9px;
 }
 
 .compass-cardinal.east {
-  left: calc(100% - 11px);
+  left: calc(100% - 9px);
 }
 
 .compass-cardinal.south {
-  top: calc(100% - 11px);
+  top: calc(100% - 9px);
 }
 
 .compass-cardinal.west {
-  left: 11px;
+  left: 9px;
 }
 
 .compass-needle {
   width: 2px;
-  height: 46px;
+  height: 36px;
   transform-origin: center;
 }
 
@@ -338,14 +421,14 @@ p {
 
 .compass-needle::before {
   top: 0;
-  height: 24px;
+  height: 19px;
   background: #f4ce78;
   box-shadow: 0 0 8px rgba(244, 206, 120, 0.48);
 }
 
 .compass-needle::after {
   bottom: 0;
-  height: 18px;
+  height: 14px;
   background: rgba(128, 88, 50, 0.82);
 }
 
@@ -460,25 +543,18 @@ p {
   .room-panel {
     left: 12px;
     right: 12px;
-    bottom: 12px;
+    top: 64px;
+    bottom: auto;
     width: auto;
   }
 
   h1 {
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .mode-panel {
     left: 12px;
     top: 12px;
-  }
-
-  .hud-bar {
-    bottom: auto;
-    top: 12px;
-    right: 12px;
-    left: auto;
-    transform: none;
   }
 
   .game-panel {
