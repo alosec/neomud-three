@@ -743,7 +743,11 @@ def build_level():
 
     marker3("SPAWN_player", 0, 0.9, -28.8, "spawn", spawn_id="player", heading_degrees=180)
     marker3("CAMERA_long_nave", 0, 3.4, -12.0, "camera_zone", camera_id="long_nave", distance=8.6, height=5.35, look_ahead=3.0)
-    marker3("LIGHTS_altar_warm", 0, 5.5, 16.8, "light", display_type="SINGLE_ARROW", light_id="altar_warm", light_type="point", intensity=2.2)
+    marker3("LIGHTS_temple_ambient_fill", 0, 4.0, -8.0, "light", display_type="SINGLE_ARROW", light_id="ambient_fill", light_type="hemisphere", intensity=0.44, sky_color="#ffe2bd", ground_color="#2d231b")
+    marker3("LIGHTS_altar_warm", 0, 4.35, 16.2, "light", display_type="SINGLE_ARROW", light_id="altar_warm", light_type="point", intensity=2.45, distance=24.0, color="#ffba6f")
+    marker3("LIGHTS_entry_cool_fill", 0, 4.0, -24.0, "light", display_type="SINGLE_ARROW", light_id="entry_cool_fill", light_type="point", intensity=0.82, distance=23.0, color="#b8d4ff")
+    marker3("LIGHTS_west_window_cool", -10.8, 4.8, -9.0, "light", display_type="SINGLE_ARROW", light_id="west_window_cool", light_type="point", intensity=0.48, distance=15.5, color="#8fb8ff")
+    marker3("LIGHTS_east_window_cool", 10.8, 4.8, -9.0, "light", display_type="SINGLE_ARROW", light_id="east_window_cool", light_type="point", intensity=0.48, distance=15.5, color="#8fb8ff")
 
     batch_visible_meshes_by_material()
 

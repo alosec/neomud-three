@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { LEVEL_PACKAGES } from "./level-packages.js";
-import { buildGlbRoomRuntime } from "./glb-room-runtime.js";
+import { addRuntimeLightsFromBlenderLevel, buildGlbRoomRuntime } from "./glb-room-runtime.js";
 import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
 import { TOWN_SQUARE_SPEC } from "./room-specs.js";
 import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
@@ -268,9 +268,18 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
       fogDensity: 0.018
     },
     configureScene: configureBlenderTempleScene,
+    configureLights: configureBlenderTempleLights,
     floorColliderId: "world-floor",
     colliderRadius: 0.42,
     landmarkId: "town-temple-glb"
+  });
+}
+
+function configureBlenderTempleLights(scene, level) {
+  addRuntimeLightsFromBlenderLevel(scene, level, {
+    idPrefix: "temple-runtime-marker-",
+    defaultColor: 0xffba6f,
+    defaultDistance: 18
   });
 }
 
@@ -6188,26 +6197,6 @@ function configureBlenderTempleScene(scene) {
     }
   });
 
-  const ambientFill = new THREE.HemisphereLight(0xffe2bd, 0x2d231b, 0.44);
-  ambientFill.name = "temple-runtime-warm-ambient-fill";
-  scene.add(ambientFill);
-
-  const altarLight = new THREE.PointLight(0xffba6f, 2.45, 24.0);
-  altarLight.name = "temple-runtime-altar-warm-light";
-  altarLight.position.set(0, 4.35, 16.2);
-  scene.add(altarLight);
-
-  const naveFill = new THREE.PointLight(0xb8d4ff, 0.82, 23.0);
-  naveFill.name = "temple-runtime-entry-cool-fill";
-  naveFill.position.set(0, 4.0, -24.0);
-  scene.add(naveFill);
-
-  for (const [side, name] of [[-1, "west"], [1, "east"]]) {
-    const windowLight = new THREE.PointLight(0x8fb8ff, 0.48, 15.5);
-    windowLight.name = `temple-runtime-${name}-window-cool-light`;
-    windowLight.position.set(side * 10.8, 4.8, -9.0);
-    scene.add(windowLight);
-  }
 }
 
 function configureBlenderTavernScene(scene, flameMeshes = []) {

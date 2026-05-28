@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T23:30:54.000Z",
+  "updated": "2026-05-28T23:38:17.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -3011,6 +3011,28 @@
       "comments": [],
       "created": "2026-05-28T23:28:17Z",
       "updated": "2026-05-28T23:30:54Z"
+    },
+    {
+      "id": "neo-1fb2.88",
+      "project": "NeoMud",
+      "title": "Drive GLB room lights from Blender markers",
+      "description": "",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: GLB runtime now instantiates lights from authored LIGHTS_ markers; Temple exports five marker-driven lights and passes lab/room/offline/server QA",
+      "labels": [
+        "blender",
+        "lighting",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T23:33:10Z",
+      "updated": "2026-05-28T23:38:17Z"
     }
   ]
 }

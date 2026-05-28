@@ -10,13 +10,13 @@
   "runtimeGlb": "town_temple.glb",
   "files": {
     "sourceImageBytes": 74634,
-    "sourceBlendBytes": 205561,
-    "runtimeGlbBytes": 1685296
+    "sourceBlendBytes": 206379,
+    "runtimeGlbBytes": 1686212
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 26,
+    "nodes": 30,
     "meshes": 23,
     "materials": 17,
     "prefixes": {
@@ -29,13 +29,13 @@
       "ENEMY_": 0,
       "PATH_": 0,
       "CAMERA_": 1,
-      "LIGHTS_": 1
+      "LIGHTS_": 5
     }
   },
   "runtimeQa": {
     "offlineTempleBudget": {
       "drawCalls": 35,
-      "triangles": 7710,
+      "triangles": 12286,
       "textures": 2,
       "geometries": 22
     },
@@ -52,6 +52,7 @@
   "knownLimits": [
     "Materials are mixed: most stone/wood remains first-pass Blender-authored stylized colors, while stained glass now uses a generated painted lancet texture candidate.",
     "The package now uses isolated pew, wall-window bay, and altar/incense asset candidates plus material-batched visible room meshes.",
+    "Runtime lighting is now driven by five authored LIGHTS_ markers, but Tavern still needs the same marker-driven lighting migration.",
     "Stained-glass floor-light patches are subdued, but still procedural and should become a dedicated lighting/effects pass later.",
     "The painted stained-glass texture is embedded in the GLB for this candidate; future asset-build work should move repeated textures toward optimized/compressed delivery.",
     "The old procedural Temple builder remains in code as a temporary removal candidate."

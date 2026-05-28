@@ -9,6 +9,7 @@ export function buildGlbRoomRuntime({
   status,
   environment,
   configureScene,
+  configureLights,
   floorColliderId = "world-floor",
   colliderRadius = 0.42,
   landmarkId = packageInfo.id,
@@ -16,6 +17,7 @@ export function buildGlbRoomRuntime({
 }) {
   const { scene, level } = instantiateBlenderLevel(packageInfo.url, { hideAuthoringNodes: true });
   configureScene?.(scene, level);
+  configureLights?.(scene, level);
   root.add(scene);
 
   const colliders = collidersFromBlenderLevel(level);
@@ -56,7 +58,9 @@ export function buildGlbRoomRuntime({
         profile: packageInfo.profile,
         renderNodes: level.summary.renderNodes,
         collisionNodes: level.summary.collisionNodes,
-        triggerNodes: level.summary.triggerNodes
+        triggerNodes: level.summary.triggerNodes,
+        lightNodes: level.byKind.light.length,
+        runtimeLights: scene.userData.neomudRuntimeLights ?? []
       }];
     },
     debugColliders() {
@@ -64,6 +68,76 @@ export function buildGlbRoomRuntime({
     },
     update
   };
+}
+
+export function addRuntimeLightsFromBlenderLevel(scene, level, {
+  idPrefix = "",
+  includePreview = false,
+  defaultDistance = 18,
+  defaultColor = 0xffffff
+} = {}) {
+  const created = [];
+  for (const node of level.byKind.light) {
+    const lightId = String(node.userData.light_id ?? stripLevelPrefix(node.name, "LIGHTS_"));
+    if (!includePreview && lightId.startsWith("preview_")) continue;
+
+    const lightType = String(node.userData.light_type ?? "point").toLowerCase();
+    const intensity = numberValue(node.userData.intensity, 1);
+    const color = colorValue(node.userData.color, defaultColor);
+    const distance = numberValue(node.userData.distance, defaultDistance);
+    const decay = numberValue(node.userData.decay, 2);
+    const light = createRuntimeLight(lightType, color, intensity, distance, decay, node.userData);
+    if (!light) continue;
+
+    light.name = `${idPrefix}${lightId}`;
+    light.position.set(node.position.x, node.position.y, node.position.z);
+    if (light.target && node.userData.target_x !== undefined) {
+      light.target.position.set(
+        numberValue(node.userData.target_x, 0),
+        numberValue(node.userData.target_y, 0),
+        numberValue(node.userData.target_z, 0)
+      );
+      scene.add(light.target);
+    }
+    scene.add(light);
+    created.push(light);
+  }
+  scene.userData.neomudRuntimeLights = created.map((light) => light.name);
+  return created;
+}
+
+function createRuntimeLight(lightType, color, intensity, distance, decay, userData) {
+  if (lightType === "hemisphere" || lightType === "hemi") {
+    return new THREE.HemisphereLight(
+      colorValue(userData.sky_color, color),
+      colorValue(userData.ground_color, 0x2d231b),
+      intensity
+    );
+  }
+  if (lightType === "directional" || lightType === "sun") {
+    return new THREE.DirectionalLight(color, intensity);
+  }
+  if (lightType === "spot") {
+    const light = new THREE.SpotLight(color, intensity, distance, numberValue(userData.angle, Math.PI / 5), numberValue(userData.penumbra, 0.35), decay);
+    return light;
+  }
+  if (lightType === "point") {
+    return new THREE.PointLight(color, intensity, distance, decay);
+  }
+  return null;
+}
+
+function numberValue(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function colorValue(value, fallback) {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value !== "string") return fallback;
+  const normalized = value.trim().replace(/^#/, "0x");
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function collidersFromBlenderLevel(level) {
