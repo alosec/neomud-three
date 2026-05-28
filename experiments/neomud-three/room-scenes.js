@@ -2381,6 +2381,7 @@ function addTavernInterior(root, materials, fireGroup) {
     addBox(root, materials.darkTimber, x, 0.075, 0, 0.12, 0.15, TAVERN.depth - 0.3, { castShadow: false });
   }
 
+  addTavernCeilingComposition(root, materials);
   addTavernBar(root, materials);
   addTavernFireplace(root, materials, fireGroup);
   addTavernTables(root, materials);
@@ -2407,6 +2408,32 @@ function addTavernInterior(root, materials, fireGroup) {
   const tableLight = new THREE.PointLight(0xffd39a, 1.6, 8.8);
   tableLight.position.set(2.1, 2.35, 2.2);
   root.add(tableLight);
+}
+
+function addTavernCeilingComposition(root, materials) {
+  const planks = [];
+  const rafters = [];
+  for (const z of [-7.35, -6.25, -5.15, -4.05, -2.95, -1.85, -0.75, 0.35, 1.45, 2.55, 3.65, 4.75, 5.85, 6.95]) {
+    planks.push({ x: 0, y: 4.28, z, width: TAVERN.width - 1.1, height: 0.08, depth: 0.38 });
+  }
+  for (const x of [-8.6, -4.3, 0, 4.3, 8.6]) {
+    rafters.push({ x, y: 4.02, z: 0, width: 0.22, height: 0.22, depth: TAVERN.depth - 0.8 });
+  }
+  rafters.push({ x: 0, y: 3.86, z: 0, width: TAVERN.width - 0.9, height: 0.18, depth: 0.18 });
+  addInstancedBoxes(root, materials.timber, planks, "tavern-ceiling-planks", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.darkTimber, rafters, "tavern-ceiling-rafters");
+
+  addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), materials.sign, [
+    { x: -3.8, y: 3.62, z: -2.5, scale: [0.16, 0.16, 0.16] },
+    { x: 3.9, y: 3.58, z: 2.4, scale: [0.16, 0.16, 0.16] },
+    { x: -0.1, y: 3.52, z: 5.4, scale: [0.13, 0.13, 0.13] }
+  ], "tavern-ceiling-lantern-bulbs", { castShadow: false, receiveShadow: false });
+
+  for (const [x, z] of [[-3.8, -2.5], [3.9, 2.4], [-0.1, 5.4]]) {
+    const light = new THREE.PointLight(0xffc477, 0.85, 4.4);
+    light.position.set(x, 3.45, z);
+    root.add(light);
+  }
 }
 
 function addTavernBar(root, materials) {

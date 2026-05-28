@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:01:36.023Z",
+  "updated": "2026-05-28T18:13:58.914Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2316,6 +2316,29 @@
       ],
       "created": "2026-05-28T17:53:33Z",
       "updated": "2026-05-28T18:01:09Z"
+    },
+    {
+      "id": "neo-1fb2.25.1",
+      "project": "NeoMud",
+      "title": "Improve Tavern ceiling composition",
+      "description": "Reduce the flat dark Tavern ceiling mass with reusable low-cost ceiling planks, rafters, and a few warm lantern accents using existing Tavern/Town materials only.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.25",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 109,
+          "body": "Completed: Tavern ceiling now has instanced planks/rafters and three low-cost warm lantern accents using existing materials. Room-shot/offline/server QA pass; metrics recorded in memory bank.",
+          "created": "2026-05-28T18:13:43Z"
+        }
+      ],
+      "created": "2026-05-28T18:05:40Z",
+      "updated": "2026-05-28T18:13:46Z"
     }
   ],
   "ready": [
