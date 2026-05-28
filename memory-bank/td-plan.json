@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:21:23.291Z",
+  "updated": "2026-05-28T18:29:44.832Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2362,6 +2362,29 @@
       ],
       "created": "2026-05-28T18:15:48Z",
       "updated": "2026-05-28T18:20:32Z"
+    },
+    {
+      "id": "neo-1fb2.14.2",
+      "project": "NeoMud",
+      "title": "Improve compact avatar rear silhouette",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.14",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 111,
+          "body": "Completed: compact avatar proxy is now v5 with darker palette, rear cloak structure, shoulder pieces, and extra gold trim visible from the third-person camera. Labs/town/offline/server QA pass; parent remains open for a real authored skinned adventurer GLB.",
+          "created": "2026-05-28T18:29:18Z"
+        }
+      ],
+      "created": "2026-05-28T18:24:31Z",
+      "updated": "2026-05-28T18:29:29Z"
     }
   ],
   "ready": [
