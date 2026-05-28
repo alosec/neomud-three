@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T11:43:27.558Z",
+  "updated": "2026-05-28T11:55:05.315Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1541,6 +1541,27 @@
       "comments": [],
       "created": "2026-05-28T11:34:01Z",
       "updated": "2026-05-28T11:43:08Z"
+    },
+    {
+      "id": "neo-11c4",
+      "project": "NeoMud",
+      "title": "Add low-cost stained-glass floor light patches to Temple",
+      "description": "Add instanced transparent color patches on the Temple marble floor to sell stained-glass light without increasing room complexity; keep Temple under render budget, update screenshots/review/memory, commit and push.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: added instanced stained-glass floor light strips to Temple, rejected over-budget/material-group version, and verified offline/room/server QA within budget",
+      "labels": [
+        "neomud-three",
+        "qa",
+        "visual"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T11:48:31Z",
+      "updated": "2026-05-28T11:54:40Z"
     }
   ],
   "ready": [

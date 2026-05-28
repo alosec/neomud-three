@@ -119,6 +119,7 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
 
   addTempleShell(root, materials);
   addTempleWindows(root, materials, beams);
+  addTempleGlassFloorPatches(root);
   addAltar(root, materials, smokePuffs);
   addNorthDoor(root, materials);
   addFloorRunes(root);
@@ -846,6 +847,54 @@ function addTempleWindows(root, materials, beams) {
   for (const z of positions) {
     addWindow(root, beams, materials, -14.05, 7.15, z, Math.PI / 2, 1);
     addWindow(root, beams, materials, 14.05, 7.15, z, -Math.PI / 2, -1);
+  }
+}
+
+function addTempleGlassFloorPatches(root) {
+  const patches = [
+    { x: -5.9, z: -29.0, width: 0.82, depth: 6.0, rotationZ: -0.28, color: 0xffc45d },
+    { x: -4.92, z: -28.2, width: 0.58, depth: 5.1, rotationZ: -0.28, color: 0x72c9ff },
+    { x: 5.72, z: -25.6, width: 0.72, depth: 5.5, rotationZ: 0.26, color: 0x72c9ff },
+    { x: 6.56, z: -24.7, width: 0.54, depth: 4.6, rotationZ: 0.26, color: 0xf26b7a },
+    { x: -5.62, z: -13.8, width: 0.8, depth: 5.8, rotationZ: -0.22, color: 0xf26b7a },
+    { x: -4.68, z: -12.9, width: 0.52, depth: 4.8, rotationZ: -0.22, color: 0xffc45d },
+    { x: 5.34, z: -10.3, width: 0.82, depth: 5.6, rotationZ: 0.3, color: 0xffc45d },
+    { x: 6.28, z: -9.5, width: 0.52, depth: 4.6, rotationZ: 0.3, color: 0x72c9ff },
+    { x: -5.82, z: 1.8, width: 0.82, depth: 5.7, rotationZ: -0.24, color: 0x72c9ff },
+    { x: -4.9, z: 2.6, width: 0.52, depth: 4.5, rotationZ: -0.24, color: 0xf26b7a },
+    { x: 5.48, z: 5.7, width: 0.78, depth: 5.1, rotationZ: 0.24, color: 0xffc45d },
+    { x: 6.32, z: 6.4, width: 0.5, depth: 4.2, rotationZ: 0.24, color: 0xf26b7a }
+  ];
+  const geometry = new THREE.PlaneGeometry(1, 1);
+  const byColor = new Map();
+  for (const patch of patches) {
+    if (!byColor.has(patch.color)) byColor.set(patch.color, []);
+    byColor.get(patch.color).push(patch);
+  }
+
+  const dummy = new THREE.Object3D();
+  for (const [color, colorPatches] of byColor) {
+    const material = new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity: 0.24,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    const mesh = new THREE.InstancedMesh(geometry, material, colorPatches.length);
+    mesh.userData = { visualRole: "temple-stained-glass-floor-patches", color };
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+
+    colorPatches.forEach((patch, index) => {
+      dummy.position.set(patch.x, 0.041, patch.z);
+      dummy.rotation.set(-Math.PI / 2, 0, patch.rotationZ ?? 0);
+      dummy.scale.set(patch.width, patch.depth, 1);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(index, dummy.matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    root.add(mesh);
   }
 }
 
