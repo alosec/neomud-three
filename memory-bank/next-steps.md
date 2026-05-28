@@ -6,6 +6,7 @@ High leverage next work:
    - Treat `memory-bank/production-workflow.md` as the operating contract.
    - One pass must name one target, one problem, one hypothesis, constraints, and evidence.
    - Treat `memory-bank/blender-glb-pipeline.md` as the authoring contract for substantial 3D geometry.
+   - Treat `memory-bank/asset-level-qa-workflow.md` as the authoring contract for repeated or close-up fixtures.
    - Prefer source image/brief + Blender source + exported GLB + validator for new rooms, landmarks, collision layouts, and authored models instead of direct JS mesh construction.
    - Read `experiments/neomud-three/ART_DIRECTION.md` before visual edits.
    - Put new generated materials through `material-lab.html`.
@@ -34,6 +35,8 @@ High leverage next work:
    - Treat `experiments/neomud-three/assets/source/scenes/town_temple/level-brief.json` as the Temple production contract.
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
+   - Use isolated asset QA for each fixture before room integration. `cathedral.pew` is the first candidate; the next targets are `cathedral.wall_window_bay`, `cathedral.altar_retable`, and `cathedral.incense_brazier`.
+   - Do not accept the current stained-glass windows as final. The next Temple fixture pass should build one reusable wall-window bay in isolation, including recess, frame, mullions/tracery, glass, and a controlled light projection test.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
    - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
 

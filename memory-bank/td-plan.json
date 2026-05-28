@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T21:51:13.382Z",
+  "updated": "2026-05-28T22:08:04.028Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2850,6 +2850,44 @@
       "comments": [],
       "created": "2026-05-28T21:48:43Z",
       "updated": "2026-05-28T21:51:00Z"
+    },
+    {
+      "id": "neo-1fb2.80",
+      "project": "NeoMud",
+      "title": "Reset cathedral asset QA and improve Temple pew/window pass",
+      "description": "Replace broad cathedral improvisation with asset-level QA gates. First concrete pass: remove window-obstructing side geometry from the Blender Temple package and replace box pew rows with a more convincing reusable pew asset before re-exporting and QAing the room.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added asset-level QA workflow, isolated cathedral pew Blender/GLB package and asset lab, removed Temple window-obstructing side piers/lintels, replaced box pews with shaped pew candidate, and passed labs/offline/room/server QA",
+      "labels": [
+        "cathedral"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T21:57:49Z",
+      "updated": "2026-05-28T22:07:49Z"
+    },
+    {
+      "id": "neo-1fb2.81",
+      "project": "NeoMud",
+      "title": "Build cathedral wall-window bay asset QA candidate",
+      "description": "Create an isolated Blender/GLB candidate for a reusable cathedral wall-window bay with recess, frame, mullions/tracery, inset stained glass, mirrored left/right behavior, and controlled light projection. It must pass asset-lab screenshot QA before replacing the current colored slab windows in town:temple.",
+      "type": "task",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "unstarted",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "pipeline"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T22:07:49Z",
+      "updated": "2026-05-28T22:07:49Z"
     }
   ]
 }

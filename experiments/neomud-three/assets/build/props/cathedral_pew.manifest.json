@@ -1,0 +1,49 @@
+{
+  "id": "cathedral.pew",
+  "slug": "cathedral_pew",
+  "name": "Cathedral Pew",
+  "packageVersion": 1,
+  "profile": "landmark",
+  "sourceBlend": "../../source/props/cathedral_pew/cathedral_pew.blend",
+  "runtimeGlb": "cathedral_pew.glb",
+  "files": {
+    "sourceBlendBytes": 103673,
+    "runtimeGlbBytes": 19488
+  },
+  "validator": {
+    "script": "scripts/validate-neomud-three-gltf.mjs",
+    "profile": "landmark",
+    "nodes": 13,
+    "meshes": 11,
+    "materials": 5,
+    "prefixes": {
+      "VIS_": 10,
+      "COL_": 1,
+      "NAV_": 0,
+      "SPAWN_": 0,
+      "TRG_": 0,
+      "PICKUP_": 0,
+      "ENEMY_": 0,
+      "PATH_": 0,
+      "CAMERA_": 1,
+      "LIGHTS_": 1
+    }
+  },
+  "runtimeQa": {
+    "cathedralAssetLabBudget": {
+      "drawCalls": 112,
+      "triangles": 1726,
+      "textures": 6,
+      "geometries": 108
+    },
+    "checks": [
+      "GLB landmark profile validation",
+      "Cathedral Asset Lab screenshot QA"
+    ]
+  },
+  "knownLimits": [
+    "This is the first asset-level pew candidate, not final cathedral furniture.",
+    "Wood materials are still flat Blender colors; later passes should add approved material variation or a trim sheet.",
+    "The Temple room currently duplicates pew submeshes directly instead of batching or instancing the asset."
+  ]
+}

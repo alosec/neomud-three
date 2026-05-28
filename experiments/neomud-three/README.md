@@ -61,6 +61,7 @@ Material and prop review levels:
 ```text
 http://127.0.0.1:4183/experiments/neomud-three/material-lab.html
 http://127.0.0.1:4183/experiments/neomud-three/prop-zoo.html
+http://127.0.0.1:4183/experiments/neomud-three/cathedral-asset-lab.html
 http://127.0.0.1:4183/experiments/neomud-three/movement-gym.html
 ```
 

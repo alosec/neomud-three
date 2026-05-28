@@ -45,6 +45,17 @@ const LABS = [
       debug: window.__neomudMovementGymDebug.debug,
       error: window.__neomudMovementGymDebug.error
     })
+  },
+  {
+    id: "cathedral-asset-lab",
+    path: "cathedral-asset-lab.html",
+    screenshot: "cathedral-asset-lab.png",
+    ready: () => window.__neomudCathedralAssetLabDebug?.ready && window.__neomudCathedralAssetLabDebug?.render?.triangles > 0,
+    snapshot: () => ({
+      render: window.__neomudCathedralAssetLabDebug.render,
+      asset: window.__neomudCathedralAssetLabDebug.asset,
+      error: window.__neomudCathedralAssetLabDebug.error
+    })
   }
 ];
 
@@ -119,6 +130,14 @@ async function main() {
           paths: 1,
           objects: 15
         });
+      }
+      if (lab.id === "cathedral-asset-lab") {
+        assert.equal(snapshot.error, null);
+        assert.equal(snapshot.asset.id, "cathedral.pew");
+        assert.ok(snapshot.asset.summary.renderNodes >= 8, `expected detailed pew render nodes: ${JSON.stringify(snapshot.asset.summary)}`);
+        assert.ok(snapshot.asset.colliders.includes("cathedral-pew-footprint"));
+        assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_end_panel")), "expected profiled pew end panels");
+        assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_back")), "expected separate pew backrest");
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });

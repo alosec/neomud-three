@@ -10,17 +10,17 @@
   "runtimeGlb": "town_temple.glb",
   "files": {
     "sourceImageBytes": 74634,
-    "sourceBlendBytes": 191427,
-    "runtimeGlbBytes": 331868
+    "sourceBlendBytes": 233018,
+    "runtimeGlbBytes": 474260
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 193,
-    "meshes": 190,
-    "materials": 12,
+    "nodes": 293,
+    "meshes": 290,
+    "materials": 14,
     "prefixes": {
-      "VIS_": 182,
+      "VIS_": 282,
       "COL_": 7,
       "NAV_": 0,
       "SPAWN_": 1,
@@ -34,12 +34,13 @@
   },
   "runtimeQa": {
     "offlineTempleBudget": {
-      "drawCalls": 220,
-      "triangles": 4656,
+      "drawCalls": 316,
+      "triangles": 5776,
       "textures": 1,
-      "geometries": 171
+      "geometries": 267
     },
     "checks": [
+      "cathedral asset lab",
       "offline smoke",
       "fixed room shots",
       "GLB room profile validation",
@@ -50,7 +51,7 @@
   },
   "knownLimits": [
     "Materials are first-pass Blender-authored stylized colors, not final generated texture families.",
-    "The package proves runtime GLB room loading and metadata extraction before final cathedral art polish.",
+    "The package now uses an isolated pew asset candidate and shallow wall ribs, but the wall-window bay, altar, and incense fixtures still need asset-level QA.",
     "The old procedural Temple builder remains in code as a temporary removal candidate."
   ]
 }

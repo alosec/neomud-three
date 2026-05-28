@@ -150,6 +150,105 @@ def marker3(name, x, y, z, kind, display_type="PLAIN_AXES", **props):
     return obj
 
 
+def prism_x3(name, x, y, z, thickness, profile_points, mat, kind="visible", **props):
+    """Extrude a local z/y profile along x.
+
+    This is intentionally simple: it gives low-poly fixture side panels a
+    readable silhouette without relying on texture detail.
+    """
+    vertices = []
+    for side in [-thickness / 2, thickness / 2]:
+        for local_z, local_y in profile_points:
+            vertices.append((x + side, y + local_y, z + local_z))
+
+    count = len(profile_points)
+    faces = [tuple(range(count)), tuple(range(count, count * 2))]
+    for index in range(count):
+        faces.append((index, (index + 1) % count, count + (index + 1) % count, count + index))
+
+    return mesh3(name, vertices, faces, mat, kind=kind, **props)
+
+
+def sloped_panel_x3(name, x, bottom_y, z, width, height, thickness, top_offset_z, mat, kind="visible", **props):
+    half_width = width / 2
+    half_depth = thickness / 2
+    y0 = bottom_y
+    y1 = bottom_y + height
+    vertices = [
+        (x - half_width, y0, z - half_depth),
+        (x + half_width, y0, z - half_depth),
+        (x + half_width, y0, z + half_depth),
+        (x - half_width, y0, z + half_depth),
+        (x - half_width, y1, z + top_offset_z - half_depth),
+        (x + half_width, y1, z + top_offset_z - half_depth),
+        (x + half_width, y1, z + top_offset_z + half_depth),
+        (x - half_width, y1, z + top_offset_z + half_depth),
+    ]
+    faces = [
+        (0, 1, 2, 3),
+        (4, 7, 6, 5),
+        (0, 4, 5, 1),
+        (1, 5, 6, 2),
+        (2, 6, 7, 3),
+        (3, 7, 4, 0),
+    ]
+    return mesh3(name, vertices, faces, mat, kind=kind, **props)
+
+
+def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
+    width = 5.05
+    seat_depth = 1.02
+    side_profile = [
+        (-0.62, 0.0),
+        (0.58, 0.0),
+        (0.58, 0.78),
+        (0.36, 1.12),
+        (-0.38, 1.24),
+        (-0.62, 0.22),
+    ]
+
+    cube3(f"VIS_pew_{pew_id}_seat", x, 0.5, z + 0.02, width, 0.24, seat_depth, wood_mid, semantic="cathedral_pew_seat")
+    sloped_panel_x3(
+        f"VIS_pew_{pew_id}_back",
+        x,
+        0.58,
+        z - 0.47,
+        width,
+        0.92,
+        0.18,
+        -0.16,
+        wood_dark,
+        semantic="cathedral_pew_backrest",
+    )
+    cube3(f"VIS_pew_{pew_id}_top_rail", x, 1.53, z - 0.67, width + 0.18, 0.16, 0.16, wood_highlight, semantic="cathedral_pew_top_rail")
+    cube3(f"VIS_pew_{pew_id}_front_rail", x, 0.36, z + 0.56, width + 0.08, 0.22, 0.14, wood_dark, semantic="cathedral_pew_front_rail")
+    cube3(f"VIS_pew_{pew_id}_lower_stretcher", x, 0.2, z - 0.1, width + 0.18, 0.16, 0.12, wood_dark, semantic="cathedral_pew_lower_stretcher")
+
+    for side, label in [(-1, "west_end"), (1, "east_end")]:
+        end_x = x + side * (width / 2 + 0.12)
+        prism_x3(
+            f"VIS_pew_{pew_id}_{label}_panel",
+            end_x,
+            0.12,
+            z,
+            0.26,
+            side_profile,
+            wood_dark,
+            semantic="cathedral_pew_end_panel",
+        )
+        cube3(
+            f"VIS_pew_{pew_id}_{label}_trim",
+            end_x,
+            0.82,
+            z + 0.42,
+            0.3,
+            0.16,
+            0.34,
+            wood_highlight,
+            semantic="cathedral_pew_end_trim",
+        )
+
+
 def build_level():
     reset_scene()
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
@@ -159,7 +258,9 @@ def build_level():
     limestone = material("MAT_temple_limestone_wall", (0.62, 0.59, 0.50, 1), roughness=0.88)
     trim = material("MAT_temple_warm_limestone_trim", (0.82, 0.74, 0.54, 1), roughness=0.7)
     dark = material("MAT_temple_recess_shadow", (0.12, 0.10, 0.08, 1), roughness=0.94)
-    wood = material("MAT_temple_dark_pew_wood", (0.21, 0.13, 0.08, 1), roughness=0.8)
+    wood = material("MAT_temple_pew_warm_oak", (0.30, 0.18, 0.09, 1), roughness=0.78)
+    wood_dark = material("MAT_temple_pew_dark_endgrain", (0.15, 0.08, 0.04, 1), roughness=0.86)
+    wood_highlight = material("MAT_temple_pew_worn_edge", (0.50, 0.30, 0.13, 1), roughness=0.72)
     cloth = material("MAT_temple_dawn_cloth", (0.86, 0.78, 0.60, 1), roughness=0.66)
     smoke = material("MAT_temple_incense_smoke", (0.72, 0.76, 0.72, 0.34), roughness=0.9, alpha=0.34)
     glass_blue = material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
@@ -179,12 +280,13 @@ def build_level():
     for rib_index, z in enumerate([-33, -24, -15, -6, 3, 12], start=1):
         barrel_vault3(f"VIS_vault_transverse_rib_{rib_index:02d}", z - 0.13, z + 0.13, trim)
 
-    # Columns and side arches.
-    for side_x, side_name in [(-10.7, "west"), (10.7, "east")]:
-        for index, z in enumerate([-29, -20, -11, -2, 7, 16], start=1):
-            cylinder3(f"VIS_{side_name}_column_{index:02d}", side_x, 3.0, z, 0.44, 6.0, 10, trim, semantic="cathedral_column")
-            cube3(f"VIS_{side_name}_arch_lintel_{index:02d}", side_x, 6.4, z, 1.35, 0.42, 4.5, trim, semantic="cathedral_arch")
-            cube3(f"VIS_{side_name}_wall_pier_{index:02d}", side_x + (-1.25 if side_x < 0 else 1.25), 3.15, z, 0.36, 6.3, 3.2, trim, semantic="cathedral_pier")
+    # Shallow wall ribs. The previous freestanding column/lintel blocks sat in
+    # front of the stained glass from gameplay camera angles and failed visual
+    # QA. Keep the rhythm on the wall plane instead of obstructing the windows.
+    for side_x, side_name in [(-12.72, "west"), (12.72, "east")]:
+        for index, z in enumerate([-34.0, -23.65, -13.95, -4.25, 5.45, 15.15], start=1):
+            cube3(f"VIS_{side_name}_wall_rib_{index:02d}", side_x, 3.25, z, 0.34, 6.5, 0.44, trim, semantic="cathedral_wall_rib")
+            cube3(f"VIS_{side_name}_wall_rib_cap_{index:02d}", side_x, 6.6, z, 0.54, 0.34, 1.05, trim, semantic="cathedral_wall_rib_cap")
 
     # Stained glass windows and colored floor-light bands.
     for side_x, side_name, inward in [(-13.05, "west", 1), (13.05, "east", -1)]:
@@ -227,8 +329,7 @@ def build_level():
     cube3("VIS_dawn_runner", 0, 0.018, -8.6, 3.1, 0.04, 43.0, cloth, semantic="center_runner")
     for side_x, side_name in [(-5.7, "west"), (5.7, "east")]:
         for index, z in enumerate([-27.5, -22.5, -17.5, -12.5, -7.5, -2.5, 2.5, 7.5], start=1):
-            cube3(f"VIS_{side_name}_pew_seat_{index:02d}", side_x, 0.48, z, 4.9, 0.34, 1.0, wood, semantic="pew_seat")
-            cube3(f"VIS_{side_name}_pew_back_{index:02d}", side_x, 1.02, z - 0.45, 4.9, 0.92, 0.16, wood, semantic="pew_back")
+            add_cathedral_pew(f"{side_name}_{index:02d}", side_x, z, wood_dark, wood, wood_highlight)
 
     # Collision and gameplay markers.
     cube3("COL_world_floor", 0, 0.02, -8, 27.2, 0.12, 60.0, collision, kind="collision", collider="box", collider_id="world-floor")

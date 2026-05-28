@@ -88,6 +88,8 @@ Before editing:
 - Read `experiments/neomud-three/ART_DIRECTION.md` for visual work.
 - Read `memory-bank/graphics-production-contract.md` for rooms, materials,
   props, generated assets, and character work.
+- Read `memory-bank/asset-level-qa-workflow.md` before cathedral fixture work
+  or any repeated prop work that needs to look convincing in close-up.
 - Identify the QA command set before making changes.
 - Create or update a TD item when the pass is not trivial.
 
@@ -189,3 +191,4 @@ Freeze broad expansion. Improve the existing authored slice by quality gates:
    or nave composition.
 6. Defer more room creation until at least one core room reaches production
    candidate status.
+7. For Temple fixture work, use asset-level QA before room-wide integration.
