@@ -465,6 +465,7 @@ function setRoom(roomId, options = {}) {
 
   const fromRoomId = options.fromRoomId ?? currentRoomId;
   currentRoomId = roomId;
+  disposeObjectTree(worldRoot);
   worldRoot.clear();
 
   roomRuntime = buildRoomScene({
@@ -908,9 +909,17 @@ function render() {
   renderer.render(scene, camera);
   lastRenderStats = {
     calls: renderer.info.render.calls,
-    triangles: renderer.info.render.triangles
+    triangles: renderer.info.render.triangles,
+    textures: renderer.info.memory.textures,
+    geometries: renderer.info.memory.geometries
   };
   updateCompass();
+}
+
+function disposeObjectTree(root) {
+  root.traverse((object) => {
+    object.geometry?.dispose?.();
+  });
 }
 
 function updatePlayer(dt) {

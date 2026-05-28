@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T07:13:38.810Z",
+  "updated": "2026-05-28T07:25:21.261Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -392,10 +392,15 @@
           "id": 40,
           "body": "QA checkpoint for facade/palette pass: node --check changed modules, spec validation, git diff --check, offline smoke, headed Canary playtest, and server-backed Temple -> Town Square -> Temple test all passed. Local server required clearing stale guest sessions first.",
           "created": "2026-05-28T07:13:21Z"
+        },
+        {
+          "id": 42,
+          "body": "Render budget gate shipped: tests now assert per-room render calls, triangles, textures, and geometries; headed playtest writes qa/latest/report.json. Geometry disposal on room/entity rebuild fixed retained geometry count in routed Town Square playtest from 498 to 222.",
+          "created": "2026-05-28T07:25:06Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T07:13:21Z"
+      "updated": "2026-05-28T07:25:06Z"
     },
     {
       "id": "neo-1fb2.12",
@@ -707,6 +712,29 @@
       ],
       "created": "2026-05-28T07:12:40Z",
       "updated": "2026-05-28T07:13:07Z"
+    },
+    {
+      "id": "neo-1fb2.24",
+      "project": "NeoMud",
+      "title": "Add Three render budget reports",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 41,
+          "body": "Added neomud-three QA helper with render budgets, offline/server report files, headed playtest report.json, renderer memory stats, and geometry disposal on room/entity rebuild. QA passed: offline smoke, server-backed movement, headed Canary playtest, spec validation, diff check.",
+          "created": "2026-05-28T07:24:50Z"
+        }
+      ],
+      "created": "2026-05-28T07:24:34Z",
+      "updated": "2026-05-28T07:24:57Z"
     }
   ],
   "ready": [

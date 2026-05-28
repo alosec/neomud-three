@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const { chromium } = require("playwright");
+const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-three-qa.cjs");
 
 const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/?offline=1";
 const headed = process.env.HEADED === "1";
@@ -13,6 +14,7 @@ async function main() {
   const browser = await launchBrowser();
   const consoleErrors = [];
   const failedRequests = [];
+  const budgetReports = [];
 
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 820 } });
@@ -53,6 +55,8 @@ async function main() {
     assert.equal(await page.locator("#compass").count(), 1);
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
     await saveScreenshot(page, "offline-temple.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:temple"));
+    assertRenderBudget(assert, "town:temple", budgetReports.at(-1).stats);
 
     await page.keyboard.press("i");
     assert.equal(await page.locator("#panel-title").textContent(), "Inventory");
@@ -119,6 +123,8 @@ async function main() {
       `expected Old Wren entity in Town Square, got ${JSON.stringify(entities)}`
     );
     await saveScreenshot(page, "offline-town-square.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:square"));
+    assertRenderBudget(assert, "town:square", budgetReports.at(-1).stats);
 
     const oldWren = entities.find((entity) => entity.id === "npc:old_wren");
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x, z: z + 1.05, heading: Math.PI }), oldWren);
@@ -149,6 +155,14 @@ async function main() {
 
     assert.deepEqual(failedRequests, []);
     assert.deepEqual(consoleErrors, []);
+    await writeQaReport(qaDir, {
+      type: "offline-smoke",
+      url,
+      generatedAt: new Date().toISOString(),
+      budgets: budgetReports,
+      failedRequests,
+      consoleErrors
+    }, "offline-report.json");
 
     console.log("NeoMud Three smoke test passed");
   } finally {
@@ -162,6 +176,12 @@ async function saveScreenshot(page, filename) {
     path: path.join(qaDir, filename),
     animations: "disabled"
   });
+}
+
+async function collectBudgetStatus(page, roomId) {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
+  return budgetStatus(roomId, stats);
 }
 
 async function launchBrowser() {

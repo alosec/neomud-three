@@ -5,6 +5,7 @@ const fs = require("node:fs/promises");
 const net = require("node:net");
 const path = require("node:path");
 const { chromium } = require("playwright");
+const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-three-qa.cjs");
 
 const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/";
 const serverHost = process.env.NEOMUD_SERVER_HOST || "127.0.0.1";
@@ -27,6 +28,7 @@ async function main() {
   const browser = await launchBrowser();
   const consoleErrors = [];
   const failedRequests = [];
+  const budgetReports = [];
 
   try {
     const page = await browser.newPage({ viewport: { width: 1280, height: 820 } });
@@ -67,6 +69,8 @@ async function main() {
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
     assert.match(await page.locator("#status-text").textContent(), /Kotlin server:/);
     await saveScreenshot(page, "server-temple.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:temple"));
+    assertRenderBudget(assert, "town:temple", budgetReports.at(-1).stats);
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -36.2, heading: 0 }));
     await page.keyboard.down("w");
@@ -86,6 +90,8 @@ async function main() {
       `expected server NPC entities in Town Square, got ${JSON.stringify(townEntities)}`
     );
     await saveScreenshot(page, "server-town-square.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:square"));
+    assertRenderBudget(assert, "town:square", budgetReports.at(-1).stats);
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));
     await page.keyboard.down("w");
@@ -103,6 +109,15 @@ async function main() {
 
     assert.deepEqual(failedRequests, []);
     assert.deepEqual(consoleErrors, []);
+    await writeQaReport(qaDir, {
+      type: "server-backed",
+      url,
+      server: `${serverHost}:${serverPort}`,
+      generatedAt: new Date().toISOString(),
+      budgets: budgetReports,
+      failedRequests,
+      consoleErrors
+    }, "server-report.json");
 
     console.log("NeoMud Three server-backed test passed");
   } finally {
@@ -116,6 +131,12 @@ async function saveScreenshot(page, filename) {
     path: path.join(qaDir, filename),
     animations: "disabled"
   });
+}
+
+async function collectBudgetStatus(page, roomId) {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
+  return budgetStatus(roomId, stats);
 }
 
 function isPortReachable(host, port) {

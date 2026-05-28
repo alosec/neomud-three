@@ -99,6 +99,7 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
   root.add(entityLayer);
 
   const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
     entityLayer.clear();
     interactables.length = 0;
     addTownSpecEntities(entityLayer, materials, spec, worldRoot, world, nextNpcs, nextRoomItems, interactables);
@@ -579,6 +580,12 @@ function spawnForEntryDirection(direction) {
 
 function material(materials, key) {
   return materials[key] ?? materials.cobble;
+}
+
+function disposeObjectTree(root) {
+  root.traverse((object) => {
+    object.geometry?.dispose?.();
+  });
 }
 
 function spawnFromSpec(spawn) {

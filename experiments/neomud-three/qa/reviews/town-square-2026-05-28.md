@@ -114,3 +114,13 @@ Total: 11/12
 Visual delta: removed the central signpost, cooled the road/plaza/ground palette, enlarged roof silhouettes, added limited tavern/market props, reduced dormers, and trimmed perimeter lamps to keep draw calls under the current budget.
 
 Remaining visual gap: this is a cleaner prototype, not a professional scene. The next high-leverage work is not more decoration; it is stronger component-level architecture, material/style rules, authored building proportions, and a real content QA loop for screenshots.
+
+## Render Budget Gate
+
+- Offline smoke budget: Temple 331 calls / 79,730 triangles / 7 textures / 278 geometries; Town Square spawn 221 calls / 55,288 triangles / 19 textures / 201 geometries.
+- Headed driven Town Square budget: 158 calls / 54,736 triangles / 19 textures / 222 geometries.
+- Current budgets: Temple <= 360 calls, <= 100,000 triangles, <= 48 textures, <= 300 geometries; Town Square <= 240 calls, <= 60,000 triangles, <= 48 textures, <= 230 geometries.
+- The gate writes machine-readable reports into `experiments/neomud-three/qa/latest/`, with `report.json` reserved for the latest headed playtest.
+- Room transition geometry disposal was fixed during this pass; routed headed Town Square playtest dropped retained geometries from 498 to 222.
+
+QA delta: future visual passes now fail automatically when they exceed the current render budget. The next renderer-quality task should reduce geometry count through geometry reuse/instancing instead of raising these budgets.

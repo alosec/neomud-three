@@ -3,6 +3,7 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const { chromium } = require("playwright");
+const { budgetStatus, writeQaReport } = require("./neomud-three-qa.cjs");
 
 const args = new Set(process.argv.slice(2));
 const argValue = (name, fallback = null) => {
@@ -73,11 +74,22 @@ async function main() {
     avatar: window.__neomudThreeDebug.avatar,
     server: window.__neomudThreeDebug.server
   }));
+  const budgetReport = budgetStatus(snapshot.roomId, snapshot.render);
+  await writeQaReport(qaDir, {
+    type: "headed-playtest",
+    url,
+    generatedAt: new Date().toISOString(),
+    snapshot,
+    budget: budgetReport,
+    failedRequests,
+    consoleErrors
+  });
 
   console.log(JSON.stringify({
     url,
     qaDir,
     snapshot,
+    budget: budgetReport,
     failedRequests,
     consoleErrors,
     controls: "Click Play, then WASD/arrows move/turn, Q/E strafe, Shift runs, Escape releases mouse, Menu opens panels."
