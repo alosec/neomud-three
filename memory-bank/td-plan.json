@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:51:37.722Z",
+  "updated": "2026-05-28T19:01:55.128Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2454,6 +2454,29 @@
       ],
       "created": "2026-05-28T18:44:10Z",
       "updated": "2026-05-28T18:51:26Z"
+    },
+    {
+      "id": "neo-f053",
+      "project": "NeoMud",
+      "title": "Improve south Temple forecourt in Town Square",
+      "description": "Author the Town Square south Temple approach as a stronger named landmark using existing approved geometry/materials: clearer forecourt staging, ritual/civic detail, collision-aware props, and fixed screenshot QA. Avoid generic foliage spam and preserve render budgets/server traversal.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 115,
+          "body": "Completed: added a spec-driven south Temple forecourt with sun inlays, offering plinths, candle rows, low rails, and plinth colliders. Town-shot QA passed at 142 calls / 15,106 triangles; offline and server-backed traversal passed with Town Square at 237 calls / 19,996 triangles, inside the 240-call budget but close.",
+          "created": "2026-05-28T19:01:30Z"
+        }
+      ],
+      "created": "2026-05-28T18:52:54Z",
+      "updated": "2026-05-28T19:01:39Z"
     }
   ],
   "ready": [

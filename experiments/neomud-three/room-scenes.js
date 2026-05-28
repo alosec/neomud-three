@@ -5405,6 +5405,7 @@ function addTownSpecProps(root, materials, spec) {
   addTownNoticeBoards(root, materials, spec.props.noticeBoards ?? []);
   addTownMarketCarts(root, materials, spec.props.marketCarts ?? []);
   addTownFirewoodStacks(root, materials, spec.props.firewoodStacks ?? []);
+  addTempleForecourtProps(root, materials, spec.props.templeForecourt);
 }
 
 function addTownLampCluster(root, materials, lamps) {
@@ -5775,6 +5776,114 @@ function addTownFirewoodStacks(root, materials, stacks) {
   });
 }
 
+function addTempleForecourtProps(root, materials, forecourt = {}) {
+  const inlays = forecourt.sunInlays ?? [];
+  if (inlays.length) {
+    addInstancedGeometry(
+      root,
+      new THREE.RingGeometry(0.78, 0.94, 32),
+      materials.sign,
+      inlays.map((inlay) => ({
+        x: inlay.x,
+        y: 0.082,
+        z: inlay.z,
+        scale: [inlay.radius ?? 1, inlay.radius ?? 1, 1],
+        rotationX: -Math.PI / 2
+      })),
+      "town-temple-forecourt-sun-rings",
+      { castShadow: false, receiveShadow: false }
+    );
+
+    const spokes = [];
+    for (const inlay of inlays) {
+      const radius = inlay.radius ?? 1;
+      for (let index = 0; index < 8; index++) {
+        spokes.push({
+          x: inlay.x,
+          y: 0.085,
+          z: inlay.z,
+          width: radius * 1.35,
+          height: 0.035,
+          depth: 0.05,
+          rotationY: (Math.PI * index) / 8
+        });
+      }
+    }
+    addInstancedBoxes(root, materials.sign, spokes, "town-temple-forecourt-sun-spokes", {
+      castShadow: false,
+      receiveShadow: false
+    });
+  }
+
+  const darkBoxes = [];
+  const trimBoxes = [];
+  const candleBodies = [];
+  const candleFlames = [];
+  const bowls = [];
+
+  for (const rail of forecourt.lowRails ?? []) {
+    darkBoxes.push({
+      x: rail.x,
+      y: 0.46,
+      z: rail.z,
+      width: rail.width ?? 1,
+      height: 0.13,
+      depth: rail.depth ?? 1,
+      rotationY: rail.rotationY ?? 0
+    });
+    for (const [localX, localZ] of [
+      [-(rail.width ?? 1) / 2, -(rail.depth ?? 1) / 2],
+      [(rail.width ?? 1) / 2, (rail.depth ?? 1) / 2]
+    ]) {
+      darkBoxes.push(orientedBox(rail, localX, 0.24, localZ, 0.14, 0.48, 0.14));
+    }
+  }
+
+  for (const plinth of forecourt.offeringPlinths ?? []) {
+    darkBoxes.push(orientedBox(plinth, 0, 0.16, 0, 0.92, 0.32, 0.86));
+    trimBoxes.push(orientedBox(plinth, 0, 0.42, 0, 1.06, 0.14, 0.96));
+    const bowl = offsetPoint(plinth, 0, -0.04);
+    bowls.push({
+      x: bowl.x,
+      y: 0.62,
+      z: bowl.z,
+      scale: [0.24, 0.08, 0.24],
+      rotationY: plinth.rotationY ?? 0
+    });
+    for (const localX of [-0.24, 0.24]) {
+      const point = offsetPoint(plinth, localX, 0.22);
+      candleBodies.push({ x: point.x, y: 0.72, z: point.z, scale: [0.045, 0.22, 0.045] });
+      candleFlames.push({ x: point.x, y: 0.98, z: point.z, scale: [0.06, 0.13, 0.06] });
+    }
+  }
+
+  for (const row of forecourt.candleRows ?? []) {
+    const count = row.count ?? 3;
+    const spacing = row.spacing ?? 0.5;
+    for (let index = 0; index < count; index++) {
+      const localX = (index - (count - 1) / 2) * spacing;
+      const point = offsetPoint(row, localX, 0);
+      candleBodies.push({ x: point.x, y: 0.18, z: point.z, scale: [0.05, 0.18, 0.05] });
+      candleFlames.push({ x: point.x, y: 0.41, z: point.z, scale: [0.065, 0.13, 0.065] });
+    }
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "town-temple-forecourt-dark");
+  addInstancedBoxes(root, materials.trimLight, trimBoxes, "town-temple-forecourt-trim");
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 12), materials.sign, bowls, "town-temple-forecourt-offering-bowls");
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 10), materials.trimLight, candleBodies, "town-temple-forecourt-candle-bodies");
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1.35, 8), materials.sign, candleFlames, "town-temple-forecourt-candle-flames", {
+    castShadow: false,
+    receiveShadow: false
+  });
+
+  if (candleFlames.length) {
+    const light = new THREE.PointLight(0xffc878, 0.75, 7.5);
+    light.position.set(0, 1.05, 18.2);
+    root.add(light);
+  }
+}
+
 function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, roomItems, interactables) {
   const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
 
@@ -6107,6 +6216,9 @@ function townCollidersFromSpec(spec) {
   }
   for (const [index, stack] of (spec.props?.firewoodStacks ?? []).entries()) {
     colliders.push({ id: `firewood-stack-${index + 1}`, center: [stack.x, stack.z], size: [1.75, 0.85] });
+  }
+  for (const [index, plinth] of (spec.props?.templeForecourt?.offeringPlinths ?? []).entries()) {
+    colliders.push({ id: `temple-offering-plinth-${index + 1}`, center: [plinth.x, plinth.z], size: [1.1, 1.0] });
   }
   return colliders;
 }

@@ -439,7 +439,29 @@ export const TOWN_SQUARE_SPEC = {
     firewoodStacks: [
       { x: -16.7, z: -5.95, rotationY: Math.PI / 2 - 0.2 },
       { x: -18.7, z: 5.55, rotationY: Math.PI / 2 + 0.24 }
-    ]
+    ],
+    templeForecourt: {
+      sunInlays: [
+        { x: 0, z: 15.1, radius: 1.15 },
+        { x: 0, z: 17.55, radius: 0.82 }
+      ],
+      offeringPlinths: [
+        { x: -3.65, z: 18.0, rotationY: -0.1 },
+        { x: 3.65, z: 18.0, rotationY: 0.1 }
+      ],
+      candleRows: [
+        { x: -2.55, z: 17.35, count: 4, spacing: 0.52, rotationY: Math.PI / 2 },
+        { x: 2.55, z: 17.35, count: 4, spacing: 0.52, rotationY: Math.PI / 2 },
+        { x: -2.9, z: 19.05, count: 3, spacing: 0.48, rotationY: 0 },
+        { x: 2.9, z: 19.05, count: 3, spacing: 0.48, rotationY: 0 }
+      ],
+      lowRails: [
+        { x: -4.9, z: 16.75, width: 0.12, depth: 3.85 },
+        { x: 4.9, z: 16.75, width: 0.12, depth: 3.85 },
+        { x: -2.15, z: 14.05, width: 1.85, depth: 0.12 },
+        { x: 2.15, z: 14.05, width: 1.85, depth: 0.12 }
+      ]
+    }
   },
   exits: [
     {
