@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T12:49:38.379Z",
+  "updated": "2026-05-28T12:54:16.749Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1648,6 +1648,28 @@
       "comments": [],
       "created": "2026-05-28T12:39:44Z",
       "updated": "2026-05-28T12:49:28Z"
+    },
+    {
+      "id": "neo-db78",
+      "project": "NeoMud",
+      "title": "Batch Town Square surface rectangles",
+      "description": "Reclaim Town Square draw-call headroom by rendering road, plaza, and outer-ground rectangles as material-grouped instanced planes instead of one mesh per rectangle. Preserve visual layout, trigger geometry, and screenshots; rerun smoke and town screenshot QA.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: batched Town Square road/plaza/outer-ground surfaces into material-grouped instanced planes, reclaiming 12 full-smoke draw calls with smoke/screenshot/server QA passing",
+      "labels": [
+        "neomud-three",
+        "performance",
+        "qa",
+        "town-square"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T12:51:42Z",
+      "updated": "2026-05-28T12:54:04Z"
     }
   ],
   "ready": [

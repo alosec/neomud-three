@@ -307,3 +307,20 @@ Visual delta: added Prop Zoo-approved plaza tree and string-lantern samples, pla
 QA delta: `node --check` for changed Three files, spec validation, Prop Zoo/Material Lab QA, Town Square screenshot anchors, offline smoke, authored-room screenshots, and server-backed movement all pass.
 
 Remaining visual gap: the scene is warmer and less empty, but the next meaningful visual upgrade should target authored landmark structure, NPC staging, or ground/stone trim rather than adding more general-purpose foliage.
+
+## Score After Surface Batching Pass
+
+- Navigation readability: 2/2. Gate, Market, Temple, Tavern, fountain, NPCs, roads, plaza edges, and exit affordances remain visible from fixed anchors.
+- Scale believability: 1/2. No art composition changed; the room is still a readable blockout rather than final architecture.
+- Semantic match: 2/2. No semantic room content changed.
+- Interaction clarity: 2/2. Physical triggers, NPC proximity prompts, compass/HUD affordances, and collision volumes still pass offline and server-backed tests.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes.
+- Performance: 2/2. Full-smoke Town Square drops from 235 to 223 draw calls and from 154 to 142 geometries; fixed Town Square anchors report 129 calls / 9,770 triangles / 19 textures / 183 geometries.
+
+Total: 11/12
+
+Optimization delta: road, plaza, and outer-ground surface rectangles now render as material-grouped instanced planes instead of one mesh per rectangle. The visual layout is unchanged, but the next Town Square pass has 17 draw calls of headroom under the current 240-call budget.
+
+QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass after this change. Screenshot review confirms the plaza/road surfaces still render in the correct positions.
+
+Remaining visual gap: use the reclaimed calls on one authored improvement at a time, preferably landmark structure, NPC staging, or material trim. Do not spend the headroom on generic clutter.

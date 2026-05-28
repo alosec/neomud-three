@@ -1327,14 +1327,12 @@ function spawnFromSpec(spawn) {
 }
 
 function addTownSpecSurfaces(root, materials, spec) {
-  for (const path of spec.surfaces.paths) {
-    addSurfaceRect(root, material(materials, path.material), path);
-  }
+  addInstancedSurfaceRects(root, materials, spec.surfaces.paths, "town-path-surfaces");
   const surfaceFrameBoxes = [];
   for (const plaza of spec.surfaces.plazas ?? []) {
-    addSurfaceRect(root, material(materials, plaza.material), plaza);
     surfaceFrameBoxes.push(...surfaceFrameBoxesFor(plaza));
   }
+  addInstancedSurfaceRects(root, materials, spec.surfaces.plazas ?? [], "town-plaza-surfaces");
   addInstancedBoxes(root, materials.pathEdge, surfaceFrameBoxes, "plaza-surface-frames", { castShadow: false });
   for (const curb of spec.surfaces.curbs) {
     addBox(root, materials.darkStone, curb.x, curb.height / 2, curb.z, curb.width, curb.height, curb.depth);
@@ -1449,9 +1447,7 @@ function addTownSpecChunkRings(root, materials, spec) {
       });
     }
     if (chunk.kind === "surface-rects") {
-      for (const surface of chunk.surfaces) {
-        addSurfaceRect(root, material(materials, surface.material), surface);
-      }
+      addInstancedSurfaceRects(root, materials, chunk.surfaces, `${chunk.id}-surfaces`);
     }
     if (chunk.kind === "wall-runs") {
       for (const run of chunk.runs) {
@@ -2019,6 +2015,34 @@ function addInstancedGeometry(root, geometry, materialRef, transforms, visualRol
   mesh.userData = { visualRole };
   root.add(mesh);
   return mesh;
+}
+
+function addInstancedSurfaceRects(root, materials, surfaces = [], visualRole) {
+  if (!surfaces.length) return;
+  const byMaterial = new Map();
+  for (const surface of surfaces) {
+    const key = surface.material ?? "cobble";
+    if (!byMaterial.has(key)) byMaterial.set(key, []);
+    byMaterial.get(key).push(surface);
+  }
+
+  for (const [materialKey, materialSurfaces] of byMaterial) {
+    addInstancedGeometry(
+      root,
+      new THREE.PlaneGeometry(1, 1),
+      material(materials, materialKey),
+      materialSurfaces.map((surface) => ({
+        x: surface.x ?? 0,
+        y: surface.y ?? 0.018,
+        z: surface.z ?? 0,
+        scale: [surface.width, surface.depth, 1],
+        rotationX: -Math.PI / 2,
+        rotationZ: surface.rotationZ ?? 0
+      })),
+      `${visualRole}-${materialKey}`,
+      { castShadow: false, receiveShadow: true }
+    );
+  }
 }
 
 function townCollidersFromSpec(spec) {
