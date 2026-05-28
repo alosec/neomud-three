@@ -2,7 +2,7 @@ import { WORLD_ROOT } from "./world-data.js";
 import { buildGenericRoom, buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
 
 export function buildRoomScene(context) {
-  const { roomId, world, serverNpcs = [], onExit } = context;
+  const { roomId, world, serverNpcs = [], serverItems = [], onExit } = context;
   const room = world.rooms.get(roomId);
   if (!room) return null;
 
@@ -20,7 +20,8 @@ export function buildRoomScene(context) {
       worldRoot: WORLD_ROOT,
       npcs: serverNpcs.length
         ? serverNpcs
-        : world.npcs.filter((npc) => npc.startRoomId === "town:square")
+        : world.npcs.filter((npc) => npc.startRoomId === "town:square"),
+      roomItems: serverItems
     });
   }
 

@@ -139,6 +139,31 @@ body[data-input-mode="play"] .crosshair {
   opacity: 1;
 }
 
+.interaction-prompt {
+  position: fixed;
+  left: 50%;
+  bottom: 62px;
+  z-index: 6;
+  min-width: 220px;
+  max-width: min(420px, calc(100vw - 40px));
+  padding: 9px 13px;
+  border: 1px solid rgba(244, 206, 120, 0.48);
+  color: #fff4c7;
+  background:
+    linear-gradient(180deg, rgba(29, 22, 14, 0.86), rgba(9, 7, 5, 0.82)),
+    rgba(9, 7, 5, 0.82);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.42);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.interaction-prompt.hidden {
+  display: none;
+}
+
 body[data-input-mode="play"] .mode-panel {
   opacity: 0;
   pointer-events: none;

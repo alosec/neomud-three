@@ -51,6 +51,8 @@ export function validateRoomRenderSpec(spec, room, rooms) {
     }
   }
 
+  validateEntities(errors, spec);
+
   return errors;
 }
 
@@ -97,6 +99,28 @@ function validateAffordance(errors, label, affordance) {
     if (!Array.isArray(affordance.threshold.size) || affordance.threshold.size.length !== 2 || affordance.threshold.size.some((value) => !Number.isFinite(value) || value <= 0)) {
       errors.push(`${label} affordance.threshold.size must be [width, depth] with positive values`);
     }
+  }
+}
+
+function validateEntities(errors, spec) {
+  const entities = spec?.entities;
+  if (!entities) return;
+
+  for (const [id, placement] of Object.entries(entities.npcPlacements ?? {})) {
+    if (!isNumericTriple(placement.position)) errors.push(`${spec.id} npc placement ${id} position must be [x, y, z]`);
+    if (placement.height !== undefined && (!Number.isFinite(placement.height) || placement.height <= 0)) {
+      errors.push(`${spec.id} npc placement ${id} height must be positive`);
+    }
+    if (placement.width !== undefined && (!Number.isFinite(placement.width) || placement.width <= 0)) {
+      errors.push(`${spec.id} npc placement ${id} width must be positive`);
+    }
+  }
+
+  if (entities.itemSpawns !== undefined && !Array.isArray(entities.itemSpawns)) {
+    errors.push(`${spec.id} entities.itemSpawns must be an array`);
+  }
+  for (const [index, spawn] of (entities.itemSpawns ?? []).entries()) {
+    if (!isNumericTriple(spawn.position)) errors.push(`${spec.id} item spawn ${index} position must be [x, y, z]`);
   }
 }
 

@@ -54,3 +54,18 @@ Total: 10/12
 Architectural delta: replaced the toy/pyramid roof with reusable gabled roof geometry, added facade trim/windows/doors/signage, added gatehouse battlements, removed duplicate generic portal frames from building landmarks, and moved the west Tavern affordance into a readable freestanding position.
 
 Remaining visual gap: the room is now more legible and less fake, but still prototype-grade. Next work should reduce label clutter, establish a stronger material/value hierarchy, and integrate server NPCs/items into the physical scene.
+
+## Score After Entity Interaction Pass
+
+- Navigation readability: 2/2. Exit landmarks and affordances still read from spawn.
+- Scale believability: 1/2. NPCs now occupy the plaza at human scale, but standee markers and label boards still feel prototype-like.
+- Semantic match: 2/2. Guildmaster Aldric and Old Wren now make the room feel like the actual Millhaven Town Square instead of an empty plaza.
+- Interaction clarity: 2/2. Nearby NPCs expose a proximity prompt and open a DOM interaction panel backed by world/server data.
+- Server sync: 2/2. Server-backed test confirms Town Square NPC payloads resolve to visible entities.
+- Performance: 2/2. Latest headed Town Square drive reports 118 draw calls and 54,096 triangles.
+
+Total: 11/12
+
+Entity delta: replaced loose NPC sprite placement with an entity layer, authored NPC placement in `TOWN_SQUARE_SPEC`, debug entity metadata, proximity detection, interaction prompt, and an interaction panel. Offline QA verifies Old Wren interaction content; server QA verifies server NPCs render as Town Square entities.
+
+Remaining visual gap: this is meaningfully more game-like, but still not professional-final. NPCs need better authored bodies/staging, and labels should eventually become diegetic signs or contextual UI instead of floating boards everywhere.

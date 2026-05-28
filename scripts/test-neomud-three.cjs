@@ -109,7 +109,29 @@ async function main() {
       ["EAST", "NORTH", "SOUTH", "WEST"]
     );
     assert.ok(triggers.every((trigger) => trigger.prompt && trigger.affordance?.label && trigger.affordance?.board));
+    const entities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      entities.some((entity) => entity.id === "npc:guildmaster" && entity.kind === "npc"),
+      `expected Guildmaster entity in Town Square, got ${JSON.stringify(entities)}`
+    );
+    assert.ok(
+      entities.some((entity) => entity.id === "npc:old_wren" && entity.kind === "npc"),
+      `expected Old Wren entity in Town Square, got ${JSON.stringify(entities)}`
+    );
     await saveScreenshot(page, "offline-town-square.png");
+
+    const oldWren = entities.find((entity) => entity.id === "npc:old_wren");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x, z: z + 1.05, heading: Math.PI }), oldWren);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:old_wren",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Old Wren/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    assert.match(await page.locator("#panel-content").textContent(), /blood|Wardens/i);
+    await page.keyboard.press("Escape");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));
     await page.keyboard.down("w");

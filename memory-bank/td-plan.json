@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T06:10:32.179Z",
+  "updated": "2026-05-28T06:30:24.954Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -297,9 +297,15 @@
         "neo-1fb2.2",
         "neo-1fb2.6"
       ],
-      "comments": [],
+      "comments": [
+        {
+          "id": 32,
+          "body": "Town Square now maps server/world NPC presence into in-world entities with proximity interaction and DOM detail panels. Room item marker support is in the renderer, but item-specific server action flow remains future work.",
+          "created": "2026-05-28T06:30:08Z"
+        }
+      ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T03:07:50Z"
+      "updated": "2026-05-28T06:30:08Z"
     },
     {
       "id": "neo-1fb2.10",
@@ -361,10 +367,15 @@
           "id": 30,
           "body": "Full QA run: spec validation passed, offline smoke passed, headed Canary drive captured QA screenshot, server-backed Temple -> Town Square -> Temple passed after clearing local guest-session saturation.",
           "created": "2026-05-28T06:09:43Z"
+        },
+        {
+          "id": 33,
+          "body": "QA now covers entity metadata, Old Wren proximity interaction, dialogue panel content, server NPC entity resolution, and no failed sprite requests.",
+          "created": "2026-05-28T06:30:08Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T06:09:43Z"
+      "updated": "2026-05-28T06:30:08Z"
     },
     {
       "id": "neo-1fb2.12",
@@ -584,6 +595,29 @@
       ],
       "created": "2026-05-28T06:09:16Z",
       "updated": "2026-05-28T06:09:50Z"
+    },
+    {
+      "id": "neo-1fb2.20",
+      "project": "NeoMud",
+      "title": "Render Town Square server NPCs as interactables",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 31,
+          "body": "Implemented entity layer for Town Square with authored NPC placement, standee/marker components, server NPC normalization, room item marker support, proximity prompt, interaction panel, debug entity metadata, and offline/server test coverage.",
+          "created": "2026-05-28T06:29:55Z"
+        }
+      ],
+      "created": "2026-05-28T06:29:33Z",
+      "updated": "2026-05-28T06:29:55Z"
     }
   ],
   "ready": [

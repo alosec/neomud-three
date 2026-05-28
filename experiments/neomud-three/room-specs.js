@@ -156,6 +156,31 @@ export const TOWN_SQUARE_SPEC = {
       ]
     }
   },
+  entities: {
+    npcPlacements: {
+      "npc:guildmaster": {
+        position: [-4.7, 0, -3.2],
+        heading: Math.PI * 0.22,
+        role: "Trainer",
+        palette: "gold",
+        height: 3.25,
+        width: 1.82
+      },
+      "npc:old_wren": {
+        position: [5.15, 0, -1.1],
+        heading: -Math.PI * 0.72,
+        role: "Quest",
+        palette: "blue",
+        height: 3.05,
+        width: 1.78
+      }
+    },
+    itemSpawns: [
+      { position: [-2.2, 0, 5.25] },
+      { position: [2.35, 0, -5.1] },
+      { position: [6.4, 0, 0.9] }
+    ]
+  },
   props: {
     lamps: [
       { x: -6.1, z: -5.5 },

@@ -68,6 +68,7 @@ async function main() {
   const snapshot = await page.evaluate(() => ({
     roomId: window.__neomudThreeDebug.currentRoomId,
     render: window.__neomudThreeDebug.render,
+    room: window.__neomudThreeDebug.room,
     player: window.__neomudThreeDebug.player,
     avatar: window.__neomudThreeDebug.avatar,
     server: window.__neomudThreeDebug.server

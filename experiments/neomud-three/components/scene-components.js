@@ -191,6 +191,121 @@ export function addMarketStall(root, materials, spec) {
   return group;
 }
 
+export function addNpcStandee(root, materials, spec) {
+  const {
+    id,
+    name,
+    role = "NPC",
+    image,
+    x,
+    z,
+    rotationY = 0,
+    height = 3.05,
+    width = 1.7,
+    palette = "gold"
+  } = spec;
+
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = rotationY;
+  group.userData = { kind: "npc", id, name, role };
+  root.add(group);
+
+  const pad = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.68, 0.82, 0.075, 36),
+    new THREE.MeshStandardMaterial({
+      color: 0x2c2216,
+      emissive: palette === "blue" ? 0x10212a : palette === "red" ? 0x2a120b : 0x2a2110,
+      emissiveIntensity: 0.28,
+      roughness: 0.68
+    })
+  );
+  pad.position.y = 0.04;
+  pad.receiveShadow = true;
+  group.add(pad);
+
+  const rim = new THREE.Mesh(
+    new THREE.TorusGeometry(0.78, 0.023, 8, 48),
+    new THREE.MeshBasicMaterial({
+      color: palette === "blue" ? 0x9bd8ee : palette === "red" ? 0xf0a070 : 0xf0c878,
+      transparent: true,
+      opacity: 0.78
+    })
+  );
+  rim.position.y = 0.1;
+  rim.rotation.x = Math.PI / 2;
+  group.add(rim);
+
+  const map = texture(image);
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map,
+      transparent: true,
+      depthWrite: false
+    })
+  );
+  sprite.position.set(0, height / 2 + 0.18, 0);
+  sprite.scale.set(width, height, 1);
+  sprite.renderOrder = 6;
+  group.add(sprite);
+
+  addTextBoard(group, name, {
+    x: 0,
+    y: height + 0.68,
+    z: 0.18,
+    width: Math.max(2.5, Math.min(4.1, name.length * 0.22)),
+    height: 0.58,
+    subtitle: role,
+    palette,
+    renderOrder: 11
+  });
+
+  const light = new THREE.PointLight(palette === "blue" ? 0x9bd8ee : palette === "red" ? 0xf0a070 : 0xf0c878, 0.85, 4.2);
+  light.position.set(0, 1.45, 0.4);
+  group.add(light);
+
+  return group;
+}
+
+export function addItemMarker(root, materials, spec) {
+  const {
+    id,
+    name,
+    x,
+    z,
+    quantity = 1
+  } = spec;
+
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.userData = { kind: "item", id, name, quantity };
+  root.add(group);
+
+  addBox(group, materials.darkTimber ?? materials.timber, 0, 0.18, 0, 0.82, 0.36, 0.58);
+  addBox(group, materials.trimLight ?? materials.sign, 0, 0.42, 0, 0.92, 0.08, 0.66);
+  addBox(group, materials.sign, 0, 0.7, 0, 0.38, 0.32, 0.18);
+
+  const glint = new THREE.Mesh(
+    new THREE.OctahedronGeometry(0.18, 0),
+    new THREE.MeshBasicMaterial({ color: 0xf4ce78, transparent: true, opacity: 0.92 })
+  );
+  glint.position.y = 1.04;
+  group.add(glint);
+
+  addTextBoard(group, quantity > 1 ? `${name} x${quantity}` : name, {
+    x: 0,
+    y: 1.42,
+    z: 0.16,
+    width: Math.max(2.1, Math.min(3.9, name.length * 0.2)),
+    height: 0.48,
+    subtitle: "Ground",
+    palette: "gold",
+    renderOrder: 11
+  });
+
+  return group;
+}
+
 export function addPortalFrame(root, materials, spec) {
   const {
     label,

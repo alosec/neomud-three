@@ -22,6 +22,7 @@ const panelContent = document.querySelector("#panel-content");
 const panelClose = document.querySelector("#panel-close");
 const miniMap = document.querySelector("#mini-map");
 const compassNeedle = document.querySelector("#compass-needle");
+const interactionPrompt = document.querySelector("#interaction-prompt");
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -64,6 +65,8 @@ let inputMode = "menu";
 let activePanel = null;
 let currentStatusDetail = "";
 let exitCooldownUntil = 0;
+let nearbyInteractable = null;
+let selectedInteractable = null;
 
 const gameLog = [];
 
@@ -266,6 +269,7 @@ function handleServerMessage(message) {
       break;
     case "room_items_update":
       serverState.roomItems = message.items ?? [];
+      refreshRendererEntities();
       break;
     case "system_message":
       appendLog(message.message);
@@ -281,9 +285,13 @@ function handleServerMessage(message) {
       break;
     case "npc_entered":
       appendLog(`${message.npcName} entered.`);
+      upsertServerNpc(message);
+      refreshRendererEntities();
       break;
     case "npc_left":
       appendLog(`${message.npcName} left ${message.direction.toLowerCase()}.`);
+      serverState.npcs = serverState.npcs.filter((npc) => (npc.id ?? npc.npcId) !== message.npcId);
+      refreshRendererEntities();
       break;
     case "auth_error":
       appendLog(`Auth error: ${message.reason}`);
@@ -318,6 +326,29 @@ function syncServerRoom(room, players = [], npcs = [], movedDirection = null) {
   exitCooldownUntil = performance.now() + 450;
   setRoom(room.id, { fromRoomId, snapCamera: true });
   appendLog(movedDirection ? `Entered ${room.name}.` : `Synced room: ${room.name}.`);
+}
+
+function upsertServerNpc(message) {
+  const id = message.npcId ?? message.id;
+  if (!id) return;
+  const existingIndex = serverState.npcs.findIndex((npc) => (npc.id ?? npc.npcId) === id);
+  const nextNpc = {
+    ...(existingIndex >= 0 ? serverState.npcs[existingIndex] : {}),
+    id,
+    name: message.npcName ?? message.name ?? id
+  };
+  if (existingIndex >= 0) {
+    serverState.npcs.splice(existingIndex, 1, nextNpc);
+  } else {
+    serverState.npcs.push(nextNpc);
+  }
+}
+
+function refreshRendererEntities() {
+  roomRuntime?.syncEntities?.({
+    npcs: serverCanDriveMovement() ? serverState.npcs : [],
+    roomItems: serverCanDriveMovement() ? serverState.roomItems : []
+  });
 }
 
 function upsertServerRoom(room) {
@@ -443,9 +474,12 @@ function setRoom(roomId, options = {}) {
     room,
     world,
     serverNpcs: serverCanDriveMovement() ? serverState.npcs : [],
+    serverItems: serverCanDriveMovement() ? serverState.roomItems : [],
     onExit: (targetId) => enterExitTarget(targetId)
   });
   if (!roomRuntime) return;
+  nearbyInteractable = null;
+  updateInteractionPrompt();
   applyEnvironment(roomRuntime.environment);
 
   const spawn = roomRuntime.spawnFor?.(fromRoomId) ?? roomRuntime.spawn;
@@ -512,6 +546,12 @@ function handleKeyDown(event) {
     return;
   }
 
+  if ((event.code === "KeyF" || event.code === "Enter") && nearbyInteractable && !activePanel) {
+    event.preventDefault();
+    interactWithNearby();
+    return;
+  }
+
   if (playableKeys.has(event.code) && !activePanel) {
     event.preventDefault();
     if (event.code === "Space" && !keys.has("Space")) movement.jumpQueued = true;
@@ -548,19 +588,21 @@ function setInputMode(mode) {
 }
 
 function openPanel(panelId) {
-  if (!panelOrder.includes(panelId)) return;
+  if (!panelOrder.includes(panelId) && panelId !== "interaction") return;
   if (document.pointerLockElement === canvas) document.exitPointerLock();
   activePanel = panelId;
   keys.clear();
   renderPanel(panelId);
   panel.classList.remove("hidden");
   updatePanelButtons();
+  updateInteractionPrompt();
 }
 
 function closePanel() {
   activePanel = null;
   panel.classList.add("hidden");
   updatePanelButtons();
+  updateInteractionPrompt();
 }
 
 function updatePanelButtons() {
@@ -584,6 +626,7 @@ function renderPanel(panelId) {
 }
 
 function panelTitleFor(panelId) {
+  if (panelId === "interaction") return selectedInteractable?.name ?? "Interaction";
   return {
     character: "Character Sheet",
     inventory: "Inventory",
@@ -602,6 +645,7 @@ function panelContentFor(panelId, room) {
   else if (panelId === "spells") content.append(spellsPanel());
   else if (panelId === "map") content.append(mapPanel(room));
   else if (panelId === "log") content.append(logPanel(room));
+  else if (panelId === "interaction") content.append(interactionPanel());
   else content.append(helpPanel());
   return content;
 }
@@ -721,6 +765,29 @@ function logPanel(room) {
   `);
 }
 
+function interactionPanel() {
+  const entity = selectedInteractable;
+  if (!entity) {
+    return htmlFragment("<p>No nearby presence is selected.</p>");
+  }
+
+  const body = entity.dialogue || entity.description || `${entity.name} is present in ${world.rooms.get(currentRoomId)?.name ?? "this room"}.`;
+  const kindLabel = entity.kind === "npc" ? entity.role || "NPC" : entity.role || "Item";
+  return htmlFragment(`
+    <p>${escapeHtml(kindLabel)} / ${escapeHtml(world.rooms.get(currentRoomId)?.name ?? currentRoomId)}</p>
+    <div class="list">
+      <div class="list-card">
+        <strong>${escapeHtml(entity.name)}</strong>
+        <span class="muted">${escapeHtml(body)}</span>
+      </div>
+    </div>
+    <div class="panel-actions">
+      <button type="button" data-panel-target="log">Open log</button>
+      <button type="button" data-panel-target="map">Map</button>
+    </div>
+  `);
+}
+
 function helpPanel() {
   return htmlFragment(`
     <div class="list">
@@ -766,6 +833,36 @@ function updateCompass() {
   compassNeedle.style.transform = `translate(-50%, -50%) rotate(${movement.heading}rad)`;
 }
 
+function updateNearbyInteractable() {
+  const next = roomRuntime?.nearestInteractable?.(player.position, 2.65) ?? null;
+  if ((next?.id ?? null) === (nearbyInteractable?.id ?? null) && (next?.kind ?? null) === (nearbyInteractable?.kind ?? null)) {
+    return;
+  }
+  nearbyInteractable = next;
+  updateInteractionPrompt();
+}
+
+function updateInteractionPrompt() {
+  if (!interactionPrompt) return;
+  if (!nearbyInteractable || activePanel) {
+    interactionPrompt.classList.add("hidden");
+    interactionPrompt.replaceChildren();
+    return;
+  }
+
+  const action = nearbyInteractable.kind === "npc" ? "Talk" : "Inspect";
+  interactionPrompt.textContent = `F ${action} ${nearbyInteractable.name}`;
+  interactionPrompt.classList.remove("hidden");
+}
+
+function interactWithNearby() {
+  if (!nearbyInteractable) return;
+  selectedInteractable = { ...nearbyInteractable };
+  appendLog(`${selectedInteractable.prompt}.`);
+  openPanel("interaction");
+  updateInteractionPrompt();
+}
+
 function applyEnvironment(environment = {}) {
   const background = environment.background ?? 0x100c08;
   const fog = environment.fog ?? background;
@@ -806,6 +903,7 @@ function render() {
   const dt = Math.min(clock.getDelta(), 0.04);
   updatePlayer(dt);
   roomRuntime?.update?.(dt, player, camera);
+  updateNearbyInteractable();
   updateCamera(dt);
   renderer.render(scene, camera);
   lastRenderStats = {
@@ -942,7 +1040,16 @@ function installDebugApi() {
     get room() {
       return {
         id: currentRoomId,
-        triggers: roomRuntime?.debugTriggers?.() ?? []
+        triggers: roomRuntime?.debugTriggers?.() ?? [],
+        entities: roomRuntime?.debugEntities?.() ?? [],
+        nearbyInteractable: nearbyInteractable
+          ? {
+              id: nearbyInteractable.id,
+              kind: nearbyInteractable.kind,
+              name: nearbyInteractable.name,
+              prompt: nearbyInteractable.prompt
+            }
+          : null
       };
     },
     get server() {

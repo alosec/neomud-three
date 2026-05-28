@@ -8,8 +8,10 @@ import {
   addExitThreshold,
   addGabledHouse,
   addGroundPlane,
+  addItemMarker,
   addLamp as addComponentLamp,
   addMarketStall as addComponentMarketStall,
+  addNpcStandee,
   addPortalFrame,
   addSurfaceRect,
   addTextBoard
@@ -80,9 +82,11 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
   return runtime;
 }
 
-export function buildTownSquareRoom({ root, worldRoot, npcs }) {
+export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
   const materials = makeTownMaterials();
   const spec = TOWN_SQUARE_SPEC;
+  const entityLayer = new THREE.Group();
+  const interactables = [];
 
   addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
   addTownSpecSurfaces(root, materials, spec);
@@ -92,16 +96,20 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
   addTownSpecLandmarks(root, materials, spec);
   addTownSpecExitAffordances(root, spec);
   addTownSpecProps(root, materials, spec);
+  root.add(entityLayer);
 
-  for (const [index, npc] of npcs.entries()) {
-    const angle = -0.9 + index * 0.75;
-    addNpcSprite(root, `${worldRoot}/assets/images/npcs/${npc.id.replace(":", "_")}.webp`, Math.sin(angle) * 4.4, 0, Math.cos(angle) * 4.4, npc.name);
-  }
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    entityLayer.clear();
+    interactables.length = 0;
+    addTownSpecEntities(entityLayer, materials, spec, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
 
   return {
     spawn: spawnFromSpec(spec.spawn),
     status: `${spec.name}: ${spec.intent}`,
     environment: spec.environment,
+    syncEntities,
     spawnFor(fromRoomId) {
       if (spec.entrySpawns[fromRoomId]) return spawnFromSpec(spec.entrySpawns[fromRoomId]);
       return this.spawn;
@@ -116,11 +124,39 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
     debugTriggers() {
       return triggerDebugInfo(spec.exits);
     },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    nearestInteractable(position, maxDistance = 2.6) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
     update(dt) {
       fountain.water.rotation.y += dt * 0.25;
       fountain.topBowl.rotation.y += dt * 0.2;
       fountain.topWater.rotation.y -= dt * 0.28;
       fountain.fallingWater.material.opacity = 0.3 + Math.sin(performance.now() * 0.006) * 0.08;
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0018 + index) * 0.025;
+        }
+      });
     }
   };
 }
@@ -677,6 +713,132 @@ function addTownSpecProps(root, materials, spec) {
   for (const lamp of spec.props.lamps) {
     addComponentLamp(root, materials, lamp.x, lamp.z, { intensity: 1.45, distance: 5.2 });
   }
+}
+
+function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+
+    const placement = spec.entities?.npcPlacements?.[normalized.id] ?? fallbackNpcPlacement(index);
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role ?? npcRoleLabel(normalized),
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading ?? 0,
+      height: placement.height ?? 3,
+      width: placement.width ?? 1.68,
+      palette: placement.palette ?? npcPalette(normalized)
+    });
+
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role ?? npcRoleLabel(normalized),
+      prompt: `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+
+    const placement = spec.entities?.itemSpawns?.[index % (spec.entities.itemSpawns.length || 1)] ?? {
+      position: [2 + index * 0.8, 0, 5.2]
+    };
+    const [x, , z] = placement.position;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Ground",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function normalizeNpc(npc, worldNpcsById) {
+  const explicitId = npc.id ?? npc.npcId;
+  const incomingName = npc.name ?? npc.npcName;
+  const source = worldNpcsById.get(explicitId) ??
+    [...worldNpcsById.values()].find((worldNpc) => worldNpc.name === incomingName) ??
+    {};
+  const id = explicitId ?? source.id;
+  return {
+    ...source,
+    ...npc,
+    id,
+    name: incomingName ?? source.name ?? id
+  };
+}
+
+function normalizeRoomItem(item, world) {
+  const id = item.itemId ?? item.id;
+  const catalogItem = world?.catalogs?.itemsById?.get(id);
+  return {
+    ...catalogItem,
+    ...item,
+    id,
+    name: item.itemName ?? item.name ?? catalogItem?.name ?? id,
+    description: item.description ?? catalogItem?.description ?? "",
+    quantity: item.quantity ?? item.count ?? 1
+  };
+}
+
+function fallbackNpcPlacement(index) {
+  const angle = -0.78 + index * 0.74;
+  const radius = 5.6 + (index % 2) * 0.85;
+  return {
+    position: [Math.sin(angle) * radius, 0, Math.cos(angle) * radius],
+    heading: angle + Math.PI,
+    role: "NPC",
+    palette: index % 2 ? "blue" : "gold"
+  };
+}
+
+function imageId(id) {
+  return String(id ?? "").replace(":", "_");
+}
+
+function npcRoleLabel(npc) {
+  if (npc.behaviorType === "trainer") return "Trainer";
+  if (npc.behaviorType === "quest") return "Quest";
+  if (npc.behaviorType === "merchant") return "Merchant";
+  return "NPC";
+}
+
+function npcPalette(npc) {
+  if (npc.behaviorType === "quest") return "blue";
+  if (npc.behaviorType === "merchant") return "red";
+  return "gold";
+}
+
+function horizontalDistanceSq(a, b) {
+  const dx = a.x - b.x;
+  const dz = a.z - b.z;
+  return dx * dx + dz * dz;
 }
 
 function addTownSpecExitAffordances(root, spec) {

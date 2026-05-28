@@ -80,6 +80,11 @@ async function main() {
     const townTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.ok(townTriggers.some((trigger) => trigger.id === "exit-south-temple"));
     assert.ok(townTriggers.every((trigger) => trigger.prompt && trigger.affordance?.label));
+    const townEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      townEntities.some((entity) => entity.kind === "npc" && /Guildmaster/i.test(entity.name)),
+      `expected server NPC entities in Town Square, got ${JSON.stringify(townEntities)}`
+    );
     await saveScreenshot(page, "server-town-square.png");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));
