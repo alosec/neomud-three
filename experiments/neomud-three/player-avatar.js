@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-const HERO_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
+export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
 
 export function makePlayerAvatar() {
   const root = new THREE.Group();
@@ -66,7 +66,7 @@ function makeMaterials() {
 
 async function loadSkinnedHero(state) {
   try {
-    const gltf = await new GLTFLoader().loadAsync(HERO_MODEL_URL);
+    const gltf = await new GLTFLoader().loadAsync(PLAYER_MODEL_URL);
     const model = gltf.scene;
     model.name = "Xbot skinned player rig";
     model.scale.setScalar(1.48);

@@ -2,6 +2,13 @@
 
 High leverage next work:
 
+0. Use the new production pipeline for all visual work.
+   - Read `experiments/neomud-three/ART_DIRECTION.md` before visual edits.
+   - Put new generated materials through `material-lab.html`.
+   - Put new reusable components through `prop-zoo.html`.
+   - Do not add room-specific art that bypasses approved material IDs or TownKit components.
+   - Keep fixed screenshot anchors in `scripts/test-neomud-three-town-shots.cjs` current after Town Square visual changes.
+
 1. Build a small renderer architecture instead of per-room hacks.
    - Room scene registry.
    - Room render specs for authored spaces, starting with `TOWN_SQUARE_SPEC`.
@@ -13,12 +20,15 @@ High leverage next work:
    - Better Gothic wall/window frames.
    - More convincing transparent stained glass placement.
    - Larger readable north doorway and exit affordance.
-   - Warmer interior fill and stained-glass color patches on the floor.
+   - Better pew/runner/candle proportions; the current warmth pass is useful but still blockout-grade.
+   - Stained-glass color patches on the floor.
 
 3. Rebuild Town Square as a real 3D room.
    - Replace placeholder facades with authored structures.
    - Use existing room image as reference, not as a flat backdrop.
    - Give each NPC a real placement and interaction zone.
+   - Expand the current low-poly tree into a fuller approved foliage kit from Prop Zoo.
+   - Preserve the current exit readability and 240-call full-smoke budget, or explicitly justify a new budget before raising it.
 
 4. Connect NeoMud gameplay surfaces.
    - Clicking/approaching an NPC should open a DOM interaction panel.
@@ -30,6 +40,7 @@ High leverage next work:
    - Assert physical exit traversal from temple to square through the live server, not only debug movement.
    - Add visual screenshots for temple and square after major renderer changes.
    - Add collision and spawn-heading checks for each authored room.
+   - Keep adding fixed screenshot anchors before major visual passes, not after the fact.
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
 
 6. Revisit HTML-in-Canvas once the 3D space is stable.
@@ -40,3 +51,9 @@ High leverage next work:
    - Generate reusable tileable textures first: stone, marble, wood, roof, cloth, metal trim.
    - Generate transparent component cutouts second: stained glass variants, banners, icons, NPC standees.
    - Keep all generated project assets under `experiments/neomud-three/assets/generated/`.
+
+8. Next concrete visual pass.
+   - Build the next foliage kit in Prop Zoo: conifer variant, shrub clump, flower planter, grass tuft, and ground decal.
+   - Add that kit to Town Square while preserving screenshot readability.
+   - Then pick one landmark, preferably the west Tavern exterior, and rebuild it from approved TownKit pieces.
+   - Keep Town Square under the current render budget and update fixed screenshots.

@@ -141,3 +141,35 @@ Visual delta: replaced the minimal south threshold with an authored `cathedral-f
 Renderer delta: shared box geometries are cached at the component layer and disposed once per room teardown, reducing geometry count without retaining stale room geometry across transitions.
 
 Remaining visual gap: this fixes the "there is no Temple" failure, but it is still not production art. The next graphics task should not add more random decoration; it should define and execute the same spec-first contract for player character art and for each named landmark.
+
+## Score After Pipeline/Lab Pass
+
+- Navigation readability: 2/2. Town Square exits and physical triggers still pass; four-sided horizon/road continuation reduces the hard blank-edge feeling without adding unreviewed building clutter.
+- Scale believability: 1/2. The room still has blockout-grade architecture and placeholder character art, but new visual content now has material-lab/prop-zoo gates before entering rooms.
+- Semantic match: 2/2. Temple, Tavern, Market, Gate, fountain, Guildmaster, and Old Wren remain present and connected to the NeoMud room graph.
+- Interaction clarity: 2/2. Physical exit triggers and NPC proximity interaction still pass offline and server-backed tests.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes.
+- Performance: 2/2. Latest offline Town Square smoke reports 237 draw calls, 55,376 triangles, 18 textures, and 133 geometries; cardinal headed checks remain within budget.
+
+Total: 11/12
+
+Pipeline delta: added `ART_DIRECTION.md`, approved material definitions/metadata, `material-lab.html`, first TownKit prop components, `prop-zoo.html`, and browser QA for both labs. Removed expensive side-building massing after screenshots showed it was crude and pushed draw calls over budget.
+
+Remaining visual gap: Town Square is still not professional-final. The immediate next visual pass should rebuild one landmark from TownKit after approving its component pieces in Prop Zoo, rather than adding raw room-specific meshes.
+
+## Score After Courtyard Warmth And Screenshot-Anchor Pass
+
+- Navigation readability: 2/2. Gate, Market, Temple, and Tavern remain visible from the fixed anchors; trees and props frame the plaza without blocking the main exit paths.
+- Scale believability: 1/2. Larger courtyard trees, benches, planters, banners, and crate stacks add scale cues, but the tree shapes and building forms are still stylized blockout-grade.
+- Semantic match: 2/2. The plaza now reads more like a civic courtyard with places to gather instead of an empty test pad.
+- Interaction clarity: 2/2. Physical exits, NPC proximity prompts, and collision metadata still pass offline and server-backed tests.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes after the room dressing pass.
+- Performance: 2/2. Latest full smoke Town Square budget is exactly 240 draw calls / 57,088 triangles / 18 textures / 142 geometries; fixed screenshot anchors report 126 calls / 53,058 triangles / 19 textures / 188 geometries.
+
+Total: 11/12
+
+Visual delta: moved trees into the actual courtyard composition, replaced the cone tree with a low-poly broadleaf tree kit, enlarged and varied tree placement, added benches/planters/banners/crate stacks, added Town Square collision for new dressing volumes, and converted repeated dressing to instanced batches after the first pass exceeded budget.
+
+QA delta: added `scripts/test-neomud-three-town-shots.cjs` for fixed Town Square screenshots and updated smoke tests to cover stable grounded walking, HP HUD, Temple altar collision, and Tavern table collision.
+
+Remaining visual gap: the scene is warmer and less barren, but the trees are still procedural low-poly placeholders. The next art-quality pass should create a fuller approved foliage kit in Prop Zoo, then add shrubs/flowers/ground decals without changing the room layout.

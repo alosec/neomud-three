@@ -60,7 +60,7 @@ Research anchors:
    Validate navigation, scale, sightlines, physical exits, camera, and server movement before generating or wiring more textures.
 
 9. Generated assets need a component target.
-   Good uses are tileable materials, transparent windows, banners, signs, NPC standees, item icons, and distant atmosphere. Avoid full-room pasted art and one-off decorative props before the layout works.
+   Good uses are tileable materials, transparent windows, banners, signs, NPC standees, item icons, and distant atmosphere. Avoid full-room pasted art and one-off decorative props before the layout works. New materials go through `material-lab.html`; new reusable props go through `prop-zoo.html`.
 
 10. Preserve the MUD UI soul.
     Keep room text, command/combat log, dialogue, inventory, equipment, and debug/server state in DOM overlays for now. The 3D scene should answer where the player is, where they can go, and who/what is present.
@@ -102,3 +102,9 @@ Do not hand-edit a room as scattered mesh calls. Each authored room needs a `Roo
 - `spawn` / `entrySpawns`: camera and player staging for each server transition.
 
 Renderer code should instantiate the spec. Design iteration should mostly edit the spec.
+
+## Production Labs
+
+- `experiments/neomud-three/material-lab.html`: approved material IDs on repeatable test geometry, with texture dimensions, color space, repeat, roughness, metalness, alpha/emissive, intended use, and approval metadata exposed to QA.
+- `experiments/neomud-three/prop-zoo.html`: reusable TownKit props staged with player scale reference before room use.
+- `scripts/test-neomud-three-labs.cjs`: browser QA for both labs, including screenshots, render stats, budgets, and console/request checks.

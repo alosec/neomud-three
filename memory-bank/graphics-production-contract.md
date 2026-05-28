@@ -39,6 +39,19 @@ Town Square's south exit now uses `south-temple-threshold` as a `primary-exit-la
 
 The component layer now caches box geometries while still disposing them on room teardown. This keeps the authored blockout manageable without inflating route-to-route render budgets.
 
+## Pipeline Pass
+
+The fork now has the first production pipeline pieces:
+
+- `experiments/neomud-three/ART_DIRECTION.md` defines style, shape, material, lighting, asset, and QA rules.
+- `render-assets.js` exposes approved material IDs and metadata: family, kind, intended use, texture source, dimensions, estimated GPU bytes, repeat, color space, roughness, metalness, alpha/emissive flags, and approval state.
+- `material-lab.html` renders every approved material on the same plane/cube/wall/cylinder test station.
+- `components/town-kit.js` defines the first reusable TownKit props.
+- `prop-zoo.html` stages TownKit props with player scale reference before they enter game rooms.
+- `scripts/test-neomud-three-labs.cjs` screenshots both labs and writes render/budget reports.
+
+This is now the required path for new visual content: material lab for materials, prop zoo for reusable components, then room spec assembly.
+
 ## Acceptance Bar
 
 Before a visual pass is called successful:

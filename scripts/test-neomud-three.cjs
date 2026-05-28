@@ -54,6 +54,7 @@ async function main() {
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.enabled), false);
     assert.equal(await page.locator("#compass").count(), 1);
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
+    assert.match(await page.locator("#hp-value").textContent(), /^86\/86$/);
     await saveScreenshot(page, "offline-temple.png");
     budgetReports.push(await collectBudgetStatus(page, "town:temple"));
     assertRenderBudget(assert, "town:temple", budgetReports.at(-1).stats);
@@ -70,6 +71,8 @@ async function main() {
     await page.waitForTimeout(700);
     const runningAvatar = await page.evaluate(() => window.__neomudThreeDebug.avatar);
     assert.equal(runningAvatar.activeAnimation, "Run");
+    const runSample = await page.evaluate(() => window.__neomudThreeDebug.player);
+    assert.ok(Math.abs(runSample.y) < 0.02, `expected no procedural grounded walk bob, got y=${runSample.y}`);
     await page.keyboard.up("w");
     await page.keyboard.up("Shift");
 
@@ -81,6 +84,22 @@ async function main() {
       headingForwardDelta > 1.2,
       `expected forward movement along heading, delta ${headingForwardDelta}, player ${JSON.stringify({ initial, afterForward })}`
     );
+    assert.ok(Math.abs(afterForward.y) < 0.02, `expected grounded walking y to stay stable, got ${afterForward.y}`);
+
+    const templeColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      templeColliders.some((collider) => collider.id === "altar-dais"),
+      `expected Temple altar collider, got ${JSON.stringify(templeColliders)}`
+    );
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 15.55, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForTimeout(650);
+    await page.keyboard.up("w");
+    const afterAltarPush = await page.evaluate(() => window.__neomudThreeDebug.player);
+    assert.ok(afterAltarPush.z < 17.05, `expected altar collision to block south movement, got ${JSON.stringify(afterAltarPush)}`);
+    await page.evaluate((player) => {
+      window.__neomudThreeDebug.placePlayer({ x: player.x, z: player.z, heading: player.heading });
+    }, afterForward);
 
     await page.keyboard.down("w");
     await page.keyboard.down("e");
@@ -160,6 +179,11 @@ async function main() {
     assert.equal((await page.locator("#room-name").textContent()).trim(), "The Rusty Tankard");
     const tavernTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
     assert.ok(tavernTriggers.some((trigger) => trigger.id === "exit-east-square"));
+    const tavernColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      tavernColliders.some((collider) => collider.id === "table-northwest"),
+      `expected Tavern table collider, got ${JSON.stringify(tavernColliders)}`
+    );
     const tavernEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
     assert.ok(
       tavernEntities.some((entity) => entity.id === "npc:barkeep" && /Barkeep Grom/i.test(entity.name)),
@@ -168,6 +192,13 @@ async function main() {
     await saveScreenshot(page, "offline-tavern.png");
     budgetReports.push(await collectBudgetStatus(page, "town:tavern"));
     assertRenderBudget(assert, "town:tavern", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -2.65, z: -7.55, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForTimeout(700);
+    await page.keyboard.up("w");
+    const afterTablePush = await page.evaluate(() => window.__neomudThreeDebug.player);
+    assert.ok(afterTablePush.z < -6.45, `expected Tavern table collision to block movement, got ${JSON.stringify(afterTablePush)}`);
 
     const barkeep = tavernEntities.find((entity) => entity.id === "npc:barkeep");
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.1, z, heading: -Math.PI / 2 }), barkeep);
@@ -181,7 +212,10 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Barkeep Grom");
     await page.keyboard.press("Escape");
 
-    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 6.8, z: 0, heading: Math.PI / 2 }));
+    const tavernExit = tavernTriggers.find((trigger) => trigger.id === "exit-east-square");
+    await page.evaluate((trigger) => {
+      window.__neomudThreeDebug.placePlayer({ x: trigger.trigger.center[0] - 0.65, z: 0, heading: Math.PI / 2 });
+    }, tavernExit);
     await page.keyboard.down("w");
     await page.waitForFunction(
       () => window.__neomudThreeDebug.currentRoomId === "town:square",

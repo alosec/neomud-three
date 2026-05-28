@@ -23,6 +23,9 @@ const panelClose = document.querySelector("#panel-close");
 const miniMap = document.querySelector("#mini-map");
 const compassNeedle = document.querySelector("#compass-needle");
 const interactionPrompt = document.querySelector("#interaction-prompt");
+const hpFill = document.querySelector("#hp-fill");
+const hpValue = document.querySelector("#hp-value");
+const movementChip = document.querySelector("#movement-chip");
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -110,8 +113,8 @@ const playerProfile = {
 
 const controls = {
   turnRate: 2.55,
-  walkSpeed: 5.35,
-  runSpeed: 8.1,
+  walkSpeed: 5.85,
+  runSpeed: 10.6,
   backpedalScale: 0.58,
   strafeScale: 0.78,
   mouseSensitivity: 0.0024,
@@ -128,6 +131,7 @@ const movement = {
   verticalVelocity: 0,
   grounded: true,
   jumpQueued: false,
+  running: false,
   walkClock: 0,
   cameraTarget: new THREE.Vector3(0, 1.4, 0)
 };
@@ -371,6 +375,7 @@ function applyServerPlayer(playerData) {
   playerProfile.mp = playerData.currentMp ?? playerProfile.mp;
   playerProfile.maxMp = playerData.maxMp ?? playerProfile.maxMp;
   if (activePanel === "character") renderPanel(activePanel);
+  updatePlayerHud();
 }
 
 function requestMove(direction, targetId = null) {
@@ -914,6 +919,7 @@ function render() {
     geometries: renderer.info.memory.geometries
   };
   updateCompass();
+  updatePlayerHud();
 }
 
 function disposeObjectTree(root) {
@@ -974,8 +980,7 @@ function updatePlayer(dt) {
 
   const horizontalSpeed = movement.velocity.length();
   movement.walkClock += horizontalSpeed * dt * 4.4;
-  const bob = movement.grounded ? Math.sin(movement.walkClock) * Math.min(0.05, horizontalSpeed * 0.01) : 0;
-  player.position.y += bob;
+  movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
   player.userData.animate?.({
@@ -1056,6 +1061,7 @@ function installDebugApi() {
         triggers: roomRuntime?.debugTriggers?.() ?? [],
         landmarks: roomRuntime?.debugLandmarks?.() ?? [],
         entities: roomRuntime?.debugEntities?.() ?? [],
+        colliders: roomRuntime?.debugColliders?.() ?? [],
         nearbyInteractable: nearbyInteractable
           ? {
               id: nearbyInteractable.id,
@@ -1095,6 +1101,7 @@ function installDebugApi() {
       movement.verticalVelocity = 0;
       movement.grounded = true;
       movement.jumpQueued = false;
+      movement.running = false;
       player.rotation.set(0, -movement.heading, 0);
       updateCamera(1, true);
       return this.player;
@@ -1111,4 +1118,13 @@ function installDebugApi() {
       updateStatusText("Disconnected from Kotlin server; using local fallback.");
     }
   };
+}
+
+function updatePlayerHud() {
+  if (!hpFill || !hpValue || !movementChip) return;
+  const maxHp = Math.max(1, Number(playerProfile.maxHp) || 1);
+  const hp = THREE.MathUtils.clamp(Number(playerProfile.hp) || 0, 0, maxHp);
+  hpValue.textContent = `${Math.round(hp)}/${Math.round(maxHp)}`;
+  hpFill.style.transform = `scaleX(${hp / maxHp})`;
+  movementChip.textContent = movement.grounded ? (movement.running ? "Run" : "Walk") : "Air";
 }

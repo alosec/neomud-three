@@ -20,6 +20,17 @@
     <div class="crosshair" id="crosshair"></div>
     <div class="interaction-prompt hidden" id="interaction-prompt" aria-live="polite"></div>
 
+    <section class="player-hud" id="player-hud" aria-label="Player status">
+      <div class="hp-row">
+        <span>HP</span>
+        <strong id="hp-value">86/86</strong>
+      </div>
+      <div class="hp-track" aria-hidden="true">
+        <span id="hp-fill"></span>
+      </div>
+      <div class="movement-chip" id="movement-chip">Walk</div>
+    </section>
+
     <section class="room-panel" id="room-panel">
       <div class="eyebrow">NeoMud Three Lab</div>
       <h1 id="room-name">Loading...</h1>

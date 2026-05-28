@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+
+const assert = require("node:assert/strict");
+const fs = require("node:fs/promises");
+const path = require("node:path");
+const { chromium } = require("playwright");
+const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-three-qa.cjs");
+
+const baseUrl = process.env.NEOMUD_THREE_BASE_URL || "http://127.0.0.1:4183/experiments/neomud-three/";
+const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
+const headed = process.env.HEADED === "1";
+
+const LABS = [
+  {
+    id: "material-lab",
+    path: "material-lab.html",
+    screenshot: "material-lab.png",
+    ready: () => window.__neomudMaterialLabDebug?.render?.triangles > 0,
+    snapshot: () => ({
+      render: window.__neomudMaterialLabDebug.render,
+      materials: window.__neomudMaterialLabDebug.materials
+    })
+  },
+  {
+    id: "prop-zoo",
+    path: "prop-zoo.html",
+    screenshot: "prop-zoo.png",
+    ready: () =>
+      window.__neomudPropZooDebug?.render?.triangles > 0 &&
+      (window.__neomudPropZooDebug.avatar.loaded || window.__neomudPropZooDebug.avatar.loadFailed),
+    snapshot: () => ({
+      render: window.__neomudPropZooDebug.render,
+      props: window.__neomudPropZooDebug.props,
+      avatar: window.__neomudPropZooDebug.avatar
+    })
+  }
+];
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
+
+async function main() {
+  const browser = await launchBrowser();
+  const reports = [];
+  const consoleErrors = [];
+  const failedRequests = [];
+
+  try {
+    await fs.mkdir(qaDir, { recursive: true });
+
+    for (const lab of LABS) {
+      const page = await browser.newPage({ viewport: { width: 1440, height: 920 } });
+      page.on("console", (message) => {
+        const text = message.text();
+        if (message.type() === "error" && !text.startsWith("Failed to load resource")) {
+          consoleErrors.push(`${lab.id}: ${text}`);
+        }
+      });
+      page.on("pageerror", (error) => consoleErrors.push(`${lab.id}: ${error.message}`));
+      page.on("response", (response) => {
+        const status = response.status();
+        if (status >= 400 && !response.url().endsWith("/favicon.ico")) {
+          failedRequests.push(`${lab.id}: ${status} ${response.url()}`);
+        }
+      });
+
+      const url = new URL(lab.path, baseUrl).toString();
+      await page.goto(url, { waitUntil: "domcontentloaded" });
+      await page.waitForFunction(lab.ready, null, { timeout: 20_000 });
+      await page.waitForTimeout(900);
+      await page.screenshot({ path: path.join(qaDir, lab.screenshot), animations: "disabled" });
+      const snapshot = await page.evaluate(lab.snapshot);
+      const budget = budgetStatus(lab.id, snapshot.render);
+      assertRenderBudget(assert, lab.id, snapshot.render);
+
+      if (lab.id === "material-lab") {
+        assert.ok(snapshot.materials.length >= 24, `expected approved material set, got ${snapshot.materials.length}`);
+        assert.ok(snapshot.materials.every((material) => material.approved), "expected only approved material definitions");
+      }
+      if (lab.id === "prop-zoo") {
+        assert.ok(snapshot.props.length >= 10, `expected reusable prop set, got ${snapshot.props.length}`);
+        assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
+      }
+
+      reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });
+      await page.close();
+    }
+
+    assert.deepEqual(failedRequests, []);
+    assert.deepEqual(consoleErrors, []);
+
+    await writeQaReport(qaDir, {
+      type: "labs",
+      generatedAt: new Date().toISOString(),
+      labs: reports,
+      failedRequests,
+      consoleErrors
+    }, "labs-report.json");
+
+    console.log("NeoMud Three lab QA passed");
+  } finally {
+    await browser.close();
+  }
+}
+
+async function launchBrowser() {
+  const options = { headless: !headed };
+  if (process.env.NEOMUD_THREE_BROWSER_CHANNEL) {
+    return chromium.launch({ ...options, channel: process.env.NEOMUD_THREE_BROWSER_CHANNEL });
+  }
+  try {
+    return await chromium.launch(options);
+  } catch (error) {
+    if (process.platform === "darwin") return chromium.launch({ ...options, channel: "chrome" });
+    throw error;
+  }
+}

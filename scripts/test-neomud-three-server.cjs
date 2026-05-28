@@ -113,7 +113,10 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:tavern"));
     assertRenderBudget(assert, "town:tavern", budgetReports.at(-1).stats);
 
-    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 6.8, z: 0, heading: Math.PI / 2 }));
+    const tavernExit = tavernTriggers.find((trigger) => trigger.id === "exit-east-square");
+    await page.evaluate((trigger) => {
+      window.__neomudThreeDebug.placePlayer({ x: trigger.trigger.center[0] - 0.65, z: 0, heading: Math.PI / 2 });
+    }, tavernExit);
     await page.keyboard.down("w");
     await page.waitForFunction(
       () => window.__neomudThreeDebug.currentRoomId === "town:square",

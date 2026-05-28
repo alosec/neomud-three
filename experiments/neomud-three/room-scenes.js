@@ -33,6 +33,43 @@ const TEMPLE = {
   doorHalfWidth: 2.0
 };
 
+const TAVERN = {
+  width: 22.0,
+  depth: 17.0,
+  halfX: 11.0,
+  halfZ: 8.5,
+  spawnX: 7.15,
+  exitX: 10.2,
+  exitHalfZ: 2.35,
+  barX: -8.35,
+  barZ: -3.1,
+  fireplaceX: -10.35,
+  fireplaceZ: 4.8
+};
+
+const TAVERN_TABLES = [
+  { id: "table-northwest", x: -2.65, z: -5.45, rotation: 0.18, collider: { width: 2.35, depth: 1.78 } },
+  { id: "table-northeast", x: 3.35, z: -5.0, rotation: -0.24, collider: { width: 2.35, depth: 1.78 } },
+  { id: "table-southwest", x: -1.55, z: 4.85, rotation: 0.42, collider: { width: 2.35, depth: 1.78 } },
+  { id: "table-southeast", x: 4.75, z: 3.82, rotation: -0.12, collider: { width: 2.35, depth: 1.78 } }
+];
+
+const TAVERN_COLLIDERS = [
+  { id: "bar", center: [TAVERN.barX - 0.1, TAVERN.barZ], size: [1.78, 7.8] },
+  { id: "fireplace", center: [TAVERN.fireplaceX + 0.18, TAVERN.fireplaceZ], size: [1.45, 2.9] },
+  ...TAVERN_TABLES.map((table) => ({
+    id: table.id,
+    center: [table.x, table.z],
+    size: [table.collider.width, table.collider.depth]
+  }))
+];
+
+const TEMPLE_COLLIDERS = [
+  { id: "altar-dais", center: [0, TEMPLE.altarZ + 0.12], size: [6.0, 3.25] },
+  { id: "left-incense-brazier", center: [-2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] },
+  { id: "right-incense-brazier", center: [2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] }
+];
+
 export function buildTempleRoom({ root, worldRoot, onExit }) {
   const materials = makeTempleMaterials();
   const runtime = {
@@ -51,9 +88,15 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
     clamp(position) {
       position.x = THREE.MathUtils.clamp(position.x, -12.35, 12.35);
       position.z = THREE.MathUtils.clamp(position.z, -36.9, 20.5);
+      resolveColliderPushout(position, TEMPLE_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -12.35, 12.35);
+      position.z = THREE.MathUtils.clamp(position.z, -36.9, 20.5);
     },
     exitAt(position) {
       return position.z < TEMPLE.exitTriggerZ && Math.abs(position.x) < TEMPLE.doorHalfWidth ? "town:square" : null;
+    },
+    debugColliders() {
+      return debugColliders(TEMPLE_COLLIDERS, 0.42);
     },
     update(dt) {
       for (const smoke of smokePuffs) {
@@ -78,6 +121,7 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
   addAltar(root, materials, smokePuffs);
   addNorthDoor(root, materials);
   addFloorRunes(root);
+  addTempleWarmth(root, materials);
 
   return runtime;
 }
@@ -88,6 +132,7 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
   const entityLayer = new THREE.Group();
   const interactables = [];
   const landmarkDebug = [];
+  const townColliders = townCollidersFromSpec(spec);
 
   addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
   addTownSpecSurfaces(root, materials, spec);
@@ -119,6 +164,9 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
     clamp(position) {
       position.x = THREE.MathUtils.clamp(position.x, spec.size.clamp.minX, spec.size.clamp.maxX);
       position.z = THREE.MathUtils.clamp(position.z, spec.size.clamp.minZ, spec.size.clamp.maxZ);
+      resolveColliderPushout(position, townColliders, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, spec.size.clamp.minX, spec.size.clamp.maxX);
+      position.z = THREE.MathUtils.clamp(position.z, spec.size.clamp.minZ, spec.size.clamp.maxZ);
     },
     exitAt(position) {
       return exitForPosition(position, spec.exits)?.targetId ?? null;
@@ -139,6 +187,9 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
     },
     debugLandmarks() {
       return landmarkDebug;
+    },
+    debugColliders() {
+      return debugColliders(townColliders, 0.42);
     },
     nearestInteractable(position, maxDistance = 2.6) {
       let nearest = null;
@@ -185,32 +236,35 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   syncEntities();
 
   return {
-    spawn: { position: new THREE.Vector3(4.35, 0, 0), heading: -Math.PI / 2 },
-    status: "The Rusty Tankard: authored tavern interior with bar, fireplace, trapdoor, and server-driven barkeep.",
+    spawn: { position: new THREE.Vector3(TAVERN.spawnX, 0, 0), heading: -Math.PI / 2 },
+    status: "The Rusty Tankard: larger authored tavern interior with blocking tables, bar, fireplace, trapdoor, and server-driven barkeep.",
     environment: {
       background: 0x21140c,
       fog: 0x21140c,
       fogDensity: 0.018
     },
     camera: {
-      distance: 5.4,
-      height: 3.15,
+      distance: 6.85,
+      height: 3.75,
       sideOffset: -0.18,
-      lookAhead: 2.1,
+      lookAhead: 2.55,
       targetHeight: 1.28
     },
     syncEntities,
     spawnFor(fromRoomId) {
       return fromRoomId === "town:square"
-        ? { position: new THREE.Vector3(4.35, 0, 0), heading: -Math.PI / 2 }
+        ? { position: new THREE.Vector3(TAVERN.spawnX, 0, 0), heading: -Math.PI / 2 }
         : this.spawn;
     },
     clamp(position) {
-      position.x = THREE.MathUtils.clamp(position.x, -7.35, 7.35);
-      position.z = THREE.MathUtils.clamp(position.z, -5.75, 5.75);
+      position.x = THREE.MathUtils.clamp(position.x, -TAVERN.halfX + 0.55, TAVERN.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -TAVERN.halfZ + 0.55, TAVERN.halfZ - 0.55);
+      resolveColliderPushout(position, TAVERN_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -TAVERN.halfX + 0.55, TAVERN.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -TAVERN.halfZ + 0.55, TAVERN.halfZ - 0.55);
     },
     exitAt(position) {
-      return position.x > 7.05 && Math.abs(position.z) < 2.05 ? "town:square" : null;
+      return position.x > TAVERN.exitX && Math.abs(position.z) < TAVERN.exitHalfZ ? "town:square" : null;
     },
     debugTriggers() {
       return [
@@ -219,7 +273,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
           direction: "EAST",
           targetId: "town:square",
           prompt: "Return to Town Square",
-          trigger: { type: "box", center: [7.25, 1, 0], size: [1.2, 3, 4.1] },
+          trigger: { type: "box", center: [TAVERN.exitX + 0.18, 1, 0], size: [1.2, 3, TAVERN.exitHalfZ * 2] },
           affordance: {
             label: "Town Square",
             subtitle: "East Door"
@@ -237,6 +291,9 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
         x: entity.position.x,
         z: entity.position.z
       }));
+    },
+    debugColliders() {
+      return debugColliders(TAVERN_COLLIDERS, 0.42);
     },
     nearestInteractable(position, maxDistance = 2.45) {
       let nearest = null;
@@ -310,80 +367,76 @@ export function buildGenericRoom({ root, room, worldRoot, rooms }) {
 }
 
 function addTavernInterior(root, materials, fireGroup) {
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(16.8, 12.8), materials.darkTimber);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(TAVERN.width, TAVERN.depth), materials.darkTimber);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   root.add(floor);
 
-  addBox(root, materials.plasterWarm, -8.25, 2.25, 0, 0.42, 4.5, 12.8, { castShadow: false });
-  addBox(root, materials.plaster, 0, 2.25, -6.25, 16.8, 4.5, 0.42, { castShadow: false });
-  addBox(root, materials.plaster, 0, 2.25, 6.25, 16.8, 4.5, 0.42, { castShadow: false });
-  addBox(root, materials.darkTimber, 8.05, 2.2, -2.42, 0.36, 4.4, 0.42);
-  addBox(root, materials.darkTimber, 8.05, 2.2, 2.42, 0.36, 4.4, 0.42);
+  addBox(root, materials.plasterWarm, -TAVERN.halfX + 0.18, 2.25, 0, 0.42, 4.5, TAVERN.depth, { castShadow: false });
+  addBox(root, materials.plaster, 0, 2.25, -TAVERN.halfZ + 0.18, TAVERN.width, 4.5, 0.42, { castShadow: false });
+  addBox(root, materials.plaster, 0, 2.25, TAVERN.halfZ - 0.18, TAVERN.width, 4.5, 0.42, { castShadow: false });
+  addBox(root, materials.darkTimber, TAVERN.halfX - 0.45, 2.2, -2.75, 0.36, 4.4, 0.42);
+  addBox(root, materials.darkTimber, TAVERN.halfX - 0.45, 2.2, 2.75, 0.36, 4.4, 0.42);
 
-  for (const z of [-5.2, -2.6, 0, 2.6, 5.2]) {
-    addBox(root, materials.timber, 0, 4.16, z, 16.9, 0.28, 0.28);
+  for (const z of [-7.0, -3.5, 0, 3.5, 7.0]) {
+    addBox(root, materials.timber, 0, 4.16, z, TAVERN.width + 0.1, 0.28, 0.28);
   }
-  for (const x of [-6.2, -3.1, 0, 3.1, 6.2]) {
-    addBox(root, materials.darkTimber, x, 0.075, 0, 0.12, 0.15, 12.5, { castShadow: false });
+  for (const x of [-8.2, -4.1, 0, 4.1, 8.2]) {
+    addBox(root, materials.darkTimber, x, 0.075, 0, 0.12, 0.15, TAVERN.depth - 0.3, { castShadow: false });
   }
 
   addTavernBar(root, materials);
   addTavernFireplace(root, materials, fireGroup);
   addTavernTables(root, materials);
+  addTavernWarmth(root, materials);
   addTavernTrapdoor(root, materials);
   addTavernExit(root, materials);
 
   const roomLight = new THREE.PointLight(0xffa04f, 4.6, 13.2);
-  roomLight.position.set(-1.2, 3.5, -1.2);
+  roomLight.position.set(-1.0, 3.8, -0.8);
   root.add(roomLight);
   const doorFill = new THREE.PointLight(0xd9e5ff, 1.2, 6.2);
-  doorFill.position.set(7.0, 2.8, 0);
+  doorFill.position.set(TAVERN.halfX - 0.7, 2.8, 0);
   root.add(doorFill);
 }
 
 function addTavernBar(root, materials) {
-  addBox(root, materials.darkTimber, -6.0, 0.72, -2.35, 1.05, 1.44, 6.45);
-  addBox(root, materials.timber, -5.42, 1.52, -2.35, 0.72, 0.24, 6.8);
-  addBox(root, materials.trimLight, -5.03, 1.68, -2.35, 0.18, 0.18, 6.85);
-  addBox(root, materials.darkTimber, -7.96, 2.35, -2.35, 0.26, 2.1, 6.8);
-  addBox(root, materials.timber, -7.68, 3.35, -2.35, 0.42, 0.18, 6.6);
-  for (const z of [-4.7, -3.5, -2.3, -1.1, 0.1]) {
+  addBox(root, materials.darkTimber, TAVERN.barX, 0.72, TAVERN.barZ, 1.05, 1.44, 7.45);
+  addBox(root, materials.timber, TAVERN.barX + 0.58, 1.52, TAVERN.barZ, 0.72, 0.24, 7.8);
+  addBox(root, materials.trimLight, TAVERN.barX + 0.97, 1.68, TAVERN.barZ, 0.18, 0.18, 7.85);
+  addBox(root, materials.darkTimber, -TAVERN.halfX + 0.29, 2.35, TAVERN.barZ, 0.26, 2.1, 7.8);
+  addBox(root, materials.timber, -TAVERN.halfX + 0.58, 3.35, TAVERN.barZ, 0.42, 0.18, 7.6);
+  for (const z of [-5.8, -4.4, -3.0, -1.6, -0.2]) {
     const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.24, 12), materials.sign);
-    mug.position.set(-4.95, 1.92, z);
+    mug.position.set(TAVERN.barX + 1.05, 1.92, z);
     mug.castShadow = true;
     root.add(mug);
   }
 }
 
 function addTavernFireplace(root, materials, fireGroup) {
-  addBox(root, materials.darkStone, -8.0, 1.16, 3.35, 0.46, 2.32, 2.2);
-  addBox(root, materials.portalDark, -7.7, 0.9, 3.35, 0.18, 1.45, 1.28);
-  addBox(root, materials.darkStone, -7.52, 1.85, 3.35, 0.34, 0.34, 1.78);
-  addBox(root, materials.darkTimber, -7.45, 0.46, 3.05, 0.36, 0.18, 0.88);
-  addBox(root, materials.darkTimber, -7.45, 0.46, 3.64, 0.36, 0.18, 0.88);
+  addBox(root, materials.darkStone, TAVERN.fireplaceX, 1.16, TAVERN.fireplaceZ, 0.46, 2.32, 2.2);
+  addBox(root, materials.portalDark, TAVERN.fireplaceX + 0.3, 0.9, TAVERN.fireplaceZ, 0.18, 1.45, 1.28);
+  addBox(root, materials.darkStone, TAVERN.fireplaceX + 0.48, 1.85, TAVERN.fireplaceZ, 0.34, 0.34, 1.78);
+  addBox(root, materials.darkTimber, TAVERN.fireplaceX + 0.55, 0.46, TAVERN.fireplaceZ - 0.3, 0.36, 0.18, 0.88);
+  addBox(root, materials.darkTimber, TAVERN.fireplaceX + 0.55, 0.46, TAVERN.fireplaceZ + 0.29, 0.36, 0.18, 0.88);
 
-  for (const [z, color] of [[3.12, 0xff4f22], [3.36, 0xffb13a], [3.58, 0xffe07a]]) {
+  for (const [z, color] of [[TAVERN.fireplaceZ - 0.23, 0xff4f22], [TAVERN.fireplaceZ + 0.01, 0xffb13a], [TAVERN.fireplaceZ + 0.23, 0xffe07a]]) {
     const flame = new THREE.Mesh(
       new THREE.ConeGeometry(0.18, 0.72, 10),
       new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.56 })
     );
-    flame.position.set(-7.42, 0.88, z);
+    flame.position.set(TAVERN.fireplaceX + 0.58, 0.88, z);
     flame.rotation.z = -0.28;
     fireGroup.add(flame);
   }
   const fireLight = new THREE.PointLight(0xff7d2f, 6.4, 8.6);
-  fireLight.position.set(-6.8, 1.9, 3.35);
+  fireLight.position.set(TAVERN.fireplaceX + 1.2, 1.9, TAVERN.fireplaceZ);
   root.add(fireLight);
 }
 
 function addTavernTables(root, materials) {
-  for (const table of [
-    { x: -1.8, z: -4.0, rotation: 0.18 },
-    { x: 2.65, z: -3.25, rotation: -0.24 },
-    { x: -0.4, z: 3.25, rotation: 0.42 },
-    { x: 3.8, z: 2.45, rotation: -0.12 }
-  ]) {
+  for (const table of TAVERN_TABLES) {
     addTavernTable(root, materials, table);
   }
 }
@@ -403,14 +456,97 @@ function addTavernTable(root, materials, { x, z, rotation }) {
   addBox(group, materials.timber, 0, 0.38, 0.82, 1.52, 0.22, 0.28);
 }
 
+function addTavernWarmth(root, materials) {
+  addBox(root, materials.awningRed, 1.4, 0.035, 0.2, 5.2, 0.05, 2.2, { castShadow: false });
+  addBox(root, materials.sign, 1.4, 0.072, -0.78, 5.35, 0.04, 0.08, { castShadow: false });
+  addBox(root, materials.sign, 1.4, 0.072, 1.18, 5.35, 0.04, 0.08, { castShadow: false });
+
+  addTavernStools(root, materials);
+  addTavernCandleClusters(root, materials);
+
+  for (const [z, labelWidth] of [[-6.75, 2.6], [6.75, 2.3]]) {
+    addBox(root, materials.darkTimber, -6.6, 2.28, z, 3.3, 0.16, 0.2);
+    addBox(root, materials.timber, -6.0, 2.52, z, labelWidth, 0.18, 0.16);
+    addBox(root, materials.sign, -7.35, 2.56, z, 0.32, 0.26, 0.2);
+    addBox(root, materials.sign, -5.05, 2.56, z, 0.28, 0.22, 0.2);
+  }
+}
+
+function addTavernStools(root, materials) {
+  const stools = [
+    [-3.55, -5.45], [-1.75, -6.42], [-1.25, -4.38],
+    [2.0, -5.85], [4.65, -5.38], [3.55, -3.65],
+    [-2.62, 4.05], [-0.35, 5.7], [-0.1, 3.62],
+    [3.42, 2.72], [5.9, 4.25], [4.72, 5.15],
+    [TAVERN.barX + 1.6, -5.6], [TAVERN.barX + 1.6, -4.0], [TAVERN.barX + 1.6, -2.4], [TAVERN.barX + 1.6, -0.8]
+  ];
+  const seatGeometry = new THREE.CylinderGeometry(0.3, 0.34, 0.14, 14);
+  const legGeometry = new THREE.BoxGeometry(0.07, 0.58, 0.07);
+  const seatMesh = new THREE.InstancedMesh(seatGeometry, materials.darkTimber, stools.length);
+  const legMesh = new THREE.InstancedMesh(legGeometry, materials.timber, stools.length * 4);
+  const dummy = new THREE.Object3D();
+
+  stools.forEach(([x, z], index) => {
+    dummy.position.set(x, 0.72, z);
+    dummy.rotation.set(0, 0, 0);
+    dummy.scale.set(1, 1, 1);
+    dummy.updateMatrix();
+    seatMesh.setMatrixAt(index, dummy.matrix);
+
+    for (const [legIndex, [dx, dz]] of [[-0.18, -0.16], [0.18, -0.16], [-0.16, 0.16], [0.16, 0.16]].entries()) {
+      dummy.position.set(x + dx, 0.36, z + dz);
+      dummy.updateMatrix();
+      legMesh.setMatrixAt(index * 4 + legIndex, dummy.matrix);
+    }
+  });
+
+  seatMesh.castShadow = true;
+  seatMesh.receiveShadow = true;
+  legMesh.castShadow = true;
+  legMesh.receiveShadow = true;
+  root.add(seatMesh, legMesh);
+}
+
+function addTavernCandleClusters(root, materials) {
+  const candles = [
+    [-2.65, -5.45], [3.35, -5.0], [-1.55, 4.85], [4.75, 3.82],
+    [-5.05, -5.7], [-5.05, -0.6]
+  ];
+  const waxGeometry = new THREE.BoxGeometry(0.1, 0.42, 0.1);
+  const flameGeometry = new THREE.SphereGeometry(0.075, 10, 8);
+  const waxMesh = new THREE.InstancedMesh(waxGeometry, materials.trimLight, candles.length);
+  const flameMesh = new THREE.InstancedMesh(
+    flameGeometry,
+    new THREE.MeshBasicMaterial({ color: 0xffd58a, transparent: true, opacity: 0.9 }),
+    candles.length
+  );
+  const dummy = new THREE.Object3D();
+
+  candles.forEach(([x, z], index) => {
+    dummy.position.set(x, 0.88, z);
+    dummy.rotation.set(0, 0, 0);
+    dummy.scale.set(1, 1, 1);
+    dummy.updateMatrix();
+    waxMesh.setMatrixAt(index, dummy.matrix);
+
+    dummy.position.set(x, 1.14, z);
+    dummy.updateMatrix();
+    flameMesh.setMatrixAt(index, dummy.matrix);
+  });
+
+  waxMesh.castShadow = true;
+  waxMesh.receiveShadow = true;
+  root.add(waxMesh, flameMesh);
+}
+
 function addTavernTrapdoor(root, materials) {
-  addBox(root, materials.portalDark, -1.7, 0.05, 4.65, 1.85, 0.08, 1.32, { castShadow: false });
-  addBox(root, materials.trimLight, -1.7, 0.11, 4.65, 1.95, 0.06, 0.12, { castShadow: false });
-  addBox(root, materials.trimLight, -2.62, 0.11, 4.65, 0.12, 0.06, 1.38, { castShadow: false });
+  addBox(root, materials.portalDark, -2.35, 0.05, 6.7, 1.85, 0.08, 1.32, { castShadow: false });
+  addBox(root, materials.trimLight, -2.35, 0.11, 6.7, 1.95, 0.06, 0.12, { castShadow: false });
+  addBox(root, materials.trimLight, -3.27, 0.11, 6.7, 0.12, 0.06, 1.38, { castShadow: false });
   addTextBoard(root, "Cellar", {
-    x: -1.7,
+    x: -2.35,
     y: 0.64,
-    z: 4.65,
+    z: 6.7,
     width: 1.6,
     height: 0.36,
     subtitle: "Locked",
@@ -419,16 +555,16 @@ function addTavernTrapdoor(root, materials) {
 }
 
 function addTavernExit(root, materials) {
-  addBox(root, materials.trimLight, 7.35, 0.09, -2.08, 0.18, 0.18, 0.64, { castShadow: false });
-  addBox(root, materials.trimLight, 7.35, 0.09, 2.08, 0.18, 0.18, 0.64, { castShadow: false });
-  addExitThreshold(root, { x: 7.15, z: 0, width: 1.1, depth: 4.15, color: 0xe3c36e, opacity: 0.22 });
+  addBox(root, materials.trimLight, TAVERN.exitX + 0.28, 0.09, -TAVERN.exitHalfZ, 0.18, 0.18, 0.64, { castShadow: false });
+  addBox(root, materials.trimLight, TAVERN.exitX + 0.28, 0.09, TAVERN.exitHalfZ, 0.18, 0.18, 0.64, { castShadow: false });
+  addExitThreshold(root, { x: TAVERN.exitX, z: 0, width: 1.1, depth: TAVERN.exitHalfZ * 2, color: 0xe3c36e, opacity: 0.22 });
 }
 
 function addTavernEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
   const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
   const placements = {
     "npc:barkeep": {
-      position: [-5.6, 0, -2.2],
+      position: [TAVERN.barX + 0.38, 0, TAVERN.barZ - 0.1],
       heading: Math.PI / 2,
       role: "Barkeep",
       palette: "red",
@@ -517,6 +653,89 @@ function addTempleShell(root, materials) {
   addAisleInlays(root);
   addVaultedCeiling(root, materials);
   for (const z of [-35, -29.3, -23.6, -17.9, -12.2, -6.5, -0.8, 4.9, 10.6, 16.3, 20.6]) addArch(root, z, materials);
+}
+
+function addTempleWarmth(root, materials) {
+  addBox(root, materials.altar, 0, 0.035, -7.6, 2.6, 0.05, 36.5, { castShadow: false });
+  addBox(root, materials.trim, -1.44, 0.07, -7.6, 0.08, 0.05, 36.8, { castShadow: false });
+  addBox(root, materials.trim, 1.44, 0.07, -7.6, 0.08, 0.05, 36.8, { castShadow: false });
+  addTemplePews(root, materials);
+  addTempleCandleRows(root, materials);
+  addTempleBanners(root, materials);
+}
+
+function addTemplePews(root, materials) {
+  const rows = [-24.5, -20.0, -15.5, -11.0, -6.5, -2.0, 2.5, 7.0];
+  const seatGeometry = new THREE.BoxGeometry(3.2, 0.22, 0.62);
+  const backGeometry = new THREE.BoxGeometry(3.2, 0.72, 0.16);
+  const seatMesh = new THREE.InstancedMesh(seatGeometry, materials.windowFrame ?? materials.trim, rows.length * 2);
+  const backMesh = new THREE.InstancedMesh(backGeometry, materials.stone, rows.length * 2);
+  const dummy = new THREE.Object3D();
+  let index = 0;
+
+  for (const z of rows) {
+    for (const x of [-6.05, 6.05]) {
+      dummy.position.set(x, 0.48, z);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(1, 1, 1);
+      dummy.updateMatrix();
+      seatMesh.setMatrixAt(index, dummy.matrix);
+
+      dummy.position.set(x, 0.78, z + (x < 0 ? -0.36 : 0.36));
+      dummy.rotation.set(0, x < 0 ? 0 : Math.PI, 0);
+      dummy.updateMatrix();
+      backMesh.setMatrixAt(index, dummy.matrix);
+      index += 1;
+    }
+  }
+
+  seatMesh.castShadow = true;
+  seatMesh.receiveShadow = true;
+  backMesh.castShadow = true;
+  backMesh.receiveShadow = true;
+  root.add(seatMesh, backMesh);
+}
+
+function addTempleCandleRows(root, materials) {
+  const points = [
+    [-3.6, 15.6], [3.6, 15.6],
+    [-3.2, 12.6], [3.2, 12.6],
+    [-10.8, -28.5], [10.8, -28.5],
+    [-10.8, -12.5], [10.8, -12.5],
+    [-10.8, 3.5], [10.8, 3.5]
+  ];
+  const waxGeometry = new THREE.CylinderGeometry(0.1, 0.11, 0.42, 10);
+  const flameGeometry = new THREE.SphereGeometry(0.075, 10, 8);
+  const waxMesh = new THREE.InstancedMesh(waxGeometry, materials.trim, points.length);
+  const flameMesh = new THREE.InstancedMesh(
+    flameGeometry,
+    new THREE.MeshBasicMaterial({ color: 0xffd58a, transparent: true, opacity: 0.88 }),
+    points.length
+  );
+  const dummy = new THREE.Object3D();
+
+  points.forEach(([x, z], index) => {
+    dummy.position.set(x, 0.42, z);
+    dummy.rotation.set(0, 0, 0);
+    dummy.scale.set(1, 1, 1);
+    dummy.updateMatrix();
+    waxMesh.setMatrixAt(index, dummy.matrix);
+
+    dummy.position.set(x, 0.72, z);
+    dummy.updateMatrix();
+    flameMesh.setMatrixAt(index, dummy.matrix);
+  });
+
+  waxMesh.castShadow = true;
+  waxMesh.receiveShadow = true;
+  root.add(waxMesh, flameMesh);
+}
+
+function addTempleBanners(root, materials) {
+  for (const [x, z] of [[-13.88, -26], [13.88, -26], [-13.88, -10], [13.88, -10], [-13.88, 6], [13.88, 6]]) {
+    addBox(root, materials.windowFrame ?? materials.trim, x, 4.1, z, 0.12, 2.4, 1.08);
+    addBox(root, materials.altar, x + (x < 0 ? 0.04 : -0.04), 3.72, z, 0.08, 1.72, 0.78);
+  }
 }
 
 function addWall(root, material, x, y, z, width, height, rotY) {
@@ -1004,15 +1223,111 @@ function addTownSpecChunkRings(root, materials, spec) {
     if (chunk.kind === "backdrop") {
       addComponentBackdrop(root, chunk.asset, chunk.x, chunk.y, chunk.z, chunk.width, chunk.height, {
         opacity: chunk.opacity,
+        rotationY: chunk.rotationY ?? 0,
         unlit: true
       });
+    }
+    if (chunk.kind === "surface-rects") {
+      for (const surface of chunk.surfaces) {
+        addSurfaceRect(root, material(materials, surface.material), surface);
+      }
     }
     if (chunk.kind === "wall-runs") {
       for (const run of chunk.runs) {
         addBox(root, material(materials, chunk.material), run.x, run.height / 2, run.z, run.width, run.height, run.depth, { castShadow: false });
       }
     }
+    if (chunk.kind === "context-buildings") {
+      for (const building of chunk.buildings) {
+        const group = addGabledHouse(root, materials, {
+          ...resolveBuildingSpec(materials, building),
+          sign: false,
+          awning: null
+        });
+        group.userData = { visualRole: "context-building", ring: chunk.ring };
+      }
+    }
+    if (chunk.kind === "context-masses") {
+      for (const mass of chunk.masses) {
+        addBox(root, material(materials, mass.material), mass.x, mass.y, mass.z, mass.width, mass.height, mass.depth, { castShadow: mass.castShadow ?? true });
+      }
+    }
+    if (chunk.kind === "tree-line") {
+      addTownContextTrees(root, materials, chunk.trees);
+    }
   }
+}
+
+function addTownContextTrees(root, materials, trees = []) {
+  if (!trees.length) return null;
+  const group = new THREE.Group();
+  group.userData = { visualRole: "context-tree-line", count: trees.length };
+  root.add(group);
+
+  const trunkGeometry = new THREE.CylinderGeometry(0.22, 0.34, 2.55, 8);
+  const lowerGeometry = new THREE.DodecahedronGeometry(1, 0);
+  const upperGeometry = new THREE.DodecahedronGeometry(1, 0);
+  const trunkMesh = new THREE.InstancedMesh(trunkGeometry, materials.trunk, trees.length);
+  const lowerMesh = new THREE.InstancedMesh(lowerGeometry, materials.foliageDark, trees.length);
+  const upperMesh = new THREE.InstancedMesh(upperGeometry, materials.foliage, trees.length);
+  const dummy = new THREE.Object3D();
+
+  trees.forEach((tree, index) => {
+    const scale = tree.scale ?? 1;
+    const rotationY = tree.rotationY ?? 0;
+    dummy.rotation.set(0, rotationY, 0);
+    dummy.scale.setScalar(scale);
+
+    dummy.position.set(tree.x, 1.28 * scale, tree.z);
+    dummy.scale.set(scale, scale, scale);
+    dummy.updateMatrix();
+    trunkMesh.setMatrixAt(index, dummy.matrix);
+
+    dummy.position.set(tree.x, 3.05 * scale, tree.z);
+    dummy.scale.set(1.62 * scale, 1.05 * scale, 1.42 * scale);
+    dummy.updateMatrix();
+    lowerMesh.setMatrixAt(index, dummy.matrix);
+
+    dummy.position.set(tree.x + 0.36 * Math.cos(rotationY) * scale, 3.78 * scale, tree.z + 0.36 * Math.sin(rotationY) * scale);
+    dummy.scale.set(1.12 * scale, 0.92 * scale, 1.02 * scale);
+    dummy.updateMatrix();
+    upperMesh.setMatrixAt(index, dummy.matrix);
+  });
+
+  for (const mesh of [trunkMesh, lowerMesh, upperMesh]) {
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+
+  return group;
+}
+
+function addTownContextTree(root, materials, tree) {
+  const scale = tree.scale ?? 1;
+  const group = new THREE.Group();
+  group.position.set(tree.x, 0, tree.z);
+  group.scale.setScalar(scale);
+  group.userData = { visualRole: "context-tree" };
+  root.add(group);
+
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 1.9, 8), materials.trunk);
+  trunk.position.y = 0.95;
+  trunk.castShadow = true;
+  trunk.receiveShadow = true;
+  group.add(trunk);
+
+  const lower = new THREE.Mesh(new THREE.ConeGeometry(1.0, 2.0, 8), materials.foliageDark);
+  lower.position.y = 2.2;
+  lower.castShadow = true;
+  lower.receiveShadow = true;
+  group.add(lower);
+
+  const upper = new THREE.Mesh(new THREE.ConeGeometry(0.72, 1.55, 8), materials.foliage);
+  upper.position.y = 3.25;
+  upper.castShadow = true;
+  upper.receiveShadow = true;
+  group.add(upper);
 }
 
 function addTownSpecLandmarks(root, materials, spec, debug = []) {
@@ -1034,9 +1349,91 @@ function addTownSpecLandmarks(root, materials, spec, debug = []) {
 }
 
 function addTownSpecProps(root, materials, spec) {
-  for (const lamp of spec.props.lamps) {
-    addComponentLamp(root, materials, lamp.x, lamp.z, { intensity: 1.45, distance: 5.2 });
+  addTownLampCluster(root, materials, spec.props.lamps ?? []);
+  addTownBenches(root, materials, spec.props.benches ?? []);
+  addTownPlanters(root, materials, spec.props.planters ?? []);
+  addTownBanners(root, materials, spec.props.banners ?? []);
+  addTownCrateStacks(root, materials, spec.props.crateStacks ?? []);
+}
+
+function addTownLampCluster(root, materials, lamps) {
+  if (!lamps.length) return;
+  const posts = [];
+  const bars = [];
+  for (const lamp of lamps) {
+    posts.push({ x: lamp.x, y: 1.1, z: lamp.z, width: 0.13, height: 2.2, depth: 0.13, rotationY: 0 });
+    bars.push({ x: lamp.x, y: 2.14, z: lamp.z, width: 0.58, height: 0.09, depth: 0.09, rotationY: 0 });
+    const light = new THREE.PointLight(0xffbf62, 1.45, 5.2);
+    light.position.set(lamp.x, 2.28, lamp.z);
+    root.add(light);
   }
+  addInstancedBoxes(root, materials.darkTimber, posts, "courtyard-lamp-posts");
+  addInstancedBoxes(root, materials.timber, bars, "courtyard-lamp-bars");
+}
+
+function addTownBenches(root, materials, benches) {
+  if (!benches.length) return;
+  const darkBoxes = [];
+  const lightBoxes = [];
+  for (const bench of benches) {
+    darkBoxes.push(orientedBox(bench, 0, 0.52, 0, 2.35, 0.16, 0.56));
+    lightBoxes.push(orientedBox(bench, 0, 0.98, 0.32, 2.28, 0.16, 0.16));
+    for (const x of [-0.86, 0.86]) {
+      lightBoxes.push(orientedBox(bench, x, 0.27, -0.16, 0.16, 0.54, 0.16));
+      lightBoxes.push(orientedBox(bench, x, 0.58, 0.36, 0.16, 1.1, 0.16));
+    }
+  }
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "courtyard-benches-dark");
+  addInstancedBoxes(root, materials.timber, lightBoxes, "courtyard-benches-light");
+}
+
+function addTownPlanters(root, materials, planters) {
+  if (!planters.length) return;
+  const boxesByMaterial = [
+    [materials.darkTimber, []],
+    [materials.timber, []],
+    [materials.foliageDark, []],
+    [materials.foliage, []]
+  ];
+  for (const planter of planters) {
+    const width = planter.width ?? 2.6;
+    const depth = planter.depth ?? 0.9;
+    boxesByMaterial[0][1].push(orientedBox(planter, 0, 0.24, 0, width, 0.48, depth));
+    boxesByMaterial[1][1].push(orientedBox(planter, 0, 0.55, 0, width + 0.22, 0.16, depth + 0.18));
+    boxesByMaterial[3][1].push(orientedBox(planter, -width * 0.05, 0.83, 0.02, width * 0.86, 0.5, depth * 0.82));
+  }
+  boxesByMaterial.forEach(([mat, boxes], index) => addInstancedBoxes(root, mat, boxes, `courtyard-planters-${index}`));
+}
+
+function addTownBanners(root, materials, banners) {
+  if (!banners.length) return;
+  const poles = [];
+  const clothByMaterial = new Map();
+  for (const banner of banners) {
+    const height = banner.height ?? 2.35;
+    poles.push({ x: banner.x, y: height / 2, z: banner.z, width: 0.13, height, depth: 0.13, rotationY: 0 });
+    const materialKey = banner.material ?? "awningGold";
+    if (!clothByMaterial.has(materialKey)) clothByMaterial.set(materialKey, []);
+    clothByMaterial.get(materialKey).push({ x: banner.x + 0.32, y: height - 0.42, z: banner.z, width: 0.08, height: 0.96, depth: 0.62, rotationY: 0 });
+  }
+  addInstancedBoxes(root, materials.darkTimber, poles, "courtyard-banner-poles");
+  for (const [materialKey, boxes] of clothByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `courtyard-banner-${materialKey}`);
+  }
+}
+
+function addTownCrateStacks(root, materials, stacks) {
+  if (!stacks.length) return;
+  const timberBoxes = [];
+  const darkBoxes = [];
+  const signBoxes = [];
+  for (const stack of stacks) {
+    timberBoxes.push(orientedBox(stack, -0.28, 0.32, 0, 0.72, 0.64, 0.58));
+    darkBoxes.push(orientedBox(stack, -0.28, 0.32, -0.32, 0.8, 0.08, 0.06));
+    timberBoxes.push(orientedBox(stack, 0.42, 0.24, 0.12, 0.56, 0.48, 0.48));
+  }
+  addInstancedBoxes(root, materials.timber, timberBoxes, "courtyard-crates-timber");
+  addInstancedBoxes(root, materials.darkTimber, darkBoxes, "courtyard-crates-dark");
 }
 
 function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, roomItems, interactables) {
@@ -1209,6 +1606,105 @@ function horizontalDistanceSq(a, b) {
   const dx = a.x - b.x;
   const dz = a.z - b.z;
   return dx * dx + dz * dz;
+}
+
+function resolveColliderPushout(position, colliders, radius = 0.38) {
+  for (const collider of colliders) {
+    const [cx, cz] = collider.center;
+    const [width, depth] = collider.size;
+    const halfX = width / 2 + radius;
+    const halfZ = depth / 2 + radius;
+    const dx = position.x - cx;
+    const dz = position.z - cz;
+    if (Math.abs(dx) >= halfX || Math.abs(dz) >= halfZ) continue;
+
+    const pushX = halfX - Math.abs(dx);
+    const pushZ = halfZ - Math.abs(dz);
+    if (pushX < pushZ) {
+      position.x = cx + (dx < 0 ? -halfX : halfX);
+    } else {
+      position.z = cz + (dz < 0 ? -halfZ : halfZ);
+    }
+  }
+}
+
+function debugColliders(colliders, radius = 0.38) {
+  return colliders.map((collider) => ({
+    id: collider.id,
+    center: [...collider.center],
+    size: [...collider.size],
+    radius
+  }));
+}
+
+function orientedBox(anchor, localX, y, localZ, width, height, depth) {
+  const rotationY = anchor.rotationY ?? 0;
+  const cos = Math.cos(rotationY);
+  const sin = Math.sin(rotationY);
+  return {
+    x: anchor.x + localX * cos + localZ * sin,
+    y,
+    z: anchor.z - localX * sin + localZ * cos,
+    width,
+    height,
+    depth,
+    rotationY
+  };
+}
+
+function addInstancedBoxes(root, materialRef, boxes, visualRole) {
+  if (!boxes.length) return null;
+  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), materialRef, boxes.length);
+  const dummy = new THREE.Object3D();
+  boxes.forEach((box, index) => {
+    dummy.position.set(box.x, box.y, box.z);
+    dummy.rotation.set(0, box.rotationY ?? 0, 0);
+    dummy.scale.set(box.width, box.height, box.depth);
+    dummy.updateMatrix();
+    mesh.setMatrixAt(index, dummy.matrix);
+  });
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData = { visualRole };
+  root.add(mesh);
+  return mesh;
+}
+
+function townCollidersFromSpec(spec) {
+  const colliders = [];
+  const fountain = spec.features?.fountain;
+  if (fountain) {
+    const diameter = fountain.radius * 2.35;
+    colliders.push({ id: "fountain", center: [fountain.x, fountain.z], size: [diameter, diameter] });
+  }
+  for (const [index, tree] of townTreesFromSpec(spec).entries()) {
+    const scale = tree.scale ?? 1;
+    colliders.push({
+      id: `tree-${index + 1}`,
+      center: [tree.x, tree.z],
+      size: [0.84 * scale, 0.84 * scale]
+    });
+  }
+  for (const [index, bench] of (spec.props?.benches ?? []).entries()) {
+    colliders.push({ id: `bench-${index + 1}`, center: [bench.x, bench.z], size: [2.35, 0.7] });
+  }
+  for (const [index, planter] of (spec.props?.planters ?? []).entries()) {
+    colliders.push({
+      id: `planter-${index + 1}`,
+      center: [planter.x, planter.z],
+      size: [planter.width ?? 2.6, planter.depth ?? 0.9]
+    });
+  }
+  for (const [index, stack] of (spec.props?.crateStacks ?? []).entries()) {
+    colliders.push({ id: `crate-stack-${index + 1}`, center: [stack.x, stack.z], size: [1.2, 1.0] });
+  }
+  return colliders;
+}
+
+function townTreesFromSpec(spec) {
+  return spec.chunkRings
+    .filter((chunk) => chunk.kind === "tree-line")
+    .flatMap((chunk) => chunk.trees ?? []);
 }
 
 function addTownSpecExitAffordances(root, spec) {

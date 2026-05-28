@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T08:05:10.420Z",
+  "updated": "2026-05-28T09:12:03.308Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -786,6 +786,305 @@
       ],
       "created": "2026-05-28T08:03:06Z",
       "updated": "2026-05-28T08:03:32Z"
+    },
+    {
+      "id": "neo-1fb2.27",
+      "project": "NeoMud",
+      "title": "Add repeatable Town Square screenshot QA anchors",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 48,
+          "body": "Duplicate of neo-1fb2.32; screenshot-anchor QA implemented in scripts/test-neomud-three-town-shots.cjs.",
+          "created": "2026-05-28T09:10:47Z"
+        }
+      ],
+      "created": "2026-05-28T08:38:30Z",
+      "updated": "2026-05-28T09:10:47Z"
+    },
+    {
+      "id": "neo-1fb2.28",
+      "project": "NeoMud",
+      "title": "Remove procedural player walk bob now that Xbot has walk/run animation",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 46,
+          "body": "Duplicate of neo-1fb2.29; completed by removing the grounded procedural y-bob while preserving AnimationMixer walk/run gait.",
+          "created": "2026-05-28T09:10:07Z"
+        }
+      ],
+      "created": "2026-05-28T08:39:10Z",
+      "updated": "2026-05-28T09:10:07Z"
+    },
+    {
+      "id": "neo-1fb2.29",
+      "project": "NeoMud",
+      "title": "Remove procedural walk bob now that avatar animation owns gait",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 47,
+          "body": "Removed procedural walk bob from app.js; smoke test now asserts grounded movement y stays stable during run.",
+          "created": "2026-05-28T09:10:27Z"
+        }
+      ],
+      "created": "2026-05-28T08:41:02Z",
+      "updated": "2026-05-28T09:10:27Z"
+    },
+    {
+      "id": "neo-1fb2.30",
+      "project": "NeoMud",
+      "title": "Add prop-zoo-approved tree context to Town Square",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 50,
+          "body": "Added larger courtyard tree clusters through the Town Square spec and instanced tree batches; fixed screenshots verify placement.",
+          "created": "2026-05-28T09:11:03Z"
+        }
+      ],
+      "created": "2026-05-28T08:41:02Z",
+      "updated": "2026-05-28T09:11:03Z"
+    },
+    {
+      "id": "neo-1fb2.31",
+      "project": "NeoMud",
+      "title": "Add collision volumes for Tavern tables and Temple altar",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 52,
+          "body": "Added collision pushout/debug metadata for Temple altar/dais and Tavern tables/bar/fireplace; offline smoke asserts altar and table blocking.",
+          "created": "2026-05-28T09:11:21Z"
+        }
+      ],
+      "created": "2026-05-28T08:41:02Z",
+      "updated": "2026-05-28T09:11:21Z"
+    },
+    {
+      "id": "neo-1fb2.32",
+      "project": "NeoMud",
+      "title": "Add Town Square screenshot QA anchors",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 49,
+          "body": "Added fixed Town Square Playwright screenshot anchors for spawn, gate, tavern, market, and temple, with budget/report output.",
+          "created": "2026-05-28T09:10:47Z"
+        }
+      ],
+      "created": "2026-05-28T08:41:09Z",
+      "updated": "2026-05-28T09:10:47Z"
+    },
+    {
+      "id": "neo-1fb2.33",
+      "project": "NeoMud",
+      "title": "Add running input and visible health UI",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 54,
+          "body": "Added visible HP HUD/movement chip and increased Shift run speed; smoke verifies HP UI and run animation activation.",
+          "created": "2026-05-28T09:11:21Z"
+        }
+      ],
+      "created": "2026-05-28T08:41:12Z",
+      "updated": "2026-05-28T09:11:22Z"
+    },
+    {
+      "id": "neo-1fb2.34",
+      "project": "NeoMud",
+      "title": "Make Tavern interior scale less cramped",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 53,
+          "body": "Scaled the Rusty Tankard interior up, adjusted spawn/exit/camera, and updated server/offline exit tests to use trigger metadata.",
+          "created": "2026-05-28T09:11:21Z"
+        }
+      ],
+      "created": "2026-05-28T08:41:15Z",
+      "updated": "2026-05-28T09:11:21Z"
+    },
+    {
+      "id": "neo-1fb2.35",
+      "project": "NeoMud",
+      "title": "Add warm prop zoo expansion for scene dressing",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 55,
+          "body": "Expanded Prop Zoo with reusable warm/support props: tavern table/stool, runner rug, candle cluster, planter, banner pole, crate stack, altar, and larger tree.",
+          "created": "2026-05-28T09:11:38Z"
+        }
+      ],
+      "created": "2026-05-28T08:54:02Z",
+      "updated": "2026-05-28T09:11:38Z"
+    },
+    {
+      "id": "neo-1fb2.36",
+      "project": "NeoMud",
+      "title": "Add larger courtyard tree clusters to Town Square",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 51,
+          "body": "Expanded the tree pass into visible courtyard framing trees with varied sizes; maintained Town Square render budget via instancing.",
+          "created": "2026-05-28T09:11:03Z"
+        }
+      ],
+      "created": "2026-05-28T08:54:02Z",
+      "updated": "2026-05-28T09:11:03Z"
+    },
+    {
+      "id": "neo-1fb2.37",
+      "project": "NeoMud",
+      "title": "Add warmth and collision-aware dressing to Tavern",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 56,
+          "body": "Added Tavern stools, candles, shelves, runner rug, larger scale, and collision-aware furniture layout.",
+          "created": "2026-05-28T09:11:38Z"
+        }
+      ],
+      "created": "2026-05-28T08:54:02Z",
+      "updated": "2026-05-28T09:11:38Z"
+    },
+    {
+      "id": "neo-1fb2.38",
+      "project": "NeoMud",
+      "title": "Add Temple warmth pass without blocking the nave",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 57,
+          "body": "Added Temple runner rug, pew rows, candle rows, wall banners, and altar collision without blocking the nave route.",
+          "created": "2026-05-28T09:11:38Z"
+        }
+      ],
+      "created": "2026-05-28T08:54:02Z",
+      "updated": "2026-05-28T09:11:38Z"
+    },
+    {
+      "id": "neo-1fb2.39",
+      "project": "NeoMud",
+      "title": "Review fixed screenshots after each visual pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 58,
+          "body": "Reviewed fixed Town Square, Temple, Tavern, and Prop Zoo screenshots; optimized Town Square dressing from 301 to 240 full-smoke draw calls.",
+          "created": "2026-05-28T09:11:38Z"
+        }
+      ],
+      "created": "2026-05-28T08:54:03Z",
+      "updated": "2026-05-28T09:11:38Z"
     }
   ],
   "ready": [

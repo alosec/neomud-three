@@ -19,6 +19,18 @@ const RENDER_BUDGETS = {
     triangles: 60_000,
     textures: 32,
     geometries: 100
+  },
+  "material-lab": {
+    calls: 420,
+    triangles: 120_000,
+    textures: 64,
+    geometries: 260
+  },
+  "prop-zoo": {
+    calls: 260,
+    triangles: 100_000,
+    textures: 48,
+    geometries: 180
   }
 };
 

@@ -45,7 +45,7 @@ export const TOWN_SQUARE_SPEC = {
   },
   chunkRings: [
     {
-      id: "far-hills",
+      id: "far-hills-north",
       ring: "far",
       kind: "backdrop",
       asset: "townHorizonDay",
@@ -57,16 +57,107 @@ export const TOWN_SQUARE_SPEC = {
       opacity: 0.94
     },
     {
+      id: "far-hills-south",
+      ring: "far",
+      kind: "backdrop",
+      asset: "townHorizonDay",
+      x: 0,
+      y: 13.6,
+      z: 52,
+      rotationY: Math.PI,
+      width: 136,
+      height: 44,
+      opacity: 0.72
+    },
+    {
+      id: "far-hills-east",
+      ring: "far",
+      kind: "backdrop",
+      asset: "townHorizonDay",
+      x: 52,
+      y: 13.6,
+      z: 0,
+      rotationY: -Math.PI / 2,
+      width: 136,
+      height: 44,
+      opacity: 0.72
+    },
+    {
+      id: "far-hills-west",
+      ring: "far",
+      kind: "backdrop",
+      asset: "townHorizonDay",
+      x: -52,
+      y: 13.6,
+      z: 0,
+      rotationY: Math.PI / 2,
+      width: 136,
+      height: 44,
+      opacity: 0.72
+    },
+    {
+      id: "outer-ground-and-roads",
+      ring: "middle",
+      kind: "surface-rects",
+      surfaces: [
+        { material: "packedDirt", x: 0, z: -35, width: 42, depth: 19, y: 0.006 },
+        { material: "packedDirt", x: 0, z: 35, width: 42, depth: 19, y: 0.006 },
+        { material: "packedDirt", x: -35, z: 0, width: 19, depth: 42, y: 0.006 },
+        { material: "packedDirt", x: 35, z: 0, width: 19, depth: 42, y: 0.006 },
+        { material: "road", x: 0, z: -34.8, width: 7.2, depth: 19.4, y: 0.024 },
+        { material: "road", x: 0, z: 34.6, width: 8.2, depth: 18.6, y: 0.024 },
+        { material: "road", x: -34.8, z: 0, width: 19.4, depth: 7.2, y: 0.024 },
+        { material: "road", x: 34.8, z: 0, width: 19.4, depth: 7.2, y: 0.024 }
+      ]
+    },
+    {
       id: "town-wall",
       ring: "middle",
       kind: "wall-runs",
       material: "stone",
       runs: [
-        { x: 0, z: -25.1, width: 34, height: 1.25, depth: 0.8 },
+        { x: -16.4, z: -25.1, width: 11.2, height: 1.25, depth: 0.8 },
+        { x: 16.4, z: -25.1, width: 11.2, height: 1.25, depth: 0.8 },
         { x: -20.2, z: 25.1, width: 9.6, height: 1.25, depth: 0.8 },
         { x: 20.2, z: 25.1, width: 9.6, height: 1.25, depth: 0.8 },
-        { x: -25.1, z: 0, width: 0.8, height: 1.25, depth: 34 },
-        { x: 25.1, z: 0, width: 0.8, height: 1.25, depth: 34 }
+        { x: -25.1, z: -15.7, width: 0.8, height: 1.25, depth: 11.8 },
+        { x: -25.1, z: 15.7, width: 0.8, height: 1.25, depth: 11.8 },
+        { x: 25.1, z: -15.7, width: 0.8, height: 1.25, depth: 11.8 },
+        { x: 25.1, z: 15.7, width: 0.8, height: 1.25, depth: 11.8 }
+      ]
+    },
+    {
+      id: "temple-side-gardens",
+      ring: "middle",
+      kind: "context-masses",
+      masses: [
+        { material: "stone", x: -13.6, y: 1.45, z: 27.2, width: 5.9, height: 2.9, depth: 3.1 },
+        { material: "stone", x: 13.6, y: 1.45, z: 27.2, width: 5.9, height: 2.9, depth: 3.1 },
+        { material: "foliage", x: -13.6, y: 0.62, z: 22.2, width: 6.8, height: 0.8, depth: 1.25 },
+        { material: "foliage", x: 13.6, y: 0.62, z: 22.2, width: 6.8, height: 0.8, depth: 1.25 }
+      ]
+    },
+    {
+      id: "courtyard-tree-clusters",
+      ring: "middle",
+      kind: "tree-line",
+      trees: [
+        { x: -14.8, z: -13.6, scale: 1.45, rotationY: 0.15 },
+        { x: -10.8, z: -16.8, scale: 1.18, rotationY: -0.4 },
+        { x: 13.8, z: -13.4, scale: 1.36, rotationY: 0.4 },
+        { x: 9.8, z: -17.0, scale: 1.12, rotationY: -0.2 },
+        { x: -16.6, z: 12.4, scale: 1.28, rotationY: 0.65 },
+        { x: -12.4, z: 16.0, scale: 1.08, rotationY: -0.18 },
+        { x: 16.2, z: 12.8, scale: 1.3, rotationY: -0.45 },
+        { x: 11.9, z: 16.2, scale: 1.1, rotationY: 0.24 },
+        { x: -18.3, z: -5.8, scale: 1.08, rotationY: 0.72 },
+        { x: -18.2, z: 6.4, scale: 1.2, rotationY: -0.22 },
+        { x: 18.2, z: -7.0, scale: 1.16, rotationY: 0.38 },
+        { x: 18.4, z: 6.7, scale: 1.08, rotationY: -0.56 },
+        { x: -6.8, z: -18.5, scale: 0.92, rotationY: 0.18 },
+        { x: 6.8, z: -18.4, scale: 0.96, rotationY: -0.34 },
+        { x: -7.2, z: 18.8, scale: 0.98, rotationY: 0.48 },
+        { x: 7.4, z: 18.7, scale: 1.02, rotationY: -0.62 }
       ]
     }
   ],
@@ -221,6 +312,32 @@ export const TOWN_SQUARE_SPEC = {
       { x: 6.1, z: -5.5 },
       { x: -6.1, z: 5.5 },
       { x: 6.1, z: 5.5 }
+    ],
+    benches: [
+      { x: -5.2, z: 8.2, rotationY: -0.38 },
+      { x: 5.2, z: 8.2, rotationY: 0.38 },
+      { x: -8.6, z: -2.6, rotationY: Math.PI / 2 },
+      { x: 8.6, z: 2.6, rotationY: -Math.PI / 2 }
+    ],
+    planters: [
+      { x: -12.8, z: -8.3, width: 2.8, depth: 0.9, rotationY: 0.2 },
+      { x: 12.8, z: -8.3, width: 2.8, depth: 0.9, rotationY: -0.2 },
+      { x: -12.8, z: 8.6, width: 2.8, depth: 0.9, rotationY: -0.2 },
+      { x: 12.8, z: 8.6, width: 2.8, depth: 0.9, rotationY: 0.2 }
+    ],
+    banners: [
+      { x: -4.7, z: -18.7, material: "awningBlue", height: 2.6 },
+      { x: 4.7, z: -18.7, material: "awningBlue", height: 2.6 },
+      { x: -5.25, z: 19.1, material: "awningGold", height: 2.4 },
+      { x: 5.25, z: 19.1, material: "awningGold", height: 2.4 },
+      { x: -18.8, z: -4.7, material: "awningGold", height: 2.3 },
+      { x: 18.8, z: -4.7, material: "awningGold", height: 2.3 }
+    ],
+    crateStacks: [
+      { x: 15.6, z: 3.7, rotationY: -0.18 },
+      { x: 16.4, z: -5.6, rotationY: 0.32 },
+      { x: -17.6, z: 3.9, rotationY: -0.44 },
+      { x: -17.8, z: -3.8, rotationY: 0.22 }
     ]
   },
   exits: [
