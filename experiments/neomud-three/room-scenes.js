@@ -199,6 +199,25 @@ const FOREST_PATH_COLLIDERS = [
   { id: "east-branch-stone", center: [12.0, 4.3], size: [2.0, 1.4] }
 ];
 
+const SUNLIT_CLEARING = {
+  width: 34,
+  depth: 34,
+  halfX: 17,
+  halfZ: 17,
+  westExitX: -15.45,
+  exitHalfZ: 4.3
+};
+
+const SUNLIT_CLEARING_COLLIDERS = [
+  { id: "northwest-sentinel-tree", center: [-12.4, -10.6], size: [1.7, 1.7] },
+  { id: "northeast-sentinel-tree", center: [11.8, -10.2], size: [1.65, 1.65] },
+  { id: "southwest-sentinel-tree", center: [-12.2, 9.4], size: [1.55, 1.55] },
+  { id: "southeast-sentinel-tree", center: [12.5, 8.8], size: [1.55, 1.55] },
+  { id: "north-log", center: [0.8, -5.0], size: [4.4, 1.05] },
+  { id: "mushroom-log", center: [-5.2, 4.3], size: [3.2, 1.0] },
+  { id: "west-root-stone", center: [-10.6, 0.6], size: [2.2, 1.35] }
+];
+
 const TEMPLE_COLLIDERS = [
   { id: "altar-dais", center: [0, TEMPLE.altarZ + 0.12], size: [6.0, 3.25] },
   { id: "left-incense-brazier", center: [-2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] },
@@ -1062,6 +1081,96 @@ export function buildForestPathRoom({ root, worldRoot, npcs = [], roomItems = []
       entityLayer.children.forEach((child, index) => {
         if (child.userData.kind === "npc") {
           child.position.y = Math.sin(performance.now() * 0.002 + index * 0.7) * 0.03;
+        }
+      });
+    }
+  };
+}
+
+export function buildSunlitClearingRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = { ...makeTownMaterials(), ...makeSunlitClearingMaterials() };
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  const clearing = addSunlitClearingStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addSunlitClearingEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(11.3, 0, 3.6), heading: -Math.PI / 2 },
+    status: "Sunlit Clearing: authored sanctuary clearing with wildflowers, fallen logs, large trees, warm light, and a real west exit.",
+    environment: {
+      background: 0x9ec9b4,
+      fog: 0x9fc9b2,
+      fogDensity: 0.01
+    },
+    camera: {
+      distance: 6.15,
+      height: 4.05,
+      sideOffset: -0.24,
+      lookAhead: 3.2,
+      targetHeight: 1.12
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "forest:path") return { position: new THREE.Vector3(11.3, 0, 3.6), heading: -Math.PI / 2 };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -SUNLIT_CLEARING.halfX + 0.55, SUNLIT_CLEARING.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -SUNLIT_CLEARING.halfZ + 0.55, SUNLIT_CLEARING.halfZ - 0.55);
+      resolveColliderPushout(position, SUNLIT_CLEARING_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -SUNLIT_CLEARING.halfX + 0.55, SUNLIT_CLEARING.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -SUNLIT_CLEARING.halfZ + 0.55, SUNLIT_CLEARING.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.x < SUNLIT_CLEARING.westExitX && Math.abs(position.z - 3.6) < SUNLIT_CLEARING.exitHalfZ) return "forest:path";
+      return null;
+    },
+    debugTriggers() {
+      return sunlitClearingTriggers();
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(SUNLIT_CLEARING_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.65) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update() {
+      clearing.butterflies.children.forEach((child, index) => {
+        child.position.y = child.userData.baseY + Math.sin(performance.now() * 0.0028 + index) * 0.18;
+        child.rotation.y += 0.012 + index * 0.001;
+      });
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0018 + index) * 0.02;
         }
       });
     }
@@ -3159,6 +3268,241 @@ function forestPathTriggers() {
         label: "Sunlit Clearing",
         subtitle: "East",
         threshold: { center: [FOREST_PATH.eastExitX, 0.05, 3.6], size: [1.35, FOREST_PATH.exitHalfWidth * 2], color: 0xf1d784 }
+      }
+    }
+  ];
+}
+
+function makeSunlitClearingMaterials() {
+  return {
+    meadowGrass: new THREE.MeshStandardMaterial({ color: 0x6f9b55, roughness: 0.88, metalness: 0 }),
+    lightGrass: new THREE.MeshStandardMaterial({ color: 0x9fbd61, roughness: 0.86, metalness: 0 }),
+    flowerGold: new THREE.MeshBasicMaterial({ color: 0xffd86e, transparent: true, opacity: 0.92 }),
+    flowerPink: new THREE.MeshBasicMaterial({ color: 0xff91b8, transparent: true, opacity: 0.9 }),
+    flowerBlue: new THREE.MeshBasicMaterial({ color: 0x8fb9ff, transparent: true, opacity: 0.86 }),
+    butterfly: new THREE.MeshBasicMaterial({ color: 0xffe29a, transparent: true, opacity: 0.9, depthWrite: false }),
+    sunDisc: new THREE.MeshBasicMaterial({ color: 0xffe8a4, transparent: true, opacity: 0.16, depthWrite: false })
+  };
+}
+
+function addSunlitClearingStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.meadowGrass, SUNLIT_CLEARING.width, SUNLIT_CLEARING.depth);
+  addInstancedSurfaceRects(root, materials, [
+    { material: "lightGrass", x: 0, z: 0, width: 22.0, depth: 18.0, y: 0.024 },
+    { material: "road", x: -8.4, z: 3.6, width: 15.0, depth: 4.0, y: 0.026 },
+    { material: "packedDirt", x: -13.2, z: 3.6, width: 5.2, depth: 5.4, y: 0.018 }
+  ], "sunlit-clearing-surfaces");
+
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_clearing.webp`, 0, 8.8, -19.2, 34, 18.0, {
+    opacity: 0.16
+  });
+  addSunlitClearingTreeRing(root, materials);
+  addSunlitClearingDressing(root, materials);
+  addSunlitClearingExitAffordances(root);
+  const butterflies = addSunlitClearingButterflies(root, materials);
+
+  const ambientFill = new THREE.HemisphereLight(0xffefbd, 0x3f5b2d, 1.08);
+  root.add(ambientFill);
+
+  const sun = new THREE.DirectionalLight(0xffe2a8, 2.8);
+  sun.position.set(-4.0, 12.0, 3.5);
+  root.add(sun);
+
+  const warmPool = new THREE.PointLight(0xffd77c, 2.2, 13.5);
+  warmPool.position.set(0, 4.0, -1.8);
+  root.add(warmPool);
+
+  const sunShaft = new THREE.Mesh(new THREE.PlaneGeometry(8.0, 5.8), materials.sunDisc);
+  sunShaft.position.set(-1.2, 4.2, -4.4);
+  sunShaft.rotation.x = -0.28;
+  sunShaft.castShadow = false;
+  sunShaft.receiveShadow = false;
+  root.add(sunShaft);
+
+  return { butterflies };
+}
+
+function addSunlitClearingTreeRing(root, materials) {
+  addTownContextTrees(root, materials, [
+    { x: -12.4, z: -10.6, scale: 1.8, rotationY: 0.32 },
+    { x: 11.8, z: -10.2, scale: 1.72, rotationY: -0.36 },
+    { x: -12.2, z: 9.4, scale: 1.56, rotationY: -0.18 },
+    { x: 12.5, z: 8.8, scale: 1.58, rotationY: 0.44 },
+    { x: -15.2, z: -1.6, scale: 1.28, rotationY: 0.16 },
+    { x: 15.0, z: -2.1, scale: 1.34, rotationY: -0.22 },
+    { x: -5.4, z: -15.1, scale: 1.22, rotationY: 0.28 },
+    { x: 5.7, z: -15.0, scale: 1.26, rotationY: -0.3 }
+  ]);
+
+  addInstancedGeometry(
+    root,
+    new THREE.DodecahedronGeometry(1, 0),
+    materials.foliage,
+    [
+      { x: -9.2, y: 7.2, z: -10.8, scale: [2.4, 0.82, 1.8], rotationY: 0.24 },
+      { x: 9.0, y: 7.15, z: -10.8, scale: [2.35, 0.82, 1.8], rotationY: -0.24 },
+      { x: -12.5, y: 6.45, z: 2.6, scale: [2.1, 0.76, 1.6], rotationY: -0.18 },
+      { x: 12.5, y: 6.42, z: 2.2, scale: [2.1, 0.76, 1.6], rotationY: 0.2 }
+    ],
+    "sunlit-clearing-high-canopy",
+    { castShadow: false, receiveShadow: false }
+  );
+}
+
+function addSunlitClearingDressing(root, materials) {
+  addTownKitProp(root, materials, "log.fallen", { x: 0.8, z: -5.0, rotationY: 0.18, scale: 1.22 });
+  addTownKitProp(root, materials, "log.fallen", { x: -5.2, z: 4.3, rotationY: -0.4, scale: 0.96 });
+  addTownKitProp(root, materials, "stone.moss", { x: -10.6, z: 0.6, rotationY: 0.18, scale: 1.0 });
+
+  const grass = [];
+  for (const [x, z] of [
+    [-7.8, -3.4], [-6.1, 1.2], [-4.6, -7.1], [-2.2, 5.8], [1.6, 4.8],
+    [3.4, -6.2], [5.8, 1.9], [7.6, -3.6], [8.8, 5.4], [-9.4, 6.2],
+    [-11.3, -5.1], [10.8, -7.1], [0.0, 8.1], [2.7, -1.4], [-3.4, -1.8]
+  ]) {
+    grass.push({ x, y: 0.23, z, scale: [0.2, 0.52, 0.2], rotationY: x * 0.2 });
+  }
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1, 5), materials.foliage, grass, "sunlit-clearing-grass-tufts");
+
+  const flowerGroups = new Map([
+    ["flowerGold", []],
+    ["flowerPink", []],
+    ["flowerBlue", []]
+  ]);
+  const flowerCenters = [
+    [-4.8, -1.2], [-2.8, -0.2], [-0.4, 1.3], [2.2, 0.4], [4.2, -1.7],
+    [-6.8, 5.6], [-2.0, 7.0], [3.1, 6.4], [7.0, 4.4], [6.2, -5.4],
+    [-7.4, -5.4], [0.6, -7.0]
+  ];
+  flowerCenters.forEach(([x, z], index) => {
+    const key = index % 3 === 0 ? "flowerGold" : index % 3 === 1 ? "flowerPink" : "flowerBlue";
+    flowerGroups.get(key).push({ x, y: 0.42, z, scale: [0.1, 0.1, 0.1], rotationY: index * 0.4 });
+    flowerGroups.get(key).push({ x: x + 0.35, y: 0.4, z: z - 0.22, scale: [0.085, 0.085, 0.085], rotationY: index * 0.3 });
+    flowerGroups.get(key).push({ x: x - 0.28, y: 0.41, z: z + 0.18, scale: [0.08, 0.08, 0.08], rotationY: index * 0.5 });
+  });
+  for (const [key, flowers] of flowerGroups) {
+    addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials[key], flowers, `sunlit-clearing-${key}`, {
+      castShadow: false,
+      receiveShadow: false
+    });
+  }
+
+  const mushrooms = [
+    { x: -5.9, y: 0.52, z: 4.0, scale: [0.1, 0.1, 0.1] },
+    { x: -5.55, y: 0.58, z: 4.35, scale: [0.12, 0.12, 0.12] },
+    { x: -4.92, y: 0.5, z: 4.0, scale: [0.09, 0.09, 0.09] }
+  ];
+  addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), materials.trimLight, mushrooms, "sunlit-clearing-log-mushrooms", {
+    castShadow: false
+  });
+}
+
+function addSunlitClearingButterflies(root, materials) {
+  const group = new THREE.Group();
+  group.userData.visualRole = "sunlit-clearing-butterflies";
+  root.add(group);
+  const specs = [
+    { x: -2.2, y: 1.65, z: -2.1, scale: 0.22 },
+    { x: 1.6, y: 1.9, z: 1.1, scale: 0.18 },
+    { x: 4.3, y: 1.55, z: -1.4, scale: 0.16 },
+    { x: -5.2, y: 1.45, z: 2.3, scale: 0.16 }
+  ];
+  for (const spec of specs) {
+    const butterfly = new THREE.Mesh(new THREE.PlaneGeometry(1, 0.42), materials.butterfly);
+    butterfly.position.set(spec.x, spec.y, spec.z);
+    butterfly.scale.setScalar(spec.scale);
+    butterfly.userData.baseY = spec.y;
+    butterfly.castShadow = false;
+    butterfly.receiveShadow = false;
+    group.add(butterfly);
+  }
+  return group;
+}
+
+function addSunlitClearingExitAffordances(root) {
+  addTextBoard(root, "Forest Path", {
+    x: -13.35,
+    y: 1.9,
+    z: 1.0,
+    width: 2.48,
+    height: 0.46,
+    subtitle: "West",
+    palette: "green",
+    renderOrder: 9
+  });
+  addExitThreshold(root, { x: SUNLIT_CLEARING.westExitX, z: 3.6, width: 1.2, depth: SUNLIT_CLEARING.exitHalfZ * 2, color: 0xf3dd84, opacity: 0.2 });
+}
+
+function addSunlitClearingEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const x = -1.8 + index * 1.2;
+    const z = -1.4 + index * 0.8;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: npcRoleLabel(normalized),
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: Math.PI,
+      height: normalized.hostile ? 2.2 : 2.6,
+      width: normalized.hostile ? 1.45 : 1.55,
+      palette: npcPalette(normalized),
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: npcRoleLabel(normalized),
+      prompt: normalized.hostile ? `Engage: ${normalized.name}` : `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -0.8 + index * 0.9;
+    const z = -2.6 + (index % 2) * 1.2;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Sanctuary",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function sunlitClearingTriggers() {
+  return [
+    {
+      id: "exit-west-path",
+      direction: "WEST",
+      targetId: "forest:path",
+      prompt: "Return to the Winding Forest Path",
+      trigger: { type: "box", center: [SUNLIT_CLEARING.westExitX, 1, 3.6], size: [1.7, 3, SUNLIT_CLEARING.exitHalfZ * 2] },
+      affordance: {
+        label: "Forest Path",
+        subtitle: "West",
+        threshold: { center: [SUNLIT_CLEARING.westExitX, 0.05, 3.6], size: [1.35, SUNLIT_CLEARING.exitHalfZ * 2], color: 0xf3dd84 }
       }
     }
   ];

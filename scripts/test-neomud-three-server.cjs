@@ -268,6 +268,37 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "forest:path"));
     assertRenderBudget(assert, "forest:path", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 15.1, z: 3.6, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:clearing",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Sunlit Clearing");
+    const clearingTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(clearingTriggers.some((trigger) => trigger.id === "exit-west-path"));
+    const clearingEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    const clearingServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      clearingEntities.map((entity) => entity.id).sort(),
+      clearingServerNpcs.map((npc) => npc.id).sort(),
+      `expected Sunlit Clearing rendered entities to mirror live server NPCs: server=${JSON.stringify(clearingServerNpcs)} rendered=${JSON.stringify(clearingEntities)}`
+    );
+    await saveScreenshot(page, "server-sunlit-clearing.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:clearing"));
+    assertRenderBudget(assert, "forest:clearing", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -15.1, z: 3.6, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:path",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 22.6, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(

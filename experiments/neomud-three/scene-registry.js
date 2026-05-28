@@ -7,6 +7,7 @@ import {
   buildMagicShopRoom,
   buildMarketRoom,
   buildNorthGateRoom,
+  buildSunlitClearingRoom,
   buildTavernRoom,
   buildTempleRoom,
   buildTownSquareRoom
@@ -93,6 +94,15 @@ export function buildRoomScene(context) {
       ...context,
       worldRoot: WORLD_ROOT,
       npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:path"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "forest:clearing") {
+    return buildSunlitClearingRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:clearing"),
       roomItems: serverItems
     });
   }

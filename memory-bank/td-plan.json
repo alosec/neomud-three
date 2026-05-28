@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T15:54:22.467Z",
+  "updated": "2026-05-28T16:04:37.165Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1982,6 +1982,34 @@
       ],
       "created": "2026-05-28T15:40:47Z",
       "updated": "2026-05-28T15:54:02Z"
+    },
+    {
+      "id": "neo-1fb2.67",
+      "project": "NeoMud",
+      "title": "Author Sunlit Clearing room",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 89,
+          "body": "Scope: replace forest:clearing generic fallback with authored sanctuary clearing, west physical exit to Forest Path, large trees, flowers, fallen log, collision, screenshots, offline smoke, and server-backed traversal.",
+          "created": "2026-05-28T15:55:50Z"
+        },
+        {
+          "id": 90,
+          "body": "Completed: authored Sunlit Clearing sanctuary room with west physical exit to Forest Path, large-tree/flower/log dressing, collision, fixed screenshots, offline smoke, and server-backed traversal QA.",
+          "created": "2026-05-28T16:04:35Z"
+        }
+      ],
+      "created": "2026-05-28T15:55:50Z",
+      "updated": "2026-05-28T16:04:35Z"
     }
   ],
   "ready": [

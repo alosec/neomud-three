@@ -450,6 +450,43 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Shadow Wolf");
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 15.1, z: 3.6, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:clearing",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Sunlit Clearing");
+    const clearingTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      clearingTriggers.map((trigger) => trigger.direction).sort(),
+      ["WEST"]
+    );
+    assert.ok(clearingTriggers.some((trigger) => trigger.id === "exit-west-path" && trigger.targetId === "forest:path"));
+    const clearingColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      clearingColliders.some((collider) => collider.id === "north-log"),
+      `expected Sunlit Clearing log collider, got ${JSON.stringify(clearingColliders)}`
+    );
+    assert.ok(
+      clearingColliders.some((collider) => collider.id === "northwest-sentinel-tree"),
+      `expected Sunlit Clearing sentinel tree collider, got ${JSON.stringify(clearingColliders)}`
+    );
+    await saveScreenshot(page, "offline-sunlit-clearing.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:clearing"));
+    assertRenderBudget(assert, "forest:clearing", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -15.1, z: 3.6, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:path",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 22.6, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(
