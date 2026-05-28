@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 
 const assert = require("node:assert/strict");
+const fs = require("node:fs/promises");
+const path = require("node:path");
 const { chromium } = require("playwright");
 
-const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/";
+const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/?offline=1";
 const headed = process.env.HEADED === "1";
+const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
 
 async function main() {
   const browser = await launchBrowser();
@@ -38,8 +41,10 @@ async function main() {
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
     assert.match(await page.locator("#world-count").textContent(), /\d+ rooms/);
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.currentRoomId), "town:temple");
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.enabled), false);
     assert.equal(await page.locator("#compass").count(), 1);
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
+    await saveScreenshot(page, "offline-temple.png");
 
     await page.keyboard.press("i");
     assert.equal(await page.locator("#panel-title").textContent(), "Inventory");
@@ -72,6 +77,7 @@ async function main() {
     await page.evaluate(() => window.__neomudThreeDebug.setRoom("town:square"));
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.currentRoomId), "town:square");
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Town Square");
+    await saveScreenshot(page, "offline-town-square.png");
 
     const renderStats = await page.evaluate(() => window.__neomudThreeDebug.render);
     assert.ok(renderStats.calls > 0, `expected render calls, got ${JSON.stringify(renderStats)}`);
@@ -84,6 +90,14 @@ async function main() {
   } finally {
     await browser.close();
   }
+}
+
+async function saveScreenshot(page, filename) {
+  await fs.mkdir(qaDir, { recursive: true });
+  await page.screenshot({
+    path: path.join(qaDir, filename),
+    animations: "disabled"
+  });
 }
 
 async function launchBrowser() {

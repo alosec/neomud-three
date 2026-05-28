@@ -6,6 +6,7 @@ High leverage next work:
    - Room scene registry.
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
    - A consistent coordinate convention for exits and spawn headings.
+   - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
 
 2. Upgrade Temple of the Dawn into the quality bar.
    - Better Gothic wall/window frames.
@@ -22,9 +23,10 @@ High leverage next work:
    - Clicking/approaching an NPC should open a DOM interaction panel.
    - Exits should show in-world affordances plus the current UI buttons.
    - Room descriptions and events should remain readable in overlay UI.
+   - Server messages like tutorials, room items, player presence, NPC movement, combat, and dialogue should produce visible world objects or focused UI.
 
 5. Expand the test harness with real gameplay gates.
-   - Assert physical exit traversal from temple to square, not only debug switching.
+   - Assert physical exit traversal from temple to square through the live server, not only debug movement.
    - Add visual screenshots for temple and square after major renderer changes.
    - Add collision and spawn-heading checks for each authored room.
 

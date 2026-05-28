@@ -12,5 +12,6 @@ Current fork intent:
 Useful entries:
 
 - `current-state.md`: what exists now, what is running, and what is rough.
+- `architecture.md`: how the Three.js client now slots into the Kotlin server.
+- `methodical-workflow.md`: QA and design gates for future renderer work.
 - `next-steps.md`: highest leverage follow-up work for the 3D game fork.
-

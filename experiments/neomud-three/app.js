@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { WORLD_ROOT, loadWorld } from "./world-data.js";
+import { WORLD_ROOT, loadWorld, sortedDirections } from "./world-data.js";
+import { connectNeoMud, defaultNeoMudServerUrl, offlineRequested } from "./neomud-protocol.js";
 import { buildGenericRoom, buildTempleRoom, buildTownSquareRoom } from "./room-scenes.js";
 import { makePlayerAvatar } from "./player-avatar.js";
 
@@ -60,6 +61,31 @@ let roomRuntime = null;
 let lastRenderStats = { calls: 0, triangles: 0 };
 let inputMode = "menu";
 let activePanel = null;
+let currentStatusDetail = "";
+let exitCooldownUntil = 0;
+
+const gameLog = [];
+
+const serverState = {
+  enabled: !offlineRequested(),
+  url: defaultNeoMudServerUrl(),
+  client: null,
+  connected: false,
+  authenticated: false,
+  phase: "offline",
+  player: null,
+  players: [],
+  npcs: [],
+  roomItems: [],
+  mapRooms: [],
+  visitedRooms: [],
+  inventory: [],
+  equipment: {},
+  coins: null,
+  pendingMove: null,
+  lastError: "",
+  messageCount: 0
+};
 
 const playerProfile = {
   name: "Guest Adventurer",
@@ -136,6 +162,12 @@ async function main() {
   setRoom("town:temple", { snapCamera: true });
   setInputMode("menu");
   installDebugApi();
+  if (serverState.enabled) {
+    connectGameServer();
+  } else {
+    appendLog("Offline mode: using the static NeoMud room graph and local Three.js fallback.");
+    updateStatusText("Offline room graph. Add ?server=ws://127.0.0.1:8080/game to reconnect.");
+  }
 
   window.addEventListener("resize", resize);
   window.addEventListener("keydown", handleKeyDown);
@@ -153,6 +185,243 @@ async function main() {
   renderer.setAnimationLoop(render);
 }
 
+function connectGameServer() {
+  appendLog(`Connecting to NeoMud Kotlin server at ${serverState.url}`);
+  serverState.phase = "connecting";
+  updateStatusText();
+
+  serverState.client = connectNeoMud({
+    url: serverState.url,
+    onMessage: handleServerMessage,
+    onState: (snapshot) => {
+      serverState.connected = snapshot.connected;
+      serverState.authenticated = snapshot.authenticated;
+      serverState.phase = snapshot.phase;
+      serverState.lastError = snapshot.lastError;
+      if (snapshot.player) {
+        serverState.player = snapshot.player;
+        applyServerPlayer(snapshot.player);
+      }
+      if (snapshot.phase === "error" && snapshot.lastError) {
+        appendLog(snapshot.lastError);
+      }
+      updateStatusText();
+    }
+  });
+}
+
+function handleServerMessage(message) {
+  serverState.messageCount += 1;
+
+  if (message.type === "class_catalog_sync") applyCatalog("classes", message.classes);
+  if (message.type === "item_catalog_sync") applyCatalog("items", message.items);
+  if (message.type === "skill_catalog_sync") applyCatalog("skills", message.skills);
+  if (message.type === "race_catalog_sync") applyCatalog("races", message.races);
+  if (message.type === "spell_catalog_sync") applyCatalog("spells", message.spells);
+
+  switch (message.type) {
+    case "server_hello":
+      appendLog(`Server hello: ${message.worldName || "NeoMud"} ${message.worldVersion || ""}`.trim());
+      break;
+    case "register_ok":
+      appendLog("Guest character registered.");
+      break;
+    case "login_ok":
+      serverState.player = message.player;
+      applyServerPlayer(message.player);
+      roomCount.textContent = "Kotlin server-backed play: guest session is authoritative";
+      appendLog(`Logged in as ${message.player.name}.`);
+      break;
+    case "room_info":
+      syncServerRoom(message.room, message.players, message.npcs);
+      break;
+    case "move_ok":
+      appendLog(`Moved ${message.direction.toLowerCase()} to ${message.room.name}.`);
+      syncServerRoom(message.room, message.players, message.npcs, message.direction);
+      break;
+    case "move_error":
+      appendLog(`Move blocked: ${message.reason}`);
+      nudgeFromExitDirection(serverState.pendingMove);
+      serverState.pendingMove = null;
+      exitCooldownUntil = performance.now() + 1100;
+      updateStatusText(`Move blocked: ${message.reason}`);
+      break;
+    case "map_data":
+      serverState.mapRooms = message.rooms ?? [];
+      serverState.visitedRooms = [...(message.visitedRooms ?? [])];
+      break;
+    case "inventory_update":
+      serverState.inventory = message.inventory ?? [];
+      serverState.equipment = message.equipment ?? {};
+      serverState.coins = message.coins ?? null;
+      playerProfile.inventoryIds = serverState.inventory.map((item) => item.itemId);
+      playerProfile.equipment = { ...serverState.equipment };
+      if (activePanel === "inventory") renderPanel(activePanel);
+      break;
+    case "room_items_update":
+      serverState.roomItems = message.items ?? [];
+      break;
+    case "system_message":
+      appendLog(message.message);
+      break;
+    case "tutorial":
+      appendLog(`${message.title}: ${message.content.split("\n")[0]}`);
+      break;
+    case "player_entered":
+      appendLog(`${message.playerName} entered the room.`);
+      break;
+    case "player_left":
+      appendLog(`${message.playerName} left ${message.direction.toLowerCase()}.`);
+      break;
+    case "npc_entered":
+      appendLog(`${message.npcName} entered.`);
+      break;
+    case "npc_left":
+      appendLog(`${message.npcName} left ${message.direction.toLowerCase()}.`);
+      break;
+    case "auth_error":
+      appendLog(`Auth error: ${message.reason}`);
+      break;
+    case "error":
+      appendLog(`Server error: ${message.message}`);
+      break;
+    case "server_shutdown":
+      appendLog(`Server shutdown: ${message.message}`);
+      break;
+    case "session_displaced":
+      appendLog(`Session displaced: ${message.reason}`);
+      break;
+    default:
+      break;
+  }
+}
+
+function applyCatalog(name, entries = []) {
+  if (!world?.catalogs) return;
+  world.catalogs[name] = entries;
+  const byIdName = `${name}ById`;
+  world.catalogs[byIdName] = new Map(entries.map((entry) => [entry.id, entry]));
+}
+
+function syncServerRoom(room, players = [], npcs = [], movedDirection = null) {
+  const fromRoomId = currentRoomId;
+  upsertServerRoom(room);
+  serverState.players = players ?? [];
+  serverState.npcs = npcs ?? [];
+  serverState.pendingMove = null;
+  exitCooldownUntil = performance.now() + 450;
+  setRoom(room.id, { fromRoomId, snapCamera: true });
+  appendLog(movedDirection ? `Entered ${room.name}.` : `Synced room: ${room.name}.`);
+}
+
+function upsertServerRoom(room) {
+  const existing = world.rooms.get(room.id) ?? {};
+  world.rooms.set(room.id, {
+    ...existing,
+    ...room,
+    exits: { ...(room.exits ?? existing.exits ?? {}) },
+    zoneId: room.zoneId ?? existing.zoneId ?? "server"
+  });
+}
+
+function applyServerPlayer(playerData) {
+  playerProfile.name = playerData.name ?? playerProfile.name;
+  playerProfile.classId = playerData.characterClass ?? playerProfile.classId;
+  playerProfile.raceId = playerData.race || playerProfile.raceId;
+  playerProfile.level = playerData.level ?? playerProfile.level;
+  playerProfile.hp = playerData.currentHp ?? playerProfile.hp;
+  playerProfile.maxHp = playerData.maxHp ?? playerProfile.maxHp;
+  playerProfile.mp = playerData.currentMp ?? playerProfile.mp;
+  playerProfile.maxMp = playerData.maxMp ?? playerProfile.maxMp;
+  if (activePanel === "character") renderPanel(activePanel);
+}
+
+function requestMove(direction, targetId = null) {
+  const normalizedDirection = direction?.toUpperCase?.() ?? directionForTarget(world.rooms.get(currentRoomId), targetId);
+  const localTargetId = targetId ?? world.rooms.get(currentRoomId)?.exits?.[normalizedDirection];
+
+  if (serverCanDriveMovement() && normalizedDirection) {
+    if (serverState.pendingMove) return false;
+    serverState.pendingMove = normalizedDirection;
+    exitCooldownUntil = performance.now() + 550;
+    updateStatusText(`Moving ${normalizedDirection.toLowerCase()} through the Kotlin server...`);
+    const sent = serverState.client.sendMove(normalizedDirection);
+    if (!sent) {
+      serverState.pendingMove = null;
+      appendLog("Server move send failed; falling back to local room graph.");
+      if (localTargetId) setRoom(localTargetId, { fromRoomId: currentRoomId, snapCamera: true });
+    }
+    return sent;
+  }
+
+  if (localTargetId) {
+    setRoom(localTargetId, { fromRoomId: currentRoomId, snapCamera: true });
+    return true;
+  }
+
+  return false;
+}
+
+function enterExitTarget(targetId) {
+  requestMove(directionForTarget(world.rooms.get(currentRoomId), targetId), targetId);
+}
+
+function serverCanDriveMovement() {
+  return serverState.enabled && serverState.connected && serverState.authenticated && serverState.client;
+}
+
+function directionForTarget(room, targetId) {
+  if (!room || !targetId) return null;
+  const entry = Object.entries(room.exits ?? {}).find(([, id]) => id === targetId);
+  return entry?.[0] ?? null;
+}
+
+function nudgeFromExitDirection(direction) {
+  const vector = directionVector(direction);
+  if (!vector) return;
+  player.position.addScaledVector(vector, -0.9);
+  roomRuntime?.clamp?.(player.position);
+  movement.velocity.set(0, 0, 0);
+}
+
+function directionVector(direction) {
+  const vector = {
+    NORTH: new THREE.Vector3(0, 0, -1),
+    SOUTH: new THREE.Vector3(0, 0, 1),
+    EAST: new THREE.Vector3(1, 0, 0),
+    WEST: new THREE.Vector3(-1, 0, 0),
+    NORTHEAST: new THREE.Vector3(1, 0, -1),
+    NORTHWEST: new THREE.Vector3(-1, 0, -1),
+    SOUTHEAST: new THREE.Vector3(1, 0, 1),
+    SOUTHWEST: new THREE.Vector3(-1, 0, 1)
+  }[direction];
+  return vector?.normalize() ?? null;
+}
+
+function appendLog(line) {
+  if (!line) return;
+  gameLog.push(line);
+  if (gameLog.length > 80) gameLog.shift();
+  if (activePanel === "log") renderPanel(activePanel);
+}
+
+function updateStatusText(override = null) {
+  if (override) currentStatusDetail = override;
+  let transport = "Offline room graph";
+  if (serverState.enabled) {
+    if (serverState.authenticated) {
+      transport = `Kotlin server: ${serverState.player?.name ?? "guest"} online`;
+    } else if (serverState.connected) {
+      transport = `Kotlin server: ${serverState.phase}`;
+    } else if (serverState.lastError) {
+      transport = "Offline fallback";
+    } else {
+      transport = "Kotlin server: connecting";
+    }
+  }
+  statusText.textContent = `${transport}. ${currentStatusDetail}`;
+}
+
 function setRoom(roomId, options = {}) {
   const room = world.rooms.get(roomId);
   if (!room) return;
@@ -166,15 +435,17 @@ function setRoom(roomId, options = {}) {
       THREE,
       root: worldRoot,
       worldRoot: WORLD_ROOT,
-      onExit: (targetId) => setRoom(targetId, { fromRoomId: roomId, snapCamera: true })
+      onExit: (targetId) => enterExitTarget(targetId)
     });
   } else if (roomId === "town:square") {
     roomRuntime = buildTownSquareRoom({
       THREE,
       root: worldRoot,
       worldRoot: WORLD_ROOT,
-      npcs: world.npcs.filter((npc) => npc.startRoomId === "town:square"),
-      onExit: (targetId) => setRoom(targetId, { fromRoomId: roomId, snapCamera: true })
+      npcs: serverCanDriveMovement() && serverState.npcs.length
+        ? serverState.npcs
+        : world.npcs.filter((npc) => npc.startRoomId === "town:square"),
+      onExit: (targetId) => enterExitTarget(targetId)
     });
   } else {
     roomRuntime = buildGenericRoom({
@@ -183,7 +454,7 @@ function setRoom(roomId, options = {}) {
       room,
       rooms: world.rooms,
       worldRoot: WORLD_ROOT,
-      onExit: (targetId) => setRoom(targetId, { fromRoomId: roomId, snapCamera: true })
+      onExit: (targetId) => enterExitTarget(targetId)
     });
   }
 
@@ -198,7 +469,8 @@ function setRoom(roomId, options = {}) {
 
   roomName.textContent = room.name;
   roomDescription.textContent = room.description;
-  statusText.textContent = roomRuntime.status;
+  currentStatusDetail = roomRuntime.status;
+  updateStatusText();
   updateExitButtons(room);
   updateMiniMap(room);
   if (activePanel) renderPanel(activePanel);
@@ -206,13 +478,14 @@ function setRoom(roomId, options = {}) {
 }
 
 function updateExitButtons(room) {
-  roomExits.replaceChildren(...Object.entries(room.exits).map(([direction, targetId]) => {
+  const exits = sortedDirections(Object.keys(room.exits ?? {})).map((direction) => [direction, room.exits[direction]]);
+  roomExits.replaceChildren(...exits.map(([direction, targetId]) => {
     const target = world.rooms.get(targetId);
     const button = document.createElement("button");
     button.className = "exit-button";
     button.type = "button";
     button.textContent = `${direction.toLowerCase()}${target ? `: ${target.name}` : ""}`;
-    button.addEventListener("click", () => setRoom(targetId, { fromRoomId: currentRoomId, snapCamera: true }));
+    button.addEventListener("click", () => requestMove(direction, targetId));
     return button;
   }));
 }
@@ -309,7 +582,7 @@ function renderPanel(panelId) {
   panelContent.replaceChildren(panelContentFor(panelId, room));
   for (const button of panelContent.querySelectorAll("[data-room-target]")) {
     button.addEventListener("click", () => {
-      setRoom(button.dataset.roomTarget, { fromRoomId: currentRoomId, snapCamera: true });
+      requestMove(button.dataset.roomDirection, button.dataset.roomTarget);
       closePanel();
     });
   }
@@ -402,23 +675,28 @@ function spellsPanel() {
 }
 
 function mapPanel(room) {
-  const exits = Object.entries(room.exits ?? {});
+  const exits = sortedDirections(Object.keys(room.exits ?? {})).map((direction) => [direction, room.exits[direction]]);
   return htmlFragment(`
     <p>${escapeHtml(room.name)}: ${escapeHtml(room.description)}</p>
     <div class="panel-actions">
       ${exits.map(([direction, targetId]) => {
         const target = world.rooms.get(targetId);
-        return `<button type="button" data-room-target="${escapeHtml(targetId)}">${escapeHtml(direction)} ${escapeHtml(target?.name ?? targetId)}</button>`;
+        return `<button type="button" data-room-direction="${escapeHtml(direction)}" data-room-target="${escapeHtml(targetId)}">${escapeHtml(direction)} ${escapeHtml(target?.name ?? targetId)}</button>`;
       }).join("")}
     </div>
   `);
 }
 
 function logPanel(room) {
+  const lines = gameLog.length
+    ? gameLog.slice(-12)
+    : [
+        `You stand in ${room.name}.`,
+        room.description,
+        "The 3D lab is using the real NeoMud room graph and catalogs, with authored geometry for the current vertical slice."
+      ];
   return htmlFragment(`
-    <div class="log-line">You stand in ${escapeHtml(room.name)}.</div>
-    <div class="log-line">${escapeHtml(room.description)}</div>
-    <div class="log-line">The 3D lab is using the real NeoMud room graph and catalogs, with authored geometry for the current vertical slice.</div>
+    ${lines.map((line) => `<div class="log-line">${escapeHtml(line)}</div>`).join("")}
   `);
 }
 
@@ -455,7 +733,7 @@ function updateMiniMap(room) {
     if (targetId) {
       cell.classList.add("exit");
       cell.title = world.rooms.get(targetId)?.name ?? targetId;
-      cell.addEventListener("click", () => setRoom(targetId, { fromRoomId: currentRoomId, snapCamera: true }));
+      cell.addEventListener("click", () => requestMove(direction, targetId));
     } else {
       cell.disabled = true;
     }
@@ -557,7 +835,7 @@ function updatePlayer(dt) {
   });
 
   const exit = roomRuntime?.exitAt?.(player.position);
-  if (exit) setRoom(exit, { fromRoomId: currentRoomId, snapCamera: true });
+  if (exit && performance.now() > exitCooldownUntil) enterExitTarget(exit);
 }
 
 function updateCamera(dt, snap = false) {
@@ -610,9 +888,38 @@ function installDebugApi() {
     get render() {
       return lastRenderStats;
     },
+    get server() {
+      return {
+        enabled: serverState.enabled,
+        url: serverState.url,
+        connected: serverState.connected,
+        authenticated: serverState.authenticated,
+        phase: serverState.phase,
+        player: serverState.player,
+        pendingMove: serverState.pendingMove,
+        lastError: serverState.lastError,
+        messageCount: serverState.messageCount,
+        mapRooms: serverState.mapRooms.length,
+        inventory: serverState.inventory.length
+      };
+    },
     setRoom(roomId) {
       setRoom(roomId, { fromRoomId: currentRoomId, snapCamera: true });
       return currentRoomId;
+    },
+    requestMove(direction) {
+      return requestMove(direction);
+    },
+    reconnectServer() {
+      serverState.client?.close();
+      serverState.enabled = true;
+      connectGameServer();
+      return serverState.url;
+    },
+    disconnectServer() {
+      serverState.client?.close();
+      serverState.enabled = false;
+      updateStatusText("Disconnected from Kotlin server; using local fallback.");
     }
   };
 }

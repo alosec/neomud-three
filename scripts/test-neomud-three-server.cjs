@@ -1,0 +1,142 @@
+#!/usr/bin/env node
+
+const assert = require("node:assert/strict");
+const fs = require("node:fs/promises");
+const net = require("node:net");
+const path = require("node:path");
+const { chromium } = require("playwright");
+
+const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/";
+const serverHost = process.env.NEOMUD_SERVER_HOST || "127.0.0.1";
+const serverPort = Number(process.env.NEOMUD_SERVER_PORT || 8080);
+const headed = process.env.HEADED === "1";
+const skipIfDown = process.env.NEOMUD_THREE_SKIP_IF_SERVER_DOWN === "1";
+const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
+
+async function main() {
+  const reachable = await isPortReachable(serverHost, serverPort);
+  if (!reachable) {
+    const message = `NeoMud server is not reachable at ${serverHost}:${serverPort}`;
+    if (skipIfDown) {
+      console.warn(`${message}; skipping server-backed Three test`);
+      return;
+    }
+    throw new Error(message);
+  }
+
+  const browser = await launchBrowser();
+  const consoleErrors = [];
+  const failedRequests = [];
+
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 820 } });
+
+    page.on("console", (message) => {
+      const text = message.text();
+      if (message.type() === "error" && !text.startsWith("Failed to load resource")) {
+        consoleErrors.push(text);
+      }
+    });
+    page.on("pageerror", (error) => consoleErrors.push(error.message));
+    page.on("response", (response) => {
+      const status = response.status();
+      if (status >= 400 && !response.url().endsWith("/favicon.ico")) {
+        failedRequests.push(`${status} ${response.url()}`);
+      }
+    });
+
+    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug?.server?.authenticated,
+      null,
+      { timeout: 20_000 }
+    );
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug?.currentRoomId === "town:temple",
+      null,
+      { timeout: 10_000 }
+    );
+
+    const server = await page.evaluate(() => window.__neomudThreeDebug.server);
+    assert.equal(server.connected, true);
+    assert.equal(server.authenticated, true);
+    assert.equal(server.phase, "playing");
+    assert.ok(server.player?.isGuest, `expected guest player, got ${JSON.stringify(server.player)}`);
+    assert.ok(server.messageCount >= 7, `expected several protocol messages, got ${server.messageCount}`);
+
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
+    assert.match(await page.locator("#status-text").textContent(), /Kotlin server:/);
+    await saveScreenshot(page, "server-temple.png");
+
+    await page.evaluate(() => window.__neomudThreeDebug.requestMove("NORTH"));
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:square",
+      null,
+      { timeout: 10_000 }
+    );
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Town Square");
+    await saveScreenshot(page, "server-town-square.png");
+
+    await page.evaluate(() => window.__neomudThreeDebug.requestMove("SOUTH"));
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:temple",
+      null,
+      { timeout: 10_000 }
+    );
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
+
+    await page.keyboard.press("l");
+    assert.equal(await page.locator("#panel-title").textContent(), "Game Log");
+    assert.match(await page.locator("#panel-content").textContent(), /Moved north to Town Square/i);
+
+    assert.deepEqual(failedRequests, []);
+    assert.deepEqual(consoleErrors, []);
+
+    console.log("NeoMud Three server-backed test passed");
+  } finally {
+    await browser.close();
+  }
+}
+
+async function saveScreenshot(page, filename) {
+  await fs.mkdir(qaDir, { recursive: true });
+  await page.screenshot({
+    path: path.join(qaDir, filename),
+    animations: "disabled"
+  });
+}
+
+function isPortReachable(host, port) {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host, port });
+    const done = (value) => {
+      socket.destroy();
+      resolve(value);
+    };
+    socket.setTimeout(1000);
+    socket.once("connect", () => done(true));
+    socket.once("timeout", () => done(false));
+    socket.once("error", () => done(false));
+  });
+}
+
+async function launchBrowser() {
+  const options = { headless: !headed };
+  if (process.env.NEOMUD_THREE_BROWSER_CHANNEL) {
+    return chromium.launch({ ...options, channel: process.env.NEOMUD_THREE_BROWSER_CHANNEL });
+  }
+
+  try {
+    return await chromium.launch(options);
+  } catch (error) {
+    if (process.platform === "darwin") {
+      return chromium.launch({ ...options, channel: "chrome" });
+    }
+    throw error;
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

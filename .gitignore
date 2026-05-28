@@ -51,6 +51,7 @@ maker/default_world.nmd
 
 # Playwright MCP browser cache
 .playwright-mcp/
+experiments/neomud-three/qa/latest/
 
 # Nano Banana image generation output
 nanobanana-output/

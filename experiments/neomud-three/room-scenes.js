@@ -285,10 +285,10 @@ function addAisleInlays(root) {
 }
 
 function addTempleWindows(root, materials, beams) {
-  const positions = [-33.5, -27.6, -21.7, -15.8, -9.9, -4.0, 1.9, 7.8, 13.7, 19.6];
+  const positions = [-32.5, -24.8, -17.1, -9.4, -1.7, 6.0, 13.7];
   for (const z of positions) {
-    addWindow(root, beams, materials, -14.05, 6.1, z, Math.PI / 2, 1);
-    addWindow(root, beams, materials, 14.05, 6.1, z, -Math.PI / 2, -1);
+    addWindow(root, beams, materials, -14.05, 7.15, z, Math.PI / 2, 1);
+    addWindow(root, beams, materials, 14.05, 7.15, z, -Math.PI / 2, -1);
   }
 }
 
@@ -298,48 +298,49 @@ function addWindow(root, beams, materials, x, y, z, rotY, side) {
   group.rotation.y = rotY;
   root.add(group);
 
-  const reveal = new THREE.Mesh(archedWindowGeometry(2.75, 7.22, 36), materials.windowReveal);
-  reveal.position.set(0, 3.08, -0.05);
+  const reveal = new THREE.Mesh(archedWindowGeometry(4.2, 9.3, 42), materials.windowReveal);
+  reveal.position.set(0, 3.9, -0.05);
   reveal.receiveShadow = true;
   group.add(reveal);
 
-  const backlight = new THREE.Mesh(archedWindowGeometry(2.0, 6.2, 32), materials.windowGlow);
-  backlight.position.set(0, 3.08, 0.0);
+  const backlight = new THREE.Mesh(archedWindowGeometry(3.42, 8.34, 40), materials.windowGlow);
+  backlight.position.set(0, 3.92, 0.0);
   backlight.renderOrder = 1;
   group.add(backlight);
 
-  const glass = new THREE.Mesh(archedWindowGeometry(2.05, 6.35, 32), materials.glass);
-  glass.position.set(0, 3.12, 0.055);
+  const glass = new THREE.Mesh(archedWindowGeometry(3.5, 8.45, 40), materials.glass);
+  glass.position.set(0, 3.96, 0.055);
   glass.renderOrder = 2;
   group.add(glass);
 
   const frameMaterial = materials.windowFrame;
-  addLocalBox(group, frameMaterial, 0, 0.04, 0.14, 2.95, 0.2, 0.2);
-  addLocalBox(group, frameMaterial, -1.18, 2.36, 0.12, 0.2, 4.75, 0.24);
-  addLocalBox(group, frameMaterial, 1.18, 2.36, 0.12, 0.2, 4.75, 0.24);
-  addLocalBox(group, frameMaterial, 0, 2.55, 0.18, 0.08, 4.85, 0.16);
-  addLocalBox(group, frameMaterial, -0.58, 3.0, 0.18, 0.07, 4.2, 0.14);
-  addLocalBox(group, frameMaterial, 0.58, 3.0, 0.18, 0.07, 4.2, 0.14);
-  addLocalBox(group, frameMaterial, 0, 2.7, 0.18, 1.9, 0.08, 0.14);
-  addLocalBox(group, frameMaterial, 0, 4.15, 0.18, 1.6, 0.08, 0.14);
-  addArchedFrame(group, frameMaterial, 2.52, 6.98, 0.18, 0.075);
+  addLocalBox(group, frameMaterial, 0, 0.04, 0.14, 4.52, 0.24, 0.22);
+  addLocalBox(group, frameMaterial, -1.93, 3.05, 0.12, 0.26, 6.1, 0.26);
+  addLocalBox(group, frameMaterial, 1.93, 3.05, 0.12, 0.26, 6.1, 0.26);
+  addLocalBox(group, frameMaterial, 0, 3.35, 0.18, 0.11, 6.65, 0.16);
+  addLocalBox(group, frameMaterial, -0.95, 3.8, 0.18, 0.09, 5.85, 0.14);
+  addLocalBox(group, frameMaterial, 0.95, 3.8, 0.18, 0.09, 5.85, 0.14);
+  addLocalBox(group, frameMaterial, 0, 3.05, 0.18, 3.15, 0.1, 0.14);
+  addLocalBox(group, frameMaterial, 0, 5.15, 0.18, 2.55, 0.1, 0.14);
+  addLocalBox(group, frameMaterial, 0, 6.55, 0.18, 1.75, 0.09, 0.14);
+  addArchedFrame(group, frameMaterial, 4.1, 9.18, 0.18, 0.095);
 
-  const ledge = new THREE.Mesh(new THREE.BoxGeometry(3.25, 0.2, 0.55), materials.trim);
+  const ledge = new THREE.Mesh(new THREE.BoxGeometry(4.95, 0.24, 0.68), materials.trim);
   ledge.position.set(0, -0.12, 0.22);
   ledge.castShadow = true;
   group.add(ledge);
 
   const beam = new THREE.Mesh(
-    new THREE.PlaneGeometry(11.6, 2.3),
+    new THREE.PlaneGeometry(15.5, 3.3),
     new THREE.MeshBasicMaterial({
       color: side < 0 ? 0x88ccff : 0xffdd88,
       transparent: true,
-      opacity: 0.115,
+      opacity: 0.15,
       depthWrite: false,
       side: THREE.DoubleSide
     })
   );
-  beam.position.set(x + side * 5.7, 2.35, z + 1.7);
+  beam.position.set(x + side * 6.7, 2.7, z + 1.9);
   beam.rotation.set(-0.62, rotY, side * 0.42);
   beams.add(beam);
 }
