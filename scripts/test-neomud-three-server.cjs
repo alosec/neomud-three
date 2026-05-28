@@ -135,6 +135,37 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "forest:edge"));
     assertRenderBudget(assert, "forest:edge", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -21.7, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:path",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Winding Forest Path");
+    const forestPathTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-south-edge"));
+    assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-north-deep"));
+    assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-east-clearing"));
+    const forestPathEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      forestPathEntities.some((entity) => entity.id === "npc:shadow_wolf" && /Shadow Wolf/i.test(entity.name)),
+      `expected server Shadow Wolf entity in Forest Path, got ${JSON.stringify(forestPathEntities)}`
+    );
+    await saveScreenshot(page, "server-forest-path.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:path"));
+    assertRenderBudget(assert, "forest:path", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 22.6, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:edge",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.7, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(

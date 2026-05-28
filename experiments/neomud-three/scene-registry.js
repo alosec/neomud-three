@@ -1,6 +1,7 @@
 import { WORLD_ROOT } from "./world-data.js";
 import {
   buildForestEdgeRoom,
+  buildForestPathRoom,
   buildGenericRoom,
   buildNorthGateRoom,
   buildTavernRoom,
@@ -61,6 +62,17 @@ export function buildRoomScene(context) {
       npcs: serverNpcs.length
         ? serverNpcs
         : world.npcs.filter((npc) => npc.startRoomId === "forest:edge"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "forest:path") {
+    return buildForestPathRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
+      npcs: serverNpcs.length
+        ? serverNpcs
+        : world.npcs.filter((npc) => npc.startRoomId === "forest:path"),
       roomItems: serverItems
     });
   }

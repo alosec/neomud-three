@@ -46,7 +46,7 @@ High leverage next work:
 
 5. Expand the test harness with real gameplay gates.
    - Assert physical exit traversal from temple to square through the live server, not only debug movement.
-   - Keep the authored-room screenshot suite current for Temple, Town Square, North Gate, Forest Edge, and Tavern after major renderer changes.
+   - Keep the authored-room screenshot suite current for Temple, Town Square, North Gate, Forest Edge, Forest Path, and Tavern after major renderer changes.
    - Add collision and spawn-heading checks for each authored room.
    - Keep adding fixed screenshot anchors before major visual passes, not after the fact.
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
@@ -67,6 +67,7 @@ High leverage next work:
    - The north Gate now has actual gate trim pieces, batched battlements, arrow slits, caps, and a portcullis. Further Gate work should improve massing/material treatment, not add more small bars.
    - North Gate is now an authored room with Town Guard, South/North physical triggers, gate corridor camera, and server-backed traversal. Further Gate work should refine the flat forest backdrop and tower material treatment.
    - Forest Edge is now an authored room with Forest Rat, South/North physical triggers, lightweight tree/log/stone collision, Prop Zoo forest props, first-pass side/back depth layers, and server-backed traversal. Further Forest work should improve the backdrop/material transition and path lighting rather than blindly expanding room count.
+   - Forest Path is now an authored room with Shadow Wolf/Forest Bandit offline staging, server-backed Shadow Wolf traversal, South/North/East physical triggers, and fixed screenshots. Further forest work should improve material/lighting/depth coherence before adding Deep Forest or Clearing.
    - The south Temple facade has a subtle approved-glass glow pass; the first doorway glow attempt was rejected in screenshot QA because it looked like a visible rectangle.
    - The Tavern interior now has a warmer lighting/camera pass; further Tavern work should target wall/ceiling composition and material treatment rather than more loose furniture.
    - The Tavern wall/bar composition pass adds instanced bracing, shelves, bottle silhouettes, framed panels, and window/notice shapes; further Tavern work should refine furniture/player/NPC presentation rather than more flat wall dressing.

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T13:56:39.560Z",
+  "updated": "2026-05-28T14:08:57.795Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1805,6 +1805,27 @@
       "comments": [],
       "created": "2026-05-28T13:49:34Z",
       "updated": "2026-05-28T13:56:01Z"
+    },
+    {
+      "id": "neo-1fb2.61",
+      "project": "NeoMud",
+      "title": "Author Winding Forest Path room slice",
+      "description": "Author forest:path as a playable Three.js room using real NeoMud exits and NPC data: South back to Forest Edge, North to Deep Forest, East to Sunlit Clearing, visible hostile NPC standees, simple collision, fixed screenshots, and offline/server traversal QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: authored forest:path with South/North/East triggers, Shadow Wolf/Forest Bandit staging, collision, screenshots, render budget, offline and server traversal QA",
+      "labels": [
+        "forest",
+        "neomud-three",
+        "room-slice"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T13:59:05Z",
+      "updated": "2026-05-28T14:08:40Z"
     }
   ],
   "ready": [

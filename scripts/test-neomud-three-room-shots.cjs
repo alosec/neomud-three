@@ -18,6 +18,8 @@ const ANCHORS = [
   { id: "north-gate-forest", roomId: "town:gate", filename: "room-shot-north-gate-forest.png", x: 0, z: -10.8, heading: 0 },
   { id: "forest-edge-entry", roomId: "forest:edge", filename: "room-shot-forest-edge-entry.png", x: 0, z: 13.1, heading: 0 },
   { id: "forest-edge-path", roomId: "forest:edge", filename: "room-shot-forest-edge-path.png", x: 0, z: -9.8, heading: 0 },
+  { id: "forest-path-entry", roomId: "forest:path", filename: "room-shot-forest-path-entry.png", x: 0, z: 13.6, heading: 0 },
+  { id: "forest-path-fork", roomId: "forest:path", filename: "room-shot-forest-path-fork.png", x: 0, z: -2.0, heading: 0 },
   { id: "tavern-entry", roomId: "town:tavern", filename: "room-shot-tavern-entry.png", x: 7.1, z: 0, heading: -Math.PI / 2 },
   { id: "tavern-bar", roomId: "town:tavern", filename: "room-shot-tavern-bar.png", x: 1.2, z: 0.5, heading: -Math.PI / 2 }
 ];

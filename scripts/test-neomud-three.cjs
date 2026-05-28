@@ -255,6 +255,58 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Forest Rat");
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -21.7, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:path",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Winding Forest Path");
+    const forestPathTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      forestPathTriggers.map((trigger) => trigger.direction).sort(),
+      ["EAST", "NORTH", "SOUTH"]
+    );
+    assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-south-edge" && trigger.targetId === "forest:edge"));
+    assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-north-deep" && trigger.targetId === "forest:deep"));
+    assert.ok(forestPathTriggers.some((trigger) => trigger.id === "exit-east-clearing" && trigger.targetId === "forest:clearing"));
+    const forestPathColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      forestPathColliders.some((collider) => collider.id === "west-root-cluster"),
+      `expected Forest Path root collider, got ${JSON.stringify(forestPathColliders)}`
+    );
+    const forestPathEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      forestPathEntities.some((entity) => entity.id === "npc:shadow_wolf" && /Shadow Wolf/i.test(entity.name)),
+      `expected Shadow Wolf entity in Forest Path, got ${JSON.stringify(forestPathEntities)}`
+    );
+    await saveScreenshot(page, "offline-forest-path.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:path"));
+    assertRenderBudget(assert, "forest:path", budgetReports.at(-1).stats);
+
+    const shadowWolf = forestPathEntities.find((entity) => entity.id === "npc:shadow_wolf");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), shadowWolf);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:shadow_wolf",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Shadow Wolf/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Shadow Wolf");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 22.6, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:edge",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.7, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(

@@ -105,6 +105,27 @@ const FOREST_EDGE_COLLIDERS = [
   { id: "mossy-stone", center: [5.8, -7.4], size: [2.2, 1.55] }
 ];
 
+const FOREST_PATH = {
+  width: 34,
+  depth: 48,
+  halfX: 17,
+  halfZ: 24,
+  southExitZ: 22.1,
+  northExitZ: -22.1,
+  eastExitX: 15.6,
+  exitHalfWidth: 3.6
+};
+
+const FOREST_PATH_COLLIDERS = [
+  { id: "southwest-trunk", center: [-11.8, 13.8], size: [1.55, 1.55] },
+  { id: "southeast-trunk", center: [11.6, 13.6], size: [1.55, 1.55] },
+  { id: "west-root-cluster", center: [-8.8, -2.8], size: [3.1, 1.45] },
+  { id: "east-root-cluster", center: [8.9, -3.2], size: [3.1, 1.45] },
+  { id: "northwest-trunk", center: [-12.8, -14.8], size: [1.75, 1.75] },
+  { id: "northeast-trunk", center: [12.2, -15.3], size: [1.75, 1.75] },
+  { id: "east-branch-stone", center: [12.0, 4.3], size: [2.0, 1.4] }
+];
+
 const TEMPLE_COLLIDERS = [
   { id: "altar-dais", center: [0, TEMPLE.altarZ + 0.12], size: [6.0, 3.25] },
   { id: "left-incense-brazier", center: [-2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] },
@@ -534,6 +555,96 @@ export function buildForestEdgeRoom({ root, worldRoot, npcs = [], roomItems = []
       entityLayer.children.forEach((child, index) => {
         if (child.userData.kind === "npc") {
           child.position.y = Math.sin(performance.now() * 0.0022 + index) * 0.026;
+        }
+      });
+    }
+  };
+}
+
+export function buildForestPathRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = makeTownMaterials();
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  addForestPathStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addForestPathEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(0, 0, 13.6), heading: 0 },
+    status: "Winding Forest Path: authored path split with South Forest Edge return, North Deep Forest, East Sunlit Clearing, and server-driven hostile NPCs.",
+    environment: {
+      background: 0x2f4034,
+      fog: 0x2e4532,
+      fogDensity: 0.018
+    },
+    camera: {
+      distance: 5.65,
+      height: 4.0,
+      sideOffset: -0.1,
+      lookAhead: 3.1,
+      targetHeight: 1.12
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "forest:edge") return { position: new THREE.Vector3(0, 0, 13.6), heading: 0 };
+      if (fromRoomId === "forest:deep") return { position: new THREE.Vector3(0, 0, -13.8), heading: Math.PI };
+      if (fromRoomId === "forest:clearing") return { position: new THREE.Vector3(11.4, 0, 3.6), heading: -Math.PI / 2 };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -FOREST_PATH.halfX + 0.55, FOREST_PATH.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -FOREST_PATH.halfZ + 0.55, FOREST_PATH.halfZ - 0.55);
+      resolveColliderPushout(position, FOREST_PATH_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -FOREST_PATH.halfX + 0.55, FOREST_PATH.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -FOREST_PATH.halfZ + 0.55, FOREST_PATH.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.z > FOREST_PATH.southExitZ && Math.abs(position.x) < FOREST_PATH.exitHalfWidth) return "forest:edge";
+      if (position.z < FOREST_PATH.northExitZ && Math.abs(position.x) < FOREST_PATH.exitHalfWidth) return "forest:deep";
+      if (position.x > FOREST_PATH.eastExitX && Math.abs(position.z - 3.6) < FOREST_PATH.exitHalfWidth) return "forest:clearing";
+      return null;
+    },
+    debugTriggers() {
+      return forestPathTriggers();
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(FOREST_PATH_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.65) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update(dt) {
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.002 + index * 0.7) * 0.03;
         }
       });
     }
@@ -1459,6 +1570,266 @@ function forestEdgeTriggers() {
         label: "Forest Path",
         subtitle: "North",
         threshold: { center: [0, 0.05, FOREST_EDGE.northExitZ], size: [FOREST_EDGE.exitHalfWidth * 2, 1.35], color: 0xb8e58a }
+      }
+    }
+  ];
+}
+
+function addForestPathStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.foliageDark, FOREST_PATH.width, FOREST_PATH.depth);
+  addInstancedSurfaceRects(root, materials, [
+    { material: "road", x: 0, z: 3.5, width: 5.2, depth: 40.2, y: 0.022 },
+    { material: "road", x: 7.0, z: 3.6, width: 13.8, depth: 4.4, y: 0.024 },
+    { material: "packedDirt", x: 0, z: 11.8, width: 10.6, depth: 7.6, y: 0.016 },
+    { material: "packedDirt", x: 0, z: -13.6, width: 9.6, depth: 9.0, y: 0.018 },
+    { material: "packedDirt", x: 10.2, z: 3.6, width: 8.2, depth: 7.4, y: 0.017 }
+  ], "forest-path-surfaces");
+
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.5, -28.2, 40, 22);
+  addForestPathDepth(root, materials);
+  addForestPathTrees(root, materials);
+  addForestPathDressing(root, materials);
+  addForestPathExitAffordances(root);
+
+  addTextBoard(root, "Deep Forest", {
+    x: 0,
+    y: 1.85,
+    z: -19.7,
+    width: 2.5,
+    height: 0.5,
+    subtitle: "North",
+    palette: "green",
+    renderOrder: 9
+  });
+  addTextBoard(root, "Sunlit Clearing", {
+    x: 12.4,
+    y: 1.7,
+    z: 2.2,
+    width: 2.8,
+    height: 0.48,
+    subtitle: "East",
+    palette: "gold",
+    renderOrder: 9
+  });
+
+  const ambientFill = new THREE.HemisphereLight(0xb9d4bd, 0x23351f, 0.82);
+  root.add(ambientFill);
+
+  const sun = new THREE.DirectionalLight(0xd2f0b4, 1.75);
+  sun.position.set(4.2, 10.5, -6.5);
+  root.add(sun);
+
+  const mossGlow = new THREE.PointLight(0x9fff9a, 1.35, 9.5);
+  mossGlow.position.set(-5.3, 2.1, -3.0);
+  root.add(mossGlow);
+}
+
+function addForestPathDepth(root, materials) {
+  addInstancedBoxes(
+    root,
+    materials.foliageDark,
+    [
+      { x: -16.2, y: 1.1, z: -1.2, width: 0.65, height: 2.2, depth: 35.0 },
+      { x: 16.2, y: 1.1, z: -6.8, width: 0.65, height: 2.2, depth: 23.8 },
+      { x: -10.8, y: 0.54, z: -21.4, width: 8.0, height: 1.08, depth: 0.78 },
+      { x: 10.8, y: 0.54, z: -21.4, width: 8.0, height: 1.08, depth: 0.78 }
+    ],
+    "forest-path-side-undergrowth"
+  );
+  addTownContextTrees(root, materials, [
+    { x: -14.2, z: -18.8, scale: 1.68, rotationY: 0.42 },
+    { x: -9.4, z: -22.2, scale: 1.38, rotationY: -0.22 },
+    { x: 9.6, z: -21.9, scale: 1.42, rotationY: 0.28 },
+    { x: 14.3, z: -18.6, scale: 1.72, rotationY: -0.46 },
+    { x: 14.6, z: 7.8, scale: 1.35, rotationY: 0.3 }
+  ]);
+  addInstancedGeometry(
+    root,
+    new THREE.DodecahedronGeometry(1, 0),
+    materials.foliageDark,
+    [
+      { x: -12.8, y: 7.4, z: -8.5, scale: [2.9, 1.0, 2.2], rotationY: 0.2 },
+      { x: 12.8, y: 7.3, z: -8.9, scale: [2.8, 1.0, 2.2], rotationY: -0.24 },
+      { x: -8.8, y: 7.8, z: -17.4, scale: [2.3, 0.9, 1.8], rotationY: -0.12 },
+      { x: 8.8, y: 7.9, z: -17.6, scale: [2.3, 0.9, 1.8], rotationY: 0.16 }
+    ],
+    "forest-path-high-canopy",
+    { castShadow: false, receiveShadow: false }
+  );
+}
+
+function addForestPathTrees(root, materials) {
+  addTownContextTrees(root, materials, [
+    { x: -11.8, z: 13.8, scale: 1.52, rotationY: 0.1 },
+    { x: 11.6, z: 13.6, scale: 1.46, rotationY: -0.34 },
+    { x: -13.2, z: 1.8, scale: 1.88, rotationY: 0.52 },
+    { x: 13.4, z: -1.6, scale: 1.8, rotationY: -0.48 },
+    { x: -12.8, z: -14.8, scale: 1.76, rotationY: -0.18 },
+    { x: 12.2, z: -15.3, scale: 1.7, rotationY: 0.32 },
+    { x: -6.7, z: -10.0, scale: 1.25, rotationY: 0.22 },
+    { x: 6.8, z: -11.0, scale: 1.24, rotationY: -0.3 }
+  ]);
+}
+
+function addForestPathDressing(root, materials) {
+  const roots = [
+    { x: -8.8, y: 0.18, z: -2.8, width: 3.4, height: 0.24, depth: 0.24, rotationY: -0.16 },
+    { x: -8.4, y: 0.22, z: -2.2, width: 2.4, height: 0.2, depth: 0.2, rotationY: 0.36 },
+    { x: 8.9, y: 0.18, z: -3.2, width: 3.4, height: 0.24, depth: 0.24, rotationY: 0.18 },
+    { x: 8.4, y: 0.22, z: -2.52, width: 2.4, height: 0.2, depth: 0.2, rotationY: -0.34 }
+  ];
+  addInstancedBoxes(root, materials.darkTimber, roots, "forest-path-exposed-roots");
+  addTownKitProp(root, materials, "stone.moss", { x: 12.0, z: 4.3, rotationY: 0.32, scale: 1.0 });
+  addTownKitProp(root, materials, "log.fallen", { x: -6.2, z: 7.8, rotationY: -0.18, scale: 0.92 });
+
+  addInstancedGeometry(
+    root,
+    new THREE.ConeGeometry(1, 1, 5),
+    materials.foliage,
+    [
+      { x: -5.4, y: 0.22, z: 4.8, scale: [0.2, 0.5, 0.2], rotationY: 0.1 },
+      { x: 5.6, y: 0.22, z: 4.6, scale: [0.2, 0.5, 0.2], rotationY: -0.2 },
+      { x: -4.2, y: 0.22, z: -8.8, scale: [0.2, 0.5, 0.2], rotationY: 0.2 },
+      { x: 4.0, y: 0.22, z: -9.1, scale: [0.2, 0.5, 0.2], rotationY: -0.22 },
+      { x: 10.3, y: 0.22, z: 1.2, scale: [0.18, 0.46, 0.18], rotationY: 0.6 },
+      { x: 11.1, y: 0.22, z: 6.0, scale: [0.18, 0.46, 0.18], rotationY: -0.4 }
+    ],
+    "forest-path-grass-tufts"
+  );
+}
+
+function addForestPathExitAffordances(root) {
+  for (const trigger of forestPathTriggers()) {
+    const threshold = trigger.affordance.threshold;
+    addExitThreshold(root, {
+      x: threshold.center[0],
+      z: threshold.center[2],
+      width: threshold.size[0],
+      depth: threshold.size[1],
+      color: threshold.color,
+      opacity: 0.18
+    });
+  }
+}
+
+function addForestPathEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const placements = {
+    "npc:shadow_wolf": {
+      position: [-3.6, 0, -5.4],
+      heading: Math.PI * 0.18,
+      role: "Hostile",
+      palette: "red",
+      height: 2.05,
+      width: 1.65
+    },
+    "npc:forest_bandit": {
+      position: [5.4, 0, 3.2],
+      heading: -Math.PI * 0.72,
+      role: "Hostile",
+      palette: "red",
+      height: 2.35,
+      width: 1.42
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = placements[normalized.id] ?? {
+      position: [-2.2 + index * 2.2, 0, -2.8 - index],
+      heading: Math.PI,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 2.2,
+      width: placement.width ?? 1.4,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: normalized.hostile ? `Engage: ${normalized.name}` : `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -1.8 + index * 0.9;
+    const z = 1.8 + (index % 2) * 1.2;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Ground",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function forestPathTriggers() {
+  return [
+    {
+      id: "exit-south-edge",
+      direction: "SOUTH",
+      targetId: "forest:edge",
+      prompt: "Return to Forest Edge",
+      trigger: { type: "box", center: [0, 1, FOREST_PATH.southExitZ], size: [FOREST_PATH.exitHalfWidth * 2, 3, 1.7] },
+      affordance: {
+        label: "Forest Edge",
+        subtitle: "South",
+        threshold: { center: [0, 0.05, FOREST_PATH.southExitZ], size: [FOREST_PATH.exitHalfWidth * 2, 1.35], color: 0xe8c070 }
+      }
+    },
+    {
+      id: "exit-north-deep",
+      direction: "NORTH",
+      targetId: "forest:deep",
+      prompt: "Continue into Deep Forest",
+      trigger: { type: "box", center: [0, 1, FOREST_PATH.northExitZ], size: [FOREST_PATH.exitHalfWidth * 2, 3, 1.7] },
+      affordance: {
+        label: "Deep Forest",
+        subtitle: "North",
+        threshold: { center: [0, 0.05, FOREST_PATH.northExitZ], size: [FOREST_PATH.exitHalfWidth * 2, 1.35], color: 0x88d67a }
+      }
+    },
+    {
+      id: "exit-east-clearing",
+      direction: "EAST",
+      targetId: "forest:clearing",
+      prompt: "Branch toward the Sunlit Clearing",
+      trigger: { type: "box", center: [FOREST_PATH.eastExitX, 1, 3.6], size: [1.7, 3, FOREST_PATH.exitHalfWidth * 2] },
+      affordance: {
+        label: "Sunlit Clearing",
+        subtitle: "East",
+        threshold: { center: [FOREST_PATH.eastExitX, 0.05, 3.6], size: [1.35, FOREST_PATH.exitHalfWidth * 2], color: 0xf1d784 }
       }
     }
   ];

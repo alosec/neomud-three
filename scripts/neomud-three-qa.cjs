@@ -32,6 +32,12 @@ const RENDER_BUDGETS = {
     textures: 36,
     geometries: 140
   },
+  "forest:path": {
+    calls: 150,
+    triangles: 80_000,
+    textures: 40,
+    geometries: 150
+  },
   "material-lab": {
     calls: 420,
     triangles: 120_000,
