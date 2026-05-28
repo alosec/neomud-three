@@ -55,7 +55,8 @@ High leverage next work:
 8. Next concrete visual pass.
    - The first small foliage kit is now staged in Prop Zoo and applied to Town Square with instanced shrubs, grass tufts, and flower clusters.
    - The first west Tavern landmark pass is now built from approved TownKit frontage/window/sign pieces, with instanced live-room windows to protect draw-call headroom.
+   - The first east Market Hall pass now uses a larger signed building, fewer/larger stalls, and instanced crate/produce detail.
    - Do not keep solving warmth by adding more loose foliage; Town Square is now triangle-budget constrained.
-   - Pick the next named landmark, preferably the south Temple facade or east Market Hall, and rebuild it from approved TownKit pieces with better silhouette, trim, and lighting.
-   - Add the next Prop Zoo items only when they unlock that landmark pass: conifer variant, ground decal, stone trim, market stall variant, or stained-glass/window frame variant.
+   - Pick the next named landmark, preferably the south Temple facade or north Gate, and rebuild it from approved TownKit pieces with better silhouette, trim, and lighting.
+   - Add the next Prop Zoo items only when they unlock that landmark pass: conifer variant, ground decal, stone trim, gate trim, or stained-glass/window frame variant.
    - Keep Town Square under the current render budget and update fixed screenshots.

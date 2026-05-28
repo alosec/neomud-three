@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T09:55:31.365Z",
+  "updated": "2026-05-28T10:06:31.717Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1292,6 +1292,75 @@
       ],
       "created": "2026-05-28T09:41:01Z",
       "updated": "2026-05-28T09:55:12Z"
+    },
+    {
+      "id": "neo-1fb2.49",
+      "project": "NeoMud",
+      "title": "Refine east Market Hall landmark without new assets",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 68,
+          "body": "Refined east Market Hall with larger signed building, fewer/larger stalls, and instanced crate/produce detail.",
+          "created": "2026-05-28T10:04:38Z"
+        }
+      ],
+      "created": "2026-05-28T09:58:43Z",
+      "updated": "2026-05-28T10:05:02Z"
+    },
+    {
+      "id": "neo-1fb2.50",
+      "project": "NeoMud",
+      "title": "Preserve Town Square budget after Market Hall pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 69,
+          "body": "Market pass improved budget headroom: full smoke Town Square is now 219/240 calls and 58,746/60,000 triangles.",
+          "created": "2026-05-28T10:05:18Z"
+        }
+      ],
+      "created": "2026-05-28T09:59:06Z",
+      "updated": "2026-05-28T10:05:33Z"
+    },
+    {
+      "id": "neo-1fb2.51",
+      "project": "NeoMud",
+      "title": "Update QA review and memory after Market Hall pass",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 70,
+          "body": "Updated memory bank and Town Square QA review with Market Hall pass status and latest QA metrics.",
+          "created": "2026-05-28T10:05:51Z"
+        }
+      ],
+      "created": "2026-05-28T09:59:33Z",
+      "updated": "2026-05-28T10:06:06Z"
     }
   ],
   "ready": [

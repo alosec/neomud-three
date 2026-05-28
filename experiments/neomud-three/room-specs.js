@@ -184,25 +184,24 @@ export const TOWN_SQUARE_SPEC = {
       direction: "EAST",
       building: {
         label: "Market",
-        x: 20.0,
-        z: -1.2,
+        x: 20.6,
+        z: -0.2,
         rotationY: -Math.PI / 2,
-        width: 9.4,
-        height: 5.4,
-        depth: 5.7,
+        width: 11.6,
+        height: 6.0,
+        depth: 6.6,
         floors: 2,
         roofMaterial: "roof",
         plasterMaterial: "plasterWarm",
         facadeMaterial: "plasterFacade",
-        sign: false,
-        awning: "awningBlue",
-        roofHeight: 1.48,
+        sign: true,
+        awning: null,
+        roofHeight: 1.78,
         dormers: 0
       },
       stalls: [
-        { x: 14.6, z: -7.6, awningMaterial: "awningBlue" },
-        { x: 14.6, z: -3.6, awningMaterial: "awningRed" },
-        { x: 14.6, z: 0.4, awningMaterial: "awningGold" }
+        { x: 14.45, z: -5.2, awningMaterial: "awningBlue", width: 4.1, depth: 1.85 },
+        { x: 14.45, z: 1.05, awningMaterial: "awningGold", width: 4.1, depth: 1.85 }
       ]
     },
     {

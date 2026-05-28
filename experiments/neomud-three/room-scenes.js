@@ -1857,21 +1857,51 @@ function addMarketLandmark(root, materials, landmark) {
       z: stall.z,
       rotationY: -Math.PI / 2,
       awningMaterial: material(materials, stall.awningMaterial),
-      width: 3.0,
-      depth: 1.5
+      width: stall.width ?? 3.0,
+      depth: stall.depth ?? 1.5
     });
   }
 }
 
 function addMarketDetailProps(root, materials) {
-  for (const [x, z, w, d] of [
-    [15.75, -6.2, 0.78, 0.58],
-    [15.85, -2.2, 0.62, 0.52],
-    [16.05, 1.4, 0.7, 0.56]
-  ]) {
-    addBox(root, materials.darkTimber, x, 0.24, z, w, 0.48, d, { rotationY: -Math.PI / 2 });
-    addBox(root, materials.trimLight, x, 0.54, z, w * 0.82, 0.12, d * 0.82, { rotationY: -Math.PI / 2 });
-  }
+  const crates = [
+    { x: 15.7, z: -7.1, width: 0.82, depth: 0.58 },
+    { x: 15.85, z: -3.25, width: 0.7, depth: 0.52 },
+    { x: 15.95, z: 2.55, width: 0.74, depth: 0.56 },
+    { x: 15.65, z: 4.45, width: 0.58, depth: 0.48 }
+  ];
+  addInstancedBoxes(
+    root,
+    materials.darkTimber,
+    crates.map((crate) => ({ x: crate.x, y: 0.24, z: crate.z, width: crate.width, height: 0.48, depth: crate.depth, rotationY: -Math.PI / 2 })),
+    "market-crate-bases"
+  );
+  addInstancedBoxes(
+    root,
+    materials.trimLight,
+    crates.map((crate) => ({ x: crate.x, y: 0.54, z: crate.z, width: crate.width * 0.82, height: 0.12, depth: crate.depth * 0.82, rotationY: -Math.PI / 2 })),
+    "market-crate-lids"
+  );
+  addInstancedBoxes(
+    root,
+    materials.awningRed,
+    [
+      { x: 15.38, y: 0.72, z: -7.1, width: 0.18, height: 0.18, depth: 0.18 },
+      { x: 15.54, y: 0.78, z: -6.9, width: 0.16, height: 0.16, depth: 0.16 },
+      { x: 15.42, y: 0.72, z: 2.48, width: 0.16, height: 0.16, depth: 0.16 }
+    ],
+    "market-red-produce"
+  );
+  addInstancedBoxes(
+    root,
+    materials.awningGold,
+    [
+      { x: 15.48, y: 0.72, z: -3.24, width: 0.18, height: 0.18, depth: 0.18 },
+      { x: 15.62, y: 0.78, z: -3.05, width: 0.16, height: 0.16, depth: 0.16 },
+      { x: 15.45, y: 0.74, z: 4.5, width: 0.18, height: 0.18, depth: 0.18 }
+    ],
+    "market-gold-produce"
+  );
 }
 
 function addTempleThresholdLandmark(root, materials, landmark) {

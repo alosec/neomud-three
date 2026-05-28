@@ -207,3 +207,20 @@ Visual delta: added Prop Zoo-approved Tavern frontage, warm Tavern window, and p
 QA delta: Material Lab, Prop Zoo, offline smoke, Town Square screenshots, authored-room screenshots, server-backed movement, spec validation, and diff hygiene all pass after this change.
 
 Remaining visual gap: the Tavern is a better landmark, but it still needs a cohesive trim/signage pass and the NPC/player art is still below the desired fantasy quality bar. The next landmark pass should target the south Temple facade or east Market Hall rather than adding more general props.
+
+## Score After East Market Hall Pass
+
+- Navigation readability: 2/2. The east Market Hall remains readable from the fixed east anchor and the larger sign makes the destination clearer.
+- Scale believability: 1/2. The Market building and stalls are now larger and less cluttered, but the market still needs better trim, merchandise silhouettes, and awning proportions.
+- Semantic match: 2/2. The east side now reads more like a named trade hall with stalls rather than a generic side building.
+- Interaction clarity: 2/2. The existing Market board, threshold, and physical trigger metadata remain intact.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes after the Market pass.
+- Performance: 2/2. Latest full smoke Town Square budget reports 219 draw calls / 58,746 triangles / 19 textures / 144 geometries; fixed Town Square anchors report 125 calls / 54,834 triangles / 20 textures / 188 geometries.
+
+Total: 11/12
+
+Visual delta: made the Market Hall larger and signed, replaced three smaller stalls with two larger stalls, and converted the crate/produce detail into instanced batches. This improved readability while reducing full-smoke draw calls from 236 to 219.
+
+QA delta: Material Lab, Prop Zoo, offline smoke, Town Square screenshots, authored-room screenshots, server-backed movement, spec validation, and diff hygiene all pass after this change.
+
+Remaining visual gap: the Market is now a clearer landmark, but the scene still needs a stronger south Temple/gate trim pass and better character/NPC art. Further market improvements should use approved stall/merchandise kit pieces rather than hand-placed one-off boxes.
