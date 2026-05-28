@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T15:10:38.292Z",
+  "updated": "2026-05-28T15:21:58.805Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1898,6 +1898,34 @@
       ],
       "created": "2026-05-28T14:56:27Z",
       "updated": "2026-05-28T15:10:17Z"
+    },
+    {
+      "id": "neo-1fb2.64",
+      "project": "NeoMud",
+      "title": "Improve Market Street enclosure",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 83,
+          "body": "Scope: improve authored Market Street visual closure with cheap reusable geometry: east/west threshold facades, overhead canopy/banners, and street enclosure polish. Preserve existing traversal and budgets.",
+          "created": "2026-05-28T15:13:05Z"
+        },
+        {
+          "id": 84,
+          "body": "Completed: added east threshold facade and raised overhead lantern/cloth dressing after screenshot review; room-shot, offline smoke, and server-backed traversal QA pass.",
+          "created": "2026-05-28T15:21:30Z"
+        }
+      ],
+      "created": "2026-05-28T15:13:05Z",
+      "updated": "2026-05-28T15:21:30Z"
     }
   ],
   "ready": [

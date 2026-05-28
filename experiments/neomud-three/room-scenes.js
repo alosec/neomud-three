@@ -861,6 +861,8 @@ function addMarketStage(root, materials, worldRoot) {
 
   addMarketShopfronts(root, materials);
   addMarketStalls(root, materials);
+  addMarketThresholds(root, materials);
+  addMarketOverheadDressing(root, materials);
   const forge = addMarketForge(root, materials);
   addMarketDressing(root, materials);
   addMarketExitAffordances(root);
@@ -938,6 +940,60 @@ function addMarketStalls(root, materials) {
       awningMaterial: material(materials, stall.awningMaterial)
     });
   }
+}
+
+function addMarketThresholds(root, materials) {
+  const stone = [];
+  const timber = [];
+  const dark = [];
+  const trim = [];
+
+  const x = MARKET.eastExitX + 0.8;
+  stone.push({ x, y: 1.65, z: -3.72, width: 0.62, height: 3.3, depth: 0.62 });
+  stone.push({ x, y: 1.65, z: 3.72, width: 0.62, height: 3.3, depth: 0.62 });
+  stone.push({ x, y: 3.32, z: 0, width: 0.68, height: 0.62, depth: 7.8 });
+  trim.push({ x: x - 0.16, y: 3.82, z: 0, width: 0.36, height: 0.22, depth: 8.2 });
+  timber.push({ x: x - 0.22, y: 1.72, z: -2.92, width: 0.18, height: 2.82, depth: 0.22 });
+  timber.push({ x: x - 0.22, y: 1.72, z: 2.92, width: 0.18, height: 2.82, depth: 0.22 });
+  dark.push({ x: x + 0.08, y: 1.42, z: 0, width: 0.22, height: 2.84, depth: 2.4 });
+  trim.push({ x: x - 0.18, y: 2.92, z: 0, width: 0.18, height: 0.2, depth: 3.2 });
+
+  addInstancedBoxes(root, materials.stone, stone, "market-threshold-stone");
+  addInstancedBoxes(root, materials.darkTimber, timber, "market-threshold-timber");
+  addInstancedBoxes(root, materials.portalDark, dark, "market-threshold-portal");
+  addInstancedBoxes(root, materials.trimLight, trim, "market-threshold-trim");
+}
+
+function addMarketOverheadDressing(root, materials) {
+  const cables = [];
+  const clothByMaterial = new Map([
+    ["awningBlue", []],
+    ["awningGold", []],
+    ["awningRed", []]
+  ]);
+  const lanterns = [];
+  const hangers = [];
+
+  for (const [index, x] of [-10.8, -4.4, 2.4, 9.2].entries()) {
+    cables.push({ x, y: 4.75, z: 0, width: 0.04, height: 0.04, depth: 10.6 });
+    const materialKey = index % 3 === 0 ? "awningBlue" : index % 3 === 1 ? "awningGold" : "awningRed";
+    clothByMaterial.get(materialKey).push({ x: x + 0.18, y: 4.42, z: -1.55, width: 0.06, height: 0.34, depth: 1.72 });
+    clothByMaterial.get(materialKey).push({ x: x + 0.18, y: 4.42, z: 1.48, width: 0.06, height: 0.3, depth: 1.56 });
+    for (const z of [-3.6, 0, 3.6]) {
+      hangers.push({ x, y: 4.42, z, width: 0.032, height: 0.34, depth: 0.032 });
+      lanterns.push({ x, y: 4.16, z, scale: [0.075, 0.075, 0.075] });
+    }
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, cables, "market-overhead-cables", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.trimLight, hangers, "market-overhead-lantern-hangers", { castShadow: false, receiveShadow: false });
+  for (const [materialKey, boxes] of clothByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `market-overhead-cloth-${materialKey}`);
+  }
+  addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), materials.sign, lanterns, "market-overhead-lanterns", {
+    castShadow: false,
+    receiveShadow: false
+  });
 }
 
 function addMarketForge(root, materials) {
