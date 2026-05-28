@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T15:21:58.805Z",
+  "updated": "2026-05-28T15:39:46.834Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1926,6 +1926,34 @@
       ],
       "created": "2026-05-28T15:13:05Z",
       "updated": "2026-05-28T15:21:30Z"
+    },
+    {
+      "id": "neo-1fb2.65",
+      "project": "NeoMud",
+      "title": "Author Magic Shop room",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 85,
+          "body": "Scope: replace town:magic_shop generic fallback with authored Enchanted Emporium room, Enchantress Lyra entity, west/east physical exits, collisions, screenshot anchors, offline smoke, and server-backed traversal.",
+          "created": "2026-05-28T15:27:27Z"
+        },
+        {
+          "id": 86,
+          "body": "Completed: authored Magic Shop room with Enchantress Lyra, west/east physical exits, fixture collisions, fixed screenshots, offline smoke, and server-backed traversal QA.",
+          "created": "2026-05-28T15:39:34Z"
+        }
+      ],
+      "created": "2026-05-28T15:27:27Z",
+      "updated": "2026-05-28T15:39:34Z"
     }
   ],
   "ready": [

@@ -26,6 +26,12 @@ const RENDER_BUDGETS = {
     textures: 36,
     geometries: 150
   },
+  "town:magic_shop": {
+    calls: 170,
+    triangles: 80_000,
+    textures: 44,
+    geometries: 180
+  },
   "town:gate": {
     calls: 150,
     triangles: 60_000,

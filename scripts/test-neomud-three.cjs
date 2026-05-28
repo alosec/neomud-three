@@ -213,6 +213,57 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Blacksmith Torren");
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 16.9, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:magic_shop",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "The Enchanted Emporium");
+    const magicTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      magicTriggers.map((trigger) => trigger.direction).sort(),
+      ["EAST", "WEST"]
+    );
+    assert.ok(magicTriggers.some((trigger) => trigger.id === "exit-west-market" && trigger.targetId === "town:market"));
+    assert.ok(magicTriggers.some((trigger) => trigger.id === "exit-east-forge" && trigger.targetId === "town:forge"));
+    const magicColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      magicColliders.some((collider) => collider.id === "display-case"),
+      `expected Magic Shop display-case collider, got ${JSON.stringify(magicColliders)}`
+    );
+    const magicEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      magicEntities.some((entity) => entity.id === "npc:enchantress" && /Enchantress Lyra/i.test(entity.name)),
+      `expected Enchantress Lyra entity in Magic Shop, got ${JSON.stringify(magicEntities)}`
+    );
+    await saveScreenshot(page, "offline-magic-shop.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:magic_shop"));
+    assertRenderBudget(assert, "town:magic_shop", budgetReports.at(-1).stats);
+
+    const enchantress = magicEntities.find((entity) => entity.id === "npc:enchantress");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.0, z, heading: Math.PI / 2 }), enchantress);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:enchantress",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Enchantress Lyra/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Enchantress Lyra");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -11.1, z: 0, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:market",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.9, z: 0, heading: -Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

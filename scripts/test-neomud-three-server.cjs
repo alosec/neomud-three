@@ -120,6 +120,42 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:market"));
     assertRenderBudget(assert, "town:market", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 16.9, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:magic_shop",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "The Enchanted Emporium");
+    const magicTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(magicTriggers.some((trigger) => trigger.id === "exit-west-market"));
+    assert.ok(magicTriggers.some((trigger) => trigger.id === "exit-east-forge"));
+    const magicEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    const magicServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      magicEntities.map((entity) => entity.id).sort(),
+      magicServerNpcs.map((npc) => npc.id).sort(),
+      `expected Magic Shop rendered entities to mirror live server NPCs: server=${JSON.stringify(magicServerNpcs)} rendered=${JSON.stringify(magicEntities)}`
+    );
+    assert.ok(
+      magicEntities.some((entity) => entity.id === "npc:enchantress" && /Enchantress Lyra/i.test(entity.name)),
+      `expected server Enchantress entity in Magic Shop, got ${JSON.stringify(magicEntities)}`
+    );
+    await saveScreenshot(page, "server-magic-shop.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:magic_shop"));
+    assertRenderBudget(assert, "town:magic_shop", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -11.1, z: 0, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:market",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.9, z: 0, heading: -Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

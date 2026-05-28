@@ -98,6 +98,27 @@ const MARKET_COLLIDERS = [
   }))
 ];
 
+const MAGIC_SHOP = {
+  width: 25,
+  depth: 18,
+  halfX: 12.5,
+  halfZ: 9,
+  westExitX: -11.55,
+  eastExitX: 11.55,
+  exitHalfZ: 2.45
+};
+
+const MAGIC_SHOP_COLLIDERS = [
+  { id: "north-shelves", center: [0, -8.15], size: [23.2, 1.45] },
+  { id: "south-shelves", center: [0, 8.15], size: [23.2, 1.45] },
+  { id: "east-rune-doorframe", center: [11.6, 0], size: [1.0, 5.9] },
+  { id: "display-case", center: [-0.7, 3.55], size: [4.65, 1.35] },
+  { id: "counter", center: [4.25, -3.45], size: [4.2, 1.35] },
+  { id: "orb-dais", center: [2.25, 0.65], size: [1.45, 1.45] },
+  { id: "scroll-table", center: [-5.3, -3.65], size: [2.4, 1.35] },
+  { id: "potion-cabinet", center: [-6.8, 4.75], size: [2.0, 1.15] }
+];
+
 const NORTH_GATE = {
   width: 26,
   depth: 42,
@@ -523,6 +544,126 @@ export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       forge.flames.children.forEach((child, index) => {
         if (child.material?.opacity) {
           child.material.opacity = 0.5 + Math.sin(performance.now() * 0.009 + index) * 0.16;
+        }
+      });
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0017 + index) * 0.016;
+        }
+      });
+    }
+  };
+}
+
+export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = { ...makeTownMaterials(), ...makeMagicShopMaterials() };
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  const magic = addMagicShopStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addMagicShopEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(-8.4, 0, 0), heading: Math.PI / 2 },
+    status: "The Enchanted Emporium: authored arcane shop with shelves, display case, floating crystals, Enchantress Lyra, and real west/east exits.",
+    environment: {
+      background: 0x151126,
+      fog: 0x17142a,
+      fogDensity: 0.02
+    },
+    camera: {
+      distance: 5.65,
+      height: 3.25,
+      sideOffset: -0.16,
+      lookAhead: 2.85,
+      targetHeight: 1.12
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "town:market") return { position: new THREE.Vector3(-8.4, 0, 0), heading: Math.PI / 2 };
+      if (fromRoomId === "town:forge") return { position: new THREE.Vector3(8.5, 0, 0), heading: -Math.PI / 2 };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -MAGIC_SHOP.halfX + 0.55, MAGIC_SHOP.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -MAGIC_SHOP.halfZ + 0.55, MAGIC_SHOP.halfZ - 0.55);
+      resolveColliderPushout(position, MAGIC_SHOP_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -MAGIC_SHOP.halfX + 0.55, MAGIC_SHOP.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -MAGIC_SHOP.halfZ + 0.55, MAGIC_SHOP.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.x < MAGIC_SHOP.westExitX && Math.abs(position.z) < MAGIC_SHOP.exitHalfZ) return "town:market";
+      if (position.x > MAGIC_SHOP.eastExitX && Math.abs(position.z) < MAGIC_SHOP.exitHalfZ) return "town:forge";
+      return null;
+    },
+    debugTriggers() {
+      return [
+        {
+          id: "exit-west-market",
+          direction: "WEST",
+          targetId: "town:market",
+          prompt: "Return to Market Street",
+          trigger: { type: "box", center: [MAGIC_SHOP.westExitX - 0.15, 1, 0], size: [1.2, 3, MAGIC_SHOP.exitHalfZ * 2] },
+          affordance: {
+            label: "Market",
+            subtitle: "West"
+          }
+        },
+        {
+          id: "exit-east-forge",
+          direction: "EAST",
+          targetId: "town:forge",
+          prompt: "Enter Grimjaw's Forge",
+          trigger: { type: "box", center: [MAGIC_SHOP.eastExitX + 0.15, 1, 0], size: [1.2, 3, MAGIC_SHOP.exitHalfZ * 2] },
+          affordance: {
+            label: "Forge",
+            subtitle: "East"
+          }
+        }
+      ];
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(MAGIC_SHOP_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.55) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update() {
+      magic.crystals.children.forEach((child, index) => {
+        child.rotation.y += 0.01 + index * 0.0015;
+        child.position.y = child.userData.baseY + Math.sin(performance.now() * 0.0018 + index) * 0.08;
+      });
+      magic.runes.children.forEach((child, index) => {
+        if (child.material?.opacity) {
+          child.material.opacity = 0.48 + Math.sin(performance.now() * 0.0024 + index) * 0.18;
         }
       });
       entityLayer.children.forEach((child, index) => {
@@ -1160,6 +1301,292 @@ function addMarketEntities(root, materials, worldRoot, world, npcs, roomItems, i
       id: normalized.id,
       name: normalized.name,
       role: "Market",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function makeMagicShopMaterials() {
+  return {
+    arcaneFloor: new THREE.MeshStandardMaterial({ color: 0x2b2238, roughness: 0.78, metalness: 0.02 }),
+    arcaneWall: new THREE.MeshStandardMaterial({ color: 0x4f4266, roughness: 0.82, metalness: 0 }),
+    velvet: new THREE.MeshStandardMaterial({ color: 0x5d1f44, roughness: 0.74, metalness: 0.02 }),
+    glassCase: new THREE.MeshStandardMaterial({ color: 0xb9efff, transparent: true, opacity: 0.38, roughness: 0.18, metalness: 0.05 }),
+    crystalBlue: new THREE.MeshBasicMaterial({ color: 0x8be8ff, transparent: true, opacity: 0.78 }),
+    crystalViolet: new THREE.MeshBasicMaterial({ color: 0xc48cff, transparent: true, opacity: 0.72 }),
+    crystalGold: new THREE.MeshBasicMaterial({ color: 0xffd36a, transparent: true, opacity: 0.78 }),
+    runeGlow: new THREE.MeshBasicMaterial({ color: 0x86eaff, transparent: true, opacity: 0.58, depthWrite: false })
+  };
+}
+
+function addMagicShopStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.arcaneFloor, MAGIC_SHOP.width, MAGIC_SHOP.depth);
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_magic_shop.webp`, MAGIC_SHOP.eastExitX + 4.6, 4.7, 0, 13.2, 7.45, {
+    rotationY: -Math.PI / 2,
+    opacity: 0.34
+  });
+
+  addMagicShopArchitecture(root, materials);
+  addMagicShopShelves(root, materials);
+  addMagicShopDisplay(root, materials);
+  addMagicShopExitAffordances(root);
+  const crystals = addMagicShopCrystals(root, materials);
+  const runes = addMagicShopRunes(root, materials);
+
+  const ambientFill = new THREE.HemisphereLight(0xaaa7ff, 0x160f1d, 0.82);
+  root.add(ambientFill);
+
+  const shopGlow = new THREE.PointLight(0x98dfff, 2.6, 12);
+  shopGlow.position.set(0.6, 4.2, 0.4);
+  root.add(shopGlow);
+
+  const counterGlow = new THREE.PointLight(0xd797ff, 1.9, 7.5);
+  counterGlow.position.set(3.6, 2.2, -2.8);
+  root.add(counterGlow);
+
+  const eastGlow = new THREE.PointLight(0xffc778, 1.55, 6.5);
+  eastGlow.position.set(10.2, 2.7, 0);
+  root.add(eastGlow);
+
+  return { crystals, runes };
+}
+
+function addMagicShopArchitecture(root, materials) {
+  const walls = [
+    { x: 0, y: 2.65, z: -8.85, width: MAGIC_SHOP.width, height: 5.3, depth: 0.3 },
+    { x: 0, y: 2.65, z: 8.85, width: MAGIC_SHOP.width, height: 5.3, depth: 0.3 },
+    { x: 12.38, y: 2.75, z: -4.8, width: 0.3, height: 5.5, depth: 8.4 },
+    { x: 12.38, y: 2.75, z: 4.8, width: 0.3, height: 5.5, depth: 8.4 },
+    { x: -12.38, y: 2.75, z: -4.8, width: 0.3, height: 5.5, depth: 8.4 },
+    { x: -12.38, y: 2.75, z: 4.8, width: 0.3, height: 5.5, depth: 8.4 }
+  ];
+  const timber = [
+    { x: 0, y: 0.14, z: -8.6, width: MAGIC_SHOP.width, height: 0.22, depth: 0.22 },
+    { x: 0, y: 0.14, z: 8.6, width: MAGIC_SHOP.width, height: 0.22, depth: 0.22 },
+    { x: 0, y: 5.08, z: -8.56, width: MAGIC_SHOP.width, height: 0.18, depth: 0.22 },
+    { x: 0, y: 5.08, z: 8.56, width: MAGIC_SHOP.width, height: 0.18, depth: 0.22 },
+    { x: 11.95, y: 2.7, z: -2.85, width: 0.22, height: 5.4, depth: 0.22 },
+    { x: 11.95, y: 2.7, z: 2.85, width: 0.22, height: 5.4, depth: 0.22 },
+    { x: -11.95, y: 2.7, z: -2.85, width: 0.22, height: 5.4, depth: 0.22 },
+    { x: -11.95, y: 2.7, z: 2.85, width: 0.22, height: 5.4, depth: 0.22 }
+  ];
+
+  addInstancedBoxes(root, materials.arcaneWall, walls, "magic-shop-walls");
+  addInstancedBoxes(root, materials.darkTimber, timber, "magic-shop-wall-trim");
+  addBox(root, materials.portalDark, 12.43, 1.56, 0, 0.18, 3.12, 2.4);
+  addBox(root, materials.trimLight, 12.25, 3.12, 0, 0.18, 0.22, 3.45);
+  addBox(root, materials.trimLight, -12.25, 0.08, 0, 0.18, 0.16, MAGIC_SHOP.exitHalfZ * 2.05, { castShadow: false });
+}
+
+function addMagicShopShelves(root, materials) {
+  const wood = [];
+  const dark = [];
+  const scrolls = [];
+  const potionsByMaterial = new Map([
+    ["crystalBlue", []],
+    ["crystalViolet", []],
+    ["crystalGold", []]
+  ]);
+
+  for (const side of [-1, 1]) {
+    const z = side * 7.72;
+    for (const x of [-8.6, -4.4, -0.2, 4.0, 8.2]) {
+      wood.push({ x, y: 1.0, z, width: 3.35, height: 0.22, depth: 0.62 });
+      wood.push({ x, y: 1.84, z, width: 3.35, height: 0.18, depth: 0.56 });
+      wood.push({ x, y: 2.72, z, width: 3.35, height: 0.18, depth: 0.5 });
+      dark.push({ x: x - 1.52, y: 1.85, z, width: 0.12, height: 2.2, depth: 0.65 });
+      dark.push({ x: x + 1.52, y: 1.85, z, width: 0.12, height: 2.2, depth: 0.65 });
+      scrolls.push({ x: x - 0.75, y: 1.24, z: z - side * 0.14, width: 0.72, height: 0.16, depth: 0.16, rotationY: 0.08 * side });
+      scrolls.push({ x: x + 0.48, y: 2.05, z: z - side * 0.12, width: 0.58, height: 0.14, depth: 0.14, rotationY: -0.12 * side });
+      potionsByMaterial.get(x % 3 > 0 ? "crystalBlue" : side < 0 ? "crystalViolet" : "crystalGold").push({
+        x: x + 0.9,
+        y: 1.28,
+        z: z - side * 0.2,
+        scale: [0.09, 0.16, 0.09]
+      });
+      potionsByMaterial.get(x > 0 ? "crystalGold" : "crystalViolet").push({
+        x: x - 0.18,
+        y: 2.12,
+        z: z - side * 0.18,
+        scale: [0.08, 0.14, 0.08]
+      });
+    }
+  }
+
+  addInstancedBoxes(root, materials.timber, wood, "magic-shop-shelf-wood");
+  addInstancedBoxes(root, materials.darkTimber, dark, "magic-shop-shelf-posts");
+  addInstancedBoxes(root, materials.trimLight, scrolls, "magic-shop-scrolls");
+  for (const [materialKey, potions] of potionsByMaterial) {
+    addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), material(materials, materialKey), potions, `magic-shop-potions-${materialKey}`, {
+      castShadow: false,
+      receiveShadow: false
+    });
+  }
+}
+
+function addMagicShopDisplay(root, materials) {
+  addBox(root, materials.velvet, -0.7, 0.54, 3.55, 4.35, 0.42, 1.08);
+  addBox(root, materials.glassCase, -0.7, 1.05, 3.55, 4.15, 0.64, 0.92, { castShadow: false });
+  addBox(root, materials.trimLight, -2.15, 1.24, 3.08, 0.36, 0.08, 0.18, { castShadow: false });
+  addBox(root, materials.crystalGold, -0.55, 1.27, 3.08, 0.28, 0.08, 0.18, { castShadow: false });
+  addBox(root, materials.crystalBlue, 0.98, 1.23, 3.08, 0.32, 0.08, 0.18, { castShadow: false });
+
+  addBox(root, materials.darkTimber, 4.25, 0.58, -3.45, 4.2, 0.78, 1.28);
+  addBox(root, materials.timber, 4.25, 1.1, -3.45, 4.45, 0.22, 1.42);
+  addBox(root, materials.crystalViolet, 3.22, 1.34, -3.48, 0.22, 0.16, 0.22, { castShadow: false });
+  addBox(root, materials.crystalBlue, 4.18, 1.36, -3.38, 0.2, 0.18, 0.2, { castShadow: false });
+  addBox(root, materials.trimLight, 5.15, 1.32, -3.48, 0.72, 0.12, 0.16, { castShadow: false });
+
+  addBox(root, materials.darkTimber, -5.3, 0.52, -3.65, 2.35, 0.3, 1.16);
+  addBox(root, materials.timber, -5.3, 0.88, -3.65, 2.56, 0.16, 1.32);
+  addBox(root, materials.trimLight, -5.78, 1.08, -3.7, 0.78, 0.12, 0.18, { castShadow: false, rotationY: 0.15 });
+  addBox(root, materials.trimLight, -4.75, 1.08, -3.56, 0.72, 0.12, 0.18, { castShadow: false, rotationY: -0.18 });
+
+  addBox(root, materials.darkTimber, -6.8, 0.78, 4.75, 1.9, 1.56, 0.84);
+  addBox(root, materials.glassCase, -6.8, 1.52, 4.34, 1.65, 0.72, 0.12, { castShadow: false });
+}
+
+function addMagicShopCrystals(root, materials) {
+  const group = new THREE.Group();
+  root.add(group);
+
+  const specs = [
+    { x: -4.2, y: 4.25, z: -1.8, material: materials.crystalBlue, scale: 0.34 },
+    { x: -1.3, y: 4.75, z: 1.65, material: materials.crystalViolet, scale: 0.28 },
+    { x: 2.25, y: 3.05, z: 0.65, material: materials.crystalGold, scale: 0.42 },
+    { x: 5.2, y: 4.35, z: 1.0, material: materials.crystalBlue, scale: 0.3 }
+  ];
+
+  for (const spec of specs) {
+    const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(spec.scale, 0), spec.material);
+    crystal.position.set(spec.x, spec.y, spec.z);
+    crystal.userData.baseY = spec.y;
+    crystal.castShadow = false;
+    crystal.receiveShadow = false;
+    group.add(crystal);
+  }
+
+  const dais = new THREE.Mesh(new THREE.CylinderGeometry(0.64, 0.78, 0.34, 16), materials.darkStone);
+  dais.position.set(2.25, 0.17, 0.65);
+  dais.receiveShadow = true;
+  group.add(dais);
+
+  return group;
+}
+
+function addMagicShopRunes(root, materials) {
+  const group = new THREE.Group();
+  root.add(group);
+
+  const runes = [
+    { x: 11.84, y: 1.05, z: -1.4, width: 0.04, height: 0.62, depth: 0.12 },
+    { x: 11.84, y: 1.65, z: 1.32, width: 0.04, height: 0.62, depth: 0.12 },
+    { x: 11.84, y: 2.3, z: 0, width: 0.04, height: 0.12, depth: 0.72 },
+    { x: -11.84, y: 1.1, z: -1.25, width: 0.04, height: 0.5, depth: 0.12 },
+    { x: -11.84, y: 1.95, z: 1.25, width: 0.04, height: 0.5, depth: 0.12 }
+  ];
+
+  addInstancedBoxes(group, materials.runeGlow, runes, "magic-shop-runes", {
+    castShadow: false,
+    receiveShadow: false
+  });
+  return group;
+}
+
+function addMagicShopExitAffordances(root, materials) {
+  addTextBoard(root, "Market", {
+    x: -10.85,
+    y: 2.52,
+    z: -2.95,
+    width: 1.92,
+    height: 0.42,
+    subtitle: "West",
+    palette: "gold",
+    renderOrder: 10
+  });
+  addTextBoard(root, "Forge", {
+    x: 10.82,
+    y: 2.7,
+    z: 2.86,
+    width: 1.72,
+    height: 0.38,
+    subtitle: "East",
+    palette: "red",
+    renderOrder: 10
+  });
+  addExitThreshold(root, { x: MAGIC_SHOP.westExitX, z: 0, width: 1.1, depth: MAGIC_SHOP.exitHalfZ * 2, color: 0xf0c878, opacity: 0.18 });
+  addExitThreshold(root, { x: MAGIC_SHOP.eastExitX, z: 0, width: 1.1, depth: MAGIC_SHOP.exitHalfZ * 2, color: 0x8be8ff, opacity: 0.18 });
+}
+
+function addMagicShopEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const placements = {
+    "npc:enchantress": {
+      position: [3.55, 0, -1.1],
+      heading: -Math.PI / 2,
+      role: "Enchantress",
+      palette: "blue",
+      width: 1.65,
+      height: 3.02
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = placements[normalized.id] ?? {
+      position: [1.2 - index * 1.0, 0, 1.8 + index * 0.85],
+      heading: Math.PI,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 3,
+      width: placement.width ?? 1.68,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -2.2 + index * 0.9;
+    const z = index % 2 === 0 ? 3.5 : -2.8;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Emporium",
       prompt: `Inspect: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,

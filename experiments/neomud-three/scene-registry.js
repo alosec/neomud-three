@@ -3,6 +3,7 @@ import {
   buildForestEdgeRoom,
   buildForestPathRoom,
   buildGenericRoom,
+  buildMagicShopRoom,
   buildMarketRoom,
   buildNorthGateRoom,
   buildTavernRoom,
@@ -46,6 +47,15 @@ export function buildRoomScene(context) {
       ...context,
       worldRoot: WORLD_ROOT,
       npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:market"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "town:magic_shop") {
+    return buildMagicShopRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "town:magic_shop"),
       roomItems: serverItems
     });
   }
