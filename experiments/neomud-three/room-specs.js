@@ -156,9 +156,33 @@ export const TOWN_SQUARE_SPEC = {
     ]
   },
   exits: [
-    { direction: "NORTH", targetId: "town:gate", axis: "z", threshold: -20.45, min: -2.4, max: 2.4 },
-    { direction: "EAST", targetId: "town:market", axis: "x", threshold: 20.45, min: -2.4, max: 2.4 },
-    { direction: "SOUTH", targetId: "town:temple", axis: "z", threshold: 20.45, min: -2.4, max: 2.4 },
-    { direction: "WEST", targetId: "town:tavern", axis: "x", threshold: -20.45, min: -2.4, max: 2.4 }
+    {
+      id: "exit-north-gate",
+      direction: "NORTH",
+      targetId: "town:gate",
+      prompt: "Leave through the North Gate",
+      trigger: { type: "box", center: [0, 1, -20.95], size: [5.4, 3, 1.9] }
+    },
+    {
+      id: "exit-east-market",
+      direction: "EAST",
+      targetId: "town:market",
+      prompt: "Enter the Market Hall",
+      trigger: { type: "box", center: [20.95, 1, 0], size: [1.9, 3, 5.4] }
+    },
+    {
+      id: "exit-south-temple",
+      direction: "SOUTH",
+      targetId: "town:temple",
+      prompt: "Enter the Temple",
+      trigger: { type: "box", center: [0, 1, 20.95], size: [6.8, 3, 1.9] }
+    },
+    {
+      id: "exit-west-tavern",
+      direction: "WEST",
+      targetId: "town:tavern",
+      prompt: "Enter the Tavern",
+      trigger: { type: "box", center: [-20.95, 1, 0], size: [1.9, 3, 5.4] }
+    }
   ]
 };

@@ -68,21 +68,27 @@ async function main() {
     assert.match(await page.locator("#status-text").textContent(), /Kotlin server:/);
     await saveScreenshot(page, "server-temple.png");
 
-    await page.evaluate(() => window.__neomudThreeDebug.requestMove("NORTH"));
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -36.2, heading: 0 }));
+    await page.keyboard.down("w");
     await page.waitForFunction(
       () => window.__neomudThreeDebug.currentRoomId === "town:square",
       null,
       { timeout: 10_000 }
     );
+    await page.keyboard.up("w");
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Town Square");
+    const townTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(townTriggers.some((trigger) => trigger.id === "exit-south-temple"));
     await saveScreenshot(page, "server-town-square.png");
 
-    await page.evaluate(() => window.__neomudThreeDebug.requestMove("SOUTH"));
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));
+    await page.keyboard.down("w");
     await page.waitForFunction(
       () => window.__neomudThreeDebug.currentRoomId === "town:temple",
       null,
       { timeout: 10_000 }
     );
+    await page.keyboard.up("w");
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
 
     await page.keyboard.press("l");

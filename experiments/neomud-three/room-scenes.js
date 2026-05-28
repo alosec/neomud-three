@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
 import { TOWN_SQUARE_SPEC } from "./room-specs.js";
+import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
 import {
   addBackdrop as addComponentBackdrop,
   addBox,
@@ -21,14 +22,18 @@ const TEMPLE = {
   northZ: -38,
   wallHeight: 11.2,
   wallY: 5.6,
+  entryZ: -38,
+  entrySpawnZ: -28.8,
+  exitTriggerZ: -36.75,
+  altarZ: 18.6,
   doorHalfWidth: 2.0
 };
 
 export function buildTempleRoom({ root, worldRoot, onExit }) {
   const materials = makeTempleMaterials();
   const runtime = {
-    spawn: { position: new THREE.Vector3(0, 0, 18.5), heading: 0 },
-    status: "Cathedral-scale Temple: huge marble nave, vaulted stone shell, recessed Gothic stained glass, raised altar, north portal",
+    spawn: { position: new THREE.Vector3(0, 0, TEMPLE.entrySpawnZ), heading: Math.PI },
+    status: "Cathedral-scale Temple: north entry door, long marble nave, south altar, vaulted shell, stained glass, incense",
     environment: {
       background: 0x100c08,
       fog: 0x120d09,
@@ -36,7 +41,7 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
     },
     spawnFor(fromRoomId) {
       return fromRoomId === "town:square"
-        ? { position: new THREE.Vector3(0, 0, -35.1), heading: Math.PI }
+        ? { position: new THREE.Vector3(0, 0, TEMPLE.entrySpawnZ), heading: Math.PI }
         : this.spawn;
     },
     clamp(position) {
@@ -44,7 +49,7 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
       position.z = THREE.MathUtils.clamp(position.z, -36.9, 20.5);
     },
     exitAt(position) {
-      return position.z < -36.55 && Math.abs(position.x) < TEMPLE.doorHalfWidth ? "town:square" : null;
+      return position.z < TEMPLE.exitTriggerZ && Math.abs(position.x) < TEMPLE.doorHalfWidth ? "town:square" : null;
     },
     update(dt) {
       for (const smoke of smokePuffs) {
@@ -102,11 +107,16 @@ export function buildTownSquareRoom({ root, worldRoot, npcs }) {
       position.z = THREE.MathUtils.clamp(position.z, spec.size.clamp.minZ, spec.size.clamp.maxZ);
     },
     exitAt(position) {
-      return exitAtFromSpec(position, spec);
+      return exitForPosition(position, spec.exits)?.targetId ?? null;
+    },
+    debugTriggers() {
+      return triggerDebugInfo(spec.exits);
     },
     update(dt) {
-      fountain.water.rotation.z += dt * 0.25;
+      fountain.water.rotation.y += dt * 0.25;
       fountain.topBowl.rotation.y += dt * 0.2;
+      fountain.topWater.rotation.y -= dt * 0.28;
+      fountain.fallingWater.material.opacity = 0.3 + Math.sin(performance.now() * 0.006) * 0.08;
     }
   };
 }
@@ -366,28 +376,28 @@ function addArchedFrame(root, material, width, height, z, radius) {
 
 function addAltar(root, materials, smokePuffs) {
   const dais = new THREE.Mesh(new THREE.CylinderGeometry(5.4, 6.25, 0.44, 8), materials.trim);
-  dais.position.set(0, 0.22, -34.25);
+  dais.position.set(0, 0.22, TEMPLE.altarZ);
   dais.rotation.y = Math.PI / 8;
   dais.castShadow = true;
   dais.receiveShadow = true;
   root.add(dais);
 
   const altar = new THREE.Mesh(new THREE.BoxGeometry(4.1, 1.22, 1.35), materials.altar);
-  altar.position.set(0, 0.96, -35.1);
+  altar.position.set(0, 0.96, TEMPLE.altarZ + 0.35);
   altar.castShadow = true;
   altar.receiveShadow = true;
   root.add(altar);
 
   const cloth = new THREE.Mesh(new THREE.PlaneGeometry(4.45, 1.28), materials.altar);
-  cloth.position.set(0, 1.18, -34.38);
+  cloth.position.set(0, 1.18, TEMPLE.altarZ - 0.32);
   cloth.rotation.x = -0.02;
   root.add(cloth);
 
-  addIncense(root, smokePuffs, -2.72, -34.82);
-  addIncense(root, smokePuffs, 2.72, -34.82);
+  addIncense(root, smokePuffs, -2.72, TEMPLE.altarZ - 0.18);
+  addIncense(root, smokePuffs, 2.72, TEMPLE.altarZ - 0.18);
 
   const altarLight = new THREE.PointLight(0xffc979, 8.6, 12);
-  altarLight.position.set(0, 2.7, -34.6);
+  altarLight.position.set(0, 2.7, TEMPLE.altarZ);
   root.add(altarLight);
 }
 
@@ -440,7 +450,7 @@ function addNorthDoor(root, materials) {
 function addFloorRunes(root) {
   const material = new THREE.MeshBasicMaterial({ color: 0xffe6a6, transparent: true, opacity: 0.22, side: THREE.DoubleSide });
   const ring = new THREE.Mesh(new THREE.RingGeometry(2.4, 2.52, 128), material);
-  ring.position.set(0, 0.018, -12.5);
+  ring.position.set(0, 0.018, 8.2);
   ring.rotation.x = -Math.PI / 2;
   root.add(ring);
 }
@@ -538,19 +548,6 @@ function spawnFromSpec(spawn) {
   };
 }
 
-function exitAtFromSpec(position, spec) {
-  for (const exit of spec.exits) {
-    if (exit.axis === "z") {
-      const crossed = exit.threshold < 0 ? position.z < exit.threshold : position.z > exit.threshold;
-      if (crossed && position.x >= exit.min && position.x <= exit.max) return exit.targetId;
-    } else {
-      const crossed = exit.threshold < 0 ? position.x < exit.threshold : position.x > exit.threshold;
-      if (crossed && position.z >= exit.min && position.z <= exit.max) return exit.targetId;
-    }
-  }
-  return null;
-}
-
 function addTownSpecSurfaces(root, materials, spec) {
   for (const path of spec.surfaces.paths) {
     addSurfaceRect(root, material(materials, path.material), path);
@@ -561,30 +558,57 @@ function addTownSpecSurfaces(root, materials, spec) {
 }
 
 function addTownSpecFountain(root, materials, fountainSpec) {
-  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(1.95, fountainSpec.radius, 0.48, 56), materials.stone);
-  fountainBase.position.set(fountainSpec.x, 0.21, fountainSpec.z);
-  fountainBase.castShadow = true;
-  root.add(fountainBase);
+  const group = new THREE.Group();
+  group.position.set(fountainSpec.x, 0, fountainSpec.z);
+  root.add(group);
 
-  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.68, 1.68, 0.08, 56), materials.water);
-  water.position.set(fountainSpec.x, 0.52, fountainSpec.z);
-  root.add(water);
+  const apron = new THREE.Mesh(new THREE.CylinderGeometry(4.6, 4.9, 0.16, 12), materials.stone);
+  apron.position.y = 0.08;
+  apron.rotation.y = Math.PI / 12;
+  apron.receiveShadow = true;
+  group.add(apron);
+
+  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(2.25, 2.55, 0.54, 64), materials.stone);
+  fountainBase.position.y = 0.34;
+  fountainBase.castShadow = true;
+  fountainBase.receiveShadow = true;
+  group.add(fountainBase);
+
+  const innerBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.86, 0.2, 64), materials.darkStone);
+  innerBasin.position.y = 0.62;
+  innerBasin.receiveShadow = true;
+  group.add(innerBasin);
+
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.66, 1.66, 0.045, 64), materials.water);
+  water.position.y = 0.76;
+  group.add(water);
 
   const column = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 32), materials.stone);
-  column.position.set(fountainSpec.x, 1.1, fountainSpec.z);
+  column.position.y = 1.28;
   column.castShadow = true;
-  root.add(column);
+  group.add(column);
 
-  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.58, 0.18, 40), materials.stone);
-  topBowl.position.set(fountainSpec.x, 1.78, fountainSpec.z);
+  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.64, 0.24, 48), materials.stone);
+  topBowl.position.y = 1.96;
   topBowl.castShadow = true;
-  root.add(topBowl);
+  group.add(topBowl);
+
+  const topWater = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.035, 48), materials.water);
+  topWater.position.y = 2.1;
+  group.add(topWater);
+
+  const fallingWater = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.045, 0.065, 1.08, 18),
+    new THREE.MeshBasicMaterial({ color: 0xaee8ff, transparent: true, opacity: 0.38 })
+  );
+  fallingWater.position.y = 1.47;
+  group.add(fallingWater);
 
   const spray = new THREE.PointLight(0xaee8ff, 4.4, 10);
-  spray.position.set(fountainSpec.x, 2.1, fountainSpec.z);
-  root.add(spray);
+  spray.position.set(0, 2.1, 0);
+  group.add(spray);
 
-  return { water, topBowl };
+  return { water, topBowl, topWater, fallingWater };
 }
 
 function addTownSpecChunkRings(root, materials, spec) {

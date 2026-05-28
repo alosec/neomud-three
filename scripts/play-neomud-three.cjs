@@ -47,6 +47,11 @@ async function main() {
   const url = offline ? withParam(baseUrl, "offline", "1") : baseUrl;
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.__neomudThreeDebug?.render?.triangles > 0, null, { timeout: 20_000 });
+  await page.waitForFunction(
+    () => window.__neomudThreeDebug?.avatar?.loaded || window.__neomudThreeDebug?.avatar?.loadFailed,
+    null,
+    { timeout: 20_000 }
+  );
 
   if (roomId) {
     await routeToRoom(page, roomId);
@@ -64,6 +69,7 @@ async function main() {
     roomId: window.__neomudThreeDebug.currentRoomId,
     render: window.__neomudThreeDebug.render,
     player: window.__neomudThreeDebug.player,
+    avatar: window.__neomudThreeDebug.avatar,
     server: window.__neomudThreeDebug.server
   }));
 
@@ -116,6 +122,8 @@ async function driveWalk(page) {
   await page.keyboard.down("a");
   await page.waitForTimeout(300);
   await page.keyboard.up("a");
+  await page.keyboard.press("Space");
+  await page.waitForTimeout(850);
   if ((await page.locator("#game-panel.hidden").count()) === 0) {
     await page.keyboard.press("Escape");
   }

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T04:21:08.679Z",
+  "updated": "2026-05-28T05:18:24.935Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -127,10 +127,15 @@
           "id": 12,
           "body": "Added initial TOWN_SQUARE_SPEC authoring layer with surfaces, chunk rings, landmarks, props, spawns, and exit triggers so future layout changes are spec edits instead of raw mesh surgery.",
           "created": "2026-05-28T04:20:26Z"
+        },
+        {
+          "id": 23,
+          "body": "Town Square exits are now explicit RoomRenderSpec-style trigger volumes validated against the real room graph.",
+          "created": "2026-05-28T05:17:59Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T04:20:26Z"
+      "updated": "2026-05-28T05:17:59Z"
     },
     {
       "id": "neo-1fb2.5",
@@ -336,13 +341,193 @@
           "id": 13,
           "body": "Added scripts/play-neomud-three.cjs for headed Chrome/Canary real-time playtesting, including optional drive-and-close route plus QA screenshots and render/server/player snapshots.",
           "created": "2026-05-28T04:20:26Z"
+        },
+        {
+          "id": 24,
+          "body": "QA gates now include spec validation and server-backed physical trigger movement, not only debug requestMove.",
+          "created": "2026-05-28T05:17:59Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T04:20:26Z"
+      "updated": "2026-05-28T05:17:59Z"
+    },
+    {
+      "id": "neo-1fb2.12",
+      "project": "NeoMud",
+      "title": "Increase movement speed and add jump",
+      "description": "Make player locomotion feel more game-like: faster walk/run baseline, Space jump with gravity/landing, camera/player animation staying stable, and QA coverage through smoke plus headed playtest.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "movement",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 15,
+          "body": "Implemented faster walk/run tuning plus Space jump with gravity, landing state, air control, and debug player grounded/verticalVelocity fields. Offline smoke now asserts jump and landing.",
+          "created": "2026-05-28T04:41:08Z"
+        },
+        {
+          "id": 18,
+          "body": "Implemented faster walk/run, diagonal movement baseline, Space jump with gravity/landing, and smoke-test assertions.",
+          "created": "2026-05-28T05:17:16Z"
+        }
+      ],
+      "created": "2026-05-28T04:32:20Z",
+      "updated": "2026-05-28T05:17:16Z"
+    },
+    {
+      "id": "neo-1fb2.13",
+      "project": "NeoMud",
+      "title": "Reorient Temple cathedral layout",
+      "description": "Move altar to the south ceremonial end and make the town exit read as the opposite entry doorway. Update spawn/exit thresholds, altar lighting, incense, floor runes, and QA screenshots so the nave has coherent directionality.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "quality",
+        "temple"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 16,
+          "body": "Reoriented Temple nave: town entry/exit remains north, spawn faces down the nave, altar/incense/light moved to the south ceremonial end, and floor rune moved away from the doorway.",
+          "created": "2026-05-28T04:41:08Z"
+        },
+        {
+          "id": 19,
+          "body": "Temple spawn moved deeper into the nave, north exit separated from spawn, south altar retained as the destination end, and screenshots/tests pass.",
+          "created": "2026-05-28T05:17:47Z"
+        }
+      ],
+      "created": "2026-05-28T04:32:20Z",
+      "updated": "2026-05-28T05:17:47Z"
+    },
+    {
+      "id": "neo-1fb2.14",
+      "project": "NeoMud",
+      "title": "Upgrade player avatar visual quality",
+      "description": "Replace the capsule placeholder feel with a more beautiful readable fantasy avatar: richer silhouette, cape/armor details, head/hair/shoulders, weapon proportions, contact shadow, and animation hooks.",
+      "type": "task",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "avatar",
+        "neomud-three",
+        "quality"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 14,
+          "body": "Rebuilt avatar from capsule pawn into a richer handcrafted fantasy adventurer: armor, trim, cape, hair, sword, contact shadow, and animation hooks for stride/jump.",
+          "created": "2026-05-28T04:40:41Z"
+        },
+        {
+          "id": 21,
+          "body": "Soldier probe rejected. Active avatar is now Xbot/Mixamo-style skinned rig with AnimationMixer idle/walk/run; still placeholder art and needs a proper NeoMud-authored skinned adventurer.",
+          "created": "2026-05-28T05:17:47Z"
+        }
+      ],
+      "created": "2026-05-28T04:32:49Z",
+      "updated": "2026-05-28T05:17:47Z"
+    },
+    {
+      "id": "neo-1fb2.15",
+      "project": "NeoMud",
+      "title": "Fix Town Square fountain",
+      "description": "Make the fountain read as a real plaza feature instead of broken geometry: stable basin, centered water disk, column/bowl proportions, gentle water motion, collision-safe placement, and visual QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "quality",
+        "town"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 17,
+          "body": "Rebuilt fountain as grouped plaza object with apron, basin, centered water disk, column, upper bowl, falling-water hint, and gentler animation/light.",
+          "created": "2026-05-28T04:41:30Z"
+        },
+        {
+          "id": 20,
+          "body": "Fountain rebuilt as grouped basin/column/top bowl/water feature and verified by offline/headed screenshots.",
+          "created": "2026-05-28T05:17:47Z"
+        }
+      ],
+      "created": "2026-05-28T04:33:20Z",
+      "updated": "2026-05-28T05:17:47Z"
+    },
+    {
+      "id": "neo-1fb2.16",
+      "project": "NeoMud",
+      "title": "Replace Xbot placeholder with NeoMud-authored skinned adventurer rig",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "backlog",
+      "status_type": "backlog",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T05:17:47Z",
+      "updated": "2026-05-28T05:17:47Z"
+    },
+    {
+      "id": "neo-1fb2.17",
+      "project": "NeoMud",
+      "title": "Add spec validation and physical trigger tests for Town Square exits",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 22,
+          "body": "Implemented TOWN_SQUARE_SPEC physical trigger boxes, pure trigger validation, debug trigger metadata, offline physical transition test, and server-backed physical trigger movement.",
+          "created": "2026-05-28T05:17:59Z"
+        }
+      ],
+      "created": "2026-05-28T05:17:47Z",
+      "updated": "2026-05-28T05:17:59Z"
     }
   ],
   "ready": [
+    {
+      "id": "neo-1fb2.16",
+      "title": "Replace Xbot placeholder with NeoMud-authored skinned adventurer rig",
+      "priority": 2,
+      "project": "NeoMud",
+      "status": "backlog"
+    },
     {
       "id": "neo-1fb2",
       "title": "NeoMud Three practical reset",
@@ -360,6 +545,13 @@
     {
       "id": "neo-1fb2.11",
       "title": "Maintain repeatable QA gates",
+      "priority": 0,
+      "project": "NeoMud",
+      "status": "in-progress"
+    },
+    {
+      "id": "neo-1fb2.14",
+      "title": "Upgrade player avatar visual quality",
       "priority": 0,
       "project": "NeoMud",
       "status": "in-progress"

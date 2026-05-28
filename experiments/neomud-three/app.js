@@ -106,19 +106,25 @@ const playerProfile = {
 };
 
 const controls = {
-  turnRate: 2.35,
-  walkSpeed: 4.15,
-  runSpeed: 5.7,
+  turnRate: 2.55,
+  walkSpeed: 5.35,
+  runSpeed: 8.1,
   backpedalScale: 0.58,
   strafeScale: 0.78,
   mouseSensitivity: 0.0024,
   acceleration: 0.00018,
-  braking: 0.000035
+  braking: 0.000035,
+  jumpVelocity: 5.2,
+  gravity: 14.5,
+  maxAirControl: 0.55
 };
 
 const movement = {
   heading: 0,
   velocity: new THREE.Vector3(),
+  verticalVelocity: 0,
+  grounded: true,
+  jumpQueued: false,
   walkClock: 0,
   cameraTarget: new THREE.Vector3(0, 1.4, 0)
 };
@@ -135,7 +141,8 @@ const playableKeys = new Set([
   "ArrowDown",
   "ArrowRight",
   "ShiftLeft",
-  "ShiftRight"
+  "ShiftRight",
+  "Space"
 ]);
 
 const panelKeys = new Map([
@@ -447,6 +454,9 @@ function setRoom(roomId, options = {}) {
   player.position.y = 0;
   movement.heading = spawn.heading ?? roomRuntime.heading ?? movement.heading;
   movement.velocity.set(0, 0, 0);
+  movement.verticalVelocity = 0;
+  movement.grounded = true;
+  movement.jumpQueued = false;
   movement.walkClock = 0;
   player.rotation.set(0, -movement.heading, 0);
 
@@ -504,6 +514,7 @@ function handleKeyDown(event) {
 
   if (playableKeys.has(event.code) && !activePanel) {
     event.preventDefault();
+    if (event.code === "Space" && !keys.has("Space")) movement.jumpQueued = true;
     keys.add(event.code);
   }
 }
@@ -828,11 +839,24 @@ function updatePlayer(dt) {
 
   const hasMoveIntent = desired.lengthSq() > 0;
   const targetSpeed = running && forwardInput > 0 ? controls.runSpeed : controls.walkSpeed;
-  const blend = 1 - Math.pow(hasMoveIntent ? controls.acceleration : controls.braking, dt);
+  const airControl = movement.grounded ? 1 : controls.maxAirControl;
+  const blend = (1 - Math.pow(hasMoveIntent ? controls.acceleration : controls.braking, dt)) * airControl;
   movement.velocity.lerp(desired.multiplyScalar(targetSpeed), blend);
 
   const nextPosition = player.position.clone().addScaledVector(movement.velocity, dt);
-  nextPosition.y = 0;
+  const previousGroundY = Math.max(0, player.position.y);
+  if (movement.jumpQueued && movement.grounded) {
+    movement.verticalVelocity = controls.jumpVelocity;
+    movement.grounded = false;
+  }
+  movement.jumpQueued = false;
+  movement.verticalVelocity -= controls.gravity * dt;
+  nextPosition.y = Math.max(0, previousGroundY + movement.verticalVelocity * dt);
+  if (nextPosition.y <= 0) {
+    nextPosition.y = 0;
+    movement.verticalVelocity = 0;
+    movement.grounded = true;
+  }
   roomRuntime?.clamp?.(nextPosition);
   movement.velocity.x = nextPosition.x === player.position.x ? 0 : movement.velocity.x;
   movement.velocity.z = nextPosition.z === player.position.z ? 0 : movement.velocity.z;
@@ -840,7 +864,8 @@ function updatePlayer(dt) {
 
   const horizontalSpeed = movement.velocity.length();
   movement.walkClock += horizontalSpeed * dt * 4.4;
-  player.position.y = Math.sin(movement.walkClock) * Math.min(0.055, horizontalSpeed * 0.014);
+  const bob = movement.grounded ? Math.sin(movement.walkClock) * Math.min(0.05, horizontalSpeed * 0.01) : 0;
+  player.position.y += bob;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
   player.userData.animate?.({
@@ -848,11 +873,14 @@ function updatePlayer(dt) {
     forwardInput,
     strafeInput,
     turnInput,
+    running,
     speed: horizontalSpeed,
-    walkClock: movement.walkClock
+    walkClock: movement.walkClock,
+    grounded: movement.grounded,
+    verticalVelocity: movement.verticalVelocity
   });
 
-  const exit = roomRuntime?.exitAt?.(player.position);
+  const exit = movement.grounded ? roomRuntime?.exitAt?.(player.position) : null;
   if (exit && performance.now() > exitCooldownUntil) enterExitTarget(exit);
 }
 
@@ -900,11 +928,22 @@ function installDebugApi() {
         y: player.position.y,
         z: player.position.z,
         heading: movement.heading,
-        speed: movement.velocity.length()
+        speed: movement.velocity.length(),
+        grounded: movement.grounded,
+        verticalVelocity: movement.verticalVelocity
       };
     },
     get render() {
       return lastRenderStats;
+    },
+    get avatar() {
+      return player.userData.avatarInfo?.() ?? { loaded: false, loadFailed: true, activeAnimation: "missing" };
+    },
+    get room() {
+      return {
+        id: currentRoomId,
+        triggers: roomRuntime?.debugTriggers?.() ?? []
+      };
     },
     get server() {
       return {
@@ -927,6 +966,17 @@ function installDebugApi() {
     },
     requestMove(direction) {
       return requestMove(direction);
+    },
+    placePlayer({ x = player.position.x, y = 0, z = player.position.z, heading = movement.heading } = {}) {
+      player.position.set(x, y, z);
+      movement.heading = heading;
+      movement.velocity.set(0, 0, 0);
+      movement.verticalVelocity = 0;
+      movement.grounded = true;
+      movement.jumpQueued = false;
+      player.rotation.set(0, -movement.heading, 0);
+      updateCamera(1, true);
+      return this.player;
     },
     reconnectServer() {
       serverState.client?.close();

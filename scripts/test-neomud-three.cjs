@@ -37,6 +37,14 @@ async function main() {
       null,
       { timeout: 15_000 }
     );
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug?.avatar?.loaded || window.__neomudThreeDebug?.avatar?.loadFailed,
+      null,
+      { timeout: 15_000 }
+    );
+    const avatar = await page.evaluate(() => window.__neomudThreeDebug.avatar);
+    assert.equal(avatar.loaded, true, `expected avatar to initialize: ${JSON.stringify(avatar)}`);
+    assert.equal(avatar.model, "Xbot.glb");
 
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
     assert.match(await page.locator("#world-count").textContent(), /\d+ rooms/);
@@ -56,11 +64,19 @@ async function main() {
     await page.keyboard.down("Shift");
     await page.keyboard.down("w");
     await page.waitForTimeout(700);
+    const runningAvatar = await page.evaluate(() => window.__neomudThreeDebug.avatar);
+    assert.equal(runningAvatar.activeAnimation, "Run");
     await page.keyboard.up("w");
     await page.keyboard.up("Shift");
 
     const afterForward = await page.evaluate(() => window.__neomudThreeDebug.player);
-    assert.ok(afterForward.z < initial.z - 1.2, `expected forward movement, z ${initial.z} -> ${afterForward.z}`);
+    const headingForwardDelta =
+      Math.sin(initial.heading) * (afterForward.x - initial.x) +
+      -Math.cos(initial.heading) * (afterForward.z - initial.z);
+    assert.ok(
+      headingForwardDelta > 1.2,
+      `expected forward movement along heading, delta ${headingForwardDelta}, player ${JSON.stringify({ initial, afterForward })}`
+    );
 
     await page.keyboard.down("w");
     await page.keyboard.down("e");
@@ -74,10 +90,35 @@ async function main() {
       `expected diagonal/strafe movement, x ${afterForward.x} -> ${afterDiagonal.x}`
     );
 
+    await page.keyboard.press("Space");
+    await page.waitForTimeout(160);
+    const duringJump = await page.evaluate(() => window.__neomudThreeDebug.player);
+    assert.ok(duringJump.y > 0.15, `expected jump height > 0.15, got ${duringJump.y}`);
+    assert.equal(duringJump.grounded, false);
+    await page.waitForTimeout(650);
+    const afterJump = await page.evaluate(() => window.__neomudThreeDebug.player);
+    assert.equal(afterJump.grounded, true);
+    assert.ok(afterJump.y < 0.12, `expected landing near ground, got ${afterJump.y}`);
+
     await page.evaluate(() => window.__neomudThreeDebug.setRoom("town:square"));
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.currentRoomId), "town:square");
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Town Square");
+    const triggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      triggers.map((trigger) => trigger.direction).sort(),
+      ["EAST", "NORTH", "SOUTH", "WEST"]
+    );
     await saveScreenshot(page, "offline-town-square.png");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.2, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:temple",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
 
     const renderStats = await page.evaluate(() => window.__neomudThreeDebug.render);
     assert.ok(renderStats.calls > 0, `expected render calls, got ${JSON.stringify(renderStats)}`);

@@ -1,8 +1,17 @@
 # Rendering Best Practices
 
-Updated: 2026-05-27
+Updated: 2026-05-28
 
 This is the practical bar for moving NeoMud Three from a noisy prototype toward a legible game client.
+
+## Product Frame
+
+Treat NeoMud Three as a 3D client for a data-driven MUD, not as a second game simulation.
+
+- The Kotlin/JVM server owns gameplay authority: room, legal movement, NPCs, items, inventory, combat/dialogue events, map knowledge, and player state.
+- The Three client owns presentation: camera, input intent, room rendering, DOM overlays, audio cues, debug state, and physical affordances that route back to server commands.
+- A MUD room should become a compact theatrical stage/diorama with clear exits and interactables, not a square meter in an open-world terrain.
+- The immediate vertical slice remains Temple <-> Town Square <-> Tavern/Market/Gate affordances. Do not expand room count until this slice is readable, server-authoritative, and visually reviewed.
 
 ## Current Verdict
 
@@ -46,6 +55,26 @@ Research anchors:
 
 7. QA screenshots are not optional.
    Every visual pass should inspect Temple and Town Square in menu and play modes. If the screenshot looks like pasted art plus toy buildings, the pass failed.
+
+8. Greybox before assets.
+   Validate navigation, scale, sightlines, physical exits, camera, and server movement before generating or wiring more textures.
+
+9. Generated assets need a component target.
+   Good uses are tileable materials, transparent windows, banners, signs, NPC standees, item icons, and distant atmosphere. Avoid full-room pasted art and one-off decorative props before the layout works.
+
+10. Preserve the MUD UI soul.
+    Keep room text, command/combat log, dialogue, inventory, equipment, and debug/server state in DOM overlays for now. The 3D scene should answer where the player is, where they can go, and who/what is present.
+
+## Acceptance Rubric
+
+Score each room 0-2 before calling a visual pass successful:
+
+- Navigation readability: exits are clear within three seconds.
+- Scale believability: player, doors, props, and landmarks feel coherent.
+- Semantic match: the room visually matches the NeoMud description.
+- Interaction clarity: walkable/clickable/interactable affordances are obvious.
+- Server sync: server state remains authoritative when connected.
+- Performance: draw calls, triangles, textures, and materials stay budgeted.
 
 ## Immediate Design Reset
 
