@@ -2012,6 +2012,7 @@ function addTempleExteriorFacade(root, materials, exterior = {}) {
     addTempleExteriorWindow(root, materials, windowSpec);
   }
   if (exterior.roseWindow) addTempleRoseWindow(root, materials, exterior.roseWindow);
+  addTempleExteriorGlow(root, materials, exterior);
 
   const towerLookup = new Map((exterior.towers ?? []).map((tower) => [tower.x, tower]));
   for (const spire of exterior.spires ?? []) {
@@ -2024,6 +2025,36 @@ function addTempleExteriorFacade(root, materials, exterior = {}) {
     mesh.receiveShadow = true;
     root.add(mesh);
   }
+}
+
+function addTempleExteriorGlow(root, materials, exterior) {
+  const glowMaterial = materials.templeGlassGlow?.clone();
+  if (!glowMaterial) return;
+  glowMaterial.opacity = 0.09;
+
+  const glowPlanes = (exterior.windows ?? []).map((windowSpec) => ({
+    x: windowSpec.x,
+    y: windowSpec.y,
+    z: windowSpec.z - 0.16,
+    scale: [windowSpec.width * 1.12, windowSpec.height * 0.98, 1]
+  }));
+  if (exterior.roseWindow) {
+    glowPlanes.push({
+      x: exterior.roseWindow.x,
+      y: exterior.roseWindow.y,
+      z: exterior.roseWindow.z - 0.16,
+      scale: [exterior.roseWindow.radius * 1.76, exterior.roseWindow.radius * 1.76, 1]
+    });
+  }
+
+  addInstancedGeometry(
+    root,
+    new THREE.PlaneGeometry(1, 1),
+    glowMaterial,
+    glowPlanes,
+    "south-temple-window-glow",
+    { castShadow: false, receiveShadow: false }
+  );
 }
 
 function addTempleExteriorWindow(root, materials, spec) {

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T10:46:31.921Z",
+  "updated": "2026-05-28T10:54:36.223Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1469,6 +1469,23 @@
       "comments": [],
       "created": "2026-05-28T10:41:07Z",
       "updated": "2026-05-28T10:46:13Z"
+    },
+    {
+      "id": "neo-1fb2.57",
+      "project": "NeoMud",
+      "title": "Add low-cost south Temple glass glow pass",
+      "description": "Improve the Town Square south Temple exterior readability with approved emissive glass/glow planes only; preserve render budgets and existing Temple exit trigger.",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added subtle approved Temple glass glow planes, rejected doorway rectangle during screenshot QA, preserved budgets",
+      "labels": [],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T10:48:42Z",
+      "updated": "2026-05-28T10:54:21Z"
     }
   ],
   "ready": [

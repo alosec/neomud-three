@@ -241,3 +241,20 @@ Visual delta: added instanced banner planes on both towers plus instanced portal
 QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass after this change.
 
 Remaining visual gap: the gate is still a refined blockout. Further north-side work should use a real gate kit/stone trim component and probably requires reclaiming triangle budget elsewhere first.
+
+## Score After South Temple Glass Glow Pass
+
+- Navigation readability: 2/2. The south Temple remains readable from the south anchor, with subtler stained-glass/rose-window emphasis.
+- Scale believability: 1/2. The glow helps the facade read less flat, but the Temple exterior is still a blockout assembled from simple masses.
+- Semantic match: 2/2. The south side continues to read as the Temple of the Dawn rather than a generic exit.
+- Interaction clarity: 2/2. The Temple board, threshold, compass route, and physical South -> Temple trigger remain unchanged.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes after the glow pass.
+- Performance: 2/2. Latest full smoke Town Square budget reports 234 draw calls / 59,853 triangles / 19 textures / 158 geometries; fixed Town Square anchors report 138 calls / 55,931 triangles / 20 textures / 202 geometries.
+
+Total: 11/12
+
+Visual delta: added one instanced approved `templeGlassGlow` plane batch behind the Temple facade windows and rose window. A first doorway glow version was rejected during screenshot review because it produced an obvious flat rectangle over the entrance.
+
+QA delta: `node --check experiments/neomud-three/room-scenes.js`, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed movement all pass after this change.
+
+Remaining visual gap: this is the last reasonable additive Town Square pass before budget work. The next scene-quality step should reclaim calls/triangles through instancing or simplified geometry before adding more landmark detail.
