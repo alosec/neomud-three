@@ -20,7 +20,7 @@ It currently:
 - Uses transparent generated stained glass inside a physical window component.
 - Loads the vendored Three.js/Xbot GLTF as a hidden animation/reference asset, but renders a compact instanced low-poly fantasy adventurer as the visible player. This reclaims substantial triangle budget for the rooms; it is still not the final authored character model.
 - Starts a Blender-authored GLB pipeline under `assets/source/` and `assets/build/`; new substantial geometry should move through Blender source, exported GLB, and validation before runtime integration.
-- Shows Movement Gym debug geometry from parsed GLB metadata so collision, triggers, spawn points, pickups, enemy markers, paths, camera zones, and light markers can be reviewed without trusting hidden authoring meshes.
+- Provides `level-debug.js`, a reusable parsed-GLB debug renderer used by Movement Gym, so collision, triggers, spawn points, pickups, enemy markers, paths, camera zones, and light markers can be reviewed without trusting hidden authoring meshes.
 
 Art direction rules live in `ART_DIRECTION.md`.
 The graphics production rules live in `../../memory-bank/graphics-production-contract.md`.

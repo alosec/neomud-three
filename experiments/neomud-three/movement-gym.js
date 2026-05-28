@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { renderLevelDebugLayer } from "./level-debug.js";
 import { loadBlenderLevel } from "./level-loader.js";
 
 const MOVEMENT_GYM_URL = "./assets/build/levels/movement_gym.glb";
@@ -75,7 +76,7 @@ async function loadMovementGym() {
     loadedScene = gltfScene;
     configureLoadedScene(loadedScene);
     root.add(loadedScene);
-    debugSummary = addLevelDebugLayer(debugRoot, level);
+    debugSummary = renderLevelDebugLayer(debugRoot, level);
     levelSnapshot = serializeLevel(level);
   } catch (error) {
     loadError = error?.message ?? String(error);
@@ -107,88 +108,6 @@ function serializeLevel(level) {
     hiddenNodes: level.nodes.filter((node) => node.hiddenByParser).map((node) => node.name),
     renderNodes: level.byKind.visible.map((node) => node.name)
   };
-}
-
-function addLevelDebugLayer(targetRoot, level) {
-  targetRoot.clear();
-
-  const materials = {
-    collision: new THREE.MeshBasicMaterial({ color: 0x2459ff, wireframe: true, transparent: true, opacity: 0.42 }),
-    trigger: new THREE.MeshBasicMaterial({ color: 0xffbc32, transparent: true, opacity: 0.24, depthWrite: false }),
-    camera: new THREE.MeshBasicMaterial({ color: 0x9d76ff, wireframe: true, transparent: true, opacity: 0.46 }),
-    pickup: new THREE.MeshBasicMaterial({ color: 0x35f5ff }),
-    enemy: new THREE.MeshBasicMaterial({ color: 0xd93b32 }),
-    spawn: new THREE.MeshBasicMaterial({ color: 0x49f08a }),
-    light: new THREE.MeshBasicMaterial({ color: 0xfff08a }),
-    path: new THREE.LineBasicMaterial({ color: 0xf2f4a4 })
-  };
-
-  let colliders = 0;
-  for (const node of level.byKind.collision) {
-    addBoxDebug(targetRoot, node, materials.collision);
-    colliders += 1;
-  }
-  for (const node of level.byKind.trigger) {
-    addBoxDebug(targetRoot, node, materials.trigger);
-  }
-  for (const node of level.byKind.cameraZone) {
-    addBoxDebug(targetRoot, node, materials.camera);
-  }
-
-  const pickupMesh = addMarkerInstances(targetRoot, level.byKind.pickup, new THREE.OctahedronGeometry(0.22, 0), materials.pickup, 0.36);
-  const enemyMesh = addMarkerInstances(targetRoot, level.byKind.enemy, new THREE.ConeGeometry(0.36, 0.92, 6), materials.enemy, 0.78);
-  const spawnMesh = addMarkerInstances(targetRoot, level.byKind.spawn, new THREE.ConeGeometry(0.36, 0.9, 4), materials.spawn, 0.72);
-  const lightMesh = addMarkerInstances(targetRoot, level.byKind.light, new THREE.SphereGeometry(0.24, 10, 6), materials.light, 0.42);
-
-  for (const pathGroup of level.pathGroups) {
-    const points = pathGroup.nodes.map((node) => new THREE.Vector3(node.position.x, node.position.y + 0.35, node.position.z));
-    if (points.length > 1) {
-      const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), materials.path);
-      line.name = `debug-path-${pathGroup.id}`;
-      targetRoot.add(line);
-    }
-  }
-
-  return {
-    colliders,
-    triggers: level.byKind.trigger.length,
-    cameraZones: level.byKind.cameraZone.length,
-    pickups: pickupMesh?.count ?? 0,
-    enemies: enemyMesh?.count ?? 0,
-    spawns: spawnMesh?.count ?? 0,
-    lights: lightMesh?.count ?? 0,
-    paths: level.pathGroups.length,
-    objects: targetRoot.children.length
-  };
-}
-
-function addBoxDebug(targetRoot, node, material) {
-  const width = Math.max(node.size.x, 0.12);
-  const height = Math.max(node.size.y, 0.12);
-  const depth = Math.max(node.size.z, 0.12);
-  const box = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
-  box.name = `debug-${node.name}`;
-  box.position.set(node.position.x, node.position.y, node.position.z);
-  box.renderOrder = 8;
-  targetRoot.add(box);
-  return box;
-}
-
-function addMarkerInstances(targetRoot, nodes, geometry, material, yOffset) {
-  if (!nodes.length) return null;
-  const mesh = new THREE.InstancedMesh(geometry, material, nodes.length);
-  mesh.name = `debug-${nodes[0].kind}-markers`;
-  const dummy = new THREE.Object3D();
-  for (const [index, node] of nodes.entries()) {
-    dummy.position.set(node.position.x, node.position.y + yOffset, node.position.z);
-    dummy.rotation.y = (index / Math.max(1, nodes.length)) * Math.PI * 2;
-    dummy.updateMatrix();
-    mesh.setMatrixAt(index, dummy.matrix);
-  }
-  mesh.instanceMatrix.needsUpdate = true;
-  mesh.renderOrder = 9;
-  targetRoot.add(mesh);
-  return mesh;
 }
 
 function resize() {

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T20:29:35.257Z",
+  "updated": "2026-05-28T20:35:44.304Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2694,6 +2694,34 @@
       ],
       "created": "2026-05-28T20:25:48Z",
       "updated": "2026-05-28T20:29:21Z"
+    },
+    {
+      "id": "neo-1fb2.75.3",
+      "project": "NeoMud",
+      "title": "Extract reusable GLB level debug renderer",
+      "description": "Move Movement Gym parsed GLB debug drawing into a reusable module that can render collider boxes, triggers, camera zones, spawn, pickup, enemy, light markers, and path lines from LevelParser metadata. Update lab QA to assert the shared debug summary so future Blender-authored rooms can reuse the same inspection layer.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.75",
+      "close_reason": "completed",
+      "labels": [
+        "blender",
+        "debug",
+        "gltf",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 123,
+          "body": "Completed: extracted level-debug.js, Movement Gym now consumes it, and Chrome Canary lab QA asserts the shared parsed-GLB debug summary.",
+          "created": "2026-05-28T20:35:33Z"
+        }
+      ],
+      "created": "2026-05-28T20:32:02Z",
+      "updated": "2026-05-28T20:35:33Z"
     }
   ],
   "ready": [
