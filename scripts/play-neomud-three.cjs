@@ -17,6 +17,8 @@ const offline = args.has("--offline");
 const closeWhenDone = args.has("--close");
 const drive = args.has("--drive");
 const roomId = argValue("--room", null);
+const heading = argValue("--heading", null);
+const position = argValue("--position", null);
 const requestedChannel = argValue("--channel", process.env.NEOMUD_THREE_BROWSER_CHANNEL);
 const qaDir = argValue("--qa-dir", path.resolve(__dirname, "../experiments/neomud-three/qa/latest"));
 
@@ -56,6 +58,9 @@ async function main() {
 
   if (roomId) {
     await routeToRoom(page, roomId);
+  }
+  if (heading || position) {
+    await applyPlaytestPose(page, { heading, position });
   }
 
   await fs.mkdir(qaDir, { recursive: true });
@@ -174,6 +179,53 @@ async function routeToRoom(page, targetRoomId) {
   }
 
   await page.evaluate((target) => window.__neomudThreeDebug.setRoom(target), targetRoomId);
+}
+
+async function applyPlaytestPose(page, { heading: headingArg, position: positionArg }) {
+  const parsedHeading = parseHeading(headingArg);
+  const parsedPosition = parsePosition(positionArg);
+  await page.evaluate(
+    ({ parsedHeading: nextHeading, parsedPosition: nextPosition }) => {
+      window.__neomudThreeDebug.placePlayer({
+        ...(nextPosition ?? {}),
+        ...(Number.isFinite(nextHeading) ? { heading: nextHeading } : {})
+      });
+    },
+    { parsedHeading, parsedPosition }
+  );
+}
+
+function parseHeading(raw) {
+  if (!raw) return null;
+  const normalized = String(raw).trim().toLowerCase();
+  const named = {
+    north: 0,
+    n: 0,
+    east: Math.PI / 2,
+    e: Math.PI / 2,
+    south: Math.PI,
+    s: Math.PI,
+    west: -Math.PI / 2,
+    w: -Math.PI / 2
+  }[normalized];
+  if (named !== undefined) return named;
+  const numeric = Number(normalized);
+  if (!Number.isFinite(numeric)) throw new Error(`Invalid --heading=${raw}`);
+  return numeric;
+}
+
+function parsePosition(raw) {
+  if (!raw) return null;
+  const parts = String(raw).split(",").map((value) => Number(value.trim()));
+  if (parts.length !== 2 && parts.length !== 3) {
+    throw new Error("--position must be x,z or x,y,z");
+  }
+  if (parts.some((value) => !Number.isFinite(value))) {
+    throw new Error(`Invalid --position=${raw}`);
+  }
+  return parts.length === 2
+    ? { x: parts[0], z: parts[1] }
+    : { x: parts[0], y: parts[1], z: parts[2] };
 }
 
 async function screenshot(page, filename) {

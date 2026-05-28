@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T07:42:24.631Z",
+  "updated": "2026-05-28T08:05:10.420Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -763,6 +763,29 @@
       ],
       "created": "2026-05-28T07:41:13Z",
       "updated": "2026-05-28T07:41:50Z"
+    },
+    {
+      "id": "neo-1fb2.26",
+      "project": "NeoMud",
+      "title": "Fix missing Town Square Temple exterior",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "south Temple exterior implemented and QA passed",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 45,
+          "body": "Implemented south Temple as a primary exit landmark with cathedral-facade spec, visible towers/buttresses/door/windows, split south perimeter wall, shared box geometry caching, south-facing QA, offline smoke, and server-backed movement test.",
+          "created": "2026-05-28T08:03:19Z"
+        }
+      ],
+      "created": "2026-05-28T08:03:06Z",
+      "updated": "2026-05-28T08:03:32Z"
     }
   ],
   "ready": [

@@ -19,7 +19,7 @@ The current Town Square still tries too hard. The backdrop, cobbles, timber faca
 
 - North: a real gate/tunnel landmark.
 - East: a market hall with a few stalls.
-- South: the temple threshold.
+- South: the Temple exterior/facade, not just a threshold.
 - West: a larger tavern/bar entrance for `town:tavern`, with the barkeep/cellar loop treated as future interior gameplay.
 
 ## Source Guidance
@@ -64,6 +64,9 @@ Research anchors:
 
 10. Preserve the MUD UI soul.
     Keep room text, command/combat log, dialogue, inventory, equipment, and debug/server state in DOM overlays for now. The 3D scene should answer where the player is, where they can go, and who/what is present.
+
+11. Treat player art as a character asset, not an example-model slot.
+    The current Xbot rig is only an animation placeholder. A replacement needs source/license, rig/clip compatibility, scale/forward-axis notes, and fixed rear/side/running QA screenshots.
 
 ## Acceptance Rubric
 

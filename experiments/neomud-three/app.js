@@ -917,8 +917,11 @@ function render() {
 }
 
 function disposeObjectTree(root) {
+  const disposed = new Set();
   root.traverse((object) => {
-    object.geometry?.dispose?.();
+    if (!object.geometry || disposed.has(object.geometry)) return;
+    object.geometry.dispose?.();
+    disposed.add(object.geometry);
   });
 }
 
@@ -1051,6 +1054,7 @@ function installDebugApi() {
       return {
         id: currentRoomId,
         triggers: roomRuntime?.debugTriggers?.() ?? [],
+        landmarks: roomRuntime?.debugLandmarks?.() ?? [],
         entities: roomRuntime?.debugEntities?.() ?? [],
         nearbyInteractable: nearbyInteractable
           ? {

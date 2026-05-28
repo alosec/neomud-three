@@ -16,7 +16,7 @@ Playable Three.js lab:
 - By default, the lab connects to the Kotlin/JVM NeoMud server at `ws://127.0.0.1:8080/game`, logs in as an ephemeral guest, and treats `room_info` / `move_ok` as the authoritative room state.
 - `?offline=1` disables the server path and uses the static room graph fallback.
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
-- The player avatar now uses a vendored Three.js/Xbot GLTF skinned humanoid rig with `idle`, `walk`, and `run` clips driven by `AnimationMixer`. The earlier official Three.js `Soldier.glb` probe was rejected because it read as military; Xbot is still placeholder art, but it puts the runtime on the correct Mixamo-style skeletal animation architecture.
+- The player avatar uses a vendored Three.js/Xbot GLTF skinned humanoid rig with `idle`, `walk`, and `run` clips driven by `AnimationMixer`. This is an animation placeholder, not accepted player art. The earlier official Three.js `Soldier.glb` probe was rejected because it read as military, and the next character pass needs the graphics production contract instead of another random example model swap.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
 - HUD exit buttons, minimap movement, debug movement, and physical exit triggers now route through the same `move` command path when the server session is live.
 
@@ -40,6 +40,8 @@ Town Square status:
 - The latest staging pass reduces always-visible label clutter: NPC nameboards are no longer always rendered, the wayfinding signpost is moved out of the central view and made smaller, duplicate market/tavern building signs were removed, and Guildmaster/Old Wren received simple local staging props.
 - The latest material hierarchy pass adds deterministic procedural town materials for packed dirt, gravel roads, and plaza pavers; adds explicit plaza/stoop surfaces with shallow borders; and separates foreground plaza, routes, landmark thresholds, and background ground more clearly in screenshots.
 - The latest facade/palette pass removes the central signpost entirely, keeps wayfinding on the landmark boards/thresholds/compass, cools the plaza/road/ground material values, enlarges landmark roof silhouettes with a reusable gabled roof, adds tavern/market detail props, and trims lamps/dormers to keep Town Square under the current draw-call budget.
+- The south `town:temple` exit now has an authored Temple exterior instead of a token threshold: `south-temple-threshold` is a `primary-exit-landmark` with a `cathedral-facade` spec, broad steps, towers, buttresses, rose/stained-glass windows, and a physical doorway aligned to the existing trigger.
+- The component layer now caches shared box geometries while still disposing scene geometries on room teardown, which keeps route-to-route render budgets meaningful.
 - Server `npc_entered`, `npc_left`, and `room_items_update` messages now refresh the active room's entity layer when the renderer supports it. Room item markers are supported, though the current Town Square screenshots primarily exercise NPCs.
 - The fountain has been rebuilt as a grouped plaza feature with apron, basin, centered water, column, upper bowl, falling-water hint, and light.
 - The scene is more readable and less toy-like, but still not reconstructed as a convincing professional 3D place. Material hierarchy, authored player art, richer NPC staging, and chunked distant scenery remain active work.
@@ -66,7 +68,8 @@ Known rough edges:
 - The renderer is still prototype architecture, with room-specific scene builders instead of a general room/component system. The authority boundary and first spec/trigger contract are real, but the rendering system itself still needs a proper registry/component pass.
 - Collision is clamp/trigger based, not mesh or navmesh based.
 - The window alpha asset is useful, but the cathedral window component still needs better proportions, trim, and lighting direction.
-- Town Square still needs a disciplined art-direction pass: the latest pass helped, but the scene remains blockout-quality. Landmark forms need authored proportions, stronger material/style rules, richer side-specific detail, and NPC/dialogue staging that looks less like sprite standees.
+- Town Square still needs a disciplined art-direction pass: the latest pass fixed the missing south Temple landmark, but the scene remains blockout-quality. Landmark forms need authored proportions, stronger material/style rules, richer side-specific detail, and NPC/dialogue staging that looks less like sprite standees.
+- Player character art is explicitly unresolved. Xbot proves the animation/movement architecture but fails the desired fantasy identity and visual quality bar.
 - HTML-in-Canvas is not integrated into gameplay yet. The current lab uses normal DOM overlays plus Three.js.
 - Inventory catalog data and starter inventory are read from server messages, but combat, interaction prompts, dialogue, and multiplayer presence are not yet expressed as convincing in-world 3D affordances.
 
@@ -79,7 +82,7 @@ Test status:
 - If the server-backed test times out on auth with `Too many guest sessions`, restart the local `com.neomud.server.ApplicationKt` process and rerun the test; this is local session saturation rather than a renderer failure.
 - `scripts/validate-neomud-three-specs.mjs` checks that the authored Town Square render spec has physical trigger boxes and that every visual exit maps to the real NeoMud room graph.
 - `scripts/play-neomud-three.cjs` launches a headed Chrome/Canary playtest session for real-time QA. It can leave the browser open for manual walking or run a short drive-and-close route with screenshots.
-- Latest headed Town Square QA after the render-budget gate reports 158 draw calls, 54,736 triangles, 19 textures, 222 geometries, no console errors, no failed requests, and a passing budget report.
+- Latest headed south-facing Town Square QA after the Temple exterior pass reports 105 draw calls, 50,754 triangles, 19 textures, 157 geometries, no console errors, no failed requests, and a passing budget report.
 - Latest headed Tavern QA reports 57 draw calls, 50,900 triangles, 10 textures, 72 geometries, no console errors, no failed requests, and a passing budget report.
 - The render-budget work also fixed a room-transition geometry disposal leak: routed headed Town Square playtest previously retained 498 geometries after switching from Temple; after disposing old room/entity geometry it retains 222.
 - Both browser tests write QA screenshots into ignored `experiments/neomud-three/qa/latest/`.

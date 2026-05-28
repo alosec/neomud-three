@@ -87,13 +87,14 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
   const spec = TOWN_SQUARE_SPEC;
   const entityLayer = new THREE.Group();
   const interactables = [];
+  const landmarkDebug = [];
 
   addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
   addTownSpecSurfaces(root, materials, spec);
   const fountain = addTownSpecFountain(root, materials, spec.features.fountain);
   addTownSpecSignpost(root, materials, spec.features.signpost);
   addTownSpecChunkRings(root, materials, spec);
-  addTownSpecLandmarks(root, materials, spec);
+  addTownSpecLandmarks(root, materials, spec, landmarkDebug);
   addTownSpecExitAffordances(root, spec);
   addTownSpecProps(root, materials, spec);
   root.add(entityLayer);
@@ -135,6 +136,9 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
         x: entity.position.x,
         z: entity.position.z
       }));
+    },
+    debugLandmarks() {
+      return landmarkDebug;
     },
     nearestInteractable(position, maxDistance = 2.6) {
       let nearest = null;
@@ -871,8 +875,11 @@ function material(materials, key) {
 }
 
 function disposeObjectTree(root) {
+  const disposed = new Set();
   root.traverse((object) => {
-    object.geometry?.dispose?.();
+    if (!object.geometry || disposed.has(object.geometry)) return;
+    object.geometry.dispose?.();
+    disposed.add(object.geometry);
   });
 }
 
@@ -1008,8 +1015,17 @@ function addTownSpecChunkRings(root, materials, spec) {
   }
 }
 
-function addTownSpecLandmarks(root, materials, spec) {
+function addTownSpecLandmarks(root, materials, spec, debug = []) {
   for (const landmark of spec.landmarks) {
+    debug.push({
+      id: landmark.id,
+      kind: landmark.kind,
+      name: landmark.name,
+      targetId: landmark.targetId,
+      direction: landmark.direction,
+      visualRole: landmark.visualRole ?? (landmark.kind === "gatehouse" || landmark.kind === "tavern" || landmark.kind === "market-hall" ? "exit-landmark" : "landmark"),
+      visualKind: landmark.exterior?.visualKind ?? landmark.kind
+    });
     if (landmark.kind === "gatehouse") addGatehouseLandmark(root, materials, landmark);
     if (landmark.kind === "market-hall") addMarketLandmark(root, materials, landmark);
     if (landmark.kind === "temple-threshold") addTempleThresholdLandmark(root, materials, landmark);
@@ -1293,19 +1309,157 @@ function addMarketDetailProps(root, materials) {
 
 function addTempleThresholdLandmark(root, materials, landmark) {
   const group = new THREE.Group();
-  group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  group.userData = {
+    landmarkId: landmark.id,
+    targetId: landmark.targetId,
+    label: landmark.name,
+    visualRole: landmark.visualRole,
+    visualKind: landmark.exterior?.visualKind ?? landmark.kind
+  };
   root.add(group);
+
   for (const step of landmark.steps) {
     addBox(group, materials.stone, step.x, step.y, step.z, step.width, step.height, step.depth);
   }
-  addBox(group, materials.sign, 0, 1.35, 20.0, 3.1, 0.22, 0.22);
+  addBox(group, materials.plazaStone, 0, 0.07, 21.2, 11.5, 0.12, 3.25, { castShadow: false });
   for (const column of landmark.columns) {
-    addBox(group, materials.stone, column.x, 1.85, column.z, 0.42, 3.7, 0.42);
-    addBox(group, materials.stone, column.x, 3.88, column.z, 0.82, 0.32, 0.82);
+    addBox(group, materials.stone, column.x, 1.88, column.z, 0.56, 3.76, 0.56);
+    addBox(group, materials.stone, column.x, 3.96, column.z, 0.94, 0.34, 0.94);
   }
-  addBox(group, materials.stone, 0, 3.78, 20.55, 9.1, 0.42, 0.52);
-  addBox(group, materials.portalDark, 0, 1.88, 21.02, 5.4, 3.45, 0.32);
-  addPortalFrame(root, materials, portalFrameSpec(landmark));
+  addBox(group, materials.stone, 0, 3.85, 20.55, 9.8, 0.46, 0.58);
+  addTempleExteriorFacade(group, materials, landmark.exterior);
+}
+
+function addTempleExteriorFacade(root, materials, exterior = {}) {
+  const facade = exterior.facade ?? { x: 0, y: 3.7, z: 23.25, width: 15.2, height: 7.4, depth: 1.1 };
+  const frontZ = facade.z - facade.depth / 2 - 0.045;
+
+  addBox(root, materials.stone, facade.x, facade.y, facade.z, facade.width, facade.height, facade.depth);
+  addBox(root, materials.darkStone, facade.x, 0.62, frontZ + 0.1, facade.width + 0.7, 0.58, 0.44);
+  addBox(root, materials.trimLight, facade.x, facade.height - 0.28, frontZ, facade.width + 0.5, 0.34, 0.34);
+
+  for (const aisle of exterior.sideAisles ?? []) {
+    addBox(root, materials.stone, aisle.x, aisle.y, aisle.z, aisle.width, aisle.height, aisle.depth);
+    addBox(root, materials.roof, aisle.x, aisle.height + 0.28, aisle.z, aisle.width + 0.55, 0.56, aisle.depth + 0.55);
+  }
+
+  for (const tower of exterior.towers ?? []) {
+    addBox(root, materials.stone, tower.x, tower.y, tower.z, tower.width, tower.height, tower.depth);
+    addBox(root, materials.darkStone, tower.x, 0.62, frontZ, tower.width + 0.35, 0.56, 0.48);
+    addBox(root, materials.trimLight, tower.x, tower.height - 0.45, frontZ, tower.width + 0.4, 0.28, 0.32);
+  }
+
+  for (const buttress of exterior.buttresses ?? []) {
+    addBox(root, materials.darkStone, buttress.x, buttress.y, buttress.z, buttress.width, buttress.height, buttress.depth);
+    addBox(root, materials.trimLight, buttress.x, buttress.height + 0.13, buttress.z - 0.1, buttress.width + 0.22, 0.26, buttress.depth + 0.18);
+  }
+
+  const door = exterior.door ?? { x: 0, y: 2.1, z: frontZ, width: 4.8, height: 4.2, depth: 0.32 };
+  addBox(root, materials.portalDark, door.x, door.y, door.z, door.width, door.height, door.depth);
+  addBox(root, materials.darkStone, door.x - door.width / 2 - 0.24, door.y, door.z - 0.04, 0.34, door.height + 0.35, 0.38);
+  addBox(root, materials.darkStone, door.x + door.width / 2 + 0.24, door.y, door.z - 0.04, 0.34, door.height + 0.35, 0.38);
+  addBox(root, materials.trimLight, door.x, door.y + door.height / 2 + 0.12, door.z - 0.04, door.width + 0.82, 0.32, 0.4);
+
+  const pediment = exterior.pediment;
+  if (pediment) {
+    addTriangularPediment(root, materials.stone, pediment);
+    addBox(root, materials.trimLight, pediment.x, pediment.y + 0.16, pediment.z - pediment.depth / 2 - 0.04, pediment.width + 0.45, 0.24, 0.28);
+  }
+
+  for (const windowSpec of exterior.windows ?? []) {
+    addTempleExteriorWindow(root, materials, windowSpec);
+  }
+  if (exterior.roseWindow) addTempleRoseWindow(root, materials, exterior.roseWindow);
+
+  const towerLookup = new Map((exterior.towers ?? []).map((tower) => [tower.x, tower]));
+  for (const spire of exterior.spires ?? []) {
+    const tower = towerLookup.get(spire.x);
+    const towerTop = tower ? tower.y + tower.height / 2 : facade.y + facade.height / 2;
+    const mesh = new THREE.Mesh(new THREE.ConeGeometry(spire.radius, spire.height, 4), materials.roof);
+    mesh.position.set(spire.x, towerTop + spire.height / 2, spire.z);
+    mesh.rotation.y = Math.PI / 4;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    root.add(mesh);
+  }
+}
+
+function addTempleExteriorWindow(root, materials, spec) {
+  const material = materials.templeGlass ?? materials.windowDark;
+  const frameZ = spec.z - 0.05;
+  addBox(root, materials.trimLight, spec.x, spec.y, frameZ + 0.02, spec.width + 0.28, spec.height + 0.28, 0.12);
+  addBox(root, materials.darkStone, spec.x, spec.y, frameZ + 0.03, spec.width + 0.08, spec.height + 0.08, 0.1);
+
+  const glass = new THREE.Mesh(archedWindowGeometry(spec.width, spec.height, 24), material);
+  glass.position.set(spec.x, spec.y - spec.height / 2, frameZ - 0.04);
+  glass.castShadow = false;
+  glass.receiveShadow = false;
+  glass.renderOrder = 5;
+  root.add(glass);
+
+  addBox(root, materials.trimLight, spec.x, spec.y, frameZ - 0.09, 0.07, spec.height * 0.72, 0.08);
+  addBox(root, materials.trimLight, spec.x, spec.y - spec.height * 0.02, frameZ - 0.1, spec.width * 0.72, 0.055, 0.08);
+}
+
+function addTempleRoseWindow(root, materials, spec) {
+  const frameMaterial = cloneDoubleSideMaterial(materials.trimLight);
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(spec.radius * 0.86, 48), materials.templeGlass ?? materials.windowDark);
+  glass.position.set(spec.x, spec.y, spec.z - 0.08);
+  glass.renderOrder = 5;
+  root.add(glass);
+
+  const ring = new THREE.Mesh(new THREE.RingGeometry(spec.radius * 0.92, spec.radius * 1.08, 64), frameMaterial);
+  ring.position.set(spec.x, spec.y, spec.z - 0.1);
+  ring.renderOrder = 6;
+  root.add(ring);
+
+  for (let index = 0; index < 8; index++) {
+    const spoke = addBox(root, frameMaterial, spec.x, spec.y, spec.z - 0.12, spec.radius * 1.75, 0.05, 0.055);
+    spoke.rotation.z = (Math.PI * index) / 8;
+  }
+}
+
+function addTriangularPediment(root, material, spec) {
+  const mesh = new THREE.Mesh(createTriangularPrismGeometry(spec.width, spec.height, spec.depth), material);
+  mesh.position.set(spec.x, spec.y, spec.z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  root.add(mesh);
+  return mesh;
+}
+
+function createTriangularPrismGeometry(width, height, depth) {
+  const halfWidth = width / 2;
+  const halfDepth = depth / 2;
+  const vertices = new Float32Array([
+    -halfWidth, 0, halfDepth,
+    halfWidth, 0, halfDepth,
+    0, height, halfDepth,
+    -halfWidth, 0, -halfDepth,
+    halfWidth, 0, -halfDepth,
+    0, height, -halfDepth
+  ]);
+  const indices = [
+    0, 1, 2,
+    5, 4, 3,
+    0, 3, 4,
+    0, 4, 1,
+    0, 2, 5,
+    0, 5, 3,
+    1, 4, 5,
+    1, 5, 2
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function cloneDoubleSideMaterial(material) {
+  const clone = material.clone();
+  clone.side = THREE.DoubleSide;
+  return clone;
 }
 
 function addTavernLandmark(root, materials, landmark) {

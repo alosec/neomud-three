@@ -124,3 +124,20 @@ Remaining visual gap: this is a cleaner prototype, not a professional scene. The
 - Room transition geometry disposal was fixed during this pass; routed headed Town Square playtest dropped retained geometries from 498 to 222.
 
 QA delta: future visual passes now fail automatically when they exceed the current render budget. The next renderer-quality task should reduce geometry count through geometry reuse/instancing instead of raising these budgets.
+
+## Score After South Temple Exterior Pass
+
+- Navigation readability: 2/2. Turning south from Town Square now shows a real Temple/cathedral exterior with broad steps, towers, buttresses, doorway, stained-glass windows, and an aligned trigger.
+- Scale believability: 1/2. The Temple is now a believable major landmark in size, but the architectural detailing and materials are still blockout-grade.
+- Semantic match: 2/2. The south side now reads as the Temple of the Dawn rather than an empty edge with a token portal.
+- Interaction clarity: 2/2. The existing physical South -> Temple movement still passes offline and server-backed tests.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple still passes.
+- Performance: 2/2. South-facing headed Town Square QA reports 105 draw calls, 50,754 triangles, 19 textures, and 157 geometries.
+
+Total: 11/12
+
+Visual delta: replaced the minimal south threshold with an authored `cathedral-facade` exterior spec and moved the Temple label off the main rose-window/door axis. Split the south perimeter wall so it no longer cuts straight behind the Temple facade.
+
+Renderer delta: shared box geometries are cached at the component layer and disposed once per room teardown, reducing geometry count without retaining stale room geometry across transitions.
+
+Remaining visual gap: this fixes the "there is no Temple" failure, but it is still not production art. The next graphics task should not add more random decoration; it should define and execute the same spec-first contract for player character art and for each named landmark.

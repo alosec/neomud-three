@@ -13,6 +13,7 @@ Useful entries:
 
 - `current-state.md`: what exists now, what is running, and what is rough.
 - `architecture.md`: how the Three.js client now slots into the Kotlin server.
+- `graphics-production-contract.md`: rules for room/landmark/player asset production before more visual work.
 - `methodical-workflow.md`: QA and design gates for future renderer work.
 - `rendering-best-practices.md`: practical Three.js/WebGL and visual hierarchy rules for the next renderer passes.
 - `practical-reset-sketch.md`: high-level reset sketch for turning the lab into a real Three.js client.

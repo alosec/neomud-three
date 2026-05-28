@@ -2,15 +2,27 @@ import * as THREE from "three";
 import { texture } from "../render-assets.js";
 
 const textTextureCache = new Map();
+const boxGeometryCache = new Map();
 
 export function addBox(root, material, x, y, z, width, height, depth, options = {}) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+  const mesh = new THREE.Mesh(boxGeometry(width, height, depth), material);
   mesh.position.set(x, y, z);
   mesh.rotation.set(options.rotationX ?? 0, options.rotationY ?? 0, options.rotationZ ?? 0);
   mesh.castShadow = options.castShadow ?? true;
   mesh.receiveShadow = options.receiveShadow ?? true;
   root.add(mesh);
   return mesh;
+}
+
+function boxGeometry(width, height, depth) {
+  const key = `${width}:${height}:${depth}`;
+  let geometry = boxGeometryCache.get(key);
+  if (!geometry) {
+    geometry = new THREE.BoxGeometry(width, height, depth);
+    geometry.userData.shared = true;
+    boxGeometryCache.set(key, geometry);
+  }
+  return geometry;
 }
 
 export function addSurfaceRect(root, material, spec) {

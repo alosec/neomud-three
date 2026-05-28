@@ -205,6 +205,8 @@ export function makeTempleMaterials() {
 }
 
 export function makeTownMaterials() {
+  const templeGlassMap = texture("templeStainedGlassAlpha");
+
   return {
     cobble: standardMaterial({ map: texture("millhavenCobblestone", [3.7, 3.7]), color: 0xb9a77e, roughness: 0.9, metalness: 0.02 }),
     road: standardMaterial({ map: roadTexture(), color: 0xc6c2b6, roughness: 0.94 }),
@@ -228,6 +230,24 @@ export function makeTownMaterials() {
     awningBlue: standardMaterial({ color: 0x385d7a, roughness: 0.76 }),
     awningGold: standardMaterial({ color: 0xb68537, roughness: 0.78 }),
     sign: standardMaterial({ color: 0xd2ad62, roughness: 0.58, metalness: 0.04 }),
-    portalDark: standardMaterial({ color: 0x362313, emissive: 0x160e08, emissiveIntensity: 0.5, roughness: 0.72 })
+    portalDark: standardMaterial({ color: 0x362313, emissive: 0x160e08, emissiveIntensity: 0.5, roughness: 0.72 }),
+    templeGlass: standardMaterial({
+      map: templeGlassMap,
+      emissiveMap: templeGlassMap,
+      emissive: 0xffd68a,
+      emissiveIntensity: 0.85,
+      transparent: true,
+      alphaTest: 0.04,
+      depthWrite: false,
+      roughness: 0.25,
+      side: THREE.DoubleSide
+    }),
+    templeGlassGlow: new THREE.MeshBasicMaterial({
+      color: 0xffd890,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    })
   };
 }

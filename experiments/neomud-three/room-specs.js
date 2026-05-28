@@ -63,7 +63,8 @@ export const TOWN_SQUARE_SPEC = {
       material: "stone",
       runs: [
         { x: 0, z: -25.1, width: 34, height: 1.25, depth: 0.8 },
-        { x: 0, z: 25.1, width: 34, height: 1.25, depth: 0.8 },
+        { x: -20.2, z: 25.1, width: 9.6, height: 1.25, depth: 0.8 },
+        { x: 20.2, z: 25.1, width: 9.6, height: 1.25, depth: 0.8 },
         { x: -25.1, z: 0, width: 0.8, height: 1.25, depth: 34 },
         { x: 25.1, z: 0, width: 0.8, height: 1.25, depth: 34 }
       ]
@@ -119,6 +120,7 @@ export const TOWN_SQUARE_SPEC = {
       name: "Temple Threshold",
       targetId: "town:temple",
       direction: "SOUTH",
+      visualRole: "primary-exit-landmark",
       steps: [
         { x: 0, y: 0.16, z: 18.85, width: 9.8, height: 0.32, depth: 1.48 },
         { x: 0, y: 0.36, z: 19.9, width: 7.2, height: 0.28, depth: 1.18 }
@@ -126,7 +128,38 @@ export const TOWN_SQUARE_SPEC = {
       columns: [
         { x: -4.15, z: 20.55 },
         { x: 4.15, z: 20.55 }
-      ]
+      ],
+      exterior: {
+        visualKind: "cathedral-facade",
+        facade: { x: 0, y: 3.75, z: 23.25, width: 15.8, height: 7.5, depth: 1.15 },
+        sideAisles: [
+          { x: -5.45, y: 2.75, z: 23.6, width: 3.6, height: 5.5, depth: 2.2 },
+          { x: 5.45, y: 2.75, z: 23.6, width: 3.6, height: 5.5, depth: 2.2 }
+        ],
+        towers: [
+          { x: -7.3, y: 4.65, z: 23.25, width: 2.65, height: 9.3, depth: 2.35 },
+          { x: 7.3, y: 4.65, z: 23.25, width: 2.65, height: 9.3, depth: 2.35 }
+        ],
+        buttresses: [
+          { x: -4.2, y: 3.1, z: 22.35, width: 0.58, height: 6.2, depth: 1.18 },
+          { x: 4.2, y: 3.1, z: 22.35, width: 0.58, height: 6.2, depth: 1.18 },
+          { x: -6.08, y: 3.4, z: 22.25, width: 0.52, height: 6.8, depth: 1.08 },
+          { x: 6.08, y: 3.4, z: 22.25, width: 0.52, height: 6.8, depth: 1.08 }
+        ],
+        door: { x: 0, y: 2.12, z: 22.58, width: 4.9, height: 4.25, depth: 0.32 },
+        pediment: { x: 0, y: 7.42, z: 22.92, width: 10.2, height: 2.05, depth: 0.95 },
+        roseWindow: { x: 0, y: 6.05, z: 22.5, radius: 1.03 },
+        windows: [
+          { x: -3.0, y: 4.65, z: 22.48, width: 1.05, height: 2.35 },
+          { x: 3.0, y: 4.65, z: 22.48, width: 1.05, height: 2.35 },
+          { x: -7.3, y: 5.65, z: 22.4, width: 0.72, height: 2.45 },
+          { x: 7.3, y: 5.65, z: 22.4, width: 0.72, height: 2.45 }
+        ],
+        spires: [
+          { x: -7.3, z: 23.25, radius: 1.08, height: 2.2 },
+          { x: 7.3, z: 23.25, radius: 1.08, height: 2.2 }
+        ]
+      }
     },
     {
       id: "west-tavern",
@@ -229,7 +262,7 @@ export const TOWN_SQUARE_SPEC = {
         label: "Temple",
         subtitle: "Dawn Sanctuary",
         palette: "gold",
-        board: { center: [0, 5.15, 22.35], size: [4.4, 0.92] },
+        board: { center: [-5.8, 2.35, 20.85], size: [3.15, 0.68] },
         threshold: { center: [0, 0.05, 20.35], size: [8.4, 1.35], color: 0xf0c878 }
       }
     },

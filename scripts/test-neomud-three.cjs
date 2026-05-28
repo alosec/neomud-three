@@ -113,6 +113,16 @@ async function main() {
       ["EAST", "NORTH", "SOUTH", "WEST"]
     );
     assert.ok(triggers.every((trigger) => trigger.prompt && trigger.affordance?.label && trigger.affordance?.board));
+    const landmarks = await page.evaluate(() => window.__neomudThreeDebug.room.landmarks);
+    assert.ok(
+      landmarks.some(
+        (landmark) =>
+          landmark.id === "south-temple-threshold" &&
+          landmark.visualRole === "primary-exit-landmark" &&
+          landmark.visualKind === "cathedral-facade"
+      ),
+      `expected south Temple landmark to render as a cathedral facade, got ${JSON.stringify(landmarks)}`
+    );
     const entities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
     assert.ok(
       entities.some((entity) => entity.id === "npc:guildmaster" && entity.kind === "npc"),
