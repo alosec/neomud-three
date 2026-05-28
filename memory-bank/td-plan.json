@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T12:59:05.973Z",
+  "updated": "2026-05-28T13:06:53.362Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1692,6 +1692,28 @@
       "comments": [],
       "created": "2026-05-28T12:55:18Z",
       "updated": "2026-05-28T12:58:52Z"
+    },
+    {
+      "id": "neo-6df0",
+      "project": "NeoMud",
+      "title": "Add north gate trim kit",
+      "description": "Create a reusable Prop Zoo gate trim sample and apply an instanced architectural trim/portcullis/stone cap pass to the Town Square North Gate. Preserve route readability and current budgets; rerun lab, smoke, screenshots, and server traversal.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: added Prop Zoo gate trim sample, batched north gate battlements, added caps/arrow-slits/portcullis, and passed lab/smoke/screenshot/server QA",
+      "labels": [
+        "neomud-three",
+        "prop-zoo",
+        "qa",
+        "town-square"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T13:01:10Z",
+      "updated": "2026-05-28T13:06:41Z"
     }
   ],
   "ready": [

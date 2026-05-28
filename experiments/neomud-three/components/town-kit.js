@@ -36,6 +36,7 @@ export const TOWN_KIT_PROPS = [
   { id: "lantern.post", label: "Post Lantern", category: "lighting" },
   { id: "altar.temple", label: "Temple Altar", category: "landmark" },
   { id: "gatehouse", label: "Gatehouse", category: "landmark" },
+  { id: "gate.trim.stone", label: "Gate Trim", category: "landmark" },
   { id: "tree.context", label: "Context Tree", category: "background" }
 ];
 
@@ -146,6 +147,9 @@ export function addTownKitProp(root, materials, id, options = {}) {
       break;
     case "gatehouse":
       addGatehouseSample(group, materials);
+      break;
+    case "gate.trim.stone":
+      addGateTrimSample(group, materials);
       break;
     case "tree.context":
       addTreeSample(group, materials);
@@ -408,6 +412,21 @@ function addGatehouseSample(root, materials) {
   addBox(root, materials.roof, -1.7, 3.35, 0, 1.34, 0.5, 1.28);
   addBox(root, materials.roof, 1.7, 3.35, 0, 1.34, 0.5, 1.28);
   addBox(root, materials.portalDark, 0, 1.0, -0.48, 1.55, 2.0, 0.16);
+}
+
+function addGateTrimSample(root, materials) {
+  addBox(root, materials.stone, -1.62, 1.65, 0, 1.0, 3.3, 0.62);
+  addBox(root, materials.stone, 1.62, 1.65, 0, 1.0, 3.3, 0.62);
+  addBox(root, materials.stone, 0, 2.85, 0, 2.7, 0.72, 0.62);
+  addBox(root, materials.trimLight, -1.62, 3.42, -0.34, 1.22, 0.16, 0.18);
+  addBox(root, materials.trimLight, 1.62, 3.42, -0.34, 1.22, 0.16, 0.18);
+  addBox(root, materials.trimLight, 0, 3.28, -0.36, 3.05, 0.16, 0.18);
+  for (const x of [-0.54, 0, 0.54]) {
+    addBox(root, materials.darkTimber, x, 1.48, -0.42, 0.08, 2.15, 0.08);
+  }
+  addBox(root, materials.darkTimber, 0, 2.42, -0.43, 1.64, 0.08, 0.08);
+  addBox(root, materials.windowDark, -1.62, 1.92, -0.42, 0.14, 0.82, 0.08);
+  addBox(root, materials.windowDark, 1.62, 1.92, -0.42, 0.14, 0.82, 0.08);
 }
 
 function addTreeSample(root, materials) {

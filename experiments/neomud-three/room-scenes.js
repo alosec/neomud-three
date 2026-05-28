@@ -2151,12 +2151,14 @@ function addGatehouseLandmark(root, materials, landmark) {
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
   root.add(group);
 
+  const battlementBoxes = [];
   for (const tower of landmark.towers) {
     addBox(group, materials.stone, tower.x, tower.height / 2, tower.z, tower.width, tower.height, tower.depth);
     addBox(group, materials.roof, tower.x, tower.height + 0.52, tower.z, tower.width + 0.6, 0.9, tower.depth + 0.4);
     addBox(group, materials.darkStone, tower.x, tower.height * 0.52, tower.z - 0.12, tower.width * 0.52, tower.height * 0.62, 0.18);
-    addBattlements(group, materials, tower.x, tower.height + 0.98, tower.z, tower.width, tower.depth);
+    battlementBoxes.push(...battlementBoxesFor(tower.x, tower.height + 0.98, tower.z, tower.width, tower.depth));
   }
+  addInstancedBoxes(group, materials.stone, battlementBoxes, "north-gate-battlements");
   addBox(group, materials.stone, landmark.lintel.x, 5.2, landmark.lintel.z, landmark.lintel.width, landmark.lintel.height, landmark.lintel.depth);
   addBox(group, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
   addBox(group, materials.portalDark, landmark.portal.x, landmark.portal.height / 2, landmark.portal.z, landmark.portal.width, landmark.portal.height, landmark.portal.depth);
@@ -2166,6 +2168,26 @@ function addGatehouseLandmark(root, materials, landmark) {
 
 function addGatehouseTrim(root, materials, landmark) {
   const frontZ = Math.max(...landmark.towers.map((tower) => tower.z + tower.depth / 2)) + 0.035;
+  const caps = [];
+  const arrowSlits = [];
+  for (const tower of landmark.towers) {
+    caps.push({ x: tower.x, y: tower.height + 0.18, z: frontZ + 0.02, width: tower.width + 0.72, height: 0.22, depth: 0.24 });
+    caps.push({ x: tower.x, y: 1.34, z: frontZ + 0.03, width: tower.width * 0.82, height: 0.12, depth: 0.18 });
+    arrowSlits.push({ x: tower.x - tower.width * 0.18, y: tower.height * 0.55, z: frontZ + 0.055, width: 0.16, height: 1.34, depth: 0.08 });
+    arrowSlits.push({ x: tower.x + tower.width * 0.18, y: tower.height * 0.55, z: frontZ + 0.055, width: 0.16, height: 1.34, depth: 0.08 });
+  }
+  addInstancedBoxes(root, materials.trimLight, caps, "north-gate-stone-caps", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.windowDark, arrowSlits, "north-gate-arrow-slits", { castShadow: false, receiveShadow: false });
+
+  const portcullis = [];
+  for (const x of [-1.8, -1.2, -0.6, 0, 0.6, 1.2, 1.8]) {
+    portcullis.push({ x, y: 2.25, z: frontZ + 0.075, width: 0.1, height: 3.45, depth: 0.09 });
+  }
+  for (const y of [1.15, 2.35, 3.55]) {
+    portcullis.push({ x: 0, y, z: frontZ + 0.09, width: 4.2, height: 0.1, depth: 0.1 });
+  }
+  addInstancedBoxes(root, materials.darkTimber, portcullis, "north-gate-portcullis");
+
   const bannerGeometry = new THREE.PlaneGeometry(1, 1);
   addInstancedGeometry(
     root,
@@ -2196,17 +2218,19 @@ function addGatehouseTrim(root, materials, landmark) {
   );
 }
 
-function addBattlements(root, materials, x, y, z, width, depth) {
+function battlementBoxesFor(x, y, z, width, depth) {
   const count = 4;
+  const boxes = [];
   for (let index = 0; index < count; index++) {
     const offset = -width * 0.38 + (width * 0.76 * index) / (count - 1);
-    addBox(root, materials.stone, x + offset, y, z - depth * 0.42, width * 0.16, 0.48, 0.34);
+    boxes.push({ x: x + offset, y, z: z - depth * 0.42, width: width * 0.16, height: 0.48, depth: 0.34 });
   }
   for (let index = 0; index < 3; index++) {
     const offset = -depth * 0.28 + (depth * 0.56 * index) / 2;
-    addBox(root, materials.stone, x - width * 0.42, y, z + offset, 0.34, 0.48, depth * 0.16);
-    addBox(root, materials.stone, x + width * 0.42, y, z + offset, 0.34, 0.48, depth * 0.16);
+    boxes.push({ x: x - width * 0.42, y, z: z + offset, width: 0.34, height: 0.48, depth: depth * 0.16 });
+    boxes.push({ x: x + width * 0.42, y, z: z + offset, width: 0.34, height: 0.48, depth: depth * 0.16 });
   }
+  return boxes;
 }
 
 function addMarketLandmark(root, materials, landmark) {

@@ -341,3 +341,20 @@ Visual delta: added `ground.trim.stone` to Prop Zoo, then applied a restrained i
 QA delta: `node --check` for changed files, spec validation, Prop Zoo/Material Lab QA, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed traversal all pass. Screenshot review confirms the trim reads as subtle surface wear rather than blocking clutter.
 
 Remaining visual gap: do not add more general ground noise by default. The next visual pass should target authored gate/temple/tavern architecture or NPC staging.
+
+## Score After North Gate Trim Kit Pass
+
+- Navigation readability: 2/2. The north Gate remains clearly readable from spawn and the north-gate anchor, with the portcullis and arrow slits strengthening the portal instead of hiding it.
+- Scale believability: 1/2. The gate reads less like two plain blocks, but tower massing/material treatment is still stylized blockout rather than final stone architecture.
+- Semantic match: 2/2. The north landmark now communicates a guarded town gate more directly.
+- Interaction clarity: 2/2. The Gate board, threshold, compass route, and physical North trigger remain intact.
+- Server sync: 2/2. Server-backed Temple -> Town Square -> Tavern -> Town Square -> Temple passes after restarting the local server to clear the localhost connection limit.
+- Performance: 2/2. Full-smoke Town Square reports 211 calls / 13,594 triangles / 18 textures / 148 geometries, down from 227 calls before the pass because the old battlements were batched.
+
+Total: 11/12
+
+Visual delta: added `gate.trim.stone` to Prop Zoo, batched the live gate battlements, and added instanced gate caps, tower arrow slits, and portcullis bars to the north Gate landmark.
+
+QA delta: `node --check` for changed files, Prop Zoo/Material Lab QA, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed traversal all pass. The first server-backed run hit the local server's localhost connection limit; restarting the Kotlin server restored the gate.
+
+Remaining visual gap: the gate is now more readable but still simple. Further north-side work should be larger architectural massing/material work, not small trim additions.
