@@ -1,5 +1,6 @@
 import { WORLD_ROOT } from "./world-data.js";
 import {
+  buildDeepForestRoom,
   buildForestEdgeRoom,
   buildForestPathRoom,
   buildForgeRoom,
@@ -103,6 +104,15 @@ export function buildRoomScene(context) {
       ...context,
       worldRoot: WORLD_ROOT,
       npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:clearing"),
+      roomItems: serverItems
+    });
+  }
+
+  if (roomId === "forest:deep") {
+    return buildDeepForestRoom({
+      ...context,
+      worldRoot: WORLD_ROOT,
+      npcs: serverAuthoritative ? serverNpcs : world.npcs.filter((npc) => npc.startRoomId === "forest:deep"),
       roomItems: serverItems
     });
   }

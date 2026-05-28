@@ -450,6 +450,57 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Shadow Wolf");
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -21.7, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:deep",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Deep Forest");
+    const deepForestTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      deepForestTriggers.map((trigger) => trigger.direction).sort(),
+      ["SOUTH", "WEST"]
+    );
+    assert.ok(deepForestTriggers.some((trigger) => trigger.id === "exit-south-path" && trigger.targetId === "forest:path"));
+    assert.ok(deepForestTriggers.some((trigger) => trigger.id === "exit-west-cave" && trigger.targetId === "forest:cave"));
+    const deepForestColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      deepForestColliders.some((collider) => collider.id === "center-root-claw"),
+      `expected Deep Forest root collider, got ${JSON.stringify(deepForestColliders)}`
+    );
+    const deepForestEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      deepForestEntities.some((entity) => entity.id === "npc:forest_spider" && /Giant Forest Spider/i.test(entity.name)),
+      `expected Giant Forest Spider entity in Deep Forest, got ${JSON.stringify(deepForestEntities)}`
+    );
+    await saveScreenshot(page, "offline-deep-forest.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:deep"));
+    assertRenderBudget(assert, "forest:deep", budgetReports.at(-1).stats);
+
+    const forestSpider = deepForestEntities.find((entity) => entity.id === "npc:forest_spider");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), forestSpider);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:forest_spider",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Giant Forest Spider/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Giant Forest Spider");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 21.6, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:path",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 15.1, z: 3.6, heading: Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

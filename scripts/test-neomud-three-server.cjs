@@ -268,6 +268,44 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "forest:path"));
     assertRenderBudget(assert, "forest:path", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -21.7, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:deep",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Deep Forest");
+    const deepForestTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(deepForestTriggers.some((trigger) => trigger.id === "exit-south-path"));
+    assert.ok(deepForestTriggers.some((trigger) => trigger.id === "exit-west-cave"));
+    const deepForestEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    const deepForestServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      deepForestEntities.map((entity) => entity.id).sort(),
+      deepForestServerNpcs.map((npc) => npc.id).sort(),
+      `expected Deep Forest rendered entities to mirror live server NPCs: server=${JSON.stringify(deepForestServerNpcs)} rendered=${JSON.stringify(deepForestEntities)}`
+    );
+    if (deepForestServerNpcs.some((npc) => npc.id === "npc:forest_spider")) {
+      assert.ok(
+        deepForestEntities.some((entity) => entity.id === "npc:forest_spider" && /Giant Forest Spider/i.test(entity.name)),
+        `expected server Giant Forest Spider in Deep Forest, got ${JSON.stringify(deepForestEntities)}`
+      );
+    }
+    await saveScreenshot(page, "server-deep-forest.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:deep"));
+    assertRenderBudget(assert, "forest:deep", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 21.6, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:path",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 15.1, z: 3.6, heading: Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

@@ -17,7 +17,7 @@ const RENDER_BUDGETS = {
   "town:tavern": {
     calls: 120,
     triangles: 60_000,
-    textures: 48,
+    textures: 52,
     geometries: 100
   },
   "town:market": {
@@ -55,6 +55,12 @@ const RENDER_BUDGETS = {
     triangles: 80_000,
     textures: 44,
     geometries: 150
+  },
+  "forest:deep": {
+    calls: 165,
+    triangles: 90_000,
+    textures: 48,
+    geometries: 180
   },
   "forest:clearing": {
     calls: 160,
