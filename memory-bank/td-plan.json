@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T23:17:39.000Z",
+  "updated": "2026-05-28T23:25:44.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2967,6 +2967,28 @@
       "comments": [],
       "created": "2026-05-28T23:09:09Z",
       "updated": "2026-05-28T23:17:39Z"
+    },
+    {
+      "id": "neo-1fb2.86",
+      "project": "NeoMud",
+      "title": "Improve cathedral pew asset silhouette",
+      "description": "",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: added pew planks, rails, kneeler, feet, carved end-panel insets, reduced asset-lab row duplication, and passed lab/room/offline/server QA",
+      "labels": [
+        "blender",
+        "cathedral",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T23:19:52Z",
+      "updated": "2026-05-28T23:25:44Z"
     }
   ]
 }

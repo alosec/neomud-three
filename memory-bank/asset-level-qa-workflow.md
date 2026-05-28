@@ -84,6 +84,15 @@ layer, a dawn medallion, paired incense bowls, ember cues, and subtle low-poly
 smoke-wisp puff columns.
 It is accepted as a playable prototype, not final cathedral art.
 
+## Current Pew Candidate
+
+`cathedral.pew` is now on a second playable-prototype candidate. The shared
+Blender builder adds visible seat planks, back rails/stiles, a kneeler rail,
+feet, and carved end-panel insets. The asset lab keeps one detailed isolated
+pew plus one row-fit pair so QA can see scale without blowing the lab render
+budget. The next pew-specific pass should improve shared wood material
+variation or trim-sheet treatment rather than adding more loose geometry.
+
 ## Current Texture Candidate
 
 `templeStainedGlassDawnV2` now has:

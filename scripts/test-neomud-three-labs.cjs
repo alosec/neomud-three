@@ -143,6 +143,9 @@ async function main() {
         assert.ok(snapshot.asset.colliders.includes("cathedral-pew-footprint"));
         assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_end_panel")), "expected profiled pew end panels");
         assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_back")), "expected separate pew backrest");
+        assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_seat_plank_")), "expected readable seat plank details");
+        assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_carved_inset")), "expected carved end-panel insets");
+        assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_kneeler_rail")), "expected kneeler rail detail");
         assert.ok(windowBay.summary.renderNodes >= 14, `expected detailed window bay render nodes: ${JSON.stringify(windowBay.summary)}`);
         assert.ok(windowBay.colliders.includes("cathedral-window-bay-footprint"));
         assert.ok(windowBay.renderNodes.some((name) => name.includes("_outer_arch")), "expected arched window frame");

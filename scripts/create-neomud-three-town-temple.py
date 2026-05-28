@@ -348,7 +348,21 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
         (-0.62, 0.22),
     ]
 
-    cube3(f"VIS_pew_{pew_id}_seat", x, 0.5, z + 0.02, width, 0.24, seat_depth, wood_mid, semantic="cathedral_pew_seat")
+    cube3(f"VIS_pew_{pew_id}_seat_base", x, 0.47, z + 0.02, width, 0.2, seat_depth, wood_mid, semantic="cathedral_pew_seat")
+    cube3(f"VIS_pew_{pew_id}_seat_front_lip", x, 0.62, z + 0.54, width + 0.08, 0.12, 0.12, wood_highlight, semantic="cathedral_pew_seat_plank")
+    cube3(f"VIS_pew_{pew_id}_seat_rear_lip", x, 0.62, z - 0.45, width + 0.02, 0.1, 0.1, wood_highlight, semantic="cathedral_pew_seat_plank")
+    for offset, plank_id in [(-1.65, "left"), (0, "center"), (1.65, "right")]:
+        cube3(
+            f"VIS_pew_{pew_id}_seat_plank_{plank_id}",
+            x + offset,
+            0.64,
+            z + 0.02,
+            0.08,
+            0.08,
+            0.92,
+            wood_highlight,
+            semantic="cathedral_pew_seat_plank",
+        )
     sloped_panel_x3(
         f"VIS_pew_{pew_id}_back",
         x,
@@ -361,9 +375,37 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
         wood_dark,
         semantic="cathedral_pew_backrest",
     )
+    cube3(f"VIS_pew_{pew_id}_back_lower_rail", x, 0.78, z - 0.56, width + 0.12, 0.13, 0.13, wood_highlight, semantic="cathedral_pew_back_rail")
+    cube3(f"VIS_pew_{pew_id}_back_mid_rail", x, 1.17, z - 0.62, width + 0.04, 0.1, 0.1, wood_highlight, semantic="cathedral_pew_back_rail")
+    for offset, stile_id in [(-1.78, "left"), (0, "center"), (1.78, "right")]:
+        cube3(
+            f"VIS_pew_{pew_id}_back_stile_{stile_id}",
+            x + offset,
+            1.04,
+            z - 0.61,
+            0.12,
+            0.76,
+            0.12,
+            wood_highlight,
+            semantic="cathedral_pew_back_stile",
+        )
     cube3(f"VIS_pew_{pew_id}_top_rail", x, 1.53, z - 0.67, width + 0.18, 0.16, 0.16, wood_highlight, semantic="cathedral_pew_top_rail")
     cube3(f"VIS_pew_{pew_id}_front_rail", x, 0.36, z + 0.56, width + 0.08, 0.22, 0.14, wood_dark, semantic="cathedral_pew_front_rail")
+    cube3(f"VIS_pew_{pew_id}_kneeler_rail", x, 0.27, z + 0.82, width - 0.36, 0.12, 0.13, wood_highlight, semantic="cathedral_pew_kneeler_rail")
     cube3(f"VIS_pew_{pew_id}_lower_stretcher", x, 0.2, z - 0.1, width + 0.18, 0.16, 0.12, wood_dark, semantic="cathedral_pew_lower_stretcher")
+    for foot_x, foot_label in [(-2.18, "west"), (2.18, "east")]:
+        for foot_z, depth_label in [(z + 0.42, "front"), (z - 0.48, "back")]:
+            cube3(
+                f"VIS_pew_{pew_id}_{foot_label}_{depth_label}_foot",
+                x + foot_x,
+                0.16,
+                foot_z,
+                0.22,
+                0.32,
+                0.18,
+                wood_dark,
+                semantic="cathedral_pew_foot",
+            )
 
     for side, label in [(-1, "west_end"), (1, "east_end")]:
         end_x = x + side * (width / 2 + 0.12)
@@ -376,6 +418,22 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
             side_profile,
             wood_dark,
             semantic="cathedral_pew_end_panel",
+        )
+        prism_x3(
+            f"VIS_pew_{pew_id}_{label}_carved_inset",
+            end_x + side * 0.01,
+            0.22,
+            z + 0.04,
+            0.28,
+            [
+                (-0.32, 0.08),
+                (0.32, 0.08),
+                (0.26, 0.56),
+                (0.0, 0.78),
+                (-0.26, 0.56),
+            ],
+            wood_highlight,
+            semantic="cathedral_pew_carved_inset",
         )
         cube3(
             f"VIS_pew_{pew_id}_{label}_trim",
@@ -592,9 +650,9 @@ def build_level():
     limestone = material("MAT_temple_limestone_wall", (0.62, 0.59, 0.50, 1), roughness=0.88)
     trim = material("MAT_temple_warm_limestone_trim", (0.82, 0.74, 0.54, 1), roughness=0.7)
     dark = material("MAT_temple_recess_shadow", (0.12, 0.10, 0.08, 1), roughness=0.94)
-    wood = material("MAT_temple_pew_warm_oak", (0.30, 0.18, 0.09, 1), roughness=0.78)
-    wood_dark = material("MAT_temple_pew_dark_endgrain", (0.15, 0.08, 0.04, 1), roughness=0.86)
-    wood_highlight = material("MAT_temple_pew_worn_edge", (0.50, 0.30, 0.13, 1), roughness=0.72)
+    wood = material("MAT_temple_pew_warm_oak", (0.34, 0.19, 0.085, 1), roughness=0.78)
+    wood_dark = material("MAT_temple_pew_dark_endgrain", (0.13, 0.065, 0.035, 1), roughness=0.86)
+    wood_highlight = material("MAT_temple_pew_worn_edge", (0.58, 0.36, 0.15, 1), roughness=0.72)
     cloth = material("MAT_temple_dawn_cloth", (0.86, 0.78, 0.60, 1), roughness=0.66)
     smoke = material("MAT_temple_incense_smoke", (0.72, 0.76, 0.72, 0.13), roughness=0.96, alpha=0.13)
     glass_blue = material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)

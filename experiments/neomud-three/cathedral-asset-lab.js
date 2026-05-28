@@ -228,7 +228,7 @@ function addPewRowStation() {
   root.add(station);
 
   for (const side of [-1, 1]) {
-    for (let index = 0; index < 4; index += 1) {
+    for (let index = 0; index < 1; index += 1) {
       const { scene: pew } = instantiateBlenderLevel(PEW_URL, { hideAuthoringNodes: true });
       configurePewScene(pew, { keepFloor: false });
       pew.position.set(side * 3.05, 0, -3.0 + index * 1.55);

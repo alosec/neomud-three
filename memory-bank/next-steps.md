@@ -36,7 +36,7 @@ High leverage next work:
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
    - Use isolated asset QA for each fixture before room integration. `cathedral.pew`, `cathedral.wall_window_bay`, and `cathedral.altar_incense_fixture` are the first accepted playable-prototype candidates.
-   - Do not accept the current altar and incense as final art. Smoke has moved from hard cones to subtler low-poly puff columns, so the next Temple fixture/material pass should improve altar material hierarchy, lighting, glass variants, or optimized texture delivery with screenshot evidence.
+   - Do not accept the current altar and incense as final art. Smoke has moved from hard cones to subtler low-poly puff columns, and pews now have a stronger second candidate; the next Temple fixture/material pass should improve altar material hierarchy, authored lighting, shared wood/glass material variants, or optimized texture delivery with screenshot evidence.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
    - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
 
