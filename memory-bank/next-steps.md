@@ -11,7 +11,8 @@ High leverage next work:
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
-   - Next extraction should move camera rig/update and debug render hooks behind the engine boundary.
+   - Camera-follow rig math is now inside `render-engine.js`.
+   - Next extraction should move debug render hooks and room lifecycle APIs behind the engine boundary.
    - Room scene registry.
    - Room render specs for authored spaces, starting with `TOWN_SQUARE_SPEC`.
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.

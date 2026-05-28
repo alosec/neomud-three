@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T14:26:44.992Z",
+  "updated": "2026-05-28T14:36:01.419Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -98,10 +98,15 @@
           "id": 76,
           "body": "First renderer boundary pass shipped locally: added render-engine.js for renderer/scene/camera/player/world-root/base lights/environment/resize/render stats/loop binding/room-root disposal. app.js still owns camera-follow math and debug hooks, so task remains in-progress.",
           "created": "2026-05-28T14:26:25Z"
+        },
+        {
+          "id": 77,
+          "body": "Camera-follow rig math moved into render-engine.js; app.js now passes heading and room camera settings. Debug hooks and room lifecycle APIs remain in app.js, so task stays in-progress.",
+          "created": "2026-05-28T14:35:44Z"
         }
       ],
       "created": "2026-05-28T03:07:22Z",
-      "updated": "2026-05-28T14:26:25Z"
+      "updated": "2026-05-28T14:35:44Z"
     },
     {
       "id": "neo-1fb2.4",

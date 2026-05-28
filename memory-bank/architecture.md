@@ -20,7 +20,7 @@ Authority boundary:
 Rendering boundary:
 
 - `app.js` bridges protocol/input/UI state into renderer state.
-- `render-engine.js` owns the persistent Three.js shell: renderer, scene, camera, world root, player object, base lights, environment application, resize, render stats, animation-loop binding, and room-root disposal.
+- `render-engine.js` owns the persistent Three.js shell: renderer, scene, camera, camera-follow rig, world root, player object, base lights, environment application, resize, render stats, animation-loop binding, and room-root disposal.
 - `room-scenes.js` still contains room-specific builders for Temple, Town Square, North Gate, Forest Edge, Forest Path, Tavern, and generic fallback rooms.
 - When server-authoritative mode is active, authored room builders receive exactly the live server NPC list, including an empty list. Static NeoMud NPC placement is only used in offline graphics mode.
 - This is useful for a vertical slice, but it should become a registry/component renderer before adding many more rooms.

@@ -34,6 +34,7 @@ export function createRenderEngine(canvas) {
   scene.add(sun);
 
   const clock = new THREE.Clock();
+  const cameraTarget = new THREE.Vector3(0, 1.4, 0);
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
 
   return {
@@ -61,6 +62,28 @@ export function createRenderEngine(canvas) {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    },
+    updateCamera({ heading = 0, roomCamera = {}, dt = 1 / 60, snap = false } = {}) {
+      const forward = new THREE.Vector3(Math.sin(heading), 0, -Math.cos(heading));
+      const right = new THREE.Vector3(Math.cos(heading), 0, Math.sin(heading));
+      const desired = player.position
+        .clone()
+        .addScaledVector(forward, -(roomCamera.distance ?? 8.6))
+        .addScaledVector(right, roomCamera.sideOffset ?? -0.35)
+        .add(new THREE.Vector3(0, roomCamera.height ?? 5.35, 0));
+      const lookTarget = player.position
+        .clone()
+        .addScaledVector(forward, roomCamera.lookAhead ?? 3.0)
+        .add(new THREE.Vector3(0, roomCamera.targetHeight ?? 1.45, 0));
+
+      if (snap) {
+        camera.position.copy(desired);
+        cameraTarget.copy(lookTarget);
+      } else {
+        camera.position.lerp(desired, Math.min(1, dt * 4.2));
+        cameraTarget.lerp(lookTarget, Math.min(1, dt * 5.8));
+      }
+      camera.lookAt(cameraTarget);
     },
     render() {
       renderer.render(scene, camera);

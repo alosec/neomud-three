@@ -102,8 +102,7 @@ const movement = {
   grounded: true,
   jumpQueued: false,
   running: false,
-  walkClock: 0,
-  cameraTarget: new THREE.Vector3(0, 1.4, 0)
+  walkClock: 0
 };
 
 const playableKeys = new Set([
@@ -947,27 +946,12 @@ function updatePlayer(dt) {
 }
 
 function updateCamera(dt, snap = false) {
-  const forward = new THREE.Vector3(Math.sin(movement.heading), 0, -Math.cos(movement.heading));
-  const right = new THREE.Vector3(Math.cos(movement.heading), 0, Math.sin(movement.heading));
-  const rig = roomRuntime?.camera ?? {};
-  const desired = player.position
-    .clone()
-    .addScaledVector(forward, -(rig.distance ?? 8.6))
-    .addScaledVector(right, rig.sideOffset ?? -0.35)
-    .add(new THREE.Vector3(0, rig.height ?? 5.35, 0));
-  const lookTarget = player.position
-    .clone()
-    .addScaledVector(forward, rig.lookAhead ?? 3.0)
-    .add(new THREE.Vector3(0, rig.targetHeight ?? 1.45, 0));
-
-  if (snap) {
-    camera.position.copy(desired);
-    movement.cameraTarget.copy(lookTarget);
-  } else {
-    camera.position.lerp(desired, Math.min(1, dt * 4.2));
-    movement.cameraTarget.lerp(lookTarget, Math.min(1, dt * 5.8));
-  }
-  camera.lookAt(movement.cameraTarget);
+  renderEngine.updateCamera({
+    dt,
+    snap,
+    heading: movement.heading,
+    roomCamera: roomRuntime?.camera
+  });
 }
 
 function axis(primary, secondary = null) {
