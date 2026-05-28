@@ -167,7 +167,11 @@ export const TOWN_SQUARE_SPEC = {
         { x: -6.8, z: -18.5, scale: 0.92, rotationY: 0.18 },
         { x: 6.8, z: -18.4, scale: 0.96, rotationY: -0.34 },
         { x: -7.2, z: 18.8, scale: 0.98, rotationY: 0.48 },
-        { x: 7.4, z: 18.7, scale: 1.02, rotationY: -0.62 }
+        { x: 7.4, z: 18.7, scale: 1.02, rotationY: -0.62 },
+        { x: -9.4, z: -6.9, scale: 1.52, rotationY: 0.36 },
+        { x: 9.4, z: -6.9, scale: 1.56, rotationY: -0.42 },
+        { x: -9.6, z: 7.2, scale: 1.46, rotationY: -0.28 },
+        { x: 9.6, z: 7.2, scale: 1.5, rotationY: 0.32 }
       ]
     }
   ],
@@ -339,6 +343,12 @@ export const TOWN_SQUARE_SPEC = {
       { x: -12.8, z: 8.6, width: 2.8, depth: 0.9, rotationY: -0.2 },
       { x: 12.8, z: 8.6, width: 2.8, depth: 0.9, rotationY: 0.2 }
     ],
+    gardenBeds: [
+      { x: -9.4, z: -6.9, width: 4.9, depth: 3.1, rotationY: 0.26 },
+      { x: 9.4, z: -6.9, width: 5.0, depth: 3.15, rotationY: -0.22 },
+      { x: -9.6, z: 7.2, width: 4.65, depth: 3.0, rotationY: -0.3 },
+      { x: 9.6, z: 7.2, width: 4.8, depth: 3.05, rotationY: 0.28 }
+    ],
     shrubs: [
       { x: -15.4, z: -10.7, scale: 0.92, rotationY: 0.4 },
       { x: -10.7, z: -12.2, scale: 0.72, rotationY: -0.2 },
@@ -347,7 +357,11 @@ export const TOWN_SQUARE_SPEC = {
       { x: -15.7, z: 10.8, scale: 0.82, rotationY: -0.4 },
       { x: 15.6, z: 10.5, scale: 0.84, rotationY: 0.3 },
       { x: -6.8, z: 13.7, scale: 0.64, rotationY: 0.6 },
-      { x: 6.9, z: 13.8, scale: 0.66, rotationY: -0.7 }
+      { x: 6.9, z: 13.8, scale: 0.66, rotationY: -0.7 },
+      { x: -8.0, z: -5.9, scale: 0.76, rotationY: -0.3 },
+      { x: 8.0, z: -5.9, scale: 0.78, rotationY: 0.26 },
+      { x: -8.15, z: 6.2, scale: 0.72, rotationY: 0.34 },
+      { x: 8.15, z: 6.2, scale: 0.74, rotationY: -0.38 }
     ],
     grassTufts: [
       { x: -18.2, z: -13.4, scale: 0.72, rotationY: 0.1 },
@@ -369,7 +383,11 @@ export const TOWN_SQUARE_SPEC = {
       { x: -12.8, z: 8.6, material: "awningBlue", radius: 0.46, count: 6, scale: 0.85 },
       { x: 12.8, z: 8.6, material: "awningGold", radius: 0.46, count: 6, scale: 0.85 },
       { x: -5.2, z: 8.2, material: "awningRed", radius: 0.34, count: 4, scale: 0.7 },
-      { x: 5.2, z: 8.2, material: "awningBlue", radius: 0.34, count: 4, scale: 0.7 }
+      { x: 5.2, z: 8.2, material: "awningBlue", radius: 0.34, count: 4, scale: 0.7 },
+      { x: -9.4, z: -6.9, material: "awningGold", radius: 0.72, count: 8, scale: 0.72 },
+      { x: 9.4, z: -6.9, material: "awningRed", radius: 0.72, count: 8, scale: 0.72 },
+      { x: -9.6, z: 7.2, material: "awningBlue", radius: 0.68, count: 8, scale: 0.68 },
+      { x: 9.6, z: 7.2, material: "awningGold", radius: 0.7, count: 8, scale: 0.7 }
     ],
     groundTrim: [
       { x: -5.85, z: -4.95, width: 1.35, depth: 0.12, rotationY: 0.12, material: "pathEdge" },

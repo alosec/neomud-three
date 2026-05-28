@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T18:13:58.914Z",
+  "updated": "2026-05-28T18:21:23.291Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2339,6 +2339,29 @@
       ],
       "created": "2026-05-28T18:05:40Z",
       "updated": "2026-05-28T18:13:46Z"
+    },
+    {
+      "id": "neo-1fb2.25.2",
+      "project": "NeoMud",
+      "title": "Improve Town Square courtyard garden composition",
+      "description": "Add a constrained main-ground warmth pass for Town Square: better clustered trees, garden/planter staging, and path-side detail using existing procedural materials and Prop Zoo patterns only. Preserve all four exit sightlines and physical trigger behavior.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.25",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 110,
+          "body": "Completed: Town Square now has four larger main-ground tree clusters with oval garden beds, shrubs, and flower clusters via TOWN_SQUARE_SPEC. Town-shot/offline/server QA pass; exits remain readable.",
+          "created": "2026-05-28T18:20:25Z"
+        }
+      ],
+      "created": "2026-05-28T18:15:48Z",
+      "updated": "2026-05-28T18:20:32Z"
     }
   ],
   "ready": [

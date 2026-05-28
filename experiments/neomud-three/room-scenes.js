@@ -5351,6 +5351,7 @@ function addTownSpecProps(root, materials, spec) {
   addTownStringLights(root, materials, spec.props.stringLights ?? []);
   addTownBenches(root, materials, spec.props.benches ?? []);
   addTownPlanters(root, materials, spec.props.planters ?? []);
+  addTownGardenBeds(root, materials, spec.props.gardenBeds ?? []);
   addTownFoliageDetails(root, materials, spec.props);
   addTownGroundTrim(root, materials, spec.props.groundTrim ?? []);
   addTownBanners(root, materials, spec.props.banners ?? []);
@@ -5470,6 +5471,26 @@ function addTownPlanters(root, materials, planters) {
     boxesByMaterial[3][1].push(orientedBox(planter, -width * 0.05, 0.83, 0.02, width * 0.86, 0.5, depth * 0.82));
   }
   boxesByMaterial.forEach(([mat, boxes], index) => addInstancedBoxes(root, mat, boxes, `courtyard-planters-${index}`));
+}
+
+function addTownGardenBeds(root, materials, beds) {
+  if (!beds.length) return;
+  const bases = beds.map((bed) => ({
+    x: bed.x,
+    y: 0.045,
+    z: bed.z,
+    scale: [(bed.width ?? 4) * 0.54, 1, (bed.depth ?? 2.5) * 0.54],
+    rotationY: bed.rotationY ?? 0
+  }));
+  const foliage = beds.map((bed) => ({
+    x: bed.x,
+    y: 0.085,
+    z: bed.z,
+    scale: [(bed.width ?? 4) * 0.48, 0.85, (bed.depth ?? 2.5) * 0.48],
+    rotationY: bed.rotationY ?? 0
+  }));
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 0.08, 28), materials.pathEdge, bases, "courtyard-garden-bed-bases", { castShadow: false, receiveShadow: true });
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 0.07, 28), materials.foliageDark, foliage, "courtyard-garden-bed-foliage", { castShadow: false, receiveShadow: true });
 }
 
 function addTownFoliageDetails(root, materials, props = {}) {
