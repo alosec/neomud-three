@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T14:53:31.782Z",
+  "updated": "2026-05-28T15:10:38.292Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1870,6 +1870,34 @@
       ],
       "created": "2026-05-28T14:38:18Z",
       "updated": "2026-05-28T14:48:10Z"
+    },
+    {
+      "id": "neo-1fb2.63",
+      "project": "NeoMud",
+      "title": "Author Market Street room",
+      "description": "",
+      "type": "task",
+      "priority": 2,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 81,
+          "body": "Scope: replace town:market generic fallback with authored market street room, Blacksmith Torren entity, physical west/east exits, collisions, budgeted screenshot/server QA.",
+          "created": "2026-05-28T14:56:27Z"
+        },
+        {
+          "id": 82,
+          "body": "Completed: authored town:market, added Blacksmith Torren entity rendering, physical west/east exits, collisions, screenshots, offline smoke, room-shot, and server-backed traversal QA.",
+          "created": "2026-05-28T15:10:17Z"
+        }
+      ],
+      "created": "2026-05-28T14:56:27Z",
+      "updated": "2026-05-28T15:10:17Z"
     }
   ],
   "ready": [

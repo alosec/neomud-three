@@ -17,8 +17,14 @@ const RENDER_BUDGETS = {
   "town:tavern": {
     calls: 120,
     triangles: 60_000,
-    textures: 32,
+    textures: 40,
     geometries: 100
+  },
+  "town:market": {
+    calls: 150,
+    triangles: 70_000,
+    textures: 36,
+    geometries: 150
   },
   "town:gate": {
     calls: 150,

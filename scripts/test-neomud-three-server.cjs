@@ -93,6 +93,42 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:square"));
     assertRenderBudget(assert, "town:square", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 20.2, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:market",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Market Street");
+    const marketTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(marketTriggers.some((trigger) => trigger.id === "exit-west-square"));
+    assert.ok(marketTriggers.some((trigger) => trigger.id === "exit-east-magic-shop"));
+    const marketEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    const marketServerNpcs = await page.evaluate(() => window.__neomudThreeDebug.server.npcs);
+    assert.deepEqual(
+      marketEntities.map((entity) => entity.id).sort(),
+      marketServerNpcs.map((npc) => npc.id).sort(),
+      `expected Market Street rendered entities to mirror live server NPCs: server=${JSON.stringify(marketServerNpcs)} rendered=${JSON.stringify(marketEntities)}`
+    );
+    assert.ok(
+      marketEntities.some((entity) => entity.id === "npc:blacksmith" && /Blacksmith Torren/i.test(entity.name)),
+      `expected server Blacksmith entity in Market Street, got ${JSON.stringify(marketEntities)}`
+    );
+    await saveScreenshot(page, "server-market.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:market"));
+    assertRenderBudget(assert, "town:market", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.9, z: 0, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:square",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -20.2, heading: 0 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

@@ -171,6 +171,57 @@ async function main() {
     assert.match(await page.locator("#panel-content").textContent(), /blood|Wardens/i);
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 20.2, z: 0, heading: Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:market",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Market Street");
+    const marketTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      marketTriggers.map((trigger) => trigger.direction).sort(),
+      ["EAST", "WEST"]
+    );
+    assert.ok(marketTriggers.some((trigger) => trigger.id === "exit-west-square" && trigger.targetId === "town:square"));
+    assert.ok(marketTriggers.some((trigger) => trigger.id === "exit-east-magic-shop" && trigger.targetId === "town:magic_shop"));
+    const marketColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      marketColliders.some((collider) => collider.id === "forge"),
+      `expected Market forge collider, got ${JSON.stringify(marketColliders)}`
+    );
+    const marketEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      marketEntities.some((entity) => entity.id === "npc:blacksmith" && /Blacksmith Torren/i.test(entity.name)),
+      `expected Blacksmith Torren entity in Market Street, got ${JSON.stringify(marketEntities)}`
+    );
+    await saveScreenshot(page, "offline-market.png");
+    budgetReports.push(await collectBudgetStatus(page, "town:market"));
+    assertRenderBudget(assert, "town:market", budgetReports.at(-1).stats);
+
+    const blacksmith = marketEntities.find((entity) => entity.id === "npc:blacksmith");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.1, z, heading: Math.PI / 2 }), blacksmith);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:blacksmith",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Blacksmith Torren/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Blacksmith Torren");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.9, z: 0, heading: -Math.PI / 2 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:square",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -20.2, heading: 0 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

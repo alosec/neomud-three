@@ -65,6 +65,39 @@ const TAVERN_COLLIDERS = [
   }))
 ];
 
+const MARKET = {
+  width: 38,
+  depth: 18,
+  halfX: 19,
+  halfZ: 9,
+  westExitX: -17.35,
+  eastExitX: 17.35,
+  exitHalfZ: 3.15
+};
+
+const MARKET_STALLS = [
+  { id: "north-west-stall", x: -9.8, z: -5.9, rotationY: 0, awningMaterial: "awningBlue" },
+  { id: "north-mid-stall", x: -3.4, z: -5.9, rotationY: 0, awningMaterial: "awningGold" },
+  { id: "north-east-stall", x: 4.2, z: -5.9, rotationY: 0, awningMaterial: "awningRed" },
+  { id: "south-west-stall", x: -7.1, z: 5.9, rotationY: Math.PI, awningMaterial: "awningGold" },
+  { id: "south-mid-stall", x: 0.2, z: 5.9, rotationY: Math.PI, awningMaterial: "awningBlue" },
+  { id: "south-east-stall", x: 7.8, z: 5.9, rotationY: Math.PI, awningMaterial: "awningRed" }
+];
+
+const MARKET_COLLIDERS = [
+  { id: "north-shopfronts", center: [0, -8.25], size: [36.5, 1.6] },
+  { id: "south-shopfronts", center: [0, 8.25], size: [36.5, 1.6] },
+  { id: "forge", center: [13.65, -2.85], size: [3.2, 2.4] },
+  { id: "weapon-rack", center: [11.15, 3.5], size: [2.8, 0.75] },
+  { id: "armor-display", center: [14.9, 3.9], size: [1.2, 1.1] },
+  { id: "west-cart", center: [-12.4, 3.45], size: [2.4, 1.55] },
+  ...MARKET_STALLS.map((stall) => ({
+    id: stall.id,
+    center: [stall.x, stall.z],
+    size: [3.75, 2.15]
+  }))
+];
+
 const NORTH_GATE = {
   width: 26,
   depth: 42,
@@ -385,6 +418,122 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   };
 }
 
+export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = makeTownMaterials();
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  const forge = addMarketStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addMarketEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(-13.8, 0, 0), heading: Math.PI / 2 },
+    status: "Market Street: authored merchant street with shopfronts, forge, stall collisions, Blacksmith Torren, and real west/east exits.",
+    environment: {
+      background: 0xc5d8dc,
+      fog: 0xc5d8dc,
+      fogDensity: 0.01
+    },
+    camera: {
+      distance: 6.15,
+      height: 3.75,
+      sideOffset: -0.22,
+      lookAhead: 3.15,
+      targetHeight: 1.2
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "town:square") return { position: new THREE.Vector3(-13.8, 0, 0), heading: Math.PI / 2 };
+      if (fromRoomId === "town:magic_shop") return { position: new THREE.Vector3(13.8, 0, 0), heading: -Math.PI / 2 };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -MARKET.halfX + 0.55, MARKET.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -MARKET.halfZ + 0.55, MARKET.halfZ - 0.55);
+      resolveColliderPushout(position, MARKET_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -MARKET.halfX + 0.55, MARKET.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -MARKET.halfZ + 0.55, MARKET.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.x < MARKET.westExitX && Math.abs(position.z) < MARKET.exitHalfZ) return "town:square";
+      if (position.x > MARKET.eastExitX && Math.abs(position.z) < MARKET.exitHalfZ) return "town:magic_shop";
+      return null;
+    },
+    debugTriggers() {
+      return [
+        {
+          id: "exit-west-square",
+          direction: "WEST",
+          targetId: "town:square",
+          prompt: "Return to Town Square",
+          trigger: { type: "box", center: [MARKET.westExitX - 0.18, 1, 0], size: [1.2, 3, MARKET.exitHalfZ * 2] },
+          affordance: {
+            label: "Town Square",
+            subtitle: "West"
+          }
+        },
+        {
+          id: "exit-east-magic-shop",
+          direction: "EAST",
+          targetId: "town:magic_shop",
+          prompt: "Visit the Magic Shop",
+          trigger: { type: "box", center: [MARKET.eastExitX + 0.18, 1, 0], size: [1.2, 3, MARKET.exitHalfZ * 2] },
+          affordance: {
+            label: "Magic Shop",
+            subtitle: "East"
+          }
+        }
+      ];
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(MARKET_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.55) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update() {
+      forge.flames.children.forEach((child, index) => {
+        if (child.material?.opacity) {
+          child.material.opacity = 0.5 + Math.sin(performance.now() * 0.009 + index) * 0.16;
+        }
+      });
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0017 + index) * 0.016;
+        }
+      });
+    }
+  };
+}
+
 export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
   const materials = makeTownMaterials();
   const interactables = [];
@@ -693,6 +842,274 @@ export function buildGenericRoom({ root, room, worldRoot, rooms }) {
     },
     update() {}
   };
+}
+
+function addMarketStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.packedDirt, MARKET.width, MARKET.depth);
+  addInstancedSurfaceRects(root, materials, [
+    { material: "road", x: 0, z: 0, width: MARKET.width, depth: 5.8, y: 0.022 },
+    { material: "plazaStone", x: -15.0, z: 0, width: 5.6, depth: 6.5, y: 0.034 },
+    { material: "plazaStone", x: 13.3, z: 0, width: 8.8, depth: 7.2, y: 0.034 },
+    { material: "plazaStone", x: 0, z: -6.05, width: MARKET.width - 2.4, depth: 2.5, y: 0.03 },
+    { material: "plazaStone", x: 0, z: 6.05, width: MARKET.width - 2.4, depth: 2.5, y: 0.03 }
+  ], "market-street-surfaces");
+
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_market.webp`, MARKET.eastExitX + 8.2, 6.1, 0, 22, 12.4, {
+    rotationY: -Math.PI / 2,
+    opacity: 0.44
+  });
+
+  addMarketShopfronts(root, materials);
+  addMarketStalls(root, materials);
+  const forge = addMarketForge(root, materials);
+  addMarketDressing(root, materials);
+  addMarketExitAffordances(root);
+
+  const ambientFill = new THREE.HemisphereLight(0xeef7ff, 0x5a4634, 1.15);
+  root.add(ambientFill);
+
+  const sun = new THREE.DirectionalLight(0xffdfaa, 2.1);
+  sun.position.set(-6.2, 10, 6.2);
+  root.add(sun);
+
+  const forgeLight = new THREE.PointLight(0xff7a2e, 3.4, 10.5);
+  forgeLight.position.set(13.45, 2.2, -2.72);
+  root.add(forgeLight);
+
+  const lanternLight = new THREE.PointLight(0xffc06d, 1.6, 8);
+  lanternLight.position.set(-4.2, 2.8, 0.2);
+  root.add(lanternLight);
+
+  return forge;
+}
+
+function addMarketShopfronts(root, materials) {
+  const plaster = [];
+  const timber = [];
+  const trim = [];
+  const dark = [];
+  const awnings = new Map([
+    ["awningBlue", []],
+    ["awningGold", []],
+    ["awningRed", []]
+  ]);
+  const windows = [];
+
+  for (const side of [-1, 1]) {
+    const z = side * 8.25;
+    const frontZ = side * 7.38;
+    plaster.push({ x: -12.2, y: 2.15, z, width: 7.6, height: 4.3, depth: 1.18 });
+    plaster.push({ x: -3.6, y: 2.42, z, width: 7.4, height: 4.84, depth: 1.18 });
+    plaster.push({ x: 5.0, y: 2.22, z, width: 7.8, height: 4.44, depth: 1.18 });
+
+    for (const x of [-15.8, -8.7, -7.1, -0.2, 1.4, 8.7]) {
+      timber.push({ x, y: 2.28, z: frontZ, width: 0.16, height: 4.55, depth: 0.16 });
+    }
+    for (const x of [-12.2, -3.6, 5.0]) {
+      timber.push({ x, y: 0.18, z: frontZ, width: 7.95, height: 0.24, depth: 0.2 });
+      timber.push({ x, y: 4.42, z: frontZ, width: 7.95, height: 0.2, depth: 0.18 });
+      windows.push({ x: x - 1.55, y: 2.72, z: frontZ - side * 0.06, width: 0.76, height: 0.86, depth: 0.08 });
+      windows.push({ x: x + 1.55, y: 2.72, z: frontZ - side * 0.06, width: 0.76, height: 0.86, depth: 0.08 });
+    }
+
+    awnings.get(side < 0 ? "awningBlue" : "awningGold").push({ x: -11.8, y: 1.62, z: side * 6.84, width: 5.6, height: 0.18, depth: 1.15 });
+    awnings.get(side < 0 ? "awningGold" : "awningRed").push({ x: 3.2, y: 1.62, z: side * 6.84, width: 6.8, height: 0.18, depth: 1.15 });
+    trim.push({ x: -17.8, y: 1.2, z: frontZ, width: 0.26, height: 2.4, depth: 0.24 });
+    trim.push({ x: 16.4, y: 1.2, z: frontZ, width: 0.26, height: 2.4, depth: 0.24 });
+    dark.push({ x: 0, y: 0.12, z: side * 7.18, width: MARKET.width - 1.5, height: 0.18, depth: 0.18 });
+  }
+
+  addInstancedBoxes(root, materials.plasterWarm, plaster, "market-shopfront-plaster");
+  addInstancedBoxes(root, materials.darkTimber, timber, "market-shopfront-timber");
+  addInstancedBoxes(root, materials.trimLight, trim, "market-shopfront-trim");
+  addInstancedBoxes(root, materials.darkStone, dark, "market-shopfront-curbs", { castShadow: false });
+  addInstancedBoxes(root, materials.windowDark, windows, "market-shopfront-windows", { castShadow: false, receiveShadow: false });
+  for (const [materialKey, boxes] of awnings) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `market-shopfront-awning-${materialKey}`);
+  }
+}
+
+function addMarketStalls(root, materials) {
+  for (const stall of MARKET_STALLS) {
+    addComponentMarketStall(root, materials, {
+      ...stall,
+      width: 3.25,
+      depth: 1.65,
+      awningMaterial: material(materials, stall.awningMaterial)
+    });
+  }
+}
+
+function addMarketForge(root, materials) {
+  const group = new THREE.Group();
+  group.position.set(13.45, 0, -2.8);
+  root.add(group);
+
+  addBox(group, materials.darkStone, 0, 0.42, 0, 2.75, 0.84, 1.35);
+  addBox(group, materials.stone, 0, 1.12, 0.04, 2.25, 0.48, 1.05);
+  addBox(group, materials.portalDark, 0, 1.34, -0.06, 1.34, 0.32, 0.62);
+  addBox(group, materials.trimLight, -1.25, 1.0, 0, 0.22, 1.5, 1.18);
+  addBox(group, materials.trimLight, 1.25, 1.0, 0, 0.22, 1.5, 1.18);
+  addBox(group, materials.darkTimber, 0, 2.08, 0.18, 3.25, 0.2, 1.48);
+
+  const flames = new THREE.Group();
+  group.add(flames);
+  for (const [x, z, scale] of [[-0.32, -0.12, 1.0], [0.05, 0.08, 0.85], [0.36, -0.04, 0.72]]) {
+    const flame = new THREE.Mesh(
+      new THREE.ConeGeometry(0.18 * scale, 0.62 * scale, 8),
+      new THREE.MeshBasicMaterial({ color: 0xff8a32, transparent: true, opacity: 0.72 })
+    );
+    flame.position.set(x, 1.72, z);
+    flame.rotation.z = x * 0.18;
+    flames.add(flame);
+  }
+
+  addTextBoard(root, "Forge", {
+    x: 13.45,
+    y: 3.05,
+    z: -3.46,
+    width: 2.2,
+    height: 0.46,
+    subtitle: "Torren",
+    palette: "red",
+    renderOrder: 10
+  });
+
+  return { group, flames };
+}
+
+function addMarketDressing(root, materials) {
+  const timber = [];
+  const dark = [];
+  const metal = [];
+  const produce = new Map([
+    ["foliage", []],
+    ["awningRed", []],
+    ["awningBlue", []],
+    ["awningGold", []]
+  ]);
+
+  addTownKitProp(root, materials, "cart.market", { x: -12.4, z: 3.45, rotationY: Math.PI / 2, scale: 0.88 });
+  addTownKitProp(root, materials, "crate.stack", { x: -14.6, z: -3.65, rotationY: -0.28, scale: 0.88 });
+  addTownKitProp(root, materials, "barrel", { x: -5.8, z: 3.8, rotationY: 0.2, scale: 0.9 });
+
+  timber.push({ x: 11.15, y: 0.9, z: 3.5, width: 2.8, height: 0.16, depth: 0.16 });
+  timber.push({ x: 11.15, y: 1.55, z: 3.5, width: 2.8, height: 0.16, depth: 0.16 });
+  for (const x of [10.0, 10.78, 11.54, 12.3]) {
+    metal.push({ x, y: 1.18, z: 3.38, width: 0.1, height: 1.28, depth: 0.08, rotationY: 0.28 });
+  }
+
+  dark.push({ x: 14.9, y: 0.48, z: 3.9, width: 1.12, height: 0.12, depth: 1.02 });
+  metal.push({ x: 14.9, y: 1.28, z: 3.9, width: 0.7, height: 1.28, depth: 0.18 });
+  metal.push({ x: 14.9, y: 2.05, z: 3.9, width: 1.04, height: 0.18, depth: 0.22 });
+
+  for (const [x, z, materialKey] of [
+    [-9.8, -4.8, "awningRed"],
+    [-3.4, -4.8, "foliage"],
+    [4.2, -4.8, "awningBlue"],
+    [-7.1, 4.8, "awningGold"],
+    [0.2, 4.8, "foliage"],
+    [7.8, 4.8, "awningRed"]
+  ]) {
+    produce.get(materialKey).push({ x, y: 0.92, z, width: 0.54, height: 0.22, depth: 0.44 });
+    produce.get(materialKey).push({ x: x + 0.58, y: 0.9, z: z + 0.08, width: 0.42, height: 0.2, depth: 0.36 });
+  }
+
+  addInstancedBoxes(root, materials.timber, timber, "market-dressing-timber");
+  addInstancedBoxes(root, materials.darkTimber, dark, "market-dressing-dark");
+  addInstancedBoxes(root, materials.trimLight, metal, "market-dressing-metal");
+  for (const [materialKey, boxes] of produce) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `market-dressing-produce-${materialKey}`);
+  }
+}
+
+function addMarketExitAffordances(root) {
+  addTextBoard(root, "Magic Shop", {
+    x: 17.1,
+    y: 2.32,
+    z: 3.35,
+    width: 2.2,
+    height: 0.48,
+    subtitle: "East",
+    palette: "blue",
+    renderOrder: 10
+  });
+  addExitThreshold(root, { x: MARKET.westExitX, z: 0, width: 1.15, depth: MARKET.exitHalfZ * 2, color: 0xf0c878, opacity: 0.2 });
+  addExitThreshold(root, { x: MARKET.eastExitX, z: 0, width: 1.15, depth: MARKET.exitHalfZ * 2, color: 0xbfe8f0, opacity: 0.2 });
+}
+
+function addMarketEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const placements = {
+    "npc:blacksmith": {
+      position: [12.3, 0, -0.9],
+      heading: -Math.PI / 2,
+      role: "Blacksmith",
+      palette: "red",
+      width: 1.82,
+      height: 3.12
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = placements[normalized.id] ?? {
+      position: [4.5 - index * 1.25, 0, 1.4 + index * 0.9],
+      heading: Math.PI,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 3,
+      width: placement.width ?? 1.68,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -5.2 + index * 0.9;
+    const z = index % 2 === 0 ? -2.8 : 2.6;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Market",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
 }
 
 function addTavernInterior(root, materials, fireGroup) {
