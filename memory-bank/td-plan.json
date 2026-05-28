@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T13:21:42.243Z",
+  "updated": "2026-05-28T13:34:00.090Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1736,6 +1736,28 @@
       "comments": [],
       "created": "2026-05-28T13:09:19Z",
       "updated": "2026-05-28T13:21:26Z"
+    },
+    {
+      "id": "neo-5f09",
+      "project": "NeoMud",
+      "title": "Author Forest Edge room slice",
+      "description": "Replace generic forest:edge fallback with an authored forest threshold stage using the real room graph, Forest Rat NPC, physical South/North triggers, collision, camera, render budget, screenshots, and server-backed traversal coverage.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "",
+      "close_reason": "done: authored forest:edge as playable Forest Edge room with Forest Rat, triggers, collision, screenshots, render budget, offline and server traversal QA",
+      "labels": [
+        "forest-edge",
+        "neomud-three",
+        "qa",
+        "server"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T13:25:19Z",
+      "updated": "2026-05-28T13:33:49Z"
     }
   ],
   "ready": [

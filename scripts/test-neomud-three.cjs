@@ -213,6 +213,57 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Town Guard");
     await page.keyboard.press("Escape");
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -20.7, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:edge",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Forest Edge");
+    const forestTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.deepEqual(
+      forestTriggers.map((trigger) => trigger.direction).sort(),
+      ["NORTH", "SOUTH"]
+    );
+    assert.ok(forestTriggers.some((trigger) => trigger.id === "exit-south-gate" && trigger.targetId === "town:gate"));
+    assert.ok(forestTriggers.some((trigger) => trigger.id === "exit-north-path" && trigger.targetId === "forest:path"));
+    const forestColliders = await page.evaluate(() => window.__neomudThreeDebug.room.colliders);
+    assert.ok(
+      forestColliders.some((collider) => collider.id === "fallen-log"),
+      `expected Forest Edge fallen-log collider, got ${JSON.stringify(forestColliders)}`
+    );
+    const forestEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      forestEntities.some((entity) => entity.id === "npc:forest_rat" && /Forest Rat/i.test(entity.name)),
+      `expected Forest Rat entity in Forest Edge, got ${JSON.stringify(forestEntities)}`
+    );
+    await saveScreenshot(page, "offline-forest-edge.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:edge"));
+    assertRenderBudget(assert, "forest:edge", budgetReports.at(-1).stats);
+
+    const forestRat = forestEntities.find((entity) => entity.id === "npc:forest_rat");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), forestRat);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:forest_rat",
+      null,
+      { timeout: 2_000 }
+    );
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Forest Rat/);
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "Forest Rat");
+    await page.keyboard.press("Escape");
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.7, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:gate",
+      null,
+      { timeout: 5_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 18.7, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(

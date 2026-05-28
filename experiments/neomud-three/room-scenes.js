@@ -84,6 +84,27 @@ const NORTH_GATE_COLLIDERS = [
   { id: "supply-crates", center: [6.4, 6.8], size: [2.1, 1.55] }
 ];
 
+const FOREST_EDGE = {
+  width: 32,
+  depth: 46,
+  halfX: 16,
+  halfZ: 23,
+  southExitZ: 21.2,
+  northExitZ: -21.2,
+  exitHalfWidth: 3.7
+};
+
+const FOREST_EDGE_COLLIDERS = [
+  { id: "southwest-oak", center: [-10.4, 10.2], size: [1.35, 1.35] },
+  { id: "southeast-oak", center: [10.5, 9.8], size: [1.35, 1.35] },
+  { id: "west-ancient-oak", center: [-12.3, -3.8], size: [1.65, 1.65] },
+  { id: "east-ancient-oak", center: [12.2, -4.2], size: [1.65, 1.65] },
+  { id: "northwest-oak", center: [-8.2, -15.4], size: [1.45, 1.45] },
+  { id: "northeast-oak", center: [8.2, -15.7], size: [1.45, 1.45] },
+  { id: "fallen-log", center: [-5.8, -8.6], size: [3.4, 1.0] },
+  { id: "mossy-stone", center: [5.8, -7.4], size: [2.2, 1.55] }
+];
+
 const TEMPLE_COLLIDERS = [
   { id: "altar-dais", center: [0, TEMPLE.altarZ + 0.12], size: [6.0, 3.25] },
   { id: "left-incense-brazier", center: [-2.72, TEMPLE.altarZ - 0.18], size: [1.05, 1.05] },
@@ -425,6 +446,94 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
       entityLayer.children.forEach((child, index) => {
         if (child.userData.kind === "npc") {
           child.position.y = Math.sin(performance.now() * 0.0015 + index) * 0.018;
+        }
+      });
+    }
+  };
+}
+
+export function buildForestEdgeRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
+  const materials = makeTownMaterials();
+  const interactables = [];
+  const entityLayer = new THREE.Group();
+  root.add(entityLayer);
+
+  addForestEdgeStage(root, materials, worldRoot);
+
+  const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
+    disposeObjectTree(entityLayer);
+    entityLayer.clear();
+    interactables.length = 0;
+    addForestEdgeEntities(entityLayer, materials, worldRoot, world, nextNpcs, nextRoomItems, interactables);
+  };
+  syncEntities();
+
+  return {
+    spawn: { position: new THREE.Vector3(0, 0, 13.1), heading: 0 },
+    status: "Forest Edge: authored wilderness threshold with South gate return, North forest path, tree collision, and server-driven hostile Forest Rat.",
+    environment: {
+      background: 0x3d5140,
+      fog: 0x384b3b,
+      fogDensity: 0.014
+    },
+    camera: {
+      distance: 5.8,
+      height: 4.1,
+      sideOffset: -0.12,
+      lookAhead: 3.0,
+      targetHeight: 1.12
+    },
+    syncEntities,
+    spawnFor(fromRoomId) {
+      if (fromRoomId === "town:gate") return { position: new THREE.Vector3(0, 0, 13.1), heading: 0 };
+      if (fromRoomId === "forest:path") return { position: new THREE.Vector3(0, 0, -13.1), heading: Math.PI };
+      return this.spawn;
+    },
+    clamp(position) {
+      position.x = THREE.MathUtils.clamp(position.x, -FOREST_EDGE.halfX + 0.55, FOREST_EDGE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -FOREST_EDGE.halfZ + 0.55, FOREST_EDGE.halfZ - 0.55);
+      resolveColliderPushout(position, FOREST_EDGE_COLLIDERS, 0.42);
+      position.x = THREE.MathUtils.clamp(position.x, -FOREST_EDGE.halfX + 0.55, FOREST_EDGE.halfX - 0.55);
+      position.z = THREE.MathUtils.clamp(position.z, -FOREST_EDGE.halfZ + 0.55, FOREST_EDGE.halfZ - 0.55);
+    },
+    exitAt(position) {
+      if (position.z > FOREST_EDGE.southExitZ && Math.abs(position.x) < FOREST_EDGE.exitHalfWidth) return "town:gate";
+      if (position.z < FOREST_EDGE.northExitZ && Math.abs(position.x) < FOREST_EDGE.exitHalfWidth) return "forest:path";
+      return null;
+    },
+    debugTriggers() {
+      return forestEdgeTriggers();
+    },
+    debugEntities() {
+      return interactables.map((entity) => ({
+        id: entity.id,
+        kind: entity.kind,
+        name: entity.name,
+        role: entity.role ?? "",
+        prompt: entity.prompt,
+        x: entity.position.x,
+        z: entity.position.z
+      }));
+    },
+    debugColliders() {
+      return debugColliders(FOREST_EDGE_COLLIDERS, 0.42);
+    },
+    nearestInteractable(position, maxDistance = 2.5) {
+      let nearest = null;
+      let bestDistanceSq = maxDistance * maxDistance;
+      for (const entity of interactables) {
+        const distanceSq = horizontalDistanceSq(position, entity.position);
+        if (distanceSq <= bestDistanceSq) {
+          nearest = entity;
+          bestDistanceSq = distanceSq;
+        }
+      }
+      return nearest;
+    },
+    update(dt) {
+      entityLayer.children.forEach((child, index) => {
+        if (child.userData.kind === "npc") {
+          child.position.y = Math.sin(performance.now() * 0.0022 + index) * 0.026;
         }
       });
     }
@@ -1076,6 +1185,230 @@ function northGateTriggers() {
         label: "Forest",
         subtitle: "North Road",
         threshold: { center: [0, 0.05, NORTH_GATE.northExitZ], size: [NORTH_GATE.exitHalfWidth * 2, 1.35], color: 0xb9e0a1 }
+      }
+    }
+  ];
+}
+
+function addForestEdgeStage(root, materials, worldRoot) {
+  addGroundPlane(root, materials.foliageDark, FOREST_EDGE.width, FOREST_EDGE.depth);
+  addInstancedSurfaceRects(root, materials, [
+    { material: "road", x: 0, z: 0, width: 5.8, depth: FOREST_EDGE.depth, y: 0.022 },
+    { material: "packedDirt", x: 0, z: 10.8, width: 11.2, depth: 8.8, y: 0.016 },
+    { material: "packedDirt", x: 0, z: -12.2, width: 8.4, depth: 9.2, y: 0.018 }
+  ], "forest-edge-surfaces");
+
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4);
+  addForestEdgeSouthTownWall(root, materials);
+  addForestEdgeTrees(root, materials);
+  addForestEdgeDressing(root, materials);
+  addForestEdgeExitAffordances(root);
+
+  const ambientFill = new THREE.HemisphereLight(0xbdd4bd, 0x26371f, 0.86);
+  root.add(ambientFill);
+
+  const sun = new THREE.DirectionalLight(0xffd18a, 2.0);
+  sun.position.set(-4.2, 11, -6.5);
+  root.add(sun);
+
+  const shaftLight = new THREE.PointLight(0xffd58a, 2.2, 11.5);
+  shaftLight.position.set(-2.8, 4.5, -4.8);
+  root.add(shaftLight);
+}
+
+function addForestEdgeSouthTownWall(root, materials) {
+  const stone = [
+    { x: -8.5, y: 2.0, z: 20.8, width: 8.0, height: 4.0, depth: 0.82 },
+    { x: 8.5, y: 2.0, z: 20.8, width: 8.0, height: 4.0, depth: 0.82 },
+    { x: -3.2, y: 3.2, z: 21.0, width: 1.8, height: 6.4, depth: 1.2 },
+    { x: 3.2, y: 3.2, z: 21.0, width: 1.8, height: 6.4, depth: 1.2 },
+    { x: 0, y: 5.3, z: 21.0, width: 5.6, height: 1.4, depth: 1.1 }
+  ];
+  const trim = [
+    { x: -8.5, y: 4.15, z: 20.28, width: 8.2, height: 0.22, depth: 0.26 },
+    { x: 8.5, y: 4.15, z: 20.28, width: 8.2, height: 0.22, depth: 0.26 },
+    { x: 0, y: 6.1, z: 20.25, width: 5.9, height: 0.2, depth: 0.25 }
+  ];
+  const dark = [
+    { x: 0, y: 2.0, z: 20.18, width: 4.4, height: 4.0, depth: 0.22 }
+  ];
+  addInstancedBoxes(root, materials.stone, stone, "forest-edge-south-wall-stone");
+  addInstancedBoxes(root, materials.trimLight, trim, "forest-edge-south-wall-trim", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.portalDark, dark, "forest-edge-south-gate-shadow", { castShadow: false, receiveShadow: false });
+}
+
+function addForestEdgeTrees(root, materials) {
+  const trees = [
+    { x: -10.4, z: 10.2, scale: 1.35, rotationY: 0.22 },
+    { x: 10.5, z: 9.8, scale: 1.32, rotationY: -0.36 },
+    { x: -12.3, z: -3.8, scale: 1.65, rotationY: -0.12 },
+    { x: 12.2, z: -4.2, scale: 1.62, rotationY: 0.44 },
+    { x: -8.2, z: -15.4, scale: 1.45, rotationY: 0.62 },
+    { x: 8.2, z: -15.7, scale: 1.48, rotationY: -0.58 },
+    { x: -14.1, z: -13.0, scale: 1.16, rotationY: 0.08 },
+    { x: 14.0, z: -12.4, scale: 1.18, rotationY: -0.22 }
+  ];
+  addTownContextTrees(root, materials, trees);
+}
+
+function addForestEdgeDressing(root, materials) {
+  const darkTimber = [
+    { x: -5.8, y: 0.36, z: -8.6, width: 3.5, height: 0.58, depth: 0.64, rotationY: 0.32 },
+    { x: -5.8, y: 0.74, z: -8.6, width: 3.1, height: 0.16, depth: 0.72, rotationY: 0.32 }
+  ];
+  const stones = [
+    { x: 5.8, y: 0.46, z: -7.4, width: 1.62, height: 0.92, depth: 1.12, rotationY: -0.25 },
+    { x: 6.7, y: 0.28, z: -6.55, width: 0.9, height: 0.56, depth: 0.72, rotationY: 0.44 }
+  ];
+  const moss = [
+    { x: 5.74, y: 0.98, z: -7.4, width: 1.35, height: 0.08, depth: 0.82, rotationY: -0.25 },
+    { x: -5.8, y: 1.06, z: -8.6, width: 2.4, height: 0.06, depth: 0.36, rotationY: 0.32 }
+  ];
+  addInstancedBoxes(root, materials.darkTimber, darkTimber, "forest-edge-fallen-log");
+  addInstancedBoxes(root, materials.darkStone, stones, "forest-edge-mossy-stones");
+  addInstancedBoxes(root, materials.foliage, moss, "forest-edge-moss-patches", { castShadow: false, receiveShadow: true });
+
+  addInstancedGeometry(
+    root,
+    new THREE.ConeGeometry(1, 1, 5),
+    materials.foliage,
+    [
+      { x: -7.8, y: 0.24, z: 2.6, scale: [0.22, 0.55, 0.22], rotationY: 0.2 },
+      { x: -9.4, y: 0.22, z: -0.8, scale: [0.2, 0.46, 0.2], rotationY: -0.5 },
+      { x: 7.6, y: 0.24, z: 2.8, scale: [0.22, 0.52, 0.22], rotationY: 0.7 },
+      { x: 9.4, y: 0.22, z: -1.0, scale: [0.2, 0.44, 0.2], rotationY: -0.25 },
+      { x: -3.2, y: 0.22, z: -14.4, scale: [0.2, 0.5, 0.2], rotationY: 0.1 },
+      { x: 3.6, y: 0.22, z: -14.2, scale: [0.2, 0.5, 0.2], rotationY: -0.2 }
+    ],
+    "forest-edge-grass-tufts"
+  );
+  addInstancedGeometry(
+    root,
+    new THREE.DodecahedronGeometry(1, 0),
+    materials.awningGold,
+    [
+      { x: -6.9, y: 0.42, z: 1.4, scale: [0.12, 0.12, 0.12], rotationY: 0.2 },
+      { x: -6.6, y: 0.44, z: 1.72, scale: [0.1, 0.1, 0.1], rotationY: 0.4 },
+      { x: 6.2, y: 0.42, z: 2.05, scale: [0.12, 0.12, 0.12], rotationY: -0.3 },
+      { x: 6.56, y: 0.44, z: 1.72, scale: [0.1, 0.1, 0.1], rotationY: -0.1 }
+    ],
+    "forest-edge-wildflowers",
+    { castShadow: false, receiveShadow: false }
+  );
+}
+
+function addForestEdgeExitAffordances(root) {
+  for (const trigger of forestEdgeTriggers()) {
+    const threshold = trigger.affordance.threshold;
+    addExitThreshold(root, {
+      x: threshold.center[0],
+      z: threshold.center[2],
+      width: threshold.size[0],
+      depth: threshold.size[1],
+      color: threshold.color,
+      opacity: 0.2
+    });
+  }
+}
+
+function addForestEdgeEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
+  const worldNpcsById = new Map((world?.npcs ?? []).map((npc) => [npc.id, npc]));
+  const placements = {
+    "npc:forest_rat": {
+      position: [3.45, 0, -4.2],
+      heading: -Math.PI * 0.74,
+      role: "Hostile",
+      palette: "red",
+      height: 1.75,
+      width: 1.45
+    }
+  };
+
+  for (const [index, npc] of npcs.entries()) {
+    const normalized = normalizeNpc(npc, worldNpcsById);
+    if (!normalized.id) continue;
+    const placement = placements[normalized.id] ?? {
+      position: [3.2 - index * 1.1, 0, -4.4 - index * 0.75],
+      heading: Math.PI,
+      role: npcRoleLabel(normalized),
+      palette: npcPalette(normalized)
+    };
+    const [x, , z] = placement.position;
+    addNpcStandee(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      image: `${worldRoot}/assets/images/npcs/${imageId(normalized.spriteOverride || normalized.id)}.webp`,
+      x,
+      z,
+      rotationY: placement.heading,
+      height: placement.height ?? 2.2,
+      width: placement.width ?? 1.4,
+      palette: placement.palette,
+      showLabel: false
+    });
+    interactables.push({
+      kind: "npc",
+      id: normalized.id,
+      name: normalized.name,
+      role: placement.role,
+      prompt: normalized.hostile ? `Engage: ${normalized.name}` : `Talk: ${normalized.name}`,
+      description: normalized.description ?? "",
+      dialogue: normalized.dialogueScript ?? normalized.repeatDialogueScript ?? "",
+      behaviorType: normalized.behaviorType ?? "",
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+
+  for (const [index, item] of roomItems.entries()) {
+    const normalized = normalizeRoomItem(item, world);
+    if (!normalized.id) continue;
+    const x = -1.8 + index * 0.9;
+    const z = -2.8 + (index % 2) * 1.2;
+    addItemMarker(root, materials, {
+      id: normalized.id,
+      name: normalized.name,
+      quantity: normalized.quantity,
+      x,
+      z
+    });
+    interactables.push({
+      kind: "item",
+      id: normalized.id,
+      name: normalized.name,
+      role: "Ground",
+      prompt: `Inspect: ${normalized.name}`,
+      description: normalized.description ?? "",
+      quantity: normalized.quantity,
+      position: new THREE.Vector3(x, 0, z)
+    });
+  }
+}
+
+function forestEdgeTriggers() {
+  return [
+    {
+      id: "exit-south-gate",
+      direction: "SOUTH",
+      targetId: "town:gate",
+      prompt: "Return to the North Gate",
+      trigger: { type: "box", center: [0, 1, FOREST_EDGE.southExitZ], size: [FOREST_EDGE.exitHalfWidth * 2, 3, 1.7] },
+      affordance: {
+        label: "North Gate",
+        subtitle: "South",
+        threshold: { center: [0, 0.05, FOREST_EDGE.southExitZ], size: [FOREST_EDGE.exitHalfWidth * 2, 1.35], color: 0xe8c070 }
+      }
+    },
+    {
+      id: "exit-north-path",
+      direction: "NORTH",
+      targetId: "forest:path",
+      prompt: "Follow the Winding Forest Path",
+      trigger: { type: "box", center: [0, 1, FOREST_EDGE.northExitZ], size: [FOREST_EDGE.exitHalfWidth * 2, 3, 1.7] },
+      affordance: {
+        label: "Forest Path",
+        subtitle: "North",
+        threshold: { center: [0, 0.05, FOREST_EDGE.northExitZ], size: [FOREST_EDGE.exitHalfWidth * 2, 1.35], color: 0xb8e58a }
       }
     }
   ];

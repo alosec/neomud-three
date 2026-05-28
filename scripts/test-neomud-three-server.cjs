@@ -114,6 +114,36 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:gate"));
     assertRenderBudget(assert, "town:gate", budgetReports.at(-1).stats);
 
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: -20.7, heading: 0 }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "forest:edge",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+    assert.equal((await page.locator("#room-name").textContent()).trim(), "Forest Edge");
+    const forestTriggers = await page.evaluate(() => window.__neomudThreeDebug.room.triggers);
+    assert.ok(forestTriggers.some((trigger) => trigger.id === "exit-south-gate"));
+    assert.ok(forestTriggers.some((trigger) => trigger.id === "exit-north-path"));
+    const forestEntities = await page.evaluate(() => window.__neomudThreeDebug.room.entities);
+    assert.ok(
+      forestEntities.some((entity) => entity.id === "npc:forest_rat" && /Forest Rat/i.test(entity.name)),
+      `expected server Forest Rat entity in Forest Edge, got ${JSON.stringify(forestEntities)}`
+    );
+    await saveScreenshot(page, "server-forest-edge.png");
+    budgetReports.push(await collectBudgetStatus(page, "forest:edge"));
+    assertRenderBudget(assert, "forest:edge", budgetReports.at(-1).stats);
+
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 20.7, heading: Math.PI }));
+    await page.keyboard.down("w");
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.currentRoomId === "town:gate",
+      null,
+      { timeout: 10_000 }
+    );
+    await page.keyboard.up("w");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 18.7, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForFunction(
