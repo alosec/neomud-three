@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T20:18:41.887Z",
+  "updated": "2026-05-28T20:23:55.513Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2638,6 +2638,34 @@
       "comments": [],
       "created": "2026-05-28T20:14:23Z",
       "updated": "2026-05-28T20:18:27Z"
+    },
+    {
+      "id": "neo-1fb2.75.1",
+      "project": "NeoMud",
+      "title": "Load Blender movement gym in Three runtime",
+      "description": "Add a GLTFLoader-based level parser and movement-gym review page that classifies Blender-authored VIS/COL/SPAWN/TRG/PICKUP/ENEMY/PATH/CAMERA/LIGHTS nodes, hides non-render nodes, exposes typed metadata, and runs through lab QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.75",
+      "close_reason": "",
+      "labels": [
+        "blender",
+        "gltf",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 121,
+          "body": "Completed: level-loader.js classifies Blender GLB prefixes, movement-gym.html displays the visible VIS nodes, non-render nodes are hidden, and lab QA asserts parser metadata plus render budget.",
+          "created": "2026-05-28T20:23:40Z"
+        }
+      ],
+      "created": "2026-05-28T20:22:56Z",
+      "updated": "2026-05-28T20:23:40Z"
     }
   ],
   "ready": [

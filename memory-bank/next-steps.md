@@ -23,7 +23,8 @@ High leverage next work:
    - Reusable components for floors, walls, portals, billboards, interactables, lights, and generated-texture panels.
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
-   - Add a GLB `WorldLoader` / `LevelParser` for the Blender movement gym: classify `VIS_`, `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_` nodes, hide non-render metadata nodes, and expose typed level data to the renderer.
+   - Promote the movement gym loader from lab-only code into a main-runtime `WorldLoader` / `LevelParser` interface.
+   - Add debug drawing toggles for parsed `COL_`, `SPAWN_`, `TRG_`, `PICKUP_`, `ENEMY_`, `PATH_`, `CAMERA_`, and `LIGHTS_` metadata.
 
 2. Upgrade Temple of the Dawn into the quality bar.
    - Better Gothic wall/window frames.

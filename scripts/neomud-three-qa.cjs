@@ -85,6 +85,12 @@ const RENDER_BUDGETS = {
     triangles: 120_000,
     textures: 56,
     geometries: 240
+  },
+  "movement-gym": {
+    calls: 90,
+    triangles: 25_000,
+    textures: 16,
+    geometries: 90
   }
 };
 

@@ -133,15 +133,38 @@ Validate the exported GLB:
 node scripts/validate-neomud-three-gltf.mjs
 ```
 
+## Runtime Parser
+
+The first runtime bridge is in place:
+
+```text
+parser: experiments/neomud-three/level-loader.js
+viewer: experiments/neomud-three/movement-gym.html
+qa:     NEOMUD_THREE_BROWSER_CHANNEL=chrome-canary node scripts/test-neomud-three-labs.cjs
+```
+
+`level-loader.js` loads the movement gym GLB through `GLTFLoader`, classifies
+nodes by the Blender prefixes, hides non-`VIS_` authoring/gameplay nodes, and
+exposes a typed summary for future physics/gameplay systems.
+
+The current movement gym lab QA proves:
+
+- 8 visible render nodes stay visible.
+- 23 authoring/gameplay nodes are hidden after parsing.
+- 8 collision nodes, 1 spawn, 1 trigger, 5 pickups, 1 enemy, 4 path nodes,
+  1 camera zone, and 1 light marker are present.
+- The portal trigger targets `town:square`.
+- Render budget is currently 9 calls / 96 triangles / 1 texture / 9 geometries.
+
 ## Next Pipeline Steps
 
-1. Add a `WorldLoader` / `LevelParser` that loads the movement gym GLB and
-   classifies nodes by prefix.
-2. Add a debug level route that displays the GLB and hides collision/trigger
-   nodes after parsing.
+1. Convert the movement gym parser output into a `WorldLoader` / `LevelParser`
+   interface used by the main renderer, not only the lab page.
+2. Add debug drawing toggles for parsed colliders, trigger volumes, spawn
+   points, path nodes, and pickup/enemy markers.
 3. Move one existing room landmark from JavaScript-authored mesh code into a
    Blender source scene.
-4. Add glTF Transform inspection/optimization once the first runtime import is
+4. Add glTF Transform inspection/optimization once the first main-runtime import is
    working.
 5. Add KTX2/Basis texture compression when generated materials become part of
    GLB delivery.

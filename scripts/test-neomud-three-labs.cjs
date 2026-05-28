@@ -33,6 +33,17 @@ const LABS = [
       props: window.__neomudPropZooDebug.props,
       avatar: window.__neomudPropZooDebug.avatar
     })
+  },
+  {
+    id: "movement-gym",
+    path: "movement-gym.html",
+    screenshot: "movement-gym.png",
+    ready: () => window.__neomudMovementGymDebug?.ready && window.__neomudMovementGymDebug?.render?.triangles > 0,
+    snapshot: () => ({
+      render: window.__neomudMovementGymDebug.render,
+      level: window.__neomudMovementGymDebug.level,
+      error: window.__neomudMovementGymDebug.error
+    })
   }
 ];
 
@@ -84,6 +95,18 @@ async function main() {
         assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
         assert.equal(snapshot.avatar.visualTreatment, "procedural-adventurer-proxy-v6");
         assert.equal(snapshot.avatar.proxy, true);
+      }
+      if (lab.id === "movement-gym") {
+        assert.equal(snapshot.error, null);
+        assert.equal(snapshot.level.summary.renderNodes, 8);
+        assert.equal(snapshot.level.summary.collisionNodes, 8);
+        assert.equal(snapshot.level.summary.triggerNodes, 1);
+        assert.equal(snapshot.level.summary.pickupNodes, 5);
+        assert.equal(snapshot.level.summary.enemyNodes, 1);
+        assert.equal(snapshot.level.summary.hiddenNodes, 23);
+        assert.equal(snapshot.level.spawn.name, "SPAWN_player");
+        assert.equal(snapshot.level.triggers[0].userData.target_room, "town:square");
+        assert.deepEqual(snapshot.level.paths, [{ id: "training_dummy_patrol", count: 4 }]);
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });
