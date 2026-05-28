@@ -64,9 +64,9 @@ final production pew, until screenshot review confirms it at multiple angles.
 
 The first candidate improves the Temple side windows with a coherent wall bay:
 wall backer, recess, lancet arch frame, sill, reveals, mullions, inset colored
-glass lancets, and a restrained floor-light patch. It remains a playable
-prototype because the glass is still procedural color geometry, not a final
-painted/generated stained-glass material.
+glass texture layer, and a restrained floor-light patch. It remains a playable
+prototype because the glass is a first generated texture candidate embedded in
+the GLB, not an optimized final material pipeline.
 
 ## Current Third Candidate
 
@@ -79,6 +79,19 @@ painted/generated stained-glass material.
 - Browser QA: `experiments/neomud-three/cathedral-asset-lab.html`
 
 The first candidate replaces the flat black re-table blockout with a tiered
-dais/table, draped cloth, arched re-table panels, a dawn medallion, paired
-incense bowls, ember cues, and smoke geometry. It is accepted as a playable
-prototype, not final cathedral art.
+dais/table, draped cloth, arched re-table panels, a generated painted dawn-glass
+layer, a dawn medallion, paired incense bowls, ember cues, and smoke geometry.
+It is accepted as a playable prototype, not final cathedral art.
+
+## Current Texture Candidate
+
+`templeStainedGlassDawnV2` now has:
+
+- Source: built-in image generation output under Codex generated-images storage
+- Runtime texture: `experiments/neomud-three/assets/generated/temple-stained-glass-dawn-v2-lancet.png`
+- Registry entry: `experiments/neomud-three/render-assets.js`
+- Manifest entry: `experiments/neomud-three/assets/generated/asset-manifest.json`
+
+The square generation was cropped into a 512x1024 lancet texture after asset-lab
+QA showed black rectangular margins in the fixture. The current cropped version
+is used by the wall-window bay and altar/incense fixture candidates.

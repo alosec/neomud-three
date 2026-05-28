@@ -36,7 +36,7 @@ High leverage next work:
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
    - Use isolated asset QA for each fixture before room integration. `cathedral.pew`, `cathedral.wall_window_bay`, and `cathedral.altar_incense_fixture` are the first accepted playable-prototype candidates.
-   - Do not accept the current altar and incense as final art. The next Temple fixture/material pass should improve stained-glass texture fidelity, smoke softness, altar material hierarchy, or lighting with screenshot evidence.
+   - Do not accept the current altar and incense as final art. The next Temple fixture/material pass should improve smoke softness, altar material hierarchy, lighting, or optimized texture delivery with screenshot evidence.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
    - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
 
@@ -101,5 +101,5 @@ High leverage next work:
    - Guildmaster Aldric and Old Wren now have richer local staging props. Further Town Square NPC work should connect role-specific affordances to real dialogue/combat/tutorial interactions rather than adding disconnected clutter.
    - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k; surface and gate batching now leaves current Town Square full smoke at roughly 13.6k triangles and 211/240 draw calls. Keep spending that headroom deliberately.
    - The Temple window batching pass reclaimed more than 100 full-smoke draw calls, and the altar retable spends part of that headroom while keeping full smoke at 276 calls.
-   - Stone ground trim and gate trim are now in Prop Zoo and applied to Town Square; add the next Prop Zoo items only when they unlock that landmark pass: stained-glass/window frame variant or a better NPC staging prop.
+   - Stone ground trim and gate trim are now in Prop Zoo and applied to Town Square; add the next Prop Zoo items only when they unlock that landmark pass: a better NPC staging prop, a smoke/effects prop, or a true optimized texture-delivery path.
    - Keep Town Square under the current render budget and update fixed screenshots.

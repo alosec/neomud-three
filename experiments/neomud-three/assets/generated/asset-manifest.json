@@ -36,6 +36,15 @@
       "preloadGroup": "starter"
     },
     {
+      "id": "templeStainedGlassDawnV2",
+      "file": "temple-stained-glass-dawn-v2-lancet.png",
+      "kind": "painted-emissive-texture",
+      "source": "built-in imagegen, copied from generated PNG, resized/cropped with sips and ffmpeg",
+      "prompt": "Square stained-glass game texture for a Gothic lancet cathedral window, Temple of the Dawn sunburst motif, blue side glass, red accents, dark lead lines, readable at distance, no room background or text. Cropped into a 512x1024 lancet runtime texture to avoid black rectangular margins in fixtures.",
+      "use": ["cathedral-window", "altar-retable"],
+      "preloadGroup": "starter"
+    },
+    {
       "id": "millhavenCobblestone",
       "file": "cobblestone-millhaven.png",
       "kind": "tileable-material",

@@ -41,6 +41,7 @@ def build_asset():
     glass_blue = temple.material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
     glass_red = temple.material("MAT_temple_glass_red", (0.88, 0.13, 0.16, 0.64), roughness=0.28, alpha=0.64, emission=(0.72, 0.06, 0.07, 1), emission_strength=0.18)
     glass_gold = temple.material("MAT_temple_glass_gold", (1.0, 0.68, 0.14, 0.62), roughness=0.32, alpha=0.62, emission=(0.9, 0.42, 0.04, 1), emission_strength=0.18)
+    glass_dawn_texture = temple.image_material("MAT_temple_stained_glass_dawn_v2", temple.STAINED_GLASS_DAWN_TEXTURE, roughness=0.22, alpha=0.88, emission_strength=0.78)
     collision = temple.material("MAT_debug_collision", (0.1, 0.28, 0.95, 0.18), alpha=0.18)
 
     temple.add_cathedral_altar_incense_fixture(
@@ -56,6 +57,7 @@ def build_asset():
         glass_red,
         glass_gold,
         smoke,
+        glass_dawn_texture,
     )
     temple.cube3("COL_altar_fixture_footprint", 0, 1.15, 0.48, 10.1, 2.3, 5.9, collision, kind="collision", collider="box", collider_id="cathedral-altar-fixture-footprint")
     temple.cube3("COL_left_incense_brazier", -3.42, 0.86, -0.78, 1.05, 1.72, 1.05, collision, kind="collision", collider="box", collider_id="cathedral-altar-left-incense")

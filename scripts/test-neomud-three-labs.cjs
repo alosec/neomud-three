@@ -143,17 +143,18 @@ async function main() {
         assert.ok(snapshot.asset.colliders.includes("cathedral-pew-footprint"));
         assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_end_panel")), "expected profiled pew end panels");
         assert.ok(snapshot.asset.renderNodes.some((name) => name.includes("_back")), "expected separate pew backrest");
-        assert.ok(windowBay.summary.renderNodes >= 16, `expected detailed window bay render nodes: ${JSON.stringify(windowBay.summary)}`);
+        assert.ok(windowBay.summary.renderNodes >= 14, `expected detailed window bay render nodes: ${JSON.stringify(windowBay.summary)}`);
         assert.ok(windowBay.colliders.includes("cathedral-window-bay-footprint"));
         assert.ok(windowBay.renderNodes.some((name) => name.includes("_outer_arch")), "expected arched window frame");
         assert.ok(windowBay.renderNodes.some((name) => name.includes("_mullion")), "expected window mullions");
-        assert.ok(windowBay.renderNodes.some((name) => name.includes("_glass_")), "expected inset glass lancets");
+        assert.ok(windowBay.renderNodes.some((name) => name.includes("_painted_glass")), "expected painted stained-glass texture layer");
         assert.ok(altarFixture.summary.renderNodes >= 24, `expected detailed altar fixture render nodes: ${JSON.stringify(altarFixture.summary)}`);
         assert.ok(altarFixture.colliders.includes("cathedral-altar-fixture-footprint"));
         assert.ok(altarFixture.colliders.includes("cathedral-altar-left-incense"));
         assert.ok(altarFixture.colliders.includes("cathedral-altar-right-incense"));
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_retable_center_arch")), "expected authored retable center arch");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_dawn_medallion")), "expected dawn focal motif");
+        assert.ok(altarFixture.renderNodes.some((name) => name.includes("_painted_glass_center")), "expected painted altar glass texture layer");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_incense_bowl")), "expected readable incense bowls");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_smoke_")), "expected smoke wisp geometry");
       }

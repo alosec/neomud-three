@@ -35,6 +35,14 @@ export const GENERATED_ASSETS = {
     use: ["cathedral-window"],
     preloadGroup: "starter"
   },
+  templeStainedGlassDawnV2: {
+    url: `${ASSET_ROOT}/temple-stained-glass-dawn-v2-lancet.png`,
+    kind: "painted-emissive-texture",
+    dimensions: [512, 1024],
+    repeat: [1, 1],
+    use: ["cathedral-window", "altar-retable"],
+    preloadGroup: "starter"
+  },
   millhavenCobblestone: {
     url: `${ASSET_ROOT}/cobblestone-millhaven.png`,
     kind: "tileable-material",
@@ -237,6 +245,29 @@ const MATERIAL_DEFINITION_LIST = [
         alphaTest: 0.035,
         depthWrite: false,
         roughness: 0.2,
+        side: THREE.DoubleSide
+      });
+    }
+  },
+  {
+    id: "temple.stained-glass.dawn-v2",
+    family: "temple",
+    kind: "painted-emissive-texture",
+    intendedUse: ["cathedral-window", "altar-retable"],
+    textureAsset: "templeStainedGlassDawnV2",
+    repeat: [1, 1],
+    roughness: 0.22,
+    metalness: 0,
+    emissive: true,
+    approved: true,
+    create: () => {
+      const glassMap = texture("templeStainedGlassDawnV2");
+      return standardMaterial({
+        map: glassMap,
+        emissiveMap: glassMap,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.72,
+        roughness: 0.22,
         side: THREE.DoubleSide
       });
     }

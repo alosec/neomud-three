@@ -16,10 +16,12 @@ import bpy
 
 
 ROOT = Path(__file__).resolve().parents[1]
+GENERATED_DIR = ROOT / "experiments/neomud-three/assets/generated"
 SOURCE_DIR = ROOT / "experiments/neomud-three/assets/source/scenes/town_temple"
 BUILD_DIR = ROOT / "experiments/neomud-three/assets/build/levels"
 SOURCE_BLEND = SOURCE_DIR / "town_temple.blend"
 BUILD_GLB = BUILD_DIR / "town_temple.glb"
+STAINED_GLASS_DAWN_TEXTURE = GENERATED_DIR / "temple-stained-glass-dawn-v2-lancet.png"
 
 
 def reset_scene():
@@ -43,6 +45,26 @@ def material(name, color, roughness=0.82, alpha=1.0, emission=None, emission_str
     if alpha < 1:
         mat.blend_method = "BLEND"
         mat.use_screen_refraction = True
+    return mat
+
+
+def image_material(name, image_path, roughness=0.28, alpha=0.92, emission_strength=0.72):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    mat.use_backface_culling = False
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    image = bpy.data.images.load(str(image_path), check_existing=True)
+    image.colorspace_settings.name = "sRGB"
+    if bsdf:
+        tex = mat.node_tree.nodes.new("ShaderNodeTexImage")
+        tex.image = image
+        mat.node_tree.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+        mat.node_tree.links.new(tex.outputs["Color"], bsdf.inputs["Emission Color"])
+        bsdf.inputs["Emission Strength"].default_value = emission_strength
+        bsdf.inputs["Roughness"].default_value = roughness
+        bsdf.inputs["Alpha"].default_value = alpha
+    mat.blend_method = "BLEND"
+    mat.use_screen_refraction = True
     return mat
 
 
@@ -116,6 +138,50 @@ def mesh3(name, vertices, faces, mat, kind="visible", **props):
     mesh = bpy.data.meshes.new(f"{name}_mesh")
     mesh.from_pydata([to_blender_location(*vertex) for vertex in vertices], [], faces)
     mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    if mat:
+        obj.data.materials.append(mat)
+    tag(obj, kind, **props)
+    return obj
+
+
+def plane_x3_uv(name, x, y, z, width, height, mat, kind="visible", **props):
+    """Create a vertical textured plane at fixed x, spanning z/y."""
+    mesh = bpy.data.meshes.new(f"{name}_mesh")
+    vertices = [
+        to_blender_location(x, y, z - width / 2),
+        to_blender_location(x, y, z + width / 2),
+        to_blender_location(x, y + height, z + width / 2),
+        to_blender_location(x, y + height, z - width / 2),
+    ]
+    mesh.from_pydata(vertices, [], [(0, 1, 2, 3)])
+    mesh.update()
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    for loop, uv in zip(uv_layer.data, [(0, 0), (1, 0), (1, 1), (0, 1)]):
+        loop.uv = uv
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    if mat:
+        obj.data.materials.append(mat)
+    tag(obj, kind, **props)
+    return obj
+
+
+def plane_z3_uv(name, x, y, z, width, height, mat, kind="visible", **props):
+    """Create a vertical textured plane at fixed z, spanning x/y."""
+    mesh = bpy.data.meshes.new(f"{name}_mesh")
+    vertices = [
+        to_blender_location(x - width / 2, y, z),
+        to_blender_location(x + width / 2, y, z),
+        to_blender_location(x + width / 2, y + height, z),
+        to_blender_location(x - width / 2, y + height, z),
+    ]
+    mesh.from_pydata(vertices, [], [(0, 1, 2, 3)])
+    mesh.update()
+    uv_layer = mesh.uv_layers.new(name="UVMap")
+    for loop, uv in zip(uv_layer.data, [(0, 0), (1, 0), (1, 1), (0, 1)]):
+        loop.uv = uv
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     if mat:
@@ -317,7 +383,7 @@ def circle_panel_z3(name, x, y, z, radius, mat, segments=24, kind="visible", **p
     return mesh3(name, vertices, faces, mat, kind=kind, **props)
 
 
-def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue, glass_red, glass_gold, light_material):
+def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue, glass_red, glass_gold, light_material, glass_texture=None):
     """Build one reusable wall/window bay in side-wall coordinates.
 
     The bay is deliberately authored as a component: wall recess, thick frame,
@@ -342,9 +408,21 @@ def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue
 
     # Inset colored lancets with dark lead lines. This replaces the former
     # three pasted rectangular bars with a chapel-like grouped window.
-    lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_blue", glass_x, 2.4, z - 1.04, 0.08, 0.78, 4.9, glass_blue, semantic="cathedral_stained_glass_lancet")
-    lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_gold", glass_x + inward * 0.02, 2.34, z, 0.08, 0.86, 5.2, glass_gold, semantic="cathedral_stained_glass_lancet")
-    lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_red", glass_x, 2.4, z + 1.04, 0.08, 0.78, 4.9, glass_red, semantic="cathedral_stained_glass_lancet")
+    if glass_texture:
+        plane_x3_uv(
+            f"VIS_window_bay_{bay_id}_painted_glass",
+            glass_x + inward * 0.075,
+            2.24,
+            z,
+            3.2,
+            5.72,
+            glass_texture,
+            semantic="cathedral_stained_glass_painted_layer",
+        )
+    else:
+        lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_blue", glass_x, 2.4, z - 1.04, 0.08, 0.78, 4.9, glass_blue, semantic="cathedral_stained_glass_lancet")
+        lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_gold", glass_x + inward * 0.02, 2.34, z, 0.08, 0.86, 5.2, glass_gold, semantic="cathedral_stained_glass_lancet")
+        lancet_prism_x3(f"VIS_window_bay_{bay_id}_glass_red", glass_x, 2.4, z + 1.04, 0.08, 0.78, 4.9, glass_red, semantic="cathedral_stained_glass_lancet")
     cube3(f"VIS_window_bay_{bay_id}_mullion_left", glass_x + inward * 0.04, 4.78, z - 0.52, 0.12, 4.88, 0.11, trim, semantic="cathedral_window_bay_mullion")
     cube3(f"VIS_window_bay_{bay_id}_mullion_right", glass_x + inward * 0.04, 4.78, z + 0.52, 0.12, 4.88, 0.11, trim, semantic="cathedral_window_bay_mullion")
     cube3(f"VIS_window_bay_{bay_id}_center_lead", glass_x + inward * 0.06, 4.88, z, 0.1, 4.35, 0.08, dark, semantic="cathedral_window_bay_lead")
@@ -367,7 +445,7 @@ def add_cathedral_window_bay(bay_id, x, z, inward, stone, trim, dark, glass_blue
     )
 
 
-def add_cathedral_altar_incense_fixture(fixture_id, x, z, stone, trim, dark, cloth, gold, glass_blue, glass_red, glass_gold, smoke):
+def add_cathedral_altar_incense_fixture(fixture_id, x, z, stone, trim, dark, cloth, gold, glass_blue, glass_red, glass_gold, smoke, glass_texture=None):
     """Build the altar end as a reusable reviewed fixture.
 
     This replaces the old stack of rectangular wall bars with one staged altar:
@@ -392,6 +470,37 @@ def add_cathedral_altar_incense_fixture(fixture_id, x, z, stone, trim, dark, clo
     lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_center_arch", x, 2.05, z + 1.91, 0.18, 2.55, 5.65, glass_gold, semantic="cathedral_altar_lancet")
     lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_left_arch", x - 2.55, 2.15, z + 1.94, 0.17, 1.55, 4.92, glass_red, semantic="cathedral_altar_lancet")
     lancet_prism_z3(f"VIS_altar_{fixture_id}_retable_right_arch", x + 2.55, 2.15, z + 1.94, 0.17, 1.55, 4.92, glass_blue, semantic="cathedral_altar_lancet")
+    if glass_texture:
+        plane_z3_uv(
+            f"VIS_altar_{fixture_id}_painted_glass_center",
+            x,
+            2.02,
+            z + 1.72,
+            2.72,
+            5.78,
+            glass_texture,
+            semantic="cathedral_altar_painted_glass_layer",
+        )
+        plane_z3_uv(
+            f"VIS_altar_{fixture_id}_painted_glass_left",
+            x - 2.55,
+            2.15,
+            z + 1.72,
+            1.65,
+            4.95,
+            glass_texture,
+            semantic="cathedral_altar_painted_glass_layer",
+        )
+        plane_z3_uv(
+            f"VIS_altar_{fixture_id}_painted_glass_right",
+            x + 2.55,
+            2.15,
+            z + 1.72,
+            1.65,
+            4.95,
+            glass_texture,
+            semantic="cathedral_altar_painted_glass_layer",
+        )
     cube3(f"VIS_altar_{fixture_id}_retable_left_outer_frame", x - 4.45, 4.12, z + 1.78, 0.18, 5.65, 0.18, gold, semantic="cathedral_altar_retable_frame")
     cube3(f"VIS_altar_{fixture_id}_retable_right_outer_frame", x + 4.45, 4.12, z + 1.78, 0.18, 5.65, 0.18, gold, semantic="cathedral_altar_retable_frame")
     cube3(f"VIS_altar_{fixture_id}_retable_left_mullion", x - 1.2, 4.58, z + 1.78, 0.16, 4.46, 0.15, trim, semantic="cathedral_altar_mullion")
@@ -428,6 +537,7 @@ def build_level():
     glass_blue = material("MAT_temple_glass_blue", (0.08, 0.23, 0.88, 0.68), roughness=0.24, alpha=0.68, emission=(0.03, 0.14, 0.85, 1), emission_strength=0.24)
     glass_red = material("MAT_temple_glass_red", (0.88, 0.13, 0.16, 0.64), roughness=0.28, alpha=0.64, emission=(0.72, 0.06, 0.07, 1), emission_strength=0.18)
     glass_gold = material("MAT_temple_glass_gold", (1.0, 0.68, 0.14, 0.62), roughness=0.32, alpha=0.62, emission=(0.9, 0.42, 0.04, 1), emission_strength=0.18)
+    glass_dawn_texture = image_material("MAT_temple_stained_glass_dawn_v2", STAINED_GLASS_DAWN_TEXTURE, roughness=0.22, alpha=0.88, emission_strength=0.78)
     floor_light_blue = material("MAT_temple_floor_light_cool", (0.55, 0.72, 1.0, 0.18), roughness=0.95, alpha=0.18, emission=(0.22, 0.34, 0.75, 1), emission_strength=0.03)
     floor_light_gold = material("MAT_temple_floor_light_warm", (1.0, 0.78, 0.38, 0.16), roughness=0.96, alpha=0.16, emission=(0.72, 0.38, 0.06, 1), emission_strength=0.025)
     collision = material("MAT_debug_collision", (0.1, 0.28, 0.95, 0.18), alpha=0.18)
@@ -467,6 +577,7 @@ def build_level():
                 glass_red,
                 glass_gold,
                 floor_light_gold if index % 3 == 0 else floor_light_blue,
+                glass_dawn_texture,
             )
 
     # Entry doorway and exit trigger.
@@ -491,6 +602,7 @@ def build_level():
         glass_red,
         glass_gold,
         smoke,
+        glass_dawn_texture,
     )
 
     # Pews and runner.

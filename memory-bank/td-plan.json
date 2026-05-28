@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T22:36:13.411Z",
+  "updated": "2026-05-28T23:03:58.616Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2926,6 +2926,25 @@
       "comments": [],
       "created": "2026-05-28T22:31:38Z",
       "updated": "2026-05-28T22:36:01Z"
+    },
+    {
+      "id": "neo-1fb2.84",
+      "project": "NeoMud",
+      "title": "Add painted stained-glass texture candidate",
+      "description": "Generate a controlled Temple stained-glass texture, register it as a project asset/material, integrate it into the cathedral window/altar Blender candidates, and verify through asset-lab and room screenshot QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done: generated and cropped Temple stained-glass texture, registered it as a project material, embedded it in cathedral window/altar GLBs, and passed lab/room/offline/server QA",
+      "labels": [
+        "assets"
+      ],
+      "blockers": [],
+      "comments": [],
+      "created": "2026-05-28T22:59:41Z",
+      "updated": "2026-05-28T23:03:55Z"
     }
   ]
 }

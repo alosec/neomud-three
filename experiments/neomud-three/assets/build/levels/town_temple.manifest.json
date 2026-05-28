@@ -10,17 +10,17 @@
   "runtimeGlb": "town_temple.glb",
   "files": {
     "sourceImageBytes": 74634,
-    "sourceBlendBytes": 173930,
-    "runtimeGlbBytes": 438752
+    "sourceBlendBytes": 172409,
+    "runtimeGlbBytes": 1444316
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 25,
-    "meshes": 22,
-    "materials": 16,
+    "nodes": 26,
+    "meshes": 23,
+    "materials": 17,
     "prefixes": {
-      "VIS_": 14,
+      "VIS_": 15,
       "COL_": 7,
       "NAV_": 0,
       "SPAWN_": 1,
@@ -34,10 +34,10 @@
   },
   "runtimeQa": {
     "offlineTempleBudget": {
-      "drawCalls": 33,
-      "triangles": 9098,
-      "textures": 1,
-      "geometries": 21
+      "drawCalls": 35,
+      "triangles": 7710,
+      "textures": 2,
+      "geometries": 22
     },
     "checks": [
       "cathedral asset lab",
@@ -50,9 +50,10 @@
     ]
   },
   "knownLimits": [
-    "Materials are first-pass Blender-authored stylized colors, not final generated texture families.",
+    "Materials are mixed: most stone/wood remains first-pass Blender-authored stylized colors, while stained glass now uses a generated painted lancet texture candidate.",
     "The package now uses isolated pew, wall-window bay, and altar/incense asset candidates plus material-batched visible room meshes.",
     "Stained-glass floor-light patches are subdued, but still procedural and should become a dedicated lighting/effects pass later.",
+    "The painted stained-glass texture is embedded in the GLB for this candidate; future asset-build work should move repeated textures toward optimized/compressed delivery.",
     "The old procedural Temple builder remains in code as a temporary removal candidate."
   ]
 }
