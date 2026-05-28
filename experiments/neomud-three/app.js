@@ -40,6 +40,7 @@ let currentStatusDetail = "";
 let exitCooldownUntil = 0;
 let nearbyInteractable = null;
 let selectedInteractable = null;
+let lastInteractionResult = null;
 
 const gameLog = [];
 
@@ -246,6 +247,15 @@ function handleServerMessage(message) {
       break;
     case "system_message":
       appendLog(message.message);
+      break;
+    case "interact_result":
+      lastInteractionResult = {
+        success: Boolean(message.success),
+        featureName: message.featureName ?? selectedInteractable?.name ?? "Interaction",
+        message: message.message ?? ""
+      };
+      appendLog(`${lastInteractionResult.featureName}: ${lastInteractionResult.message}`);
+      if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "tutorial":
       appendLog(`${message.title}: ${message.content.split("\n")[0]}`);
@@ -591,6 +601,9 @@ function renderPanel(panelId) {
   for (const button of panelContent.querySelectorAll("[data-panel-target]")) {
     button.addEventListener("click", () => openPanel(button.dataset.panelTarget));
   }
+  for (const button of panelContent.querySelectorAll("[data-interact-feature]")) {
+    button.addEventListener("click", () => useSelectedInteractable(button.dataset.interactFeature));
+  }
   for (const button of panelContent.querySelectorAll("[data-room-target]")) {
     button.addEventListener("click", () => {
       requestMove(button.dataset.roomDirection, button.dataset.roomTarget);
@@ -747,6 +760,17 @@ function interactionPanel() {
 
   const body = entity.dialogue || entity.description || `${entity.name} is present in ${world.rooms.get(currentRoomId)?.name ?? "this room"}.`;
   const kindLabel = entity.kind === "npc" ? entity.role || "NPC" : entity.role || "Item";
+  const hasServerAction = Boolean(entity.actionType);
+  const canUseServerAction = hasServerAction && serverCanDriveMovement();
+  const actionResult = lastInteractionResult
+    ? `
+      <div class="list-card">
+        <small>${lastInteractionResult.success ? "server action succeeded" : "server action failed"}</small>
+        <strong>${escapeHtml(lastInteractionResult.featureName)}</strong>
+        <span class="muted">${escapeHtml(lastInteractionResult.message)}</span>
+      </div>
+    `
+    : "";
   return htmlFragment(`
     <p>${escapeHtml(kindLabel)} / ${escapeHtml(world.rooms.get(currentRoomId)?.name ?? currentRoomId)}</p>
     <div class="list">
@@ -754,8 +778,12 @@ function interactionPanel() {
         <strong>${escapeHtml(entity.name)}</strong>
         <span class="muted">${escapeHtml(body)}</span>
       </div>
+      ${actionResult}
     </div>
     <div class="panel-actions">
+      ${hasServerAction
+        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction ? "Use" : "Server action unavailable"}</button>`
+        : ""}
       <button type="button" data-panel-target="log">Open log</button>
       <button type="button" data-panel-target="map">Map</button>
     </div>
@@ -832,9 +860,38 @@ function updateInteractionPrompt() {
 function interactWithNearby() {
   if (!nearbyInteractable) return;
   selectedInteractable = { ...nearbyInteractable };
+  lastInteractionResult = null;
   appendLog(`${selectedInteractable.prompt}.`);
   openPanel("interaction");
   updateInteractionPrompt();
+}
+
+function useSelectedInteractable(featureId) {
+  if (!selectedInteractable || selectedInteractable.id !== featureId) return;
+  if (!serverCanDriveMovement()) {
+    lastInteractionResult = {
+      success: false,
+      featureName: selectedInteractable.name,
+      message: "Server action requires a live Kotlin server session."
+    };
+    appendLog(`${selectedInteractable.name}: ${lastInteractionResult.message}`);
+    if (activePanel === "interaction") renderPanel(activePanel);
+    return;
+  }
+
+  appendLog(`Using ${selectedInteractable.name} through the Kotlin server...`);
+  const sent = serverState.client.sendInteractFeature(featureId);
+  if (!sent) {
+    lastInteractionResult = {
+      success: false,
+      featureName: selectedInteractable.name,
+      message: "Could not send the interaction command."
+    };
+    appendLog(`${selectedInteractable.name}: ${lastInteractionResult.message}`);
+    if (activePanel === "interaction") renderPanel(activePanel);
+  } else {
+    updateStatusText(`Using ${selectedInteractable.name} through the Kotlin server...`);
+  }
 }
 
 function shortDirection(direction) {
@@ -1010,6 +1067,7 @@ function installDebugApi() {
         player: serverState.player,
         pendingMove: serverState.pendingMove,
         lastError: serverState.lastError,
+        lastInteractionResult,
         messageCount: serverState.messageCount,
         npcs: serverState.npcs.map((npc) => ({
           id: npc.id ?? npc.npcId ?? "",

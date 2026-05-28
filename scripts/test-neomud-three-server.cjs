@@ -317,6 +317,27 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "forest:cave"));
     assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
 
+    const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
+    await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.05, z, heading: -Math.PI / 2 }), caveChest);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
+      null,
+      { timeout: 2_000 }
+    );
+    await page.keyboard.press("f");
+    assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
+    assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), false);
+    const beforeInteractMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
+    await page.locator('[data-interact-feature="cave_chest"]').click();
+    await page.waitForFunction(
+      (before) => window.__neomudThreeDebug.server.messageCount > before && window.__neomudThreeDebug.server.lastInteractionResult,
+      beforeInteractMessages,
+      { timeout: 5_000 }
+    );
+    const chestResult = await page.evaluate(() => window.__neomudThreeDebug.server.lastInteractionResult);
+    assert.match(chestResult.message, /preserved|vial|gloves|untouched|doesn't seem to do anything more/i);
+    await page.keyboard.press("Escape");
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

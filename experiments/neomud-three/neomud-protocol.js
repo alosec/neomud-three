@@ -179,6 +179,9 @@ export function connectNeoMud(options = {}) {
     sendMove(direction) {
       return send({ type: "move", direction });
     },
+    sendInteractFeature(featureId) {
+      return send({ type: "interact_feature", featureId });
+    },
     sendLook() {
       return send({ type: "look" });
     },

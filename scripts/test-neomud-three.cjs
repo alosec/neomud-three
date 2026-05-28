@@ -531,6 +531,7 @@ async function main() {
     assert.match(await page.locator("#interaction-prompt").textContent(), /moss-covered stone chest/i);
     await page.keyboard.press("f");
     assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
+    assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), true);
     assert.match(await page.locator("#panel-content").textContent(), /preserved|vial|gloves|untouched/i);
     await page.keyboard.press("Escape");
 
