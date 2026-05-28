@@ -305,7 +305,9 @@ export function addItemMarker(root, materials, spec) {
     name,
     x,
     z,
-    quantity = 1
+    quantity = 1,
+    labelY = 1.42,
+    labelZ = 0.16
   } = spec;
 
   const group = new THREE.Group();
@@ -326,8 +328,8 @@ export function addItemMarker(root, materials, spec) {
 
   addTextBoard(group, quantity > 1 ? `${name} x${quantity}` : name, {
     x: 0,
-    y: 1.42,
-    z: 0.16,
+    y: labelY,
+    z: labelZ,
     width: Math.max(2.1, Math.min(3.9, name.length * 0.2)),
     height: 0.48,
     subtitle: "Ground",

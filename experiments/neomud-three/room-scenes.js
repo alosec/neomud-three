@@ -4268,10 +4268,11 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
   }
 
   const lootPositions = [
-    { x: -2.42, z: -2.18 },
-    { x: -2.82, z: -1.25 },
-    { x: -1.58, z: -1.65 },
-    { x: -1.85, z: -2.85 }
+    { x: -3.08, z: -0.92 },
+    { x: -0.08, z: -1.72 },
+    { x: -2.12, z: -3.55 },
+    { x: 1.04, z: -3.08 },
+    { x: -3.72, z: -2.48 }
   ];
 
   for (const [index, item] of roomItems.entries()) {
@@ -4285,7 +4286,9 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
       name: normalized.name,
       quantity: normalized.quantity,
       x,
-      z
+      z,
+      labelY: 2.08,
+      labelZ: 0.22
     });
     interactables.push({
       kind: "item",
@@ -4301,8 +4304,8 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
 
   if (hasCoins(roomCoins)) {
     const name = coinLabel(roomCoins);
-    const x = -2.52;
-    const z = -2.92;
+    const x = 0.0;
+    const z = -3.78;
     addHiddenCaveCoinPile(root, materials, roomCoins, x, z);
     interactables.push({
       kind: "item",
@@ -4334,7 +4337,7 @@ function addHiddenCaveCoinPile(root, materials, coins, x, z) {
 
   addTextBoard(group, coinLabel(coins), {
     x: 0,
-    y: 0.86,
+    y: 1.45,
     z: 0.12,
     width: 1.55,
     height: 0.35,

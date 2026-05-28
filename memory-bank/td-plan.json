@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T17:33:53.044Z",
+  "updated": "2026-05-28T17:40:11.571Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -2247,6 +2247,29 @@
       ],
       "created": "2026-05-28T17:27:43Z",
       "updated": "2026-05-28T17:33:38Z"
+    },
+    {
+      "id": "neo-1fb2.69.2",
+      "project": "NeoMud",
+      "title": "Improve Hidden Cave chest and loot staging",
+      "description": "Improve Hidden Cave chest and loot staging so item/coin markers are easier to read around the player avatar and the chest alcove feels intentional.",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.69",
+      "close_reason": "",
+      "labels": [],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 106,
+          "body": "Completed: cave loot markers are spread farther around the chest, Hidden Cave item labels use raised labelY/labelZ values through the reusable item-marker API, and the coin pile moved to a clearer visible spot. Server-backed and offline smoke QA pass.",
+          "created": "2026-05-28T17:39:51Z"
+        }
+      ],
+      "created": "2026-05-28T17:35:28Z",
+      "updated": "2026-05-28T17:39:58Z"
     }
   ],
   "ready": [
