@@ -7207,6 +7207,9 @@ function configureBlenderTempleScene(scene) {
     if (!object.isMesh) return;
     object.castShadow = object.name.startsWith("VIS_");
     object.receiveShadow = object.name.startsWith("VIS_");
+    if (object.name.includes("_ceiling_") || object.name.includes("_vault_")) {
+      object.userData.hideInIsometric = true;
+    }
     if (object.name.includes("MAT_temple_pew_warm_oak")) {
       object.material = approvedMaterials.pewOak;
     } else if (object.name.includes("MAT_temple_pew_dark_endgrain")) {
@@ -7305,7 +7308,7 @@ function addTempleRuntimeFinish(root, materials) {
   addInstancedBoxes(root, materials.trim, baseTrim, "temple-runtime-wall-base-trim", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.windowReveal ?? materials.trim, wallPilasterCaps, "temple-runtime-pilaster-caps", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.windowReveal ?? materials.trim, upperWallRibs, "temple-runtime-upper-wall-ribs", { castShadow: false, receiveShadow: true });
-  addInstancedBoxes(root, materials.ceilingWarmShadow ?? materials.trim, ceilingRibs, "temple-runtime-ceiling-rhythm", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.ceilingWarmShadow ?? materials.trim, ceilingRibs, "temple-runtime-ceiling-rhythm", { castShadow: false, receiveShadow: true, hideInIsometric: true });
   addInstancedBoxes(root, materials.trim, altarFrame, "temple-runtime-altar-frame", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.windowReveal ?? materials.trim, altarSidePanels, "temple-runtime-altar-side-panels", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.dawnRunner ?? materials.trim, altarGoldAccents, "temple-runtime-altar-gold-accents", { castShadow: false, receiveShadow: true });
@@ -7423,6 +7426,7 @@ function addInstancedBoxes(root, materialRef, boxes, visualRole, options = {}) {
   mesh.castShadow = options.castShadow ?? true;
   mesh.receiveShadow = options.receiveShadow ?? true;
   mesh.userData = { visualRole };
+  if (options.hideInIsometric) mesh.userData.hideInIsometric = true;
   root.add(mesh);
   return mesh;
 }
@@ -7447,6 +7451,7 @@ function addInstancedGeometry(root, geometry, materialRef, transforms, visualRol
   mesh.castShadow = options.castShadow ?? true;
   mesh.receiveShadow = options.receiveShadow ?? true;
   mesh.userData = { visualRole };
+  if (options.hideInIsometric) mesh.userData.hideInIsometric = true;
   root.add(mesh);
   return mesh;
 }

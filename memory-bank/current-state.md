@@ -20,6 +20,11 @@ Playable Three.js lab:
 - By default, the lab connects to the Kotlin/JVM NeoMud server at `ws://127.0.0.1:8080/game`, logs in as an ephemeral guest, and treats `room_info` / `move_ok` as the authoritative room state.
 - `?offline=1` disables the server path and uses the static room graph fallback.
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
+- The main client now has two visual modes: `Platform`, the existing
+  behind-character/pointer-lock camera, and `Iso`, the first elevated
+  action-RPG camera option for the Diablo-like control direction. Iso mode is
+  currently a visual/camera slice only; click-to-move is still the next
+  implementation step.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
@@ -202,10 +207,10 @@ Local app/server status:
 Known rough edges:
 
 - The current runtime is still primarily tuned around third-person/chase camera
-  movement. That is now a transitional state, not the target. Next input/camera
-  work should build a small Diablo-like click-to-move slice with elevated camera,
-  destination marker, clickable exits/interactables, and existing
-  server-authoritative command routing.
+  movement. `Iso` mode exists as the first visual option, but this is still a
+  transitional state until click-to-move, destination markers, clickable
+  exits/interactables, and existing server-authoritative command routing are
+  implemented.
 - The workflow itself now has an explicit anti-overcorrection guard, because
   recent avatar scale/camera/detail passes showed a tendency to swing too far
   from one piece of feedback. Future visual passes that touch scale, camera,

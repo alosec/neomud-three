@@ -60,6 +60,18 @@ async function main() {
       screenshots.push({ id: anchor.id, path: target });
     }
 
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
+    });
+    await settleFrames(page);
+    const isoCamera = await page.evaluate(() => window.__neomudThreeDebug.camera);
+    assert.equal(isoCamera.mode, "isometric");
+    assert.ok(isoCamera.position.y > 12, `expected elevated isometric Town Square camera, got ${JSON.stringify(isoCamera)}`);
+    const isoTarget = path.join(qaDir, "town-shot-isometric-plaza.png");
+    await page.screenshot({ path: isoTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-plaza", path: isoTarget });
+
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
     const budget = budgetStatus("town:square", stats);
     assertRenderBudget(assert, "town:square", stats);

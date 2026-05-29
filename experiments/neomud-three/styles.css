@@ -9,7 +9,7 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-body[data-input-mode="play"] {
+body[data-input-mode="play"][data-camera-mode="platform"] {
   cursor: none;
 }
 
@@ -72,6 +72,7 @@ input {
 
 .play-button,
 .menu-button,
+.camera-mode-button,
 .panel-close {
   display: grid;
   min-width: 34px;
@@ -86,9 +87,37 @@ input {
 .play-button:hover,
 .menu-button:hover,
 .menu-button.active,
+.camera-mode-button:hover,
+.camera-mode-button.active,
 .panel-close:hover {
   border-color: #f4ce78;
   color: #fff4c7;
+}
+
+.camera-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(204, 168, 85, 0.32);
+}
+
+.camera-mode-button {
+  min-width: 58px;
+  height: 34px;
+  border-width: 0;
+  border-right: 1px solid rgba(204, 168, 85, 0.32);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.camera-mode-button:last-child {
+  border-right: 0;
+}
+
+.camera-mode-button.active {
+  background: linear-gradient(180deg, rgba(111, 83, 38, 0.98), rgba(64, 42, 18, 0.98));
 }
 
 .mode-label {
@@ -135,7 +164,7 @@ input {
   height: 2px;
 }
 
-body[data-input-mode="play"] .crosshair {
+body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   opacity: 1;
 }
 

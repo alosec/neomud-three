@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T14:38:00.000Z",
+  "updated": "2026-05-29T15:02:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -62,10 +62,15 @@
           "id": 1,
           "body": "Product direction clarified: ship a game obviously heavily inspired by Diablo 3 mechanics. Prioritize elevated/isometric camera, click-to-move, click attacks/interactions/exits, readable loot/NPC affordances, room-to-room flow, and action-RPG pacing. Preserve NeoMud server authority and MUD room graph under the presentation layer.",
           "created": "2026-05-29T14:38:00Z"
+        },
+        {
+          "id": 2,
+          "body": "First visual-mode slice implemented: HUD camera toggle supports Platform and Iso. Platform preserves the current behind-character pointer-lock view; Iso provides elevated ARPG camera and keeps cursor visible for future click-to-move. Next slice should add ground raycast click target, destination marker, and clickable exits through the existing move command path.",
+          "created": "2026-05-29T15:02:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T14:31:43Z"
+      "updated": "2026-05-29T15:02:00Z"
     },
     {
       "id": "neo-1fb2",

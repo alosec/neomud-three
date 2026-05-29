@@ -61,6 +61,17 @@ async function main() {
     assert.equal(await page.locator("#compass").count(), 1);
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
     assert.match(await page.locator("#hp-value").textContent(), /^86\/86$/);
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.camera.mode), "platform");
+    assert.equal(await page.locator('[data-camera-mode="platform"].active').count(), 1);
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("isometric")), "isometric");
+    await settleFrames(page);
+    const isoCamera = await page.evaluate(() => window.__neomudThreeDebug.camera);
+    assert.equal(isoCamera.mode, "isometric");
+    assert.ok(isoCamera.position.y > 12, `expected elevated isometric camera, got ${JSON.stringify(isoCamera)}`);
+    assert.equal(await page.locator('[data-camera-mode="isometric"].active').count(), 1);
+    await saveScreenshot(page, "offline-temple-isometric.png");
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform")), "platform");
+    await settleFrames(page);
     await saveScreenshot(page, "offline-temple.png");
     budgetReports.push(await collectBudgetStatus(page, "town:temple"));
     assertRenderBudget(assert, "town:temple", budgetReports.at(-1).stats);
@@ -765,9 +776,13 @@ async function saveScreenshot(page, filename) {
 }
 
 async function collectBudgetStatus(page, roomId) {
-  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await settleFrames(page);
   const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
   return budgetStatus(roomId, stats);
+}
+
+async function settleFrames(page) {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
 }
 
 async function launchBrowser() {

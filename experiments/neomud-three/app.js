@@ -31,6 +31,7 @@ const movementChip = document.querySelector("#movement-chip");
 const pickupFeedback = document.querySelector("#pickup-feedback");
 const pickupFeedbackTitle = document.querySelector("#pickup-feedback-title");
 const pickupFeedbackDetail = document.querySelector("#pickup-feedback-detail");
+const cameraModeButtons = [...document.querySelectorAll("[data-camera-mode]")];
 
 const renderEngine = createRenderEngine(canvas);
 const { camera, player, clock } = renderEngine;
@@ -49,6 +50,7 @@ let selectedInteractable = null;
 let lastInteractionResult = null;
 let pickupFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
+let cameraMode = urlParams.get("camera") === "isometric" ? "isometric" : "platform";
 
 const gameLog = [];
 
@@ -176,7 +178,11 @@ async function main() {
   canvas.addEventListener("click", requestPlayMode);
   playButton.addEventListener("click", requestPlayMode);
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
+  for (const button of cameraModeButtons) {
+    button.addEventListener("click", () => setCameraMode(button.dataset.cameraMode));
+  }
   panelClose.addEventListener("click", closePanel);
+  updateCameraModeButtons();
 
   renderEngine.setAnimationLoop(render);
 }
@@ -533,6 +539,7 @@ function setRoom(roomId, options = {}) {
   updateStatusText();
   updateExitButtons(room);
   updateMiniMap(room);
+  renderEngine.applyCameraModeVisibility(cameraMode);
   if (activePanel) renderPanel(activePanel);
   updateCamera(1, options.snapCamera);
 }
@@ -639,7 +646,11 @@ function handlePointerLockChange() {
 
 function requestPlayMode() {
   closePanel();
-  canvas.requestPointerLock?.();
+  if (cameraMode === "platform") {
+    canvas.requestPointerLock?.();
+  } else {
+    setInputMode("play");
+  }
 }
 
 function setInputMode(mode) {
@@ -1164,8 +1175,30 @@ function updateCamera(dt, snap = false) {
     dt,
     snap,
     heading: movement.heading,
+    cameraMode,
     roomCamera: roomRuntime?.camera
   });
+}
+
+function setCameraMode(nextMode, { snap = true } = {}) {
+  if (!["platform", "isometric"].includes(nextMode)) return cameraMode;
+  cameraMode = nextMode;
+  if (cameraMode === "isometric" && document.pointerLockElement === canvas) {
+    document.exitPointerLock();
+  }
+  document.body.dataset.cameraMode = cameraMode;
+  renderEngine.applyCameraModeVisibility(cameraMode);
+  updateCameraModeButtons();
+  updateCamera(1, snap);
+  return cameraMode;
+}
+
+function updateCameraModeButtons() {
+  document.body.dataset.cameraMode = cameraMode;
+  for (const button of cameraModeButtons) {
+    button.classList.toggle("active", button.dataset.cameraMode === cameraMode);
+    button.setAttribute("aria-pressed", String(button.dataset.cameraMode === cameraMode));
+  }
 }
 
 function axis(primary, secondary = null) {
@@ -1197,6 +1230,12 @@ function installDebugApi() {
     },
     get camera() {
       return {
+        mode: cameraMode,
+        position: {
+          x: camera.position.x,
+          y: camera.position.y,
+          z: camera.position.z
+        },
         obstruction: renderEngine.cameraObstruction
       };
     },
@@ -1278,6 +1317,9 @@ function installDebugApi() {
     },
     setDebugOverlay(visible) {
       return setRoomDebugOverlay(visible);
+    },
+    setCameraMode(mode) {
+      return setCameraMode(mode);
     },
     toggleDebugOverlay() {
       return setRoomDebugOverlay(!roomDebugVisible);

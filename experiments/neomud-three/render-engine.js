@@ -79,6 +79,13 @@ export function createRenderEngine(canvas) {
       roomDebug = emptyRoomDebugSummary(debugRoot.visible);
       return factory(worldRoot);
     },
+    applyCameraModeVisibility(cameraMode = "platform") {
+      const hideIsoBlockers = cameraMode === "isometric";
+      worldRoot.traverse((object) => {
+        if (!object.userData?.hideInIsometric) return;
+        object.visible = !hideIsoBlockers;
+      });
+    },
     setRoomDebugVisible(visible) {
       debugRoot.visible = Boolean(visible);
       roomDebug = {
@@ -112,7 +119,22 @@ export function createRenderEngine(canvas) {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     },
-    updateCamera({ heading = 0, roomCamera = {}, dt = 1 / 60, snap = false } = {}) {
+    updateCamera({ heading = 0, roomCamera = {}, cameraMode = "platform", dt = 1 / 60, snap = false } = {}) {
+      if (cameraMode === "isometric") {
+        updateIsometricCamera({
+          camera,
+          cameraTarget,
+          cameraDesired,
+          cameraLookTarget,
+          player,
+          roomCamera,
+          dt,
+          snap
+        });
+        cameraObstruction = null;
+        return;
+      }
+
       const forward = new THREE.Vector3(Math.sin(heading), 0, -Math.cos(heading));
       const right = new THREE.Vector3(Math.cos(heading), 0, Math.sin(heading));
       const distance = roomCamera.distance ?? 9.8;
@@ -198,6 +220,32 @@ export function createRenderEngine(canvas) {
       renderer.setAnimationLoop(callback);
     }
   };
+}
+
+function updateIsometricCamera({ camera, cameraTarget, cameraDesired, cameraLookTarget, player, roomCamera = {}, dt = 1 / 60, snap = false }) {
+  const distance = roomCamera.isoDistance ?? 19.5;
+  const height = roomCamera.isoHeight ?? 17.5;
+  const angle = roomCamera.isoAngle ?? Math.PI * 0.25;
+  const targetHeight = roomCamera.isoTargetHeight ?? 0.8;
+  const lookAheadZ = roomCamera.isoLookAheadZ ?? -1.2;
+  const offsetX = Math.sin(angle) * distance;
+  const offsetZ = Math.cos(angle) * distance;
+
+  cameraDesired
+    .copy(player.position)
+    .add(new THREE.Vector3(offsetX, height, offsetZ));
+  cameraLookTarget
+    .copy(player.position)
+    .add(new THREE.Vector3(0, targetHeight, lookAheadZ));
+
+  if (snap) {
+    camera.position.copy(cameraDesired);
+    cameraTarget.copy(cameraLookTarget);
+  } else {
+    camera.position.lerp(cameraDesired, Math.min(1, dt * 3.8));
+    cameraTarget.lerp(cameraLookTarget, Math.min(1, dt * 4.8));
+  }
+  camera.lookAt(cameraTarget);
 }
 
 function resolveCameraObstruction(origin, desired, worldRoot, raycaster, direction, blockers, options = {}) {

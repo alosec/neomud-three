@@ -34,7 +34,8 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - User clarified that the desired game feel is not primarily third-person chase movement. The better target is a Diablo-like elevated camera with click-to-move, click-to-interact, click exits/NPCs/items, and readable action-RPG room flow.
    - StarCraft II and Dota are useful references for bird-eye camera clarity, but Diablo is the closer mechanics reference because NeoMud Three has one controllable character moving through authored rooms.
    - Preserve the MUD/server authority boundary: click actions should route through the same command path as keyboard movement, physical triggers, DOM interactions, and server-backed room/item/NPC messages.
-   - First implementation should be a small slice: elevated camera mode in Town Square, raycast ground click target, visible destination marker, click-to-walk toward the point, and click an exit affordance to issue the normal move command.
+   - First visual-mode slice exists: the HUD now supports `Platform` and `Iso` camera modes. Platform preserves the behind-character/pointer-lock camera; Iso provides the first elevated action-RPG camera and keeps the cursor visible for the upcoming click work.
+   - Next implementation should add interaction: raycast ground click target, visible destination marker, click-to-walk toward the point, and click an exit affordance to issue the normal move command.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
 
    Acceptance for the first slice:
