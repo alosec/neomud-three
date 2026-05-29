@@ -282,7 +282,14 @@ async function main() {
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
     });
     const npcClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), oldWren);
-    assert.deepEqual(npcClick, { type: "interactable", id: "npc:old_wren", kind: "npc", pending: true });
+    assert.deepEqual(npcClick, {
+      type: "interactable",
+      id: "npc:old_wren",
+      kind: "npc",
+      pending: true,
+      autoEngage: false,
+      autoUse: false
+    });
     const selectedNpc = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(selectedNpc.markerVisible, true);
     assert.equal(selectedNpc.objectHighlighted, true);

@@ -566,6 +566,10 @@ async function main() {
     assert.match(await page.locator(".combat-actions").textContent(), /server-authoritative command path/i);
     assert.equal(await page.locator("[data-combat-command]").count(), 2);
     assert.equal(await page.locator("[data-combat-command]:disabled").count(), 2);
+    const offlineCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
+    assert.equal(offlineCombatActions[0]?.hotkey, "1");
+    assert.equal(offlineCombatActions[0]?.command, "attack");
+    assert.equal(offlineCombatActions[0]?.enabled, false);
     await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
       type: "combat_hit",
       attackerName: "Guest Adventurer",

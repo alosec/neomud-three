@@ -303,10 +303,17 @@ async function main() {
       await page.keyboard.press("f");
       assert.equal(await page.locator("#panel-title").textContent(), "Giant Forest Spider");
       assert.equal(await page.locator('[data-combat-command="attack"]').isDisabled(), false);
+      const initialCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
+      assert.equal(initialCombatActions[0]?.hotkey, "1");
+      assert.equal(initialCombatActions[0]?.command, "attack");
+      assert.equal(initialCombatActions[0]?.enabled, true);
       await page.keyboard.press("Digit1");
       const hotkeyAttack = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
       assert.equal(hotkeyAttack?.targetId, "npc:forest_spider");
       assert.equal(hotkeyAttack?.command, "attack");
+      const pendingCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
+      assert.equal(pendingCombatActions[0]?.label, "Working...");
+      assert.equal(pendingCombatActions[0]?.enabled, false);
       await page.waitForFunction(
         () => {
           const server = window.__neomudThreeDebug.server;
@@ -317,6 +324,10 @@ async function main() {
         null,
         { timeout: 5_000 }
       );
+      const engagedCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
+      assert.equal(engagedCombatActions[0]?.hotkey, "1");
+      assert.equal(engagedCombatActions[0]?.command, "stop_attack");
+      assert.equal(engagedCombatActions[0]?.enabled, true);
       await page.keyboard.press("Digit1");
       const hotkeyStop = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
       assert.equal(hotkeyStop?.targetId, "npc:forest_spider");

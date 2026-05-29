@@ -2087,6 +2087,7 @@ function combatActionOptions(entity) {
   const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
   return [
     {
+      hotkey: "1",
       label: pendingCombat?.command === "attack" || pendingCombat?.command === "stop_attack"
         ? "Working..."
         : engaged ? "Stop Attack" : "Basic Attack",
@@ -2095,6 +2096,7 @@ function combatActionOptions(entity) {
       enabled: combatReady && !pendingCombat
     },
     {
+      hotkey: "2",
       label: pendingCombat?.command?.startsWith("cast:") ? "Working..." : spell?.name ?? "Class Skill",
       detail: pendingCombat?.command?.startsWith("cast:") ? "Awaiting server" : spell ? `${spell.manaCost} MP` : "Ability",
       command: spell ? `cast:${spell.id}` : "skill",
@@ -2730,6 +2732,15 @@ function installDebugApi() {
         actionBadgeValue: movement.selectionActionBadge?.userData?.value ?? "",
         actionBadgeType: movement.selectionActionBadge?.userData?.actionType ?? "",
         selectedInteractableId: selectedInteractable?.id ?? "",
+        combatActions: selectedInteractable && isHostileEntity(selectedInteractable)
+          ? combatActionOptions(selectedInteractable).map((action) => ({
+              hotkey: action.hotkey,
+              label: action.label,
+              detail: action.detail,
+              command: action.command,
+              enabled: Boolean(action.enabled)
+            }))
+          : [],
         objectHighlighted: movement.targetObjectHighlight?.mode === "selected"
       };
     },
