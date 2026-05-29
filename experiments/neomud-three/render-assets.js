@@ -577,7 +577,7 @@ const MATERIAL_DEFINITION_LIST = [
   colorMaterial("town.roof.quiet", "roofQuiet", "town", "background-roof", 0x435f56, { roughness: 0.94 }),
   colorMaterial("town.awning.red", "awningRed", "town", "awning", 0xa24532, { roughness: 0.76 }),
   colorMaterial("town.awning.blue", "awningBlue", "town", "awning", 0x385d7a, { roughness: 0.76 }),
-  colorMaterial("town.awning.gold", "awningGold", "town", "awning", 0xb68537, { roughness: 0.78 }),
+  colorMaterial("town.awning.gold", "awningGold", "town", "awning", 0x9b7435, { roughness: 0.82 }),
   colorMaterial("town.tree.trunk", "trunk", "town", "tree", 0x4f321b, { roughness: 0.92 }),
   colorMaterial("town.tree.foliage", "foliage", "town", "foliage", 0x638457, { roughness: 0.97 }),
   colorMaterial("town.tree.foliage.dark", "foliageDark", "town", "foliage", 0x32553d, { roughness: 0.98 }),

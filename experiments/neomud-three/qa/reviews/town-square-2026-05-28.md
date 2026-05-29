@@ -375,3 +375,20 @@ Visual delta: added approved `townHorizonPastoralV1` as the new four-sided outdo
 QA delta: `node --check` for changed files, diff hygiene, Material Lab/Prop Zoo QA, fixed Town Square screenshots, offline smoke, and authored-room screenshots all pass. Screenshot review shows a more coherent palette, though still not final-quality environment art.
 
 Remaining visual gap: the broad outdoor forms remain visibly authored from simple blocks. The next high-leverage pass should improve one landmark's silhouette/lighting at a time or move the Town Square source into Blender-authored geometry rather than adding more texture noise.
+
+## Score After Market Palette Restraint Pass
+
+- Navigation readability: 2/2. Market Street remains readable from the authored entry and forge screenshots, with stalls and the forge-side endpoint still visible.
+- Scale believability: 1/2. Muted walls reduce the toy-like yellow corridor read, but the market buildings are still simple repeated blockout masses.
+- Semantic match: 2/2. The street still reads as a market corridor with stalls, shopfronts, carts, forge endpoint, and vendor staging.
+- Interaction clarity: 2/2. Market movement, exit thresholds, compass/HUD affordances, and collision are unchanged.
+- Server sync: 2/2. Offline smoke and authored room-shot QA pass; server protocol was not changed.
+- Performance: 2/2. Latest Market smoke reports 141 calls / 55,911 triangles / 33 textures / 82 geometries, within budget.
+
+Total: 11/12
+
+Visual delta: changed Market shopfront walls from warm plaster to the cooler approved plaster material and muted the gold awning color. This targets the excessive yellow/tan field in Market Street screenshots without adding new meshes or layout changes.
+
+QA delta: `node --check`, diff hygiene, authored room screenshots, Material Lab/Prop Zoo QA, fixed Town Square screenshots, and full offline smoke all pass.
+
+Remaining visual gap: Market Street is more restrained but still needs stronger authored storefront silhouettes and less repeated facade rhythm.

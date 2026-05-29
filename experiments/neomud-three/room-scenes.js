@@ -484,11 +484,11 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   return {
     ...glbRuntime,
     camera: {
-      distance: 8.55,
-      height: 3.35,
-      sideOffset: -0.9,
-      lookAhead: 3.6,
-      targetHeight: 1.08
+      distance: 5.85,
+      height: 3.05,
+      sideOffset: -0.35,
+      lookAhead: 3.05,
+      targetHeight: 1.05
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1602,7 +1602,7 @@ function addMarketShopfronts(root, materials) {
     dark.push({ x: 0, y: 0.12, z: side * 7.18, width: MARKET.width - 1.5, height: 0.18, depth: 0.18 });
   }
 
-  addInstancedBoxes(root, materials.plasterWarm, plaster, "market-shopfront-plaster");
+  addInstancedBoxes(root, materials.plaster, plaster, "market-shopfront-plaster");
   addInstancedBoxes(root, materials.darkTimber, timber, "market-shopfront-timber");
   addInstancedBoxes(root, materials.trimLight, trim, "market-shopfront-trim");
   addInstancedBoxes(root, materials.darkStone, dark, "market-shopfront-curbs", { castShadow: false });
