@@ -271,12 +271,13 @@ function arcaneWallTexture() {
 }
 
 function calmTempleMarbleTexture() {
-  return proceduralTexture("temple-calm-marble-v1", [4.4, 7.2], (ctx, width, height, random) => {
-    ctx.fillStyle = "#cfc8b4";
+  return proceduralTexture("temple-calm-marble-v2", [3.8, 6.4], (ctx, width, height, random) => {
+    ctx.fillStyle = "#d5cdb8";
     ctx.fillRect(0, 0, width, height);
+    valueNoise(ctx, width, height, "#d8d0be", 420, 0.018, random);
 
-    ctx.strokeStyle = "rgba(106, 89, 58, 0.13)";
-    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = "rgba(99, 86, 62, 0.075)";
+    ctx.lineWidth = 1.05;
     const cell = 72;
     for (let x = 0; x <= width + cell; x += cell) {
       ctx.beginPath();
@@ -291,25 +292,25 @@ function calmTempleMarbleTexture() {
       ctx.stroke();
     }
 
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 16; i++) {
       const y = random() * height;
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(130, 107, 69, ${0.035 + random() * 0.04})`;
-      ctx.lineWidth = 0.8 + random() * 1.2;
+      ctx.strokeStyle = `rgba(124, 102, 72, ${0.018 + random() * 0.025})`;
+      ctx.lineWidth = 0.55 + random() * 0.75;
       ctx.moveTo(-12, y);
-      ctx.bezierCurveTo(width * 0.3, y + random() * 24 - 12, width * 0.65, y + random() * 28 - 14, width + 12, y + random() * 20 - 10);
+      ctx.bezierCurveTo(width * 0.3, y + random() * 18 - 9, width * 0.65, y + random() * 20 - 10, width + 12, y + random() * 16 - 8);
       ctx.stroke();
     }
   });
 }
 
 function calmTempleLimestoneTexture() {
-  return proceduralTexture("temple-calm-limestone-v1", [2.2, 2.2], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#b4aa94", 650, 0.045, random);
-    ctx.strokeStyle = "rgba(80, 70, 54, 0.11)";
-    ctx.lineWidth = 1.2;
-    const blockW = 88;
-    const blockH = 54;
+  return proceduralTexture("temple-calm-limestone-v2", [1.75, 1.75], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#b9af99", 520, 0.026, random);
+    ctx.strokeStyle = "rgba(78, 68, 51, 0.065)";
+    ctx.lineWidth = 0.95;
+    const blockW = 104;
+    const blockH = 62;
     for (let y = 0; y <= height + blockH; y += blockH) {
       const offset = Math.floor(y / blockH) % 2 ? blockW / 2 : 0;
       ctx.beginPath();
@@ -334,11 +335,11 @@ const MATERIAL_DEFINITION_LIST = [
     kind: "procedural-material",
     intendedUse: ["cathedral-floor"],
     textureAsset: "templeCalmMarbleV1",
-    repeat: [4.4, 7.2],
-    roughness: 0.68,
+    repeat: [3.8, 6.4],
+    roughness: 0.78,
     metalness: 0,
     approved: true,
-    create: () => standardMaterial({ map: calmTempleMarbleTexture(), color: 0xf0ead8, roughness: 0.68, metalness: 0 })
+    create: () => standardMaterial({ map: calmTempleMarbleTexture(), color: 0xe9e0ca, roughness: 0.78, metalness: 0 })
   },
   {
     id: "temple.limestone.wall",
@@ -347,11 +348,11 @@ const MATERIAL_DEFINITION_LIST = [
     kind: "procedural-material",
     intendedUse: ["cathedral-wall", "stone-trim"],
     textureAsset: "templeCalmLimestoneV1",
-    repeat: [2.2, 2.2],
+    repeat: [1.75, 1.75],
     roughness: 0.9,
     metalness: 0,
     approved: true,
-    create: () => standardMaterial({ map: calmTempleLimestoneTexture(), color: 0xe6dcc3, roughness: 0.9 })
+    create: () => standardMaterial({ map: calmTempleLimestoneTexture(), color: 0xd7ccb3, roughness: 0.92 })
   },
   {
     id: "temple.stained-glass.alpha",
