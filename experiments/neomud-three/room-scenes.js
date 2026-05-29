@@ -3119,12 +3119,14 @@ function addNorthGateStage(root, materials, worldRoot) {
     { material: "plazaStone", x: 0, z: 13.8, width: 10.8, depth: 5.8, y: 0.034 },
     { material: "plazaStone", x: 0, z: -11.8, width: 8.6, depth: 4.2, y: 0.034 }
   ], "north-gate-surfaces");
+  addIrregularGroundPatches(root, materials, [
+    { material: "forestShadow", x: -8.1, z: 3.2, width: 4.4, depth: 12.4, y: 0.026, rotationZ: -0.08, seed: 61 },
+    { material: "forestShadow", x: 8.0, z: 3.4, width: 4.3, depth: 12.2, y: 0.026, rotationZ: 0.08, seed: 62 },
+    { material: "forestMossLight", x: -7.8, z: -14.6, width: 4.8, depth: 7.2, y: 0.028, rotationZ: 0.14, seed: 63 },
+    { material: "forestMossLight", x: 7.6, z: -14.4, width: 4.8, depth: 7.0, y: 0.028, rotationZ: -0.12, seed: 64 },
+    { material: "pathEdge", x: 0, z: -7.5, width: 7.2, depth: 3.1, y: 0.036, rotationZ: 0.02, seed: 65 }
+  ], "north-gate-ground-breakup");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_edge.webp`, 0, 8.9, -24.4, 34, 19.2, {
-    unlit: true,
-    castShadow: false,
-    receiveShadow: false
-  });
   addNorthGateWalls(root, materials);
   addNorthGateDressing(root, materials);
   addNorthGateForestEdge(root, materials);
@@ -3235,6 +3237,13 @@ function addNorthGateDressing(root, materials) {
 }
 
 function addNorthGateForestEdge(root, materials) {
+  addStylizedForestBackdrop(root, materials, {
+    visualRole: "north-gate-stylized-forest-backdrop",
+    zOffset: -1.2,
+    xScale: 0.82,
+    zScale: 0.72
+  });
+
   addInstancedSurfaceRects(root, materials, [
     { material: "forestTrail", x: 0, z: -18.2, width: 5.0, depth: 8.8, y: 0.035 },
     { material: "forestMossLight", x: -5.2, z: -17.6, width: 3.8, depth: 7.4, y: 0.03 },
