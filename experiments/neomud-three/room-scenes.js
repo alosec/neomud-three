@@ -3104,10 +3104,10 @@ function addNorthGateDressing(root, materials) {
 
   addTextBoard(root, "Forest Road", {
     x: 0,
-    y: 5.25,
+    y: 5.05,
     z: -5.5,
-    width: 4.2,
-    height: 0.74,
+    width: 2.85,
+    height: 0.46,
     subtitle: "North",
     palette: "green",
     renderOrder: 9
@@ -3125,15 +3125,26 @@ function addNorthGateDressing(root, materials) {
 }
 
 function addNorthGateForestEdge(root, materials) {
+  addInstancedSurfaceRects(root, materials, [
+    { material: "forestTrail", x: 0, z: -18.2, width: 5.0, depth: 8.8, y: 0.035 },
+    { material: "forestMossLight", x: -5.2, z: -17.6, width: 3.8, depth: 7.4, y: 0.03 },
+    { material: "forestMossLight", x: 5.1, z: -17.8, width: 3.8, depth: 7.2, y: 0.03 },
+    { material: "forestShadow", x: -8.8, z: -16.6, width: 3.2, depth: 8.4, y: 0.032 },
+    { material: "forestShadow", x: 8.7, z: -16.7, width: 3.2, depth: 8.4, y: 0.032 }
+  ], "north-gate-forest-threshold-surfaces");
+
   const trees = [
-    { x: -8.8, z: -17.8, scale: 1.18, rotationY: 0.25 },
-    { x: -5.6, z: -18.8, scale: 0.95, rotationY: -0.4 },
-    { x: 8.6, z: -17.5, scale: 1.16, rotationY: -0.2 },
-    { x: 5.3, z: -18.9, scale: 0.98, rotationY: 0.55 },
-    { x: -11.2, z: -13.7, scale: 0.9, rotationY: -0.1 },
-    { x: 11.0, z: -13.5, scale: 0.92, rotationY: 0.18 }
+    { x: -9.4, z: -17.6, scale: 1.62, rotationY: 0.25 },
+    { x: -5.8, z: -19.4, scale: 1.22, rotationY: -0.4 },
+    { x: 9.2, z: -17.4, scale: 1.58, rotationY: -0.2 },
+    { x: 5.6, z: -19.2, scale: 1.26, rotationY: 0.55 },
+    { x: -11.6, z: -13.2, scale: 1.12, rotationY: -0.1 },
+    { x: 11.4, z: -13.1, scale: 1.14, rotationY: 0.18 },
+    { x: -3.2, z: -20.4, scale: 0.92, rotationY: 0.5 },
+    { x: 3.2, z: -20.5, scale: 0.94, rotationY: -0.42 }
   ];
   addTownContextTrees(root, materials, trees);
+  addNorthGateForestDepth(root, materials);
   addInstancedGeometry(
     root,
     new THREE.ConeGeometry(1, 1, 5),
@@ -3146,6 +3157,35 @@ function addNorthGateForestEdge(root, materials) {
     ],
     "north-gate-forest-grass"
   );
+}
+
+function addNorthGateForestDepth(root, materials) {
+  const trunks = [];
+  const shrubs = [];
+  const canopy = [];
+  const rocks = [];
+
+  for (const [x, z, scale, rotationY] of [
+    [-10.6, -20.8, 1.2, 0.18],
+    [-7.4, -22.2, 0.92, -0.44],
+    [7.2, -22.0, 0.96, 0.38],
+    [10.5, -20.7, 1.16, -0.22],
+    [-12.2, -15.4, 0.82, 0.6],
+    [12.0, -15.2, 0.86, -0.52]
+  ]) {
+    trunks.push({ x, y: 1.8 * scale, z, width: 0.46 * scale, height: 3.6 * scale, depth: 0.46 * scale, rotationY });
+    canopy.push({ x, y: 4.2 * scale, z, width: 2.4 * scale, height: 1.5 * scale, depth: 2.2 * scale, rotationY });
+    shrubs.push({ x: x * 0.94, y: 0.58 * scale, z: z + 1.4, width: 2.2 * scale, height: 0.72 * scale, depth: 1.25 * scale, rotationY: -rotationY });
+  }
+
+  for (const [x, z, width, depth] of [[-4.4, -15.0, 1.05, 0.64], [4.5, -15.2, 1.0, 0.62], [-7.6, -18.4, 0.85, 0.58], [7.9, -18.2, 0.9, 0.6]]) {
+    rocks.push({ x, y: 0.22, z, width, height: 0.42, depth, rotationY: x * 0.17 });
+  }
+
+  addInstancedBoxes(root, materials.trunk, trunks, "north-gate-forest-depth-trunks");
+  addInstancedBoxes(root, materials.foliageDark, shrubs, "north-gate-forest-depth-shrubs", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.foliage, canopy, "north-gate-forest-depth-canopy", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.darkStone, rocks, "north-gate-forest-depth-rocks", { castShadow: false, receiveShadow: true });
 }
 
 function addNorthGateExitAffordances(root) {
