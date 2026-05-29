@@ -3326,12 +3326,14 @@ function northGateTriggers() {
 function addForestEdgeStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.forestGround ?? materials.foliageDark, FOREST_EDGE.width, FOREST_EDGE.depth);
   addInstancedSurfaceRects(root, materials, [
-    { material: "forestTrail", x: 0, z: 0, width: 5.8, depth: FOREST_EDGE.depth, y: 0.022 },
-    { material: "forestMossLight", x: -7.2, z: 9.6, width: 4.4, depth: 3.2, y: 0.016, rotationZ: -0.18 },
-    { material: "forestMossLight", x: 7.4, z: 10.8, width: 4.1, depth: 3.4, y: 0.017, rotationZ: 0.16 },
-    { material: "forestMossLight", x: -7.6, z: -12.6, width: 3.8, depth: 3.7, y: 0.018, rotationZ: 0.22 },
-    { material: "forestMossLight", x: 7.8, z: -11.5, width: 3.6, depth: 3.2, y: 0.018, rotationZ: -0.2 }
+    { material: "forestTrail", x: 0, z: 0, width: 5.8, depth: FOREST_EDGE.depth, y: 0.022 }
   ], "forest-edge-surfaces");
+  addIrregularGroundPatches(root, materials, [
+    { material: "forestMossLight", x: -7.2, z: 9.6, width: 4.4, depth: 3.2, y: 0.019, rotationZ: -0.18, seed: 11 },
+    { material: "forestMossLight", x: 7.4, z: 10.8, width: 4.1, depth: 3.4, y: 0.02, rotationZ: 0.16, seed: 12 },
+    { material: "forestMossLight", x: -7.6, z: -12.6, width: 3.8, depth: 3.7, y: 0.021, rotationZ: 0.22, seed: 13 },
+    { material: "forestMossLight", x: 7.8, z: -11.5, width: 3.6, depth: 3.2, y: 0.021, rotationZ: -0.2, seed: 14 }
+  ], "forest-edge-moss-patches");
   addForestGroundBreakup(root, materials, "edge");
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4, {
@@ -6893,6 +6895,61 @@ function addInstancedSurfaceRects(root, materials, surfaces = [], visualRole) {
       { castShadow: false, receiveShadow: true }
     );
   }
+}
+
+function addIrregularGroundPatches(root, materials, patches = [], visualRole) {
+  if (!patches.length) return null;
+  const group = new THREE.Group();
+  group.userData = { visualRole, count: patches.length };
+  root.add(group);
+
+  for (const patch of patches) {
+    const shape = irregularPatchShape(patch.width ?? 1, patch.depth ?? 1, patch.seed ?? 0);
+    const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), material(materials, patch.material ?? "foliage"));
+    mesh.position.set(patch.x ?? 0, patch.y ?? 0.02, patch.z ?? 0);
+    mesh.rotation.set(-Math.PI / 2, 0, patch.rotationZ ?? 0);
+    mesh.castShadow = false;
+    mesh.receiveShadow = true;
+    mesh.userData = { visualRole: `${visualRole}-${patch.material ?? "patch"}` };
+    group.add(mesh);
+  }
+
+  return group;
+}
+
+function irregularPatchShape(width, depth, seed = 0) {
+  const random = seededPatchRandom(`ground-patch-${seed}-${width}-${depth}`);
+  const shape = new THREE.Shape();
+  const points = [];
+  const count = 12;
+  for (let index = 0; index < count; index++) {
+    const angle = (Math.PI * 2 * index) / count;
+    const radius = 0.72 + random() * 0.34;
+    const x = Math.cos(angle) * width * 0.5 * radius;
+    const y = Math.sin(angle) * depth * 0.5 * radius;
+    points.push([x, y]);
+  }
+  points.forEach(([x, y], index) => {
+    if (index === 0) shape.moveTo(x, y);
+    else shape.lineTo(x, y);
+  });
+  shape.closePath();
+  return shape;
+}
+
+function seededPatchRandom(seed) {
+  let value = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    value ^= seed.charCodeAt(i);
+    value = Math.imul(value, 16777619);
+  }
+  return () => {
+    value += 0x6d2b79f5;
+    let next = value;
+    next = Math.imul(next ^ (next >>> 15), next | 1);
+    next ^= next + Math.imul(next ^ (next >>> 7), next | 61);
+    return ((next ^ (next >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 function townCollidersFromSpec(spec) {
