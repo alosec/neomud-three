@@ -138,8 +138,11 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      `1t cooldown` or `3t cooldown` without simulating local cooldown state.
      Directional skill targeting now has a first server-compatible `KICK`
      slice. Richer projectile/travel animations remain open.
-     Item/loot hover parity exists for the Hidden Cave server-loot path, but
-     should be audited across future authored rooms as they gain live drops.
+     Item/loot hover parity now covers Hidden Cave server loot plus generic
+     authored-room item markers: authored room-item loops expose `Pick up`,
+     `PICKUP_ITEM`, and `itemId` metadata, and offline QA injects a Magic Shop
+     health potion to verify hover/selection/action-badge behavior. Future live
+     drops in newly authored rooms should stay on this same metadata contract.
    - Click-to-move now has first-pass visibility-graph waypoint routing over
      rectangular room colliders, but it is not a full navmesh. Dynamic blockers,
      irregular collision, narrow doors, and optimal paths still need a real

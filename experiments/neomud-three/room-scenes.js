@@ -2353,9 +2353,11 @@ function addMagicShopEntities(root, materials, worldRoot, world, npcs, roomItems
       id: normalized.id,
       name: normalized.name,
       role: "Emporium",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -2689,9 +2691,11 @@ function addForgeEntities(root, materials, worldRoot, world, npcs, roomItems, in
       id: normalized.id,
       name: normalized.name,
       role: "Forge",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -3153,9 +3157,11 @@ function addTavernEntities(root, materials, worldRoot, world, npcs, roomItems, i
       id: normalized.id,
       name: normalized.name,
       role: "Ground",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -3436,9 +3442,11 @@ function addNorthGateEntities(root, materials, worldRoot, world, npcs, roomItems
       id: normalized.id,
       name: normalized.name,
       role: "Ground",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -3827,9 +3835,11 @@ function addForestEdgeEntities(root, materials, worldRoot, world, npcs, roomItem
       id: normalized.id,
       name: normalized.name,
       role: "Ground",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -4151,9 +4161,11 @@ function addForestPathEntities(root, materials, worldRoot, world, npcs, roomItem
       id: normalized.id,
       name: normalized.name,
       role: "Ground",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -4491,9 +4503,11 @@ function addSunlitClearingEntities(root, materials, worldRoot, world, npcs, room
       id: normalized.id,
       name: normalized.name,
       role: "Sanctuary",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -4762,9 +4776,11 @@ function addDeepForestEntities(root, materials, worldRoot, world, npcs, roomItem
       id: normalized.id,
       name: normalized.name,
       role: "Forest",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }
@@ -6957,9 +6973,11 @@ function addTownSpecEntities(root, materials, spec, worldRoot, world, npcs, room
       id: normalized.id,
       name: normalized.name,
       role: "Ground",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }

@@ -330,7 +330,11 @@ async function main() {
       assert.equal(hotkeyAttack?.command, "attack");
       const pendingCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
       assert.match(pendingCombatActions[0]?.label ?? "", /Working|Stop Attack/);
-      assert.equal(pendingCombatActions[0]?.enabled, false);
+      if (pendingCombatActions[0]?.label === "Working...") {
+        assert.equal(pendingCombatActions[0]?.enabled, false);
+      } else {
+        assert.equal(pendingCombatActions[0]?.enabled, true);
+      }
       await page.waitForFunction(
         () => {
           const server = window.__neomudThreeDebug.server;
@@ -404,7 +408,8 @@ async function main() {
           () => {
             const server = window.__neomudThreeDebug.server;
             return server.attackMode === true
-              && server.selectedTargetId === "npc:forest_spider";
+              && server.selectedTargetId === "npc:forest_spider"
+              && server.pendingCombatCommand === null;
           },
           null,
           { timeout: 5_000 }

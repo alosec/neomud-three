@@ -335,6 +335,25 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Enchantress Lyra");
     await page.keyboard.press("Escape");
 
+    const magicItemEntities = await page.evaluate(() => window.__neomudThreeDebug.syncDebugRoomItems([
+      { itemId: "item:health_potion", quantity: 1 }
+    ]));
+    const magicPotion = magicItemEntities.find((entity) => entity.id === "item:health_potion");
+    assert.equal(magicPotion?.actionType, "PICKUP_ITEM");
+    assert.equal(magicPotion?.itemId, "item:health_potion");
+    assert.match(magicPotion?.prompt ?? "", /Pick up/i);
+    const magicPotionHover = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.hoverGround({ x, z }), magicPotion);
+    assert.equal(magicPotionHover?.label, "Pick up Health Potion");
+    const magicPotionClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), magicPotion);
+    assert.equal(magicPotionClick.type, "interactable");
+    assert.equal(magicPotionClick.id, "item:health_potion");
+    assert.equal(magicPotionClick.autoUse, false);
+    const magicPotionSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
+    assert.equal(magicPotionSelection.actionBadgeVisible, true);
+    assert.equal(magicPotionSelection.actionBadgeValue, "Pick up");
+    assert.equal(magicPotionSelection.actionBadgeType, "PICKUP_ITEM");
+    await page.evaluate(() => window.__neomudThreeDebug.cancelIsoTargeting());
+
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 11.05, z: 0, heading: Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(

@@ -2796,7 +2796,7 @@ function clearPendingCombatCommand() {
 
 function expireStaleCombatCommand() {
   if (!pendingCombatCommand) return;
-  if (performance.now() - pendingCombatCommand.startedAt < 6500) return;
+  if (performance.now() - pendingCombatCommand.startedAt < 15000) return;
   lastCombatResult = {
     success: false,
     targetName: pendingCombatCommand.targetName,
@@ -3395,6 +3395,17 @@ function installDebugApi() {
     injectServerMessage(message) {
       handleServerMessage(message);
       return this.server;
+    },
+    syncDebugRoomItems(items = [], coins = null) {
+      serverState.roomItems = items;
+      serverState.roomCoins = coins;
+      roomRuntime?.syncEntities?.({
+        npcs: [],
+        roomItems: items,
+        roomCoins: coins
+      });
+      refreshRoomDebugOverlay();
+      return this.room.entities;
     },
     reconnectServer() {
       serverState.client?.close();
