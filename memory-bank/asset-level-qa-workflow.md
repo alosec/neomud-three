@@ -102,8 +102,8 @@ panel planes with quieter worn-edge treatment and tighter center-aisle
 placement. It is improved, but still not accepted: the repeated dark backs
 remain visually heavy in the nave and compete with altar/glass hierarchy. The
 floor/wall material hierarchy is now calmer, so the next pew pass should reduce
-pew value contrast or address the Temple's black upper void, then re-score
-through asset lab plus Scenic Review.
+pew value contrast and row dominance, then re-score through asset lab plus
+Scenic Review.
 
 ## Current Texture Candidate
 

@@ -57,15 +57,13 @@
       "followUp": "Validate integrated rows from Scenic Review and player-view Temple nave cameras."
     },
     "boundedness": {
-      "score": 1,
-      "notes": "The pews do not directly break room enclosure, but their repetition contributes to a game-board read.",
-      "followUp": "Review pew rows only after the nave composition keeps altar and aisle hierarchy intact."
+      "score": 2,
+      "notes": "The new warm-shadow ceiling/vault cap removes the accidental black upper void and makes the Temple read as an enclosed stage again."
     }
   },
   "acceptedAs": null,
   "blockedBy": [
     "pew material contrast still sits too close to altar and stained-glass prominence",
-    "black upper void keeps the Temple from feeling like a monumental bounded cathedral",
     "row composition must feel more processional and less like repeated dark blocks"
   ]
 }

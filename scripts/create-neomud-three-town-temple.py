@@ -604,6 +604,7 @@ def build_level():
 
     marble = material("MAT_temple_marble_low_contrast", (0.70, 0.69, 0.62, 1), roughness=0.55)
     limestone = material("MAT_temple_limestone_wall", (0.62, 0.59, 0.50, 1), roughness=0.88)
+    ceiling = material("MAT_temple_ceiling_warm_shadow", (0.42, 0.34, 0.22, 1), roughness=0.92, emission=(0.16, 0.12, 0.07, 1), emission_strength=0.08)
     trim = material("MAT_temple_warm_limestone_trim", (0.82, 0.74, 0.54, 1), roughness=0.7)
     dark = material("MAT_temple_recess_shadow", (0.12, 0.10, 0.08, 1), roughness=0.94)
     wood = material("MAT_temple_pew_warm_oak", (0.33, 0.22, 0.13, 1), roughness=0.82)
@@ -626,7 +627,10 @@ def build_level():
     cube3("VIS_south_altar_wall", 0, 5.2, 22.3, 27.2, 10.4, 1.0, limestone, semantic="cathedral_altar_wall")
     cube3("VIS_west_wall", -13.6, 5.2, -8, 1.0, 10.4, 60.4, limestone, semantic="cathedral_side_wall")
     cube3("VIS_east_wall", 13.6, 5.2, -8, 1.0, 10.4, 60.4, limestone, semantic="cathedral_side_wall")
-    barrel_vault3("VIS_vault_curved_limestone_shell", -38.0, 22.0, limestone)
+    barrel_vault3("VIS_vault_curved_limestone_shell", -38.0, 22.0, ceiling)
+    cube3("VIS_ceiling_limestone_cap", 0, 13.15, -8, 27.2, 0.28, 60.0, ceiling, semantic="cathedral_ceiling_cap")
+    cube3("VIS_west_vault_shoulder", -11.65, 11.35, -8, 3.5, 3.7, 60.0, ceiling, semantic="cathedral_vault_shoulder")
+    cube3("VIS_east_vault_shoulder", 11.65, 11.35, -8, 3.5, 3.7, 60.0, ceiling, semantic="cathedral_vault_shoulder")
     cube3("VIS_vault_ridge", 0, 13.18, -8, 1.2, 0.5, 60.0, trim, semantic="cathedral_vault_ridge")
     for rib_index, z in enumerate([-33, -24, -15, -6, 3, 12], start=1):
         barrel_vault3(f"VIS_vault_transverse_rib_{rib_index:02d}", z - 0.13, z + 0.13, trim)

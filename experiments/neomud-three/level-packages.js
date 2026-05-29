@@ -10,6 +10,7 @@ export const LEVEL_PACKAGES = {
     materialRemaps: {
       MAT_temple_marble_low_contrast: "temple.marble.floor",
       MAT_temple_limestone_wall: "temple.limestone.wall",
+      MAT_temple_ceiling_warm_shadow: "temple.ceiling.warm-shadow",
       MAT_temple_warm_limestone_trim: "temple.trim.limestone",
       MAT_temple_pew_warm_oak: "temple.pew.oak",
       MAT_temple_pew_dark_endgrain: "temple.pew.endgrain",

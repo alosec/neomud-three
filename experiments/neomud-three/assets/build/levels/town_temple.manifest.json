@@ -10,17 +10,17 @@
   "runtimeGlb": "town_temple.glb",
   "files": {
     "sourceImageBytes": 74634,
-    "sourceBlendBytes": 183549,
-    "runtimeGlbBytes": 1518088
+    "sourceBlendBytes": 184816,
+    "runtimeGlbBytes": 1521840
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 30,
-    "meshes": 23,
-    "materials": 17,
+    "nodes": 31,
+    "meshes": 24,
+    "materials": 18,
     "prefixes": {
-      "VIS_": 15,
+      "VIS_": 16,
       "COL_": 7,
       "NAV_": 0,
       "SPAWN_": 1,

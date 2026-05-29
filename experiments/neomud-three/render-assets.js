@@ -342,6 +342,7 @@ const MATERIAL_DEFINITION_LIST = [
     create: () => standardMaterial({ map: texture("templeAltarCloth"), roughness: 0.62 })
   },
   colorMaterial("temple.trim.limestone", "trim", "temple", "stone-trim", 0xbeb39c, { roughness: 0.65 }),
+  colorMaterial("temple.ceiling.warm-shadow", "ceilingWarmShadow", "temple", "cathedral-ceiling", 0x7c6a4e, { roughness: 0.92, emissive: 0x2b2115, emissiveIntensity: 0.18 }),
   colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x654226, { roughness: 0.82 }),
   colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x3e2817, { roughness: 0.88 }),
   colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0x74502b, { roughness: 0.78 }),
@@ -570,6 +571,7 @@ export function makeTempleMaterials() {
     glass: createApprovedMaterial("temple.stained-glass.alpha"),
     altar: createApprovedMaterial("temple.altar.cloth"),
     trim: createApprovedMaterial("temple.trim.limestone"),
+    ceilingWarmShadow: createApprovedMaterial("temple.ceiling.warm-shadow"),
     pewOak: createApprovedMaterial("temple.pew.oak"),
     pewEndgrain: createApprovedMaterial("temple.pew.endgrain"),
     pewWornEdge: createApprovedMaterial("temple.pew.worn-edge"),
