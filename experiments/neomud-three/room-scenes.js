@@ -1583,16 +1583,9 @@ function addMarketStage(root, materials, worldRoot) {
     { material: "plazaStone", x: 0, z: 6.05, width: MARKET.width - 2.4, depth: 2.5, y: 0.03 }
   ], "market-street-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_market.webp`, MARKET.eastExitX + 8.2, 5.6, 0, 18, 8.8, {
-    rotationY: -Math.PI / 2,
-    opacity: 0.16,
-    unlit: true,
-    castShadow: false,
-    receiveShadow: false
-  });
-
   addMarketShopfronts(root, materials);
   addMarketRoofline(root, materials);
+  addMarketArcadeEnd(root, materials);
   addMarketStalls(root, materials);
   addMarketThresholds(root, materials);
   addMarketOverheadDressing(root, materials);
@@ -1620,6 +1613,8 @@ function addMarketStage(root, materials, worldRoot) {
 
 function addMarketShopfronts(root, materials) {
   const plaster = [];
+  const warmPlaster = [];
+  const quietPlaster = [];
   const timber = [];
   const trim = [];
   const dark = [];
@@ -1638,8 +1633,8 @@ function addMarketShopfronts(root, materials) {
     const z = side * 8.25;
     const frontZ = side * 7.38;
     plaster.push({ x: -12.2, y: 2.46, z, width: 7.6, height: 4.92, depth: 1.18 });
-    plaster.push({ x: -3.6, y: 2.84, z, width: 7.4, height: 5.68, depth: 1.18 });
-    plaster.push({ x: 5.0, y: 2.58, z, width: 7.8, height: 5.16, depth: 1.18 });
+    warmPlaster.push({ x: -3.6, y: 2.84, z, width: 7.4, height: 5.68, depth: 1.18 });
+    quietPlaster.push({ x: 5.0, y: 2.58, z, width: 7.8, height: 5.16, depth: 1.18 });
 
     for (const x of [-15.8, -8.7, -7.1, -0.2, 1.4, 8.7]) {
       timber.push({ x, y: 2.62, z: frontZ, width: 0.16, height: 5.24, depth: 0.16 });
@@ -1674,6 +1669,8 @@ function addMarketShopfronts(root, materials) {
   }
 
   addInstancedBoxes(root, materials.plaster, plaster, "market-shopfront-plaster");
+  addInstancedBoxes(root, materials.plasterWarm, warmPlaster, "market-shopfront-plaster-warm");
+  addInstancedBoxes(root, materials.plasterQuiet, quietPlaster, "market-shopfront-plaster-quiet");
   addInstancedBoxes(root, materials.darkTimber, timber, "market-shopfront-timber");
   addInstancedBoxes(root, materials.trimLight, trim, "market-shopfront-trim");
   addInstancedBoxes(root, materials.darkStone, dark, "market-shopfront-curbs", { castShadow: false });
@@ -1685,6 +1682,40 @@ function addMarketShopfronts(root, materials) {
   addInstancedBoxes(root, materials.trimLight, signTrim, "market-shopfront-sign-trim", { castShadow: false, receiveShadow: true });
   for (const [materialKey, boxes] of awnings) {
     addInstancedBoxes(root, material(materials, materialKey), boxes, `market-shopfront-awning-${materialKey}`);
+  }
+  addMarketFacadeDepth(root, materials);
+}
+
+function addMarketFacadeDepth(root, materials) {
+  const balconies = [];
+  const rails = [];
+  const planters = [];
+  const bannersByMaterial = new Map([
+    ["awningBlue", []],
+    ["awningGold", []],
+    ["awningRed", []]
+  ]);
+  for (const side of [-1, 1]) {
+    const frontZ = side * 7.14;
+    for (const [index, x] of [-12.2, -3.6, 5.0].entries()) {
+      balconies.push({ x, y: 3.55, z: frontZ - side * 0.08, width: 2.6, height: 0.16, depth: 0.48 });
+      rails.push({ x, y: 3.95, z: frontZ - side * 0.35, width: 2.72, height: 0.1, depth: 0.08 });
+      rails.push({ x: x - 1.24, y: 3.76, z: frontZ - side * 0.35, width: 0.08, height: 0.42, depth: 0.08 });
+      rails.push({ x: x + 1.24, y: 3.76, z: frontZ - side * 0.35, width: 0.08, height: 0.42, depth: 0.08 });
+      planters.push({ x: x - 0.78, y: 3.76, z: frontZ - side * 0.44, width: 0.58, height: 0.18, depth: 0.16 });
+      planters.push({ x: x + 0.78, y: 3.76, z: frontZ - side * 0.44, width: 0.58, height: 0.18, depth: 0.16 });
+      const materialKey = index === 0 ? "awningBlue" : index === 1 ? "awningGold" : "awningRed";
+      bannersByMaterial.get(materialKey).push({ x: x + side * 0.18, y: 4.2, z: frontZ - side * 0.48, width: 0.7, height: 1.16, depth: 0.06 });
+    }
+  }
+  addInstancedBoxes(root, materials.darkTimber, balconies, "market-balcony-decks", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.trimLight, rails, "market-balcony-rails", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.foliage, planters, "market-balcony-planters", { castShadow: false, receiveShadow: true });
+  for (const [materialKey, boxes] of bannersByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `market-balcony-banners-${materialKey}`, {
+      castShadow: false,
+      receiveShadow: true
+    });
   }
 }
 
@@ -1756,6 +1787,67 @@ function addMarketThresholds(root, materials) {
   addInstancedBoxes(root, materials.darkTimber, timber, "market-threshold-timber");
   addInstancedBoxes(root, materials.portalDark, dark, "market-threshold-portal");
   addInstancedBoxes(root, materials.trimLight, trim, "market-threshold-trim");
+}
+
+function addMarketArcadeEnd(root, materials) {
+  const x = MARKET.eastExitX + 1.5;
+  const backdropX = x + 2.55;
+  const plaster = [
+    { x: backdropX, y: 2.65, z: 0, width: 0.82, height: 5.3, depth: 8.7 },
+    { x: backdropX + 0.32, y: 3.35, z: -3.25, width: 0.72, height: 3.2, depth: 2.6 },
+    { x: backdropX + 0.32, y: 3.35, z: 3.25, width: 0.72, height: 3.2, depth: 2.6 }
+  ];
+  const stone = [
+    { x, y: 2.8, z: -4.6, width: 1.0, height: 5.6, depth: 1.0 },
+    { x, y: 2.8, z: 4.6, width: 1.0, height: 5.6, depth: 1.0 },
+    { x, y: 5.78, z: 0, width: 1.12, height: 1.0, depth: 10.2 },
+    { x: backdropX - 0.42, y: 0.28, z: 0, width: 0.64, height: 0.56, depth: 9.6 },
+    { x: x + 1.15, y: 2.3, z: -5.35, width: 3.0, height: 4.6, depth: 0.72 },
+    { x: x + 1.15, y: 2.3, z: 5.35, width: 3.0, height: 4.6, depth: 0.72 }
+  ];
+  const timber = [
+    { x: x - 0.58, y: 3.2, z: -4.6, width: 0.18, height: 5.6, depth: 1.22 },
+    { x: x - 0.58, y: 3.2, z: 4.6, width: 0.18, height: 5.6, depth: 1.22 },
+    { x: x - 0.6, y: 6.42, z: 0, width: 0.2, height: 0.18, depth: 10.6 },
+    { x: x - 0.64, y: 4.54, z: 0, width: 0.18, height: 0.16, depth: 6.2 },
+    { x: backdropX - 0.52, y: 5.92, z: 0, width: 0.24, height: 0.18, depth: 9.2 },
+    { x: backdropX - 0.54, y: 3.2, z: -4.42, width: 0.18, height: 4.8, depth: 0.2 },
+    { x: backdropX - 0.54, y: 3.2, z: 4.42, width: 0.18, height: 4.8, depth: 0.2 }
+  ];
+  const dark = [
+    { x: x - 0.7, y: 1.74, z: 0, width: 0.22, height: 3.48, depth: 3.15 },
+    { x: x + 0.92, y: 1.36, z: -5.35, width: 0.28, height: 2.72, depth: 1.4 },
+    { x: x + 0.92, y: 1.36, z: 5.35, width: 0.28, height: 2.72, depth: 1.4 },
+    { x: backdropX - 0.7, y: 1.82, z: 0, width: 0.24, height: 3.64, depth: 2.45 },
+    { x: backdropX - 0.72, y: 3.35, z: -2.75, width: 0.16, height: 1.15, depth: 0.92 },
+    { x: backdropX - 0.72, y: 3.35, z: 2.75, width: 0.16, height: 1.15, depth: 0.92 }
+  ];
+  const roofs = [
+    { x: backdropX - 0.18, y: 6.18, z: 0, width: 1.55, height: 0.85, depth: 9.7 },
+    { x: backdropX + 0.26, y: 5.2, z: -3.25, width: 1.15, height: 0.58, depth: 3.05 },
+    { x: backdropX + 0.26, y: 5.2, z: 3.25, width: 1.15, height: 0.58, depth: 3.05 }
+  ];
+  const awnings = [
+    { x: x + 0.9, y: 4.9, z: -5.35, width: 2.6, height: 0.22, depth: 1.25 },
+    { x: x + 0.9, y: 4.9, z: 5.35, width: 2.6, height: 0.22, depth: 1.25 }
+  ];
+  addInstancedBoxes(root, materials.plasterQuiet, plaster, "market-arcade-end-backdrop-plaster", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.stone, stone, "market-arcade-end-stone");
+  addInstancedBoxes(root, materials.darkTimber, timber, "market-arcade-end-timber");
+  addInstancedBoxes(root, materials.portalDark, dark, "market-arcade-end-shadow", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.roofQuiet, roofs, "market-arcade-end-backdrop-roof");
+  addInstancedBoxes(root, materials.awningBlue, awnings, "market-arcade-end-awnings");
+  addTextBoard(root, "Magic Shop", {
+    x: x - 0.92,
+    y: 4.62,
+    z: 0,
+    width: 2.45,
+    height: 0.46,
+    subtitle: "East",
+    palette: "blue",
+    rotationY: -Math.PI / 2,
+    renderOrder: 10
+  });
 }
 
 function addMarketOverheadDressing(root, materials) {
