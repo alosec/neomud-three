@@ -42,7 +42,7 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v7" : "procedural-adventurer-v1",
+    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v8" : "procedural-adventurer-v1",
     overlay: false,
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
@@ -273,7 +273,7 @@ function styleSkinnedModel(model) {
 function makeAdventurerRig(materials) {
   const group = new THREE.Group();
   group.name = "Fantasy adventurer rig";
-  group.scale.setScalar(1.36);
+  group.scale.setScalar(1.22);
 
   const hips = new THREE.Group();
   hips.position.y = 0.88;
@@ -359,9 +359,9 @@ function makeAdventurerRig(materials) {
 function makeCloakPanel(material, side) {
   const shape = new THREE.Shape();
   shape.moveTo(0.03 * side, 0.08);
-  shape.lineTo(0.47 * side, 0.02);
-  shape.lineTo(0.33 * side, -1.12);
-  shape.lineTo(0.08 * side, -1.34);
+  shape.lineTo(0.36 * side, 0.02);
+  shape.lineTo(0.27 * side, -0.98);
+  shape.lineTo(0.07 * side, -1.16);
   shape.lineTo(0.01 * side, -0.22);
   shape.lineTo(0.03 * side, 0.08);
 
