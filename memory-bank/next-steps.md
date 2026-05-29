@@ -66,10 +66,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      a multi-waypoint path and arrives on the far side. The router now attempts
      a small room-collider visibility graph first, then falls back to the old
      one-blocker route if no graph path is available. Waypoint following now
-     advances early to a visible next waypoint near corners, reducing hard
-     stop-and-turn motion without cutting through colliders. Click routes now
-     auto-run in Iso mode and include a small stuck/repath guard that recomputes
-     from the current avatar position if collider clamping prevents progress.
+     advances early to the farthest visible remaining waypoint near corners,
+     reducing hard stop-and-turn motion without cutting through colliders. Click
+     routes now auto-run in Iso mode and include a small stuck/repath guard that
+     recomputes from the current avatar position if collider clamping prevents progress.
      The route now also renders a subtle ground-line/waypoint preview, with QA
      coverage for clamped targets, direct clicks, fountain detours, and cleanup
      after arrival.

@@ -145,6 +145,7 @@ const movement = {
   clickPath: [],
   clickPathIndex: 0,
   clickStuckTime: 0,
+  clickRepathCount: 0,
   clickTargetMarker: null,
   clickPathMarker: null,
   hoverTarget: null,
@@ -956,6 +957,7 @@ function setClickMoveTarget(point) {
   movement.clickPath = routeClickPath(player.position, target);
   movement.clickPathIndex = 0;
   movement.clickStuckTime = 0;
+  movement.clickRepathCount = 0;
   movement.clickTarget = movement.clickPath[0] ?? target;
   movement.pendingInteractable = pendingInteractable;
   movement.pendingExit = pendingExit;
@@ -1631,6 +1633,7 @@ function clearClickMoveTarget() {
   movement.clickPath = [];
   movement.clickPathIndex = 0;
   movement.clickStuckTime = 0;
+  movement.clickRepathCount = 0;
   movement.pendingInteractable = null;
   movement.pendingExit = null;
   clearHoldMove();
@@ -2746,11 +2749,20 @@ function advanceClickWaypointIfVisible() {
   if (!movement.clickTarget || movement.clickPathIndex >= movement.clickPath.length - 1) return;
   const distance = player.position.distanceTo(movement.clickTarget);
   if (distance > controls.clickWaypointLookahead) return;
-  const nextTarget = movement.clickPath[movement.clickPathIndex + 1];
-  if (!nextTarget || firstBlockingClickCollider(player.position, nextTarget)) return;
-  movement.clickPathIndex += 1;
+
+  let visibleIndex = movement.clickPathIndex;
+  for (let index = movement.clickPath.length - 1; index > movement.clickPathIndex; index -= 1) {
+    const candidate = movement.clickPath[index];
+    if (candidate && !firstBlockingClickCollider(player.position, candidate)) {
+      visibleIndex = index;
+      break;
+    }
+  }
+  if (visibleIndex === movement.clickPathIndex) return;
+
+  movement.clickPathIndex = visibleIndex;
   movement.clickStuckTime = 0;
-  movement.clickTarget = nextTarget;
+  movement.clickTarget = movement.clickPath[visibleIndex];
   updateClickPathMarker();
 }
 
@@ -2776,6 +2788,7 @@ function updateClickMoveProgress(dt, previousPosition, desiredClickDirection) {
   movement.clickPathIndex = 0;
   movement.clickTarget = movement.clickPath[0] ?? null;
   movement.clickStuckTime = 0;
+  movement.clickRepathCount += 1;
   updateClickPathMarker();
 }
 
@@ -2876,6 +2889,7 @@ function installDebugApi() {
         pathClear: clickPathSegmentsClear(),
         path: movement.clickPath.map((point) => ({ x: point.x, y: point.y, z: point.z })),
         stuckTime: movement.clickStuckTime,
+        repathCount: movement.clickRepathCount,
         autoRun: controls.clickAutoRun,
         markerVisible: Boolean(movement.clickTargetMarker?.visible),
         pathMarkerVisible: Boolean(movement.clickPathMarker?.visible),
