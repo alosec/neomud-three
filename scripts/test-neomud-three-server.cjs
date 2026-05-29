@@ -374,6 +374,8 @@ async function main() {
     assert.equal(chestClick.id, "cave_chest");
     assert.equal(chestClick.autoUse, true);
     assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
+    const chestPending = await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction);
+    assert.equal(chestPending?.id, "cave_chest");
     await page.waitForFunction(
       (before) => window.__neomudThreeDebug.server.messageCount > before && window.__neomudThreeDebug.server.lastInteractionResult,
       beforeInteractMessages,
@@ -384,6 +386,7 @@ async function main() {
       beforeInteractEffects,
       { timeout: 2_000 }
     );
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction), null);
     const chestResult = await page.evaluate(() => window.__neomudThreeDebug.server.lastInteractionResult);
     assert.match(chestResult.message, /preserved|vial|gloves|untouched|doesn't seem to do anything more/i);
     if (chestResult.success) {
@@ -425,6 +428,8 @@ async function main() {
       assert.equal(lootClick.type, "interactable");
       assert.equal(lootClick.id, lootTarget.id);
       assert.equal(lootClick.autoUse, true);
+      const lootPending = await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction);
+      assert.equal(lootPending?.id, lootTarget.id);
       const lootSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
       assert.equal(lootSelection.actionBadgeVisible, true);
       assert.equal(lootSelection.actionBadgeValue, "Pick up");
@@ -436,6 +441,7 @@ async function main() {
         beforePickupMessages,
         { timeout: 5_000 }
       );
+      assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction), null);
       await page.waitForFunction(
         ({ actionType, before }) => {
           const server = window.__neomudThreeDebug.server;

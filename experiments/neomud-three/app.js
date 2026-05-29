@@ -55,6 +55,7 @@ let nearbyInteractable = null;
 let selectedInteractable = null;
 let lastInteractionResult = null;
 let lastCombatResult = null;
+let pendingInteractionAction = null;
 const targetHealthById = new Map();
 let pickupFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
@@ -376,6 +377,7 @@ function handleServerMessage(message) {
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "interact_result":
+      clearPendingInteractionAction();
       lastInteractionResult = {
         success: Boolean(message.success),
         featureName: message.featureName ?? selectedInteractable?.name ?? "Interaction",
@@ -386,6 +388,7 @@ function handleServerMessage(message) {
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "pickup_result":
+      clearPendingInteractionAction();
       lastInteractionResult = {
         success: true,
         featureName: message.itemName ?? selectedInteractable?.name ?? "Pickup",
@@ -683,6 +686,7 @@ function setRoom(roomId, options = {}) {
   selectedInteractable = null;
   lastCombatResult = null;
   lastInteractionResult = null;
+  clearPendingInteractionAction();
   activePanel = null;
   panel.classList.add("hidden");
   updatePanelButtons();
@@ -1323,6 +1327,7 @@ function clearSelectionTarget({ clearInteractable = false } = {}) {
   if (clearInteractable) {
     selectedInteractable = null;
     lastInteractionResult = null;
+    clearPendingInteractionAction();
   }
   if (!movement.selectionTarget && !movement.selectionMarker?.visible) {
     updateSelectionHealthBar(null);
@@ -1966,10 +1971,13 @@ function interactionPanel() {
     : "";
   const targetActions = hostile ? hostileActionFrame(entity) : "";
   const hasServerAction = Boolean(entity.actionType);
-  const canUseServerAction = hasServerAction && serverCanDriveMovement() && !entity.actionConsumed;
+  const pendingAction = pendingInteractionAction?.id === entity.id ? pendingInteractionAction : null;
+  const canUseServerAction = hasServerAction && serverCanDriveMovement() && !entity.actionConsumed && !pendingAction;
   const actionLabel = entity.actionConsumed
     ? "Picked up"
-    : serverActionLabel(entity);
+    : pendingAction
+      ? "Working..."
+      : serverActionLabel(entity);
   const actionResult = lastInteractionResult
     ? `
       <div class="list-card">
@@ -1992,7 +2000,7 @@ function interactionPanel() {
     </div>
     <div class="panel-actions">
       ${hasServerAction
-        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction ? escapeHtml(actionLabel) : escapeHtml(entity.actionConsumed ? actionLabel : `${actionLabel} unavailable`)}</button>`
+        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction || entity.actionConsumed || pendingAction ? escapeHtml(actionLabel) : escapeHtml(`${actionLabel} unavailable`)}</button>`
         : ""}
       <button type="button" data-panel-target="log">Open log</button>
       <button type="button" data-panel-target="map">Map</button>
@@ -2180,6 +2188,7 @@ function interactWithNearby(entity = nearbyInteractable, options = {}) {
 function useSelectedInteractable(featureId) {
   if (!selectedInteractable || selectedInteractable.id !== featureId) return;
   if (selectedInteractable.actionConsumed) return;
+  if (pendingInteractionAction?.id === featureId) return;
   if (!serverCanDriveMovement()) {
     lastInteractionResult = {
       success: false,
@@ -2195,8 +2204,16 @@ function useSelectedInteractable(featureId) {
     ? `Picking up ${selectedInteractable.name}`
     : `Using ${selectedInteractable.name}`;
   appendLog(`${actionText} through the Kotlin server...`);
+  pendingInteractionAction = {
+    id: selectedInteractable.id,
+    actionType: selectedInteractable.actionType ?? "",
+    label: actionText,
+    startedAt: performance.now()
+  };
+  if (activePanel === "interaction") renderPanel(activePanel);
   const sent = sendSelectedInteractableCommand(selectedInteractable);
   if (!sent) {
+    clearPendingInteractionAction();
     lastInteractionResult = {
       success: false,
       featureName: selectedInteractable.name,
@@ -2207,6 +2224,10 @@ function useSelectedInteractable(featureId) {
   } else {
     updateStatusText(`${actionText} through the Kotlin server...`);
   }
+}
+
+function clearPendingInteractionAction() {
+  pendingInteractionAction = null;
 }
 
 function sendSelectedInteractableCommand(entity) {
@@ -2711,6 +2732,13 @@ function installDebugApi() {
         pendingMove: serverState.pendingMove,
         lastError: serverState.lastError,
         lastInteractionResult,
+        pendingInteractionAction: pendingInteractionAction
+          ? {
+              id: pendingInteractionAction.id,
+              actionType: pendingInteractionAction.actionType,
+              label: pendingInteractionAction.label
+            }
+          : null,
         lastCombatResult,
         messageCount: serverState.messageCount,
         npcs: serverState.npcs.map((npc) => ({

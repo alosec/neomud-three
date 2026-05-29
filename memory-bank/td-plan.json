@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T02:23:00.000Z",
+  "updated": "2026-05-30T02:39:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -217,10 +217,15 @@
           "id": 32,
           "body": "Interaction feedback now has its own render-engine queue and debug counter instead of reusing combat effects. Server-backed chest QA now asserts effects.interaction increments on interact_result, while combat damage and pickup sparkle counts remain separate.",
           "created": "2026-05-30T02:23:00Z"
+        },
+        {
+          "id": 33,
+          "body": "Server-backed world actions now track pendingInteractionAction while an interact/pickup command is in flight. Repeat use commands are ignored until interact_result/pickup_result clears the pending state. Debug exposes pendingInteractionAction, and server-backed QA verifies chest and loot auto-use set the pending id and clear it after the server result.",
+          "created": "2026-05-30T02:39:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-30T02:23:00Z"
+      "updated": "2026-05-30T02:39:00Z"
     },
     {
       "id": "neo-9c72",
