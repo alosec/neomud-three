@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
-export const PLAYER_MODEL_SCALE = 1.72;
+export const PLAYER_MODEL_SCALE = 2.28;
 
 const sharedGeometries = new Map();
 

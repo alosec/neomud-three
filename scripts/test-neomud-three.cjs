@@ -9,7 +9,7 @@ const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-th
 const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/?offline=1";
 const headed = process.env.HEADED === "1";
 const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
-const MIN_READABLE_PLAYER_SCALE = 1.7;
+const MIN_READABLE_PLAYER_SCALE = 2.2;
 
 async function main() {
   const browser = await launchBrowser();

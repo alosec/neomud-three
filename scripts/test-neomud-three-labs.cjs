@@ -9,7 +9,7 @@ const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-th
 const baseUrl = process.env.NEOMUD_THREE_BASE_URL || "http://127.0.0.1:4183/experiments/neomud-three/";
 const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
 const headed = process.env.HEADED === "1";
-const MIN_READABLE_PLAYER_SCALE = 1.7;
+const MIN_READABLE_PLAYER_SCALE = 2.2;
 
 const LABS = [
   {
