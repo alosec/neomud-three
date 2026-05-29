@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T21:23:00.000Z",
+  "updated": "2026-05-30T05:48:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -786,10 +786,10 @@
       "description": "Implement a practical first Iso camera obstruction-avoidance pass so the elevated camera does not leave the avatar hidden behind nearby buildings, props, or other foreground blockers. Initial acceptance: the renderer samples small orbit offsets when the camera-to-avatar ray is blocked, chooses a clear angle when available, exposes debug obstruction metadata, and Town Square screenshot QA proves one obstructed placement rotates to a usable view. This is a bounded camera comfort slice, not a full room camera-volume or transparent-occluder system.",
       "type": "task",
       "priority": 0,
-      "status": "in-progress",
-      "status_type": "started",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-3361",
-      "close_reason": "",
+      "close_reason": "done: Iso camera samples obstruction-avoidance angles, fades bounded tight-room blockers, and biases framing toward selected/pending targets with screenshot QA coverage",
       "labels": [
         "neomud-three",
         "isometric",
@@ -823,10 +823,15 @@
           "id": 4,
           "body": "Extended tight Iso obstruction fallback from one faded foreground mesh to a bounded set of up to four ray-blocking meshes. Debug obstruction metadata now reports fadedCount, and Town/Tavern Chrome Canary QA asserts the count stays bounded while preserving the Tavern fade screenshot.",
           "created": "2026-05-30T03:58:00Z"
+        },
+        {
+          "id": 5,
+          "body": "Added bounded target-focus framing for Iso mode: pending clicked interactables, pending exits, selected interactables, or selected markers bias the camera frame center slightly toward the relevant world target while obstruction probes use the same frame center. Town Square QA clicks Old Wren and asserts debug camera.focus points at the pending NPC approach target.",
+          "created": "2026-05-30T05:48:00Z"
         }
       ],
       "created": "2026-05-29T20:07:00Z",
-      "updated": "2026-05-30T03:58:00Z"
+      "updated": "2026-05-30T05:48:00Z"
     },
     {
       "id": "neo-61d4",

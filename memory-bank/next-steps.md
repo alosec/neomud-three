@@ -83,7 +83,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      as camera blockers until restored, avoiding frame-to-frame fade flicker.
      Tight Iso fallback can now fade a bounded set of foreground blockers rather
      than only one mesh; debug metadata reports `fadedCount` and QA keeps the
-     count capped.
+     count capped. Iso framing now also biases slightly toward pending clicked
+     interactables, pending exits, and selected targets; Town Square QA verifies
+     the pending Old Wren approach reports `camera.focus` at the NPC target.
    - Direct click routing now covers existing NPC/item interaction panels and
      exit moves through the existing command path. Interactable clicks now select
      the target, route the avatar to a sampled clear approach point, face the

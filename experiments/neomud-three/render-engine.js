@@ -51,8 +51,11 @@ export function createRenderEngine(canvas) {
   const cameraBlockers = [];
   const isoProbeDesired = new THREE.Vector3();
   const isoProbeLookTarget = new THREE.Vector3();
+  const isoFrameCenter = new THREE.Vector3();
+  const isoFocusVector = new THREE.Vector3();
   const cameraFadeMaterials = new Map();
   let isoCameraAvoidanceAngle = 0;
+  let isoCameraFocus = null;
   const pickupEffects = [];
   const combatEffects = [];
   const interactionEffects = [];
@@ -111,6 +114,9 @@ export function createRenderEngine(canvas) {
     },
     get cameraObstruction() {
       return cameraObstruction;
+    },
+    get cameraFocus() {
+      return isoCameraFocus ? { ...isoCameraFocus } : null;
     },
     replaceWorld(factory) {
       restoreCameraFadeMaterials(cameraFadeMaterials);
@@ -177,15 +183,19 @@ export function createRenderEngine(canvas) {
           blockers: cameraBlockers,
           probeDesired: isoProbeDesired,
           probeLookTarget: isoProbeLookTarget,
+          frameCenter: isoFrameCenter,
+          focusVector: isoFocusVector,
           currentAvoidanceAngle: isoCameraAvoidanceAngle
         });
         isoCameraAvoidanceAngle = isoResult.avoidanceAngle;
         cameraObstruction = isoResult.obstruction;
+        isoCameraFocus = isoResult.focus;
         updateCameraFadeMaterials(cameraFadeMaterials, isoResult.fadeTargets);
         return;
       }
 
       restoreCameraFadeMaterials(cameraFadeMaterials);
+      isoCameraFocus = null;
       const forward = new THREE.Vector3(Math.sin(heading), 0, -Math.cos(heading));
       const right = new THREE.Vector3(Math.cos(heading), 0, Math.sin(heading));
       const distance = roomCamera.distance ?? 9.8;
@@ -337,6 +347,8 @@ function updateIsometricCamera({
   blockers,
   probeDesired,
   probeLookTarget,
+  frameCenter,
+  focusVector,
   currentAvoidanceAngle = 0
 }) {
   const zoom = roomCamera.isoZoom ?? 1;
@@ -345,8 +357,9 @@ function updateIsometricCamera({
   const baseAngle = (roomCamera.isoAngle ?? Math.PI * 0.25) + (roomCamera.isoOrbitAngle ?? 0);
   const targetHeight = roomCamera.isoTargetHeight ?? 0.8;
   const lookAheadZ = roomCamera.isoLookAheadZ ?? -1.2;
+  const focus = computeIsometricFrameCenter(player.position, roomCamera.isoFocusPoint, frameCenter, focusVector);
   const desiredAvoidance = chooseIsometricAvoidanceAngle({
-    player,
+    frameCenter,
     baseAngle,
     distance,
     height,
@@ -367,10 +380,10 @@ function updateIsometricCamera({
   const offsetZ = Math.cos(angle) * distance;
 
   cameraDesired
-    .copy(player.position)
+    .copy(frameCenter)
     .add(new THREE.Vector3(offsetX, height, offsetZ));
   cameraLookTarget
-    .copy(player.position)
+    .copy(frameCenter)
     .add(new THREE.Vector3(0, targetHeight, lookAheadZ));
 
   if (snap) {
@@ -393,12 +406,13 @@ function updateIsometricCamera({
           fadedCount: fadeTargets.length
         }
       : null,
-    fadeTargets
+    fadeTargets,
+    focus
   };
 }
 
 function chooseIsometricAvoidanceAngle({
-  player,
+  frameCenter,
   baseAngle,
   distance,
   height,
@@ -420,7 +434,7 @@ function chooseIsometricAvoidanceAngle({
   let firstFadeTargets = [];
   for (const offset of offsets) {
     const probe = probeIsometricObstruction({
-      player,
+      frameCenter,
       angle: baseAngle + offset,
       distance,
       height,
@@ -442,7 +456,7 @@ function chooseIsometricAvoidanceAngle({
 }
 
 function probeIsometricObstruction({
-  player,
+  frameCenter,
   angle,
   distance,
   height,
@@ -456,15 +470,39 @@ function probeIsometricObstruction({
   probeLookTarget
 }) {
   probeDesired
-    .copy(player.position)
+    .copy(frameCenter)
     .add(new THREE.Vector3(Math.sin(angle) * distance, height, Math.cos(angle) * distance));
   probeLookTarget
-    .copy(player.position)
+    .copy(frameCenter)
     .add(new THREE.Vector3(0, targetHeight, lookAheadZ));
   return resolveCameraObstruction(probeLookTarget, probeDesired, worldRoot, raycaster, direction, blockers, {
     minDistance: 2.15,
     margin: 0.42
   });
+}
+
+function computeIsometricFrameCenter(playerPosition, focusPoint, frameCenter, focusVector) {
+  frameCenter.copy(playerPosition);
+  if (!focusPoint || !Number.isFinite(focusPoint.x) || !Number.isFinite(focusPoint.z)) return null;
+
+  focusVector.set(focusPoint.x - playerPosition.x, 0, focusPoint.z - playerPosition.z);
+  const distance = focusVector.length();
+  if (distance < 0.1) return null;
+
+  const cappedDistance = Math.min(distance, 7.2);
+  const bias = 0.32;
+  focusVector.normalize().multiplyScalar(cappedDistance * bias);
+  frameCenter.add(focusVector);
+  return {
+    x: Number(focusPoint.x.toFixed(3)),
+    z: Number(focusPoint.z.toFixed(3)),
+    distance: Number(distance.toFixed(3)),
+    bias: Number(bias.toFixed(2)),
+    center: {
+      x: Number(frameCenter.x.toFixed(3)),
+      z: Number(frameCenter.z.toFixed(3))
+    }
+  };
 }
 
 function resolveCameraObstruction(origin, desired, worldRoot, raycaster, direction, blockers, options = {}) {

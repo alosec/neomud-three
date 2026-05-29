@@ -3119,15 +3119,27 @@ function updateClickMoveProgress(dt, previousPosition, desiredClickDirection) {
 }
 
 function updateCamera(dt, snap = false) {
+  const isoFocusPoint = cameraMode === "isometric" ? isometricCameraFocusPoint() : null;
   renderEngine.updateCamera({
     dt,
     snap,
     heading: movement.heading,
     cameraMode,
     roomCamera: roomRuntime?.camera
-      ? { ...roomRuntime.camera, isoZoom: cameraControls.isoZoom, isoOrbitAngle: cameraControls.isoOrbitAngle }
-      : { isoZoom: cameraControls.isoZoom, isoOrbitAngle: cameraControls.isoOrbitAngle }
+      ? { ...roomRuntime.camera, isoZoom: cameraControls.isoZoom, isoOrbitAngle: cameraControls.isoOrbitAngle, isoFocusPoint }
+      : { isoZoom: cameraControls.isoZoom, isoOrbitAngle: cameraControls.isoOrbitAngle, isoFocusPoint }
   });
+}
+
+function isometricCameraFocusPoint() {
+  const pendingInteractionPosition = movement.pendingInteractable?.position;
+  if (pendingInteractionPosition) return pendingInteractionPosition;
+  const pendingExitPosition = movement.pendingExit?.position;
+  if (pendingExitPosition) return pendingExitPosition;
+  const selectedPosition = selectedInteractable?.position;
+  if (selectedPosition) return selectedPosition;
+  if (movement.selectionMarker?.visible) return movement.selectionMarker.position;
+  return null;
 }
 
 function setCameraMode(nextMode, { snap = true } = {}) {
@@ -3186,6 +3198,7 @@ function installDebugApi() {
           y: camera.position.y,
           z: camera.position.z
         },
+        focus: renderEngine.cameraFocus,
         obstruction: renderEngine.cameraObstruction
       };
     },

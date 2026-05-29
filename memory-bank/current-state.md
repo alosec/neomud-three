@@ -152,7 +152,11 @@ Playable Three.js lab:
   Iso orbit angle clears the avatar ray; Town Square QA verifies this fallback
   in the Tavern as `town-shot-tavern-iso-fade.png`. Faded blockers are marked
   as active camera blockers until restored so obstruction state does not flicker
-  frame-to-frame.
+  frame-to-frame. The Iso camera now also biases its frame center slightly
+  toward pending clicked interactables, pending exits, and selected targets, so
+  click-first play keeps the relevant world object in the camera/obstruction
+  calculation instead of only tracking the avatar. Town Square QA clicks Old
+  Wren and asserts `camera.focus` points at the pending NPC approach target.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

@@ -263,6 +263,15 @@ async function main() {
     await page.waitForFunction(() => window.__neomudThreeDebug.clickMove.pendingInteraction?.id === "npc:old_wren", null, { timeout: 2_000 });
     const pendingWrenApproach = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
     assert.equal(pendingWrenApproach.pathClear, true, `expected NPC approach route to clear colliders: ${JSON.stringify(pendingWrenApproach)}`);
+    const pendingWrenCamera = await page.evaluate(() => window.__neomudThreeDebug.camera);
+    assert.ok(
+      pendingWrenCamera.focus?.distance > 1,
+      `expected Iso camera to bias framing toward pending clicked NPC target: ${JSON.stringify(pendingWrenCamera)}`
+    );
+    assert.ok(
+      Math.abs(pendingWrenCamera.focus.x - oldWren.x) < 0.1 && Math.abs(pendingWrenCamera.focus.z - oldWren.z) < 0.1,
+      `expected Iso camera focus metadata to point at Old Wren: ${JSON.stringify({ pendingWrenCamera, oldWren })}`
+    );
     const approachHud = await page.evaluate(() => window.__neomudThreeDebug.hud);
     assert.equal(approachHud.actionState, "approach", `expected HUD to show clicked NPC approach state: ${JSON.stringify(approachHud)}`);
     assert.equal(approachHud.action, "Approach");
