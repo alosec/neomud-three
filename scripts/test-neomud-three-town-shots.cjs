@@ -191,6 +191,11 @@ async function main() {
       routedMove.pathLength >= 3 && routedMove.finalTarget.z < -5.5,
       `expected click beyond fountain to route around collider with waypoints, got ${JSON.stringify({ beyondPropMove, routedMove })}`
     );
+    assert.equal(routedMove.pathClear, true, `expected every routed segment to clear room colliders: ${JSON.stringify(routedMove)}`);
+    assert.ok(
+      routedMove.path.some((point) => Math.abs(point.x) > 2.1 || Math.abs(point.z) > 2.1),
+      `expected route to contain an explicit detour waypoint outside the fountain footprint: ${JSON.stringify(routedMove.path)}`
+    );
     await page.waitForTimeout(6500);
     const routedAfter = await page.evaluate(() => ({
       player: window.__neomudThreeDebug.player,

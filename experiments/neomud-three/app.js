@@ -920,6 +920,16 @@ function routeClickPath(origin, target) {
   return waypoints.length ? [...waypoints, directTarget] : [directTarget];
 }
 
+function clickPathSegmentsClear() {
+  if (!movement.clickPath.length) return true;
+  let origin = player.position;
+  for (const waypoint of movement.clickPath) {
+    if (firstBlockingClickCollider(origin, waypoint)) return false;
+    origin = waypoint;
+  }
+  return true;
+}
+
 function firstBlockingClickCollider(origin, target) {
   const colliders = roomRuntime?.debugColliders?.() ?? [];
   let nearest = null;
@@ -2440,6 +2450,8 @@ function installDebugApi() {
           : null,
         pathLength: movement.clickPath.length,
         pathIndex: movement.clickPathIndex,
+        pathClear: clickPathSegmentsClear(),
+        path: movement.clickPath.map((point) => ({ x: point.x, y: point.y, z: point.z })),
         markerVisible: Boolean(movement.clickTargetMarker?.visible),
         holdActive: movement.holdMoveActive,
         pendingInteraction: movement.pendingInteractable

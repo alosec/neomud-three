@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T19:48:00.000Z",
+  "updated": "2026-05-30T00:22:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -199,10 +199,10 @@
       "description": "Implement a practical first click-to-move router for Iso mode so the avatar can walk around simple room colliders instead of running directly into them. Initial acceptance: clicking across the Town Square fountain from the south side produces waypoint movement around the fountain and reaches the far-side destination without breaking normal direct clicks, interactable clicks, or exit clicks. This is a bounded waypoint router over existing debug collider rectangles, not a full navmesh.",
       "type": "task",
       "priority": 0,
-      "status": "in-progress",
-      "status_type": "started",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-3361",
-      "close_reason": "",
+      "close_reason": "done: click-to-move routes around simple room colliders; QA asserts Town Square fountain route has clear waypoint segments and arrives",
       "labels": [
         "neomud-three",
         "isometric",
@@ -230,10 +230,15 @@
           "id": 3,
           "body": "Added visible-waypoint lookahead while following click paths so the avatar can round corners more naturally instead of stopping at every intermediate node. The lookahead only advances when the next waypoint is directly visible under collider checks.",
           "created": "2026-05-29T21:24:00Z"
+        },
+        {
+          "id": 4,
+          "body": "Follow-up hardening: clickMove debug now exposes the full waypoint path and a pathClear boolean, and Town Square QA asserts every fountain detour segment clears colliders plus contains an explicit detour waypoint before arrival.",
+          "created": "2026-05-30T00:22:00Z"
         }
       ],
       "created": "2026-05-29T19:32:00Z",
-      "updated": "2026-05-29T21:24:00Z"
+      "updated": "2026-05-30T00:22:00Z"
     },
     {
       "id": "neo-2a6f",
