@@ -28,7 +28,10 @@ Playable Three.js lab:
   preserving keyboard movement as fallback. The ground-click path also checks
   nearby interactables and exit trigger volumes before treating the click as a
   movement target, so NPC/item clicks open the existing interaction panel and
-  exit clicks route through the existing move command path.
+  exit clicks route through the existing move command path. Iso mode also has
+  first-pass hover targeting for clickable NPCs/items/exits: hovered targets get
+  a small world marker and a concise DOM prompt, and screenshot QA now verifies
+  both Old Wren and the North Gate trigger before click routing.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
@@ -212,9 +215,9 @@ Known rough edges:
 
 - The current runtime is still primarily tuned around third-person/chase camera
   movement. `Iso` mode now has direct ground click-to-move and a destination
-  marker plus direct exit/interactable click routing, but this is still a
-  transitional state until hover/selection feedback, pathing, combat targeting,
-  and richer ARPG affordance language are implemented.
+  marker plus direct exit/interactable click routing and hover feedback, but
+  this is still a transitional state until pathing, combat targeting, stronger
+  selection state, and richer ARPG affordance language are implemented.
 - The workflow itself now has an explicit anti-overcorrection guard, because
   recent avatar scale/camera/detail passes showed a tendency to swing too far
   from one piece of feedback. Future visual passes that touch scale, camera,

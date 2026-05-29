@@ -121,7 +121,9 @@ const movement = {
   running: false,
   walkClock: 0,
   clickTarget: null,
-  clickTargetMarker: null
+  clickTargetMarker: null,
+  hoverTarget: null,
+  hoverMarker: null
 };
 
 const playableKeys = new Set([
@@ -183,6 +185,8 @@ async function main() {
   window.addEventListener("mousemove", handleMouseMove);
   document.addEventListener("pointerlockchange", handlePointerLockChange);
   canvas.addEventListener("click", requestPlayMode);
+  canvas.addEventListener("pointermove", handleCanvasPointerMove);
+  canvas.addEventListener("pointerleave", clearHoverTarget);
   canvas.addEventListener("pointerdown", handleCanvasPointerDown);
   playButton.addEventListener("click", requestPlayMode);
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
@@ -540,6 +544,7 @@ function setRoom(roomId, options = {}) {
   movement.jumpQueued = false;
   movement.walkClock = 0;
   clearClickMoveTarget();
+  clearHoverTarget();
   player.rotation.set(0, -movement.heading, 0);
 
   roomName.textContent = room.name;
@@ -653,6 +658,19 @@ function handlePointerLockChange() {
   setInputMode(document.pointerLockElement === canvas ? "play" : "menu");
 }
 
+function handleCanvasPointerMove(event) {
+  if (cameraMode !== "isometric" || activePanel || isHudPointerTarget(event.target)) {
+    clearHoverTarget();
+    return;
+  }
+  const point = pointOnGroundFromEvent(event);
+  if (!point) {
+    clearHoverTarget();
+    return;
+  }
+  setHoverTargetFromPoint(point);
+}
+
 function handleCanvasPointerDown(event) {
   if (cameraMode !== "isometric" || activePanel || event.button !== 0) return;
   if (isHudPointerTarget(event.target)) return;
@@ -696,32 +714,103 @@ function handleGroundClick(point) {
   const target = point.clone();
   target.y = 0;
 
-  const clickedInteractable = roomRuntime?.nearestInteractable?.(target, 1.85) ?? null;
-  if (clickedInteractable) {
+  const clickTarget = classifyGroundPoint(target);
+  if (clickTarget.type === "interactable") {
     clearClickMoveTarget();
-    nearbyInteractable = clickedInteractable;
+    clearHoverTarget();
+    nearbyInteractable = clickTarget.entity;
     interactWithNearby();
     return {
       type: "interactable",
-      id: clickedInteractable.id,
-      kind: clickedInteractable.kind
+      id: clickTarget.entity.id,
+      kind: clickTarget.entity.kind
     };
   }
 
-  const clickedExitTarget = roomRuntime?.exitAt?.(target) ?? null;
-  if (clickedExitTarget) {
+  if (clickTarget.type === "exit") {
     clearClickMoveTarget();
-    enterExitTarget(clickedExitTarget);
+    clearHoverTarget();
+    enterExitTarget(clickTarget.targetId);
     return {
       type: "exit",
-      targetId: clickedExitTarget
+      targetId: clickTarget.targetId
+    };
+  }
+
+  clearHoverTarget();
+  return {
+    type: "move",
+    target: setClickMoveTarget(target)
+  };
+}
+
+function classifyGroundPoint(point) {
+  const target = point.clone();
+  target.y = 0;
+
+  const entity = roomRuntime?.nearestInteractable?.(target, 1.85) ?? null;
+  if (entity) {
+    return {
+      type: "interactable",
+      entity,
+      position: entity.position.clone?.() ?? target,
+      label: `${actionLabelForEntity(entity)} ${entity.name}`
+    };
+  }
+
+  const targetId = roomRuntime?.exitAt?.(target) ?? null;
+  if (targetId) {
+    const room = world.rooms.get(targetId);
+    const direction = directionForTarget(world.rooms.get(currentRoomId), targetId);
+    return {
+      type: "exit",
+      targetId,
+      direction,
+      position: target,
+      label: `Travel ${direction ? direction.toLowerCase() : "to"} ${room?.name ?? targetId}`
     };
   }
 
   return {
     type: "move",
-    target: setClickMoveTarget(target)
+    position: target,
+    label: "Move"
   };
+}
+
+function actionLabelForEntity(entity) {
+  if (entity.kind === "npc") return "Talk to";
+  if (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS") return "Pick up";
+  return "Inspect";
+}
+
+function setHoverTargetFromPoint(point) {
+  const target = classifyGroundPoint(point);
+  if (target.type === "move") {
+    clearHoverTarget();
+    return null;
+  }
+
+  movement.hoverTarget = {
+    type: target.type,
+    id: target.entity?.id ?? target.targetId,
+    kind: target.entity?.kind ?? "",
+    label: target.label,
+    targetId: target.targetId ?? ""
+  };
+
+  const marker = ensureHoverMarker();
+  marker.position.copy(target.position).setY(0.07);
+  marker.visible = true;
+  updateInteractionPrompt();
+  return movement.hoverTarget;
+}
+
+function clearHoverTarget() {
+  if (!movement.hoverTarget && !movement.hoverMarker?.visible) return;
+  movement.hoverTarget = null;
+  if (movement.hoverMarker) movement.hoverMarker.visible = false;
+  updateInteractionPrompt();
 }
 
 function clearClickMoveTarget() {
@@ -751,6 +840,32 @@ function ensureClickTargetMarker() {
   group.visible = false;
   renderEngine.scene.add(group);
   movement.clickTargetMarker = group;
+  return group;
+}
+
+function ensureHoverMarker() {
+  if (movement.hoverMarker) return movement.hoverMarker;
+  const group = new THREE.Group();
+  group.name = "Isometric hover target marker";
+  group.userData.cameraIgnore = true;
+
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.62, 0.026, 8, 42),
+    new THREE.MeshBasicMaterial({ color: 0x8fffe2, transparent: true, opacity: 0.84, depthWrite: false })
+  );
+  ring.rotation.x = Math.PI / 2;
+
+  const pointer = new THREE.Mesh(
+    new THREE.ConeGeometry(0.14, 0.42, 4),
+    new THREE.MeshBasicMaterial({ color: 0xfff1c2, transparent: true, opacity: 0.78, depthWrite: false })
+  );
+  pointer.position.y = 0.28;
+  pointer.rotation.y = Math.PI / 4;
+
+  group.add(ring, pointer);
+  group.visible = false;
+  renderEngine.scene.add(group);
+  movement.hoverMarker = group;
   return group;
 }
 
@@ -1107,6 +1222,13 @@ function updateNearbyInteractable() {
 
 function updateInteractionPrompt() {
   if (!interactionPrompt) return;
+  if (movement.hoverTarget && !activePanel) {
+    interactionPrompt.classList.toggle("hover", cameraMode === "isometric");
+    interactionPrompt.textContent = `Click ${movement.hoverTarget.label}`;
+    interactionPrompt.classList.remove("hidden");
+    return;
+  }
+  interactionPrompt.classList.remove("hover");
   if (!nearbyInteractable || activePanel) {
     interactionPrompt.classList.add("hidden");
     interactionPrompt.replaceChildren();
@@ -1288,6 +1410,11 @@ function updatePlayer(dt) {
     const pulse = 1 + Math.sin(performance.now() * 0.006) * 0.08;
     movement.clickTargetMarker.scale.setScalar(pulse);
   }
+  if (movement.hoverMarker?.visible) {
+    movement.hoverMarker.rotation.y += dt * 1.2;
+    const hoverPulse = 1 + Math.sin(performance.now() * 0.007) * 0.06;
+    movement.hoverMarker.scale.setScalar(hoverPulse);
+  }
   movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
@@ -1385,6 +1512,15 @@ function installDebugApi() {
         markerVisible: Boolean(movement.clickTargetMarker?.visible)
       };
     },
+    get hover() {
+      return {
+        active: Boolean(movement.hoverTarget),
+        target: movement.hoverTarget,
+        markerVisible: Boolean(movement.hoverMarker?.visible),
+        prompt: interactionPrompt?.textContent ?? "",
+        promptVisible: Boolean(interactionPrompt && !interactionPrompt.classList.contains("hidden"))
+      };
+    },
     get effects() {
       return {
         pickup: renderEngine.pickupEffectCount
@@ -1479,6 +1615,7 @@ function installDebugApi() {
       movement.jumpQueued = false;
       movement.running = false;
       clearClickMoveTarget();
+      clearHoverTarget();
       player.rotation.set(0, -movement.heading, 0);
       updateCamera(1, true);
       return this.player;
@@ -1488,6 +1625,13 @@ function installDebugApi() {
     },
     clickGround({ x = player.position.x, z = player.position.z } = {}) {
       return handleGroundClick(new THREE.Vector3(x, 0, z));
+    },
+    hoverGround({ x = player.position.x, z = player.position.z } = {}) {
+      return setHoverTargetFromPoint(new THREE.Vector3(x, 0, z));
+    },
+    clearHover() {
+      clearHoverTarget();
+      return this.hover;
     },
     reconnectServer() {
       serverState.client?.close();

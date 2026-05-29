@@ -71,6 +71,28 @@ async function main() {
     const isoTarget = path.join(qaDir, "town-shot-isometric-plaza.png");
     await page.screenshot({ path: isoTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-plaza", path: isoTarget });
+
+    const oldWren = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.entities.find((entity) => entity.id === "npc:old_wren")
+    );
+    assert.ok(oldWren, "expected Old Wren hover/click target in Town Square");
+    const npcHover = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.hoverGround({ x, z }), oldWren);
+    assert.deepEqual(npcHover, {
+      type: "interactable",
+      id: "npc:old_wren",
+      kind: "npc",
+      label: "Talk to Old Wren",
+      targetId: ""
+    });
+    const hoverState = await page.evaluate(() => window.__neomudThreeDebug.hover);
+    assert.equal(hoverState.markerVisible, true);
+    assert.equal(hoverState.promptVisible, true);
+    assert.match(hoverState.prompt, /Click Talk to Old Wren/);
+    const hoverTarget = path.join(qaDir, "town-shot-isometric-hover-target.png");
+    await page.screenshot({ path: hoverTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-hover-target", path: hoverTarget });
+    await page.evaluate(() => window.__neomudThreeDebug.clearHover());
+
     const beforeClick = await page.evaluate(() => window.__neomudThreeDebug.player);
     await page.mouse.click(760, 525);
     await page.waitForTimeout(700);
@@ -87,10 +109,6 @@ async function main() {
     await page.screenshot({ path: clickTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-click-target", path: clickTarget });
 
-    const oldWren = await page.evaluate(() =>
-      window.__neomudThreeDebug.room.entities.find((entity) => entity.id === "npc:old_wren")
-    );
-    assert.ok(oldWren, "expected Old Wren click target in Town Square");
     const npcClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), oldWren);
     assert.deepEqual(npcClick, { type: "interactable", id: "npc:old_wren", kind: "npc" });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
@@ -121,6 +139,13 @@ async function main() {
       window.__neomudThreeDebug.room.triggers.find((trigger) => trigger.id === "exit-north-gate")
     );
     assert.ok(gateTrigger, "expected north Gate trigger for click routing");
+    const exitHover = await page.evaluate((trigger) =>
+      window.__neomudThreeDebug.hoverGround({ x: trigger.trigger.center[0], z: trigger.trigger.center[2] })
+    , gateTrigger);
+    assert.equal(exitHover.type, "exit");
+    assert.equal(exitHover.targetId, "town:gate");
+    assert.match(exitHover.label, /Gate/);
+    await page.evaluate(() => window.__neomudThreeDebug.clearHover());
     const exitClick = await page.evaluate((trigger) =>
       window.__neomudThreeDebug.clickGround({ x: trigger.trigger.center[0], z: trigger.trigger.center[2] })
     , gateTrigger);
