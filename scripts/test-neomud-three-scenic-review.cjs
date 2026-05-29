@@ -8,15 +8,46 @@ const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-th
 
 const baseUrl = process.env.NEOMUD_THREE_BASE_URL || "http://127.0.0.1:4183/experiments/neomud-three/";
 const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
+const rubricPath = path.resolve(__dirname, "../experiments/neomud-three/qa/representational-rubric.json");
 const headed = process.env.HEADED === "1";
 
 const SHOTS = [
-  { id: "magic-entry", roomId: "town:magic_shop", bookmark: "entry" },
-  { id: "magic-layout", roomId: "town:magic_shop", bookmark: "topdown" },
-  { id: "town-layout", roomId: "town:square", bookmark: "layout" },
-  { id: "town-temple", roomId: "town:square", bookmark: "temple" },
-  { id: "temple-nave", roomId: "town:temple", bookmark: "nave" },
-  { id: "temple-pews", roomId: "town:temple", bookmark: "pews" }
+  {
+    id: "magic-entry",
+    roomId: "town:magic_shop",
+    bookmark: "entry",
+    reviewFocus: ["boundedness", "cohesion", "flow"]
+  },
+  {
+    id: "magic-layout",
+    roomId: "town:magic_shop",
+    bookmark: "topdown",
+    reviewFocus: ["boundedness", "visualHierarchy", "flow"]
+  },
+  {
+    id: "town-layout",
+    roomId: "town:square",
+    bookmark: "layout",
+    reviewFocus: ["scale", "visualHierarchy", "flow"]
+  },
+  {
+    id: "town-temple",
+    roomId: "town:square",
+    bookmark: "temple",
+    reviewFocus: ["representationalSanity", "scale", "visualHierarchy"]
+  },
+  {
+    id: "temple-nave",
+    roomId: "town:temple",
+    bookmark: "nave",
+    reviewFocus: ["scale", "visualHierarchy", "flow"]
+  },
+  {
+    id: "temple-pews",
+    roomId: "town:temple",
+    bookmark: "pews",
+    reviewFocus: ["representationalSanity", "cohesion", "materialLanguage"]
+  }
 ];
 
 main().catch((error) => {
@@ -25,6 +56,8 @@ main().catch((error) => {
 });
 
 async function main() {
+  const rubric = JSON.parse(await fs.readFile(rubricPath, "utf8"));
+  const criteriaById = new Map(rubric.criteria.map((criterion) => [criterion.id, criterion]));
   const browser = await launchBrowser();
   const consoleErrors = [];
   const failedRequests = [];
@@ -68,7 +101,21 @@ async function main() {
       assert.equal(review.toggles.ui, false);
       assert.ok(review.camera.position.length === 3, `expected camera position for ${shot.id}: ${JSON.stringify(review.camera)}`);
       assert.ok(review.triggers.length >= 1 || review.landmarks.length >= 1 || review.colliders.length >= 1, `expected review metadata for ${shot.id}: ${JSON.stringify(review)}`);
-      shots.push({ ...shot, screenshot, review, budget });
+      shots.push({
+        ...shot,
+        screenshot,
+        reviewQuestions: shot.reviewFocus.map((criterionId) => {
+          const criterion = criteriaById.get(criterionId);
+          assert.ok(criterion, `unknown scenic review criterion ${criterionId}`);
+          return {
+            criterionId,
+            label: criterion.label,
+            question: criterion.question
+          };
+        }),
+        review,
+        budget
+      });
     }
 
     assert.deepEqual(failedRequests, []);
@@ -76,6 +123,11 @@ async function main() {
 
     await writeQaReport(qaDir, {
       type: "scenic-review",
+      rubric: {
+        id: rubric.id,
+        version: rubric.version,
+        path: path.relative(path.resolve(__dirname, ".."), rubricPath)
+      },
       url,
       generatedAt: new Date().toISOString(),
       shots,

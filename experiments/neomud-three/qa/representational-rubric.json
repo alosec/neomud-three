@@ -1,0 +1,91 @@
+{
+  "id": "neomud-three.representational-rubric.v1",
+  "version": 1,
+  "purpose": "Judge whether a room or asset is representationally sane, coherent, scaled, and playable before accepting visual production work.",
+  "scoreScale": {
+    "0": "fails or is not assessable from the current evidence",
+    "1": "partially works but has obvious visual, semantic, or playability problems",
+    "2": "works well enough to accept for the current production stage"
+  },
+  "criteria": [
+    {
+      "id": "representationalSanity",
+      "label": "Representational Sanity",
+      "question": "Does the scene or asset read as the thing it claims to be without needing explanation?",
+      "lookFor": [
+        "clear identity at the intended viewing distance",
+        "essential features preserved despite stylization",
+        "no accidental reads such as toy, crate, barricade, or placeholder"
+      ]
+    },
+    {
+      "id": "cohesion",
+      "label": "Cohesion",
+      "question": "Do the objects, textures, lighting, and abstraction level feel like one authored visual idea?",
+      "lookFor": [
+        "consistent abstraction level",
+        "props supporting the same room premise",
+        "no isolated asset that feels imported from another game"
+      ]
+    },
+    {
+      "id": "scale",
+      "label": "Scale",
+      "question": "Does the player-to-world relationship feel spatially believable and large enough?",
+      "lookFor": [
+        "human-scale furniture and doors",
+        "landmarks that do not feel like miniatures",
+        "avatar not dominating the room"
+      ]
+    },
+    {
+      "id": "materialLanguage",
+      "label": "Material / Texture Language",
+      "question": "Do materials support the form instead of fighting it?",
+      "lookFor": [
+        "texture detail level matches geometry detail level",
+        "no overpowering tiling or baked-lighting conflict",
+        "materials distinguish focal objects from background"
+      ]
+    },
+    {
+      "id": "visualHierarchy",
+      "label": "Visual Hierarchy",
+      "question": "Can a reviewer quickly identify focal points, exits, and secondary dressing?",
+      "lookFor": [
+        "clear primary focal object or destination",
+        "supporting props quieter than landmarks",
+        "not all objects competing at equal contrast"
+      ]
+    },
+    {
+      "id": "flow",
+      "label": "Playability / Flow",
+      "question": "Does the room guide movement and make the next action understandable?",
+      "lookFor": [
+        "clear entry read",
+        "natural movement path",
+        "exits and interactables readable without debug labels",
+        "colliders supporting rather than interrupting traversal"
+      ]
+    },
+    {
+      "id": "boundedness",
+      "label": "Boundedness",
+      "question": "Does the room feel intentionally framed even when not physically complete?",
+      "lookFor": [
+        "edges and walls that create a legible place",
+        "acceptable stage-like abstraction",
+        "no accidental voids or unmotivated openness"
+      ]
+    }
+  ],
+  "acceptance": {
+    "prototypePass": "No criterion scores 0, at least four criteria score 2, and any score 1 has a concrete follow-up.",
+    "productionPass": "All criteria score 2 from both player-view and scenic-review evidence."
+  },
+  "positiveBenchmark": {
+    "roomId": "town:magic_shop",
+    "reason": "The Magic Shop is currently the clearest example of a bounded, cohesive, internally legible room whose simplified props share a consistent abstraction level."
+  }
+}

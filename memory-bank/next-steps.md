@@ -14,6 +14,7 @@ High leverage next work:
    - Do not add room-specific art that bypasses approved material IDs or TownKit components.
    - Keep fixed screenshot anchors in `scripts/test-neomud-three-town-shots.cjs` current after Town Square visual changes.
    - Use `scenic-review.html` and `scripts/test-neomud-three-scenic-review.cjs` before broad visual edits so representational QA can inspect rooms from free-fly, top-down, scale, focal-landmark, and clean UI-hidden reviewer views.
+   - Use `experiments/neomud-three/qa/representational-rubric.json` to score visual work before accepting it. Positive and negative reviews should cite specific screenshots and criteria, following the Magic Shop benchmark and Temple scenic review examples.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
@@ -69,6 +70,7 @@ High leverage next work:
    - Keep adding fixed screenshot anchors before major visual passes, not after the fact.
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
    - Use Scenic Review screenshots as a separate gate from player-follow screenshots. Player shots answer play readability; scenic shots answer representational sanity, abstraction consistency, scale, and room composition.
+   - Run `node scripts/validate-neomud-three-representational-qa.cjs` after changing the rubric, benchmark reviews, or scenic review report structure.
 
 6. Revisit HTML-in-Canvas once the 3D space is stable.
    - Use real HTML panels as texture sources on in-world boards, doors, books, plaques, and dialogue surfaces.
