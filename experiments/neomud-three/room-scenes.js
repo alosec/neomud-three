@@ -474,6 +474,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   });
   root.add(entityLayer);
   addTavernRuntimeInteriorFinish(root, materials);
+  addTavernRuntimeFloorTreatment(root);
   addTavernRuntimeFurnitureFinish(root, materials);
 
   const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
@@ -588,6 +589,64 @@ function addTavernRuntimeInteriorFinish(root, materials) {
   addInstancedBoxes(root, materials.awningBlue, blue, "tavern-runtime-wall-blue");
   addInstancedBoxes(root, materials.sign, gold, "tavern-runtime-wall-gold", { castShadow: false });
   addInstancedBoxes(root, materials.windowDark, glass, "tavern-runtime-wall-glass", { castShadow: false, receiveShadow: false });
+}
+
+function addTavernRuntimeFloorTreatment(root) {
+  const floorWash = new THREE.MeshBasicMaterial({
+    color: 0x8f5f35,
+    transparent: true,
+    opacity: 0.38,
+    depthWrite: false
+  });
+  const aisleWash = new THREE.MeshBasicMaterial({
+    color: 0xb07138,
+    transparent: true,
+    opacity: 0.22,
+    depthWrite: false
+  });
+  const seamWash = new THREE.MeshBasicMaterial({
+    color: 0x5a361f,
+    transparent: true,
+    opacity: 0.18,
+    depthWrite: false
+  });
+
+  addInstancedGeometry(
+    root,
+    new THREE.PlaneGeometry(1, 1),
+    floorWash,
+    [
+      { x: 1.7, y: 0.067, z: 0, scale: [22.6, 16.4, 1], rotationX: -Math.PI / 2 }
+    ],
+    "tavern-runtime-floor-warm-wash",
+    { castShadow: false, receiveShadow: false }
+  );
+
+  addInstancedGeometry(
+    root,
+    new THREE.PlaneGeometry(1, 1),
+    aisleWash,
+    [
+      { x: 1.8, y: 0.071, z: 0, scale: [18.4, 2.15, 1], rotationX: -Math.PI / 2 },
+      { x: -6.8, y: 0.072, z: -3.7, scale: [5.4, 1.35, 1], rotationX: -Math.PI / 2, rotationZ: 0.02 }
+    ],
+    "tavern-runtime-floor-aisle-wash",
+    { castShadow: false, receiveShadow: false }
+  );
+
+  addInstancedGeometry(
+    root,
+    new THREE.PlaneGeometry(1, 1),
+    seamWash,
+    [
+      { x: 1.8, y: 0.074, z: -2.05, scale: [17.6, 0.055, 1], rotationX: -Math.PI / 2 },
+      { x: 1.8, y: 0.074, z: 2.05, scale: [17.6, 0.055, 1], rotationX: -Math.PI / 2 },
+      { x: -2.8, y: 0.075, z: 0, scale: [0.04, 12.4, 1], rotationX: -Math.PI / 2 },
+      { x: 4.5, y: 0.075, z: 0, scale: [0.04, 12.4, 1], rotationX: -Math.PI / 2 }
+    ],
+    "tavern-runtime-floor-soft-seams",
+    { castShadow: false, receiveShadow: false }
+  );
 }
 
 function addTavernRuntimeFurnitureFinish(root, materials) {
