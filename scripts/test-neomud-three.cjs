@@ -583,6 +583,10 @@ async function main() {
     );
     const spiderHealth = await page.evaluate(() => window.__neomudThreeDebug.server.targetHealth["npc:forest_spider"]);
     assert.deepEqual(spiderHealth, { current: 18, max: 32 });
+    const spiderSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
+    assert.equal(spiderSelection.healthBarVisible, true);
+    assert.equal(spiderSelection.healthBarValue, "18/32");
+    assert.ok(spiderSelection.healthBarRatio > 0.55 && spiderSelection.healthBarRatio < 0.57, `expected spider health ratio near 18/32, got ${JSON.stringify(spiderSelection)}`);
     await page.waitForFunction(() => window.__neomudThreeDebug.effects.combat > 0, null, { timeout: 2_000 });
     await saveScreenshot(page, "offline-hostile-target-panel.png");
     await page.keyboard.press("Escape");

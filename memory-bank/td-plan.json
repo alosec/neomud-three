@@ -129,6 +129,11 @@
           "created": "2026-05-29T23:42:00Z"
         },
         {
+          "id": 26,
+          "body": "Selected hostile targets now show an in-world HP bar attached to the selected-target ring. The bar mirrors live targetHealthById values from combat_hit/npc_died and exposes healthBarVisible/value/ratio through debug selection state. Offline smoke QA verifies Giant Forest Spider shows 18/32 and the expected ratio after an injected combat_hit.",
+          "created": "2026-05-30T00:03:00Z"
+        },
+        {
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"

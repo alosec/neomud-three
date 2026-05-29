@@ -145,6 +145,7 @@ const movement = {
   hoverMarker: null,
   selectionTarget: null,
   selectionMarker: null,
+  selectionHealthBar: null,
   targetObjectHighlight: null,
   pendingInteractable: null,
   holdMoveActive: false,
@@ -326,6 +327,7 @@ function handleServerMessage(message) {
           current: Math.max(0, Number(message.defenderHp) || 0),
           max: Math.max(1, Number(message.defenderMaxHp) || 1)
         });
+        if (movement.selectionTarget?.id === defenderId) updateSelectionHealthBar(selectedInteractable);
       }
       const outcome = message.isMiss
         ? "misses"
@@ -359,6 +361,7 @@ function handleServerMessage(message) {
         current: 0,
         max: targetHealthById.get(message.npcId)?.max ?? 1
       });
+      if (movement.selectionTarget?.id === message.npcId) updateSelectionHealthBar(selectedInteractable);
       lastCombatResult = {
         success: true,
         targetName: message.npcName ?? "Target",
@@ -1201,6 +1204,11 @@ function targetHealthForEntity(entity) {
   };
 }
 
+function healthRatio(health) {
+  if (!health) return 0;
+  return THREE.MathUtils.clamp((Number(health.current) || 0) / Math.max(1, Number(health.max) || 1), 0, 1);
+}
+
 function setHoverTargetFromPoint(point) {
   const target = classifyGroundPoint(point);
   if (target.type === "move") {
@@ -1253,11 +1261,13 @@ function setSelectionTarget(target) {
 
   const marker = ensureSelectionMarker();
   const hostile = target.entity ? isHostileEntity(target.entity) : false;
+  movement.selectionTarget.hostile = hostile;
   marker.userData.outerMaterial?.color.setHex(hostile ? 0xff6b57 : 0xffd36b);
   marker.userData.innerMaterial?.color.setHex(hostile ? 0xffd0c8 : 0xffffff);
   marker.userData.cardinalMaterial?.color.setHex(hostile ? 0xff9b72 : 0xfff1c2);
   marker.position.copy(target.position).setY(0.09);
   marker.visible = true;
+  updateSelectionHealthBar(target.entity ?? null);
   applyTargetObjectHighlight(movement.selectionTarget, "selected");
   updateInteractionPrompt();
   return movement.selectionTarget;
@@ -1267,8 +1277,31 @@ function clearSelectionTarget() {
   if (!movement.selectionTarget && !movement.selectionMarker?.visible) return;
   movement.selectionTarget = null;
   if (movement.selectionMarker) movement.selectionMarker.visible = false;
+  updateSelectionHealthBar(null);
   applyTargetObjectHighlight(movement.hoverTarget, movement.hoverTarget ? "hover" : null);
   updateInteractionPrompt();
+}
+
+function updateSelectionHealthBar(entity = selectedInteractable) {
+  const bar = ensureSelectionHealthBar();
+  const targetId = entity?.id ?? movement.selectionTarget?.id ?? "";
+  const hostile = entity ? isHostileEntity(entity) : Boolean(movement.selectionTarget?.hostile);
+  if (!targetId || !hostile || !movement.selectionMarker?.visible) {
+    bar.visible = false;
+    return null;
+  }
+  const health = entity ? targetHealthForEntity(entity) : targetHealthById.get(targetId);
+  if (!health) {
+    bar.visible = false;
+    return null;
+  }
+  const ratio = healthRatio(health);
+  bar.visible = true;
+  bar.userData.fill.scale.x = ratio;
+  bar.userData.fill.position.x = -0.6 + ratio * 0.6;
+  bar.userData.value = `${Math.round(health.current)}/${Math.round(health.max)}`;
+  bar.userData.ratio = ratio;
+  return bar.userData;
 }
 
 function startPendingInteraction(entity) {
@@ -1475,6 +1508,47 @@ function ensureSelectionMarker() {
   group.visible = false;
   renderEngine.scene.add(group);
   movement.selectionMarker = group;
+  return group;
+}
+
+function ensureSelectionHealthBar() {
+  if (movement.selectionHealthBar) return movement.selectionHealthBar;
+  const marker = ensureSelectionMarker();
+  const group = new THREE.Group();
+  group.name = "Selected hostile health bar";
+  group.userData.cameraIgnore = true;
+  group.position.set(0, 1.95, 0);
+  group.visible = false;
+
+  const back = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.32, 0.16),
+    new THREE.MeshBasicMaterial({
+      color: 0x160706,
+      transparent: true,
+      opacity: 0.82,
+      depthWrite: false,
+      depthTest: false,
+      side: THREE.DoubleSide
+    })
+  );
+  const fill = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.2, 0.08),
+    new THREE.MeshBasicMaterial({
+      color: 0xff5f4b,
+      transparent: true,
+      opacity: 0.94,
+      depthWrite: false,
+      depthTest: false,
+      side: THREE.DoubleSide
+    })
+  );
+  fill.position.z = 0.01;
+  fill.position.y = 0.01;
+
+  group.add(back, fill);
+  group.userData.fill = fill;
+  marker.add(group);
+  movement.selectionHealthBar = group;
   return group;
 }
 
@@ -1740,7 +1814,7 @@ function interactionPanel() {
           <strong>${escapeHtml(entity.name)}</strong>
           <span>${targetHealth.current}/${targetHealth.max}</span>
         </div>
-        <div class="target-health"><span style="transform: scaleX(${targetHealth.current / targetHealth.max})"></span></div>
+        <div class="target-health"><span style="transform: scaleX(${healthRatio(targetHealth)})"></span></div>
       </div>
     `
     : "";
@@ -1936,6 +2010,12 @@ function updateInteractionPrompt() {
 
 function interactWithNearby(entity = nearbyInteractable) {
   if (!entity) return;
+  setSelectionTarget({
+    type: "interactable",
+    entity,
+    position: entity.position.clone?.() ?? new THREE.Vector3(entity.position.x ?? 0, 0, entity.position.z ?? 0),
+    label: `${actionVerbForEntity(entity)} ${entity.name}`
+  });
   if (!entity.hostile || lastCombatResult?.targetName !== entity.name) {
     lastCombatResult = null;
   }
@@ -2225,7 +2305,11 @@ function updatePlayer(dt) {
     movement.selectionMarker.rotation.y -= dt * 0.6;
     const selectedPulse = 1 + Math.sin(performance.now() * 0.004) * 0.035;
     movement.selectionMarker.scale.setScalar(selectedPulse);
+    if (movement.selectionHealthBar?.visible) {
+      movement.selectionHealthBar.rotation.y = -movement.selectionMarker.rotation.y;
+    }
   }
+  updateSelectionHealthBar();
   updateTargetObjectHighlight();
   movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
@@ -2383,6 +2467,9 @@ function installDebugApi() {
         active: Boolean(movement.selectionTarget),
         target: movement.selectionTarget,
         markerVisible: Boolean(movement.selectionMarker?.visible),
+        healthBarVisible: Boolean(movement.selectionHealthBar?.visible),
+        healthBarValue: movement.selectionHealthBar?.userData?.value ?? "",
+        healthBarRatio: movement.selectionHealthBar?.userData?.ratio ?? 0,
         objectHighlighted: movement.targetObjectHighlight?.mode === "selected"
       };
     },
