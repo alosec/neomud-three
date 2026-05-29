@@ -328,6 +328,7 @@ async function main() {
     }));
     assert.equal(duringHold.clickMove.holdActive, true);
     assert.ok(duringHold.clickMove.markerVisible, `expected visible hold-move marker: ${JSON.stringify(duringHold)}`);
+    assert.ok(duringHold.clickMove.pathMarkerVisible, `expected visible hold-move route preview: ${JSON.stringify(duringHold)}`);
     assert.ok(
       Math.hypot(duringHold.player.x - beforeHold.x, duringHold.player.z - beforeHold.z) > 0.45,
       `expected click-and-hold drag to move avatar in Iso mode: ${JSON.stringify({ beforeHold, duringHold })}`
