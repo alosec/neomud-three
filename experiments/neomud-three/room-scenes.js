@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { LEVEL_PACKAGES } from "./level-packages.js";
 import { addRuntimeLightsFromBlenderLevel, buildGlbRoomRuntime } from "./glb-room-runtime.js";
-import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
+import { createApprovedMaterial, makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
 import { TOWN_SQUARE_SPEC } from "./room-specs.js";
 import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
 import { addTownKitProp } from "./components/town-kit.js";
@@ -56,6 +56,24 @@ const TAVERN_TABLES = [
   { id: "table-southwest", x: -1.55, z: 4.85, rotation: 0.42, collider: { width: 2.35, depth: 1.78 } },
   { id: "table-southeast", x: 4.75, z: 3.82, rotation: -0.12, collider: { width: 2.35, depth: 1.78 } }
 ];
+
+const TEMPLE_GLB_MATERIAL_IDS = {
+  MAT_temple_marble_low_contrast: "temple.marble.floor",
+  MAT_temple_limestone_wall: "temple.limestone.wall",
+  MAT_temple_warm_limestone_trim: "temple.trim.limestone",
+  MAT_temple_dawn_cloth: "temple.altar.cloth",
+  MAT_temple_stained_glass_dawn_v2: "temple.stained-glass.dawn-v2"
+};
+
+const TAVERN_GLB_MATERIAL_IDS = {
+  MAT_tavern_plank_floor: "town.timber.dark",
+  MAT_tavern_smoky_plaster: "town.plaster.quiet",
+  MAT_tavern_warm_plaster: "town.plaster.warm",
+  MAT_tavern_dark_oak: "town.timber.dark",
+  MAT_tavern_worn_wood: "town.timber",
+  MAT_tavern_worn_trim: "town.trim.light",
+  MAT_tavern_soot_stone: "town.stone.dark"
+};
 
 const MARKET = {
   width: 38,
@@ -6181,12 +6199,55 @@ function horizontalDistanceSq(a, b) {
   return dx * dx + dz * dz;
 }
 
+function createGlbMaterialRemapper(scene, materialIdsByName) {
+  const materialCache = new Map();
+  const applied = new Map();
+  const materialEntries = Object.entries(materialIdsByName);
+
+  function approvedMaterial(materialId) {
+    if (!materialCache.has(materialId)) {
+      const material = createApprovedMaterial(materialId);
+      material.name = materialId;
+      materialCache.set(materialId, material);
+    }
+    return materialCache.get(materialId);
+  }
+
+  function remap(material, objectName) {
+    if (!material) return material;
+    const materialName = material.name ?? "";
+    const directMaterialId = materialIdsByName[materialName];
+    const fallbackMaterialId = directMaterialId
+      ?? materialEntries.find(([sourceName]) => objectName.includes(sourceName))?.[1];
+    if (!fallbackMaterialId) return material;
+    applied.set(materialName || objectName, fallbackMaterialId);
+    return approvedMaterial(fallbackMaterialId);
+  }
+
+  return {
+    remapObject(object) {
+      if (!object.material) return;
+      object.material = Array.isArray(object.material)
+        ? object.material.map((material) => remap(material, object.name))
+        : remap(object.material, object.name);
+    },
+    commit() {
+      scene.userData.neomudMaterialRemaps = [...applied.entries()].map(([source, materialId]) => ({
+        source,
+        materialId
+      }));
+    }
+  };
+}
+
 function configureBlenderTempleScene(scene) {
   scene.name = "town-temple-blender-level";
+  const materialRemapper = createGlbMaterialRemapper(scene, TEMPLE_GLB_MATERIAL_IDS);
   scene.traverse((object) => {
     if (!object.isMesh) return;
     object.castShadow = object.name.startsWith("VIS_");
     object.receiveShadow = object.name.startsWith("VIS_");
+    materialRemapper.remapObject(object);
     if (object.material) {
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {
@@ -6205,15 +6266,18 @@ function configureBlenderTempleScene(scene) {
       }
     }
   });
+  materialRemapper.commit();
 
 }
 
 function configureBlenderTavernScene(scene, flameMeshes = []) {
   scene.name = "town-tavern-blender-level";
+  const materialRemapper = createGlbMaterialRemapper(scene, TAVERN_GLB_MATERIAL_IDS);
   scene.traverse((object) => {
     if (!object.isMesh) return;
     object.castShadow = object.name.startsWith("VIS_");
     object.receiveShadow = object.name.startsWith("VIS_");
+    materialRemapper.remapObject(object);
     if (!object.material) return;
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     for (const material of materials) {
@@ -6232,6 +6296,7 @@ function configureBlenderTavernScene(scene, flameMeshes = []) {
       }
     }
   });
+  materialRemapper.commit();
 
 }
 

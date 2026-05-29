@@ -25,6 +25,7 @@ High leverage next work:
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
    - The first main-runtime GLB adapter now exists in `glb-room-runtime.js`; Temple and Tavern both use it. Keep future Blender-authored rooms on that path instead of adding per-room GLB parsing glue.
+   - Blender room material names can now be remapped at runtime to approved material IDs, and room debug landmarks expose those remaps. Keep extending that bridge instead of letting GLB exports introduce one-off flat material islands.
    - Run `node scripts/refresh-neomud-three-packages.mjs` after Blender exports; run `node scripts/refresh-neomud-three-packages.mjs --check` in verification to prove manifest file sizes and GLB counts are current.
    - Run `node scripts/validate-neomud-three-packages.mjs` after any package, source brief, manifest, or registry change so source/manifest/GLB drift is caught before browser QA.
    - Promote the movement gym loader and room adapter into a named `WorldLoader` / `LevelParser` interface before the third room package lands.
@@ -36,7 +37,7 @@ High leverage next work:
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
    - Use isolated asset QA for each fixture before room integration. `cathedral.pew`, `cathedral.wall_window_bay`, and `cathedral.altar_incense_fixture` are the first accepted playable-prototype candidates.
-   - Do not accept the current altar and incense as final art. Smoke has moved from hard cones to subtler low-poly puff columns, pews now have a stronger second candidate, and Temple lighting now comes from authored `LIGHTS_` markers. The next Temple fixture/material pass should improve altar material hierarchy, add shared wood/glass material variants, or optimize texture delivery with screenshot evidence.
+   - Do not accept the current altar and incense as final art. Smoke has moved from hard cones to subtler low-poly puff columns, pews now have a stronger second candidate, Temple lighting now comes from authored `LIGHTS_` markers, and the main Temple GLB now remaps floor/wall/trim/cloth/glass names through approved runtime material IDs. The next Temple fixture/material pass should improve shared wood material handling for pews or altar material hierarchy with screenshot evidence.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
    - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
 

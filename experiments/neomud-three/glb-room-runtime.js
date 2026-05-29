@@ -60,7 +60,8 @@ export function buildGlbRoomRuntime({
         collisionNodes: level.summary.collisionNodes,
         triggerNodes: level.summary.triggerNodes,
         lightNodes: level.byKind.light.length,
-        runtimeLights: scene.userData.neomudRuntimeLights ?? []
+        runtimeLights: scene.userData.neomudRuntimeLights ?? [],
+        materialRemaps: scene.userData.neomudMaterialRemaps ?? []
       }];
     },
     debugColliders() {

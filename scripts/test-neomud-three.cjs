@@ -99,7 +99,8 @@ async function main() {
         landmark.manifest?.endsWith("town_temple.manifest.json") &&
         landmark.sourceBrief?.endsWith("town_temple/level-brief.json") &&
         landmark.lightNodes >= 5 &&
-        landmark.runtimeLights?.length >= 5
+        landmark.runtimeLights?.length >= 5 &&
+        landmark.materialRemaps?.length >= 5
       ),
       `expected Temple to use Blender GLB level package, got ${JSON.stringify(templeLandmarks)}`
     );
@@ -671,7 +672,8 @@ async function main() {
         landmark.manifest?.endsWith("town_tavern.manifest.json") &&
         landmark.sourceBrief?.endsWith("town_tavern/level-brief.json") &&
         landmark.lightNodes >= 4 &&
-        landmark.runtimeLights?.length >= 4
+        landmark.runtimeLights?.length >= 4 &&
+        landmark.materialRemaps?.length >= 7
       ),
       `expected Tavern to use Blender GLB level package, got ${JSON.stringify(tavernLandmarks)}`
     );

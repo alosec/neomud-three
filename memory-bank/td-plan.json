@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-28T23:51:00.000Z",
+  "updated": "2026-05-29T00:00:40.508Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -3077,6 +3077,34 @@
       "comments": [],
       "created": "2026-05-28T23:49:14Z",
       "updated": "2026-05-28T23:51:00Z"
+    },
+    {
+      "id": "neo-1fb2.91",
+      "project": "NeoMud",
+      "title": "Remap Blender GLB room materials through approved material IDs",
+      "description": "",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done",
+      "labels": [
+        "blender",
+        "materials",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 126,
+          "body": "Runtime GLB material remap shipped: Temple and Tavern now map exported Blender material names to approved runtime material IDs; debug landmarks expose materialRemaps and offline smoke asserts minimum remap counts.",
+          "created": "2026-05-28T23:59:32Z"
+        }
+      ],
+      "created": "2026-05-28T23:54:49Z",
+      "updated": "2026-05-28T23:59:32Z"
     }
   ]
 }
