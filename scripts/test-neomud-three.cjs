@@ -556,6 +556,11 @@ async function main() {
     assert.match(await page.locator("#panel-content").textContent(), /Hostile target/i);
     assert.match(await page.locator(".target-health").textContent(), /^\s*$/);
     assert.equal(await page.locator(".target-frame.hostile").count(), 1);
+    assert.equal(await page.locator(".combat-actions").count(), 1);
+    assert.match(await page.locator(".combat-actions").textContent(), /Basic Attack/i);
+    assert.match(await page.locator(".combat-actions").textContent(), /server-authoritative command path/i);
+    assert.equal(await page.locator("[data-combat-command]").count(), 2);
+    assert.equal(await page.locator("[data-combat-command]:disabled").count(), 2);
     await saveScreenshot(page, "offline-hostile-target-panel.png");
     await page.keyboard.press("Escape");
 

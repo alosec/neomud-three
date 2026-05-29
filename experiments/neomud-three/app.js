@@ -1291,6 +1291,7 @@ function interactionPanel() {
       </div>
     `
     : "";
+  const targetActions = hostile ? hostileActionFrame(entity) : "";
   const hasServerAction = Boolean(entity.actionType);
   const canUseServerAction = hasServerAction && serverCanDriveMovement() && !entity.actionConsumed;
   const actionLabel = entity.actionConsumed
@@ -1308,6 +1309,7 @@ function interactionPanel() {
   return htmlFragment(`
     <p>${escapeHtml(kindLabel)} / ${escapeHtml(world.rooms.get(currentRoomId)?.name ?? currentRoomId)}</p>
     ${targetFrame}
+    ${targetActions}
     <div class="list">
       <div class="list-card">
         <strong>${escapeHtml(entity.name)}</strong>
@@ -1323,6 +1325,47 @@ function interactionPanel() {
       <button type="button" data-panel-target="map">Map</button>
     </div>
   `);
+}
+
+function hostileActionFrame(entity) {
+  const classDef = world.catalogs.classesById.get(playerProfile.classId);
+  const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
+  const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
+  const actions = [
+    {
+      label: "Basic Attack",
+      detail: "Weapon strike",
+      command: "attack"
+    },
+    {
+      label: spell?.name ?? "Class Skill",
+      detail: spell ? `${spell.manaCost} MP` : "Ability",
+      command: spell ? `cast:${spell.id}` : "skill"
+    }
+  ];
+  const authorityText = serverCanDriveMovement()
+    ? "Combat command routing is pending server protocol support."
+    : "Combat requires a live server-authoritative command path.";
+
+  return `
+    <div class="combat-actions" data-target-id="${escapeHtml(entity.id)}">
+      <div class="combat-actions-header">
+        <strong>Actions</strong>
+        <span>${escapeHtml(authorityText)}</span>
+      </div>
+      <div class="combat-action-grid">
+        ${actions.map((action, index) => `
+          <button type="button" disabled data-combat-command="${escapeHtml(action.command)}">
+            <kbd>${index + 1}</kbd>
+            <span>
+              <strong>${escapeHtml(action.label)}</strong>
+              <small>${escapeHtml(action.detail)}</small>
+            </span>
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
 }
 
 function serverActionLabel(entity) {

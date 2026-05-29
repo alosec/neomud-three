@@ -712,6 +712,87 @@ p {
   transform-origin: left center;
 }
 
+.combat-actions {
+  margin: 8px 0 10px;
+  padding: 9px 10px 10px;
+  border: 1px solid rgba(204, 168, 85, 0.28);
+  background: rgba(12, 9, 7, 0.72);
+}
+
+.combat-actions-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.combat-actions-header strong {
+  color: #fff4c7;
+  font-size: 13px;
+}
+
+.combat-actions-header span {
+  max-width: 260px;
+  color: #a99f8a;
+  font-size: 11px;
+  text-align: right;
+}
+
+.combat-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.combat-action-grid button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 137, 108, 0.32);
+  color: #f4d7c7;
+  background: rgba(48, 18, 14, 0.72);
+}
+
+.combat-action-grid button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.combat-action-grid kbd {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid rgba(255, 210, 199, 0.34);
+  color: #fff4c7;
+  background: rgba(20, 8, 7, 0.9);
+  font: 800 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.combat-action-grid button span {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  text-align: left;
+}
+
+.combat-action-grid button strong {
+  overflow: hidden;
+  color: #fff4c7;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combat-action-grid button small {
+  color: #d5a89a;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
 .panel-actions {
   display: flex;
   flex-wrap: wrap;
