@@ -384,6 +384,10 @@ async function main() {
       tavernObstruction?.faded,
       `expected tight Tavern Iso obstruction to fade the foreground blocker, got ${JSON.stringify(tavernObstruction)}`
     );
+    assert.ok(
+      tavernObstruction.fadedCount >= 1 && tavernObstruction.fadedCount <= 4,
+      `expected bounded Tavern Iso fade target count, got ${JSON.stringify(tavernObstruction)}`
+    );
     const fadeTarget = path.join(qaDir, "town-shot-tavern-iso-fade.png");
     await page.screenshot({ path: fadeTarget, animations: "disabled" });
     screenshots.push({ id: "tavern-iso-fade", path: fadeTarget });

@@ -81,6 +81,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      a transient low-opacity material clone; QA verifies that fallback in the
      Tavern as `town-shot-tavern-iso-fade.png`. Faded blockers remain eligible
      as camera blockers until restored, avoiding frame-to-frame fade flicker.
+     Tight Iso fallback can now fade a bounded set of foreground blockers rather
+     than only one mesh; debug metadata reports `fadedCount` and QA keeps the
+     count capped.
    - Direct click routing now covers existing NPC/item interaction panels and
      exit moves through the existing command path. Interactable clicks now select
      the target, route the avatar to an approach point, and open the interaction
