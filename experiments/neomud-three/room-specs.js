@@ -41,6 +41,21 @@ export const TOWN_SQUARE_SPEC = {
       { x: 0, z: 22.3, width: 46, height: 0.16, depth: 0.32 },
       { x: -22.3, z: 0, width: 0.32, height: 0.16, depth: 46 },
       { x: 22.3, z: 0, width: 0.32, height: 0.16, depth: 46 }
+    ],
+    contactShadows: [
+      { id: "fountain-grounding", x: 0, z: 0, width: 8.6, depth: 8.6 },
+      { id: "gate-mass", x: 0, z: -21.15, width: 15.5, depth: 5.9 },
+      { id: "temple-mass", x: 0, z: 21.75, width: 18.8, depth: 7.1 },
+      { id: "market-mass", x: 18.2, z: -0.3, width: 8.4, depth: 13.6, rotationY: -Math.PI / 2 },
+      { id: "tavern-mass", x: -18.4, z: 0, width: 8.8, depth: 14.4, rotationY: Math.PI / 2 },
+      { id: "northwest-trees", x: -14.4, z: -14.4, width: 10.5, depth: 9.2, rotationY: -0.35 },
+      { id: "northeast-trees", x: 13.6, z: -14.3, width: 10.2, depth: 9.0, rotationY: 0.32 },
+      { id: "southwest-trees", x: -15.0, z: 13.7, width: 10.4, depth: 9.4, rotationY: 0.42 },
+      { id: "southeast-trees", x: 14.5, z: 13.9, width: 10.8, depth: 9.2, rotationY: -0.38 },
+      { id: "guildmaster-stage", x: -7.0, z: -2.6, width: 5.4, depth: 4.6, rotationY: -0.2 },
+      { id: "wren-stage", x: 9.2, z: -1.2, width: 5.8, depth: 4.8, rotationY: 0.24 },
+      { id: "west-benches", x: -17.2, z: 0.6, width: 5.8, depth: 8.5, rotationY: Math.PI / 2 },
+      { id: "east-benches", x: 17.3, z: 0.5, width: 5.8, depth: 8.5, rotationY: -Math.PI / 2 }
     ]
   },
   chunkRings: [

@@ -682,11 +682,11 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
       fogDensity: 0.02
     },
     camera: {
-      distance: 7.65,
-      height: 4.4,
-      sideOffset: -0.95,
-      lookAhead: 3.75,
-      targetHeight: 1.02
+      distance: 2.85,
+      height: 3.75,
+      sideOffset: -3.65,
+      lookAhead: 4.8,
+      targetHeight: 1.05
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -5259,6 +5259,7 @@ function spawnFromSpec(spawn) {
 }
 
 function addTownSpecSurfaces(root, materials, spec) {
+  addTownContactShadows(root, materials, spec.surfaces.contactShadows ?? []);
   addInstancedSurfaceRects(root, materials, spec.surfaces.paths, "town-path-surfaces");
   const surfaceFrameBoxes = [];
   for (const plaza of spec.surfaces.plazas ?? []) {
@@ -5269,6 +5270,25 @@ function addTownSpecSurfaces(root, materials, spec) {
   for (const curb of spec.surfaces.curbs) {
     addBox(root, materials.darkStone, curb.x, curb.height / 2, curb.z, curb.width, curb.height, curb.depth);
   }
+}
+
+function addTownContactShadows(root, materials, shadows = []) {
+  if (!shadows.length) return null;
+  return addInstancedGeometry(
+    root,
+    new THREE.PlaneGeometry(1, 1),
+    materials.contactShadow,
+    shadows.map((shadow) => ({
+      x: shadow.x,
+      y: shadow.y ?? 0.041,
+      z: shadow.z,
+      rotationX: -Math.PI / 2,
+      rotationZ: shadow.rotationY ?? 0,
+      scale: [shadow.width, shadow.depth, 1]
+    })),
+    "town-contact-shadows",
+    { castShadow: false, receiveShadow: false }
+  );
 }
 
 function surfaceFrameBoxesFor(surface) {

@@ -405,6 +405,26 @@ const MATERIAL_DEFINITION_LIST = [
     create: () => standardMaterial({ map: texture("templeLimestoneWall", [1.1, 1.1]), color: 0x6a6254, roughness: 0.84 })
   },
   colorMaterial("town.water.fountain", "water", "town", "water", 0x67b5ce, { roughness: 0.18, metalness: 0.02, transparent: true, opacity: 0.78 }),
+  {
+    id: "town.shadow.contact",
+    legacyKey: "contactShadow",
+    family: "town",
+    kind: "transparent-ground-accent",
+    intendedUse: ["outdoor-contact-shadow", "composition-grounding"],
+    roughness: 1,
+    metalness: 0,
+    alpha: true,
+    approved: true,
+    create: () => new THREE.MeshBasicMaterial({
+      color: 0x273024,
+      transparent: true,
+      opacity: 0.09,
+      depthWrite: false,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1
+    })
+  },
   colorMaterial("town.timber", "timber", "town", "timber", 0x57351f, { roughness: 0.78 }),
   colorMaterial("town.timber.dark", "darkTimber", "town", "timber-trim", 0x322013, { roughness: 0.82 }),
   colorMaterial("town.trim.light", "trimLight", "town", "trim", 0xc8bb94, { roughness: 0.7 }),
@@ -591,6 +611,7 @@ export function makeTownMaterials() {
     stone: createApprovedMaterial("town.stone.limestone"),
     darkStone: createApprovedMaterial("town.stone.dark"),
     water: createApprovedMaterial("town.water.fountain"),
+    contactShadow: createApprovedMaterial("town.shadow.contact"),
     timber: createApprovedMaterial("town.timber"),
     darkTimber: createApprovedMaterial("town.timber.dark"),
     trimLight: createApprovedMaterial("town.trim.light"),
