@@ -7,6 +7,7 @@ Implemented:
 - Added pointer hover classification for isometric mode using the same target decision order as click handling: interactable, exit trigger, then plain ground movement.
 - Added a lightweight world hover marker and `Click ...` DOM prompt for NPCs/items/exits.
 - Added a persistent selected-target ring for clicked interactables while the interaction panel is open.
+- Selection now clears when the interaction panel closes or the player opens a non-interaction panel, preventing stale target rings until a real locked-target/combat system exists.
 - Added isometric cursor state for hoverable NPC/item/exit targets.
 - Tightened target action language so prompts use entity semantics: `Talk to`,
   `Engage`, `Inspect`, or `Pick up` instead of treating every NPC as talkable.
@@ -25,6 +26,7 @@ Evidence:
 
 - `qa/latest/town-shot-isometric-hover-target.png` shows Old Wren hover with a marker and prompt.
 - `qa/latest/town-shot-isometric-selection-target.png` shows the selected Old Wren target ring while the interaction panel is open.
+- Town Square screenshot QA asserts the selected-target ring clears after `Escape`.
 - Town Square screenshot QA verifies Old Wren hover before click-interact and North Gate hover before click-exit routing.
 - The Town Square QA budget remains under gate at `232/240` draw calls with the selection marker visible.
 - Offline smoke QA verifies hostile Forest Rat and Shadow Wolf hover/proximity prompts read as `Engage`.

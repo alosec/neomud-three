@@ -119,6 +119,9 @@ async function main() {
     await page.screenshot({ path: selectionTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-selection-target", path: selectionTarget });
     await page.keyboard.press("Escape");
+    const clearedSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
+    assert.equal(clearedSelection.markerVisible, false);
+    assert.equal(clearedSelection.active, false);
 
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
     const budget = budgetStatus("town:square", stats);

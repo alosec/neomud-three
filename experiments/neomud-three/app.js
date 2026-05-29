@@ -971,6 +971,9 @@ function setInputMode(mode) {
 function openPanel(panelId) {
   if (!panelOrder.includes(panelId) && panelId !== "interaction") return;
   if (document.pointerLockElement === canvas) document.exitPointerLock();
+  if (panelId !== "interaction") {
+    clearSelectionTarget();
+  }
   activePanel = panelId;
   keys.clear();
   renderPanel(panelId);
@@ -981,6 +984,7 @@ function openPanel(panelId) {
 
 function closePanel() {
   activePanel = null;
+  clearSelectionTarget();
   panel.classList.add("hidden");
   updatePanelButtons();
   updateInteractionPrompt();
