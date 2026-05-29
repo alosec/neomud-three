@@ -421,8 +421,14 @@ async function main() {
     assert.equal(chestClick.id, "cave_chest");
     assert.equal(chestClick.autoUse, true);
     assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
-    const chestPending = await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction);
-    assert.equal(chestPending?.id, "cave_chest");
+    const chestActionState = await page.evaluate(() => ({
+      pending: window.__neomudThreeDebug.server.pendingInteractionAction,
+      result: window.__neomudThreeDebug.server.lastInteractionResult
+    }));
+    assert.ok(
+      chestActionState.pending?.id === "cave_chest" || /chest/i.test(chestActionState.result?.featureName ?? ""),
+      `expected chest click to be pending or already confirmed by server, got ${JSON.stringify(chestActionState)}`
+    );
     await page.waitForFunction(
       (before) => window.__neomudThreeDebug.server.messageCount > before && window.__neomudThreeDebug.server.lastInteractionResult,
       beforeInteractMessages,

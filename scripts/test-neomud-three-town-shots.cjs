@@ -411,7 +411,10 @@ async function main() {
     const exitClick = await page.evaluate((trigger) =>
       window.__neomudThreeDebug.clickGround({ x: trigger.trigger.center[0], z: trigger.trigger.center[2] })
     , gateTrigger);
-    assert.deepEqual(exitClick, { type: "exit", targetId: "town:gate" });
+    assert.deepEqual(exitClick, { type: "exit", targetId: "town:gate", pending: true });
+    const pendingExit = await page.evaluate(() => window.__neomudThreeDebug.clickMove.pendingExit);
+    assert.equal(pendingExit.targetId, "town:gate");
+    assert.ok(await page.evaluate(() => window.__neomudThreeDebug.clickMove.markerVisible), "expected exit click to route through visible movement marker");
     await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:gate", null, { timeout: 5_000 });
 
     console.log("NeoMud Three Town Square screenshot test passed");

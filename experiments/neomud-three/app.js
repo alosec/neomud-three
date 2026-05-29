@@ -155,6 +155,7 @@ const movement = {
   selectionActionBadge: null,
   targetObjectHighlight: null,
   pendingInteractable: null,
+  pendingExit: null,
   holdMoveActive: false,
   holdMovePointerId: null
 };
@@ -948,6 +949,7 @@ function pointOnGroundFromEvent(event) {
 
 function setClickMoveTarget(point) {
   const pendingInteractable = movement.pendingInteractable;
+  const pendingExit = movement.pendingExit;
   const target = point.clone();
   target.y = 0;
   roomRuntime?.clamp?.(target);
@@ -956,6 +958,7 @@ function setClickMoveTarget(point) {
   movement.clickStuckTime = 0;
   movement.clickTarget = movement.clickPath[0] ?? target;
   movement.pendingInteractable = pendingInteractable;
+  movement.pendingExit = pendingExit;
   ensureClickTargetMarker().position.copy(target).setY(0.055);
   ensureClickTargetMarker().visible = true;
   updateClickPathMarker();
@@ -1184,6 +1187,7 @@ function handleGroundClick(point) {
   if (clickTarget.type === "interactable") {
     clearHoverTarget();
     setSelectionTarget(clickTarget);
+    movement.pendingExit = null;
     const autoEngage = Boolean(isHostileEntity(clickTarget.entity) && serverCanDriveMovement());
     const autoUse = canAutoUseEntity(clickTarget.entity);
     startPendingInteraction(clickTarget.entity, { autoEngage, autoUse });
@@ -1198,18 +1202,19 @@ function handleGroundClick(point) {
   }
 
   if (clickTarget.type === "exit") {
-    clearClickMoveTarget();
     clearHoverTarget();
     setSelectionTarget(clickTarget);
-    enterExitTarget(clickTarget.targetId);
+    startPendingExit(clickTarget);
     return {
       type: "exit",
-      targetId: clickTarget.targetId
+      targetId: clickTarget.targetId,
+      pending: true
     };
   }
 
   clearHoverTarget();
   clearSelectionTarget();
+  movement.pendingExit = null;
   return {
     type: "move",
     target: setClickMoveTarget(target)
@@ -1426,6 +1431,7 @@ function actionBadgeColor(entity, action) {
 
 function startPendingInteraction(entity, options = {}) {
   if (!entity?.position) return;
+  movement.pendingExit = null;
   const distance = horizontalDistance(player.position, entity.position);
   if (distance <= controls.clickInteractDistance) {
     clearClickMoveTarget();
@@ -1447,6 +1453,26 @@ function startPendingInteraction(entity, options = {}) {
   setClickMoveTarget(approach);
 }
 
+function startPendingExit(exitTarget) {
+  if (!exitTarget?.targetId || !exitTarget.position) return;
+  const position = exitTarget.position.clone?.() ?? new THREE.Vector3(exitTarget.position.x ?? 0, 0, exitTarget.position.z ?? 0);
+  const currentExitAtPlayer = roomRuntime?.exitAt?.(player.position) ?? null;
+  if (currentExitAtPlayer === exitTarget.targetId || horizontalDistance(player.position, position) <= controls.clickArriveDistance) {
+    movement.pendingExit = null;
+    clearClickMoveTarget();
+    enterExitTarget(exitTarget.targetId);
+    return;
+  }
+  movement.pendingInteractable = null;
+  movement.pendingExit = {
+    targetId: exitTarget.targetId,
+    direction: exitTarget.direction ?? "",
+    label: exitTarget.label ?? "",
+    position
+  };
+  setClickMoveTarget(position);
+}
+
 function updatePendingInteraction() {
   const pending = movement.pendingInteractable;
   if (!pending) return;
@@ -1461,6 +1487,18 @@ function updatePendingInteraction() {
     autoEngage: Boolean(pending.autoEngage),
     autoUse: Boolean(pending.autoUse)
   });
+}
+
+function updatePendingExit() {
+  const pending = movement.pendingExit;
+  if (!pending) return;
+  const targetIdAtPlayer = roomRuntime?.exitAt?.(player.position) ?? null;
+  if (targetIdAtPlayer !== pending.targetId && horizontalDistance(player.position, pending.position) > controls.clickArriveDistance + 0.18) return;
+
+  const targetId = pending.targetId;
+  movement.pendingExit = null;
+  clearClickMoveTarget();
+  enterExitTarget(targetId);
 }
 
 function approachPointForInteractable(entity) {
@@ -1533,6 +1571,7 @@ function clearClickMoveTarget() {
   movement.clickPathIndex = 0;
   movement.clickStuckTime = 0;
   movement.pendingInteractable = null;
+  movement.pendingExit = null;
   clearHoldMove();
   if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
   if (movement.clickPathMarker) movement.clickPathMarker.visible = false;
@@ -1540,8 +1579,10 @@ function clearClickMoveTarget() {
 
 function finishClickMovePath() {
   const pendingInteractable = movement.pendingInteractable;
+  const pendingExit = movement.pendingExit;
   clearClickMoveTarget();
   movement.pendingInteractable = pendingInteractable;
+  movement.pendingExit = pendingExit;
 }
 
 function ensureClickTargetMarker() {
@@ -2501,6 +2542,7 @@ function updatePlayer(dt) {
   const hasKeyboardMove = keyboardForwardInput !== 0 || strafeInput !== 0 || turnInput !== 0;
   if (hasKeyboardMove && movement.clickTarget) clearClickMoveTarget();
   updatePendingInteraction();
+  updatePendingExit();
 
   let forwardInput = keyboardForwardInput;
   let desiredClickDirection = null;
@@ -2788,6 +2830,15 @@ function installDebugApi() {
               autoUse: Boolean(movement.pendingInteractable.autoUse),
               x: movement.pendingInteractable.position.x,
               z: movement.pendingInteractable.position.z
+            }
+          : null,
+        pendingExit: movement.pendingExit
+          ? {
+              targetId: movement.pendingExit.targetId,
+              direction: movement.pendingExit.direction,
+              label: movement.pendingExit.label,
+              x: movement.pendingExit.position.x,
+              z: movement.pendingExit.position.z
             }
           : null
       };
