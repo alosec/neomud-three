@@ -2388,7 +2388,8 @@ function combatActionOptions(entity) {
       kind: ability.kind,
       abilityId: ability.id,
       spellId: ability.kind === "spell" ? ability.id : "",
-      skillId: ability.kind === "skill" ? ability.id : "",
+      skillId: ability.kind === "skill" ? ability.id.split(":")[0] : "",
+      skillDirection: ability.direction ?? "",
       manaCost: ability.manaCost,
       cooldownTicks: ability.cooldownTicks,
       label: pendingCombat?.command === ability.command ? "Working..." : ability.name,
@@ -2421,10 +2422,11 @@ function combatAbilitiesForProfile() {
     abilities.push(ability);
   }
   for (const skill of combatSkillsForProfile()) {
-    const ability = combatSkillAbility(skill);
-    if (seenCommands.has(ability.command)) continue;
-    seenCommands.add(ability.command);
-    abilities.push(ability);
+    for (const ability of combatSkillAbilities(skill)) {
+      if (seenCommands.has(ability.command)) continue;
+      seenCommands.add(ability.command);
+      abilities.push(ability);
+    }
   }
   return abilities.slice(0, 3);
 }
@@ -2445,20 +2447,36 @@ function combatSpellAbility(spell) {
   };
 }
 
-function combatSkillAbility(skill) {
+function combatSkillAbilities(skill) {
+  if (skill.id === "KICK") {
+    return kickDirectionsForCurrentRoom().map((direction) => combatSkillAbility(skill, direction));
+  }
+  return [combatSkillAbility(skill)];
+}
+
+function combatSkillAbility(skill, direction = "") {
   const manaCost = skill.manaCost ?? 0;
   const resourceReady = manaCost <= playerProfile.mp;
+  const directionLabel = direction ? ` ${shortDirection(direction)}` : "";
   return {
     kind: "skill",
-    id: skill.id,
-    name: skill.name,
-    command: `skill:${skill.id}`,
-    detail: abilityDetail(manaCost, skill.cooldownTicks, "Skill"),
+    id: direction ? `${skill.id}:${direction}` : skill.id,
+    name: `${skill.name}${directionLabel}`,
+    command: direction ? `skill:${skill.id}:${direction}` : `skill:${skill.id}`,
+    detail: direction
+      ? `${abilityDetail(manaCost, skill.cooldownTicks, "Skill")} / ${direction.toLowerCase()}`
+      : abilityDetail(manaCost, skill.cooldownTicks, "Skill"),
     manaCost,
     cooldownTicks: skill.cooldownTicks ?? 0,
+    direction,
     resourceReady,
     resourceWarning: resourceReady ? "" : `Need ${manaCost} MP`
   };
+}
+
+function kickDirectionsForCurrentRoom() {
+  const exits = world.rooms.get(currentRoomId)?.exits ?? {};
+  return sortedDirections(Object.keys(exits)).slice(0, 2);
 }
 
 function combatSpellsForProfile() {
@@ -2485,10 +2503,7 @@ function combatSkillsForProfile() {
 }
 
 function supportedHostileSkill(skill) {
-  // KICK requires a direction encoded into the target id on the current server
-  // protocol. Keep it out of the hotbar until the Iso UI can choose that
-  // direction intentionally.
-  return skill.id === "BASH";
+  return skill.id === "BASH" || (skill.id === "KICK" && kickDirectionsForCurrentRoom().length > 0);
 }
 
 function serverActionLabel(entity) {
@@ -2731,19 +2746,20 @@ function useCombatCommand(command) {
       updateStatusText(`Casting at ${target.name}...`);
     }
   } else if (command?.startsWith("skill:")) {
-    const skillId = command.slice("skill:".length);
+    const [, skillId = "", skillDirection = ""] = command.split(":");
     const skillDef = world.catalogs.skillsById.get(skillId);
+    const targetPayload = skillDirection ? `${target.id}:${skillDirection}` : target.id;
     const selected = serverState.client.sendSelectTarget(target.id);
-    const skill = serverState.client.sendUseSkill(skillId, target.id);
+    const skill = serverState.client.sendUseSkill(skillId, targetPayload);
     sent = selected && skill;
     if (sent) {
       serverState.selectedTargetId = target.id;
       lastCombatResult = {
         success: true,
         targetName: target.name,
-        message: `Using ${skillDef?.name ?? skillId} on ${target.name}.`
+        message: `Using ${skillDef?.name ?? skillId}${skillDirection ? ` ${skillDirection.toLowerCase()}` : ""} on ${target.name}.`
       };
-      appendLog(`Using ${skillDef?.name ?? skillId} on ${target.name} through the Kotlin server...`);
+      appendLog(`Using ${skillDef?.name ?? skillId}${skillDirection ? ` ${skillDirection.toLowerCase()}` : ""} on ${target.name} through the Kotlin server...`);
       updateStatusText(`Using skill on ${target.name}...`);
     }
   }
@@ -3162,6 +3178,7 @@ function installDebugApi() {
               abilityId: action.abilityId ?? "",
               spellId: action.spellId ?? "",
               skillId: action.skillId ?? "",
+              skillDirection: action.skillDirection ?? "",
               manaCost: action.manaCost ?? 0,
               cooldownTicks: action.cooldownTicks ?? 0,
               unavailableReason: action.unavailableReason ?? "",

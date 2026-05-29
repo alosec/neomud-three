@@ -80,8 +80,10 @@ Playable Three.js lab:
   messages update the combat result frame, target HP, player MP/HP where
   applicable, selected-target HP bar, and world-space feedback without creating
   a local combat simulation. Digit/Numpad 1-4 hotkeys now map to the rendered
-  action definitions. Directional `KICK` remains excluded until the Iso UI can
-  choose its required knockback direction intentionally.
+  action definitions. Directional `KICK` is now exposed as explicit
+  direction-bound actions derived from the current room exits, such as
+  `skill:KICK:WEST`; the client sends the Kotlin server's required
+  `targetId:DIRECTION` payload instead of guessing a hidden default.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside

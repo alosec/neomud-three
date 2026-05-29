@@ -1,11 +1,40 @@
 {
-  "updated": "2026-05-29T19:58:00.000Z",
+  "updated": "2026-05-29T20:05:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-c4a9",
+      "project": "NeoMud",
+      "title": "Add direction-bound Kick hostile actions",
+      "description": "Make the server's directional KICK skill usable from the isometric hostile action row by generating explicit direction-bound actions from the current room exits and sending the required targetId:DIRECTION payload.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "isometric",
+        "server-authoritative",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "KICK now appears as explicit direction-bound actions such as skill:KICK:WEST when the selected class has the skill and the current room has valid exits. The client sends the Kotlin server's required targetId:DIRECTION payload, keeps hotkeys tied to rendered actions, and server-backed QA asserts the Kick action carries a real direction and remains enabled.",
+          "created": "2026-05-29T20:05:00Z"
+        }
+      ],
+      "created": "2026-05-29T20:05:00Z",
+      "updated": "2026-05-29T20:05:00Z"
+    },
     {
       "id": "neo-b84f",
       "project": "NeoMud",

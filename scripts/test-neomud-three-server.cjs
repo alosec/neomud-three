@@ -317,11 +317,13 @@ async function main() {
       assert.equal(initialCombatActions[1]?.resourceReady, true);
       assert.equal(initialCombatActions[1]?.unavailableReason, "");
       assert.equal(initialCombatActions[1]?.enabled, true);
-      assert.equal(
-        initialCombatActions.some((action) => action.command === "skill:KICK"),
-        false,
-        "KICK should stay out of the executable hostile row until the UI can choose its required direction"
-      );
+      const kickAction = initialCombatActions.find((action) => action.command?.startsWith("skill:KICK:"));
+      assert.ok(kickAction, `expected a direction-bound Kick action, got ${JSON.stringify(initialCombatActions)}`);
+      assert.equal(kickAction.hotkey, "3");
+      assert.equal(kickAction.skillId, "KICK");
+      assert.ok(kickAction.skillDirection, `expected Kick action to carry a direction, got ${JSON.stringify(kickAction)}`);
+      assert.match(kickAction.detail ?? "", /2t cooldown/);
+      assert.equal(kickAction.enabled, true);
       await page.keyboard.press("Digit1");
       const hotkeyAttack = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
       assert.equal(hotkeyAttack?.targetId, "npc:forest_spider");
