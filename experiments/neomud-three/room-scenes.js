@@ -802,10 +802,10 @@ export function buildForgeRoom({ root, worldRoot, npcs = [], roomItems = [], wor
       fogDensity: 0.024
     },
     camera: {
-      distance: 7.25,
-      height: 4.25,
-      sideOffset: -1.1,
-      lookAhead: 3.55,
+      distance: 3.75,
+      height: 3.8,
+      sideOffset: 0.0,
+      lookAhead: 5.15,
       targetHeight: 1.0
     },
     syncEntities,
