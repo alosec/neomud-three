@@ -68,6 +68,20 @@ async function main() {
     const isoCamera = await page.evaluate(() => window.__neomudThreeDebug.camera);
     assert.equal(isoCamera.mode, "isometric");
     assert.ok(isoCamera.position.y > 12, `expected elevated isometric Town Square camera, got ${JSON.stringify(isoCamera)}`);
+    const zoomBefore = await page.evaluate(() => window.__neomudThreeDebug.cameraControls.isoZoom);
+    await page.mouse.move(640, 430);
+    await page.mouse.wheel(0, 620);
+    await settleFrames(page);
+    const zoomedOut = await page.evaluate(() => ({
+      camera: window.__neomudThreeDebug.camera,
+      controls: window.__neomudThreeDebug.cameraControls
+    }));
+    assert.ok(zoomedOut.controls.isoZoom > zoomBefore, `expected wheel down to zoom Iso camera out, got ${JSON.stringify(zoomedOut)}`);
+    assert.ok(zoomedOut.camera.position.y > isoCamera.position.y, `expected zoom-out camera to rise, got ${JSON.stringify({ isoCamera, zoomedOut })}`);
+    await page.mouse.wheel(0, -620);
+    await settleFrames(page);
+    const zoomedIn = await page.evaluate(() => window.__neomudThreeDebug.cameraControls.isoZoom);
+    assert.ok(zoomedIn < zoomedOut.controls.isoZoom, `expected wheel up to zoom Iso camera in, got ${JSON.stringify({ zoomedIn, zoomedOut })}`);
     const isoTarget = path.join(qaDir, "town-shot-isometric-plaza.png");
     await page.screenshot({ path: isoTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-plaza", path: isoTarget });

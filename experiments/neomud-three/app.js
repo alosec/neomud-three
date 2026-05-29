@@ -112,6 +112,13 @@ const controls = {
   clickArriveDistance: 0.38
 };
 
+const cameraControls = {
+  isoZoom: 1,
+  isoMinZoom: 0.68,
+  isoMaxZoom: 1.34,
+  isoWheelStep: 0.075
+};
+
 const movement = {
   heading: 0,
   velocity: new THREE.Vector3(),
@@ -194,6 +201,7 @@ async function main() {
   canvas.addEventListener("pointerdown", handleCanvasPointerDown);
   canvas.addEventListener("pointerup", handleCanvasPointerUp);
   canvas.addEventListener("pointercancel", handleCanvasPointerCancel);
+  canvas.addEventListener("wheel", handleCanvasWheel, { passive: false });
   playButton.addEventListener("click", requestPlayMode);
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
   for (const button of cameraModeButtons) {
@@ -712,6 +720,19 @@ function handleCanvasPointerUp(event) {
 function handleCanvasPointerCancel(event) {
   if (event.pointerId !== movement.holdMovePointerId) return;
   clearHoldMove();
+}
+
+function handleCanvasWheel(event) {
+  if (cameraMode !== "isometric" || activePanel || isHudPointerTarget(event.target)) return;
+  event.preventDefault();
+  const direction = event.deltaY > 0 ? 1 : -1;
+  setIsoZoom(cameraControls.isoZoom + direction * cameraControls.isoWheelStep);
+}
+
+function setIsoZoom(value, { snap = false } = {}) {
+  cameraControls.isoZoom = THREE.MathUtils.clamp(value, cameraControls.isoMinZoom, cameraControls.isoMaxZoom);
+  updateCamera(1, snap);
+  return cameraControls.isoZoom;
 }
 
 function clearHoldMove() {
@@ -1564,6 +1585,8 @@ function updateCamera(dt, snap = false) {
     heading: movement.heading,
     cameraMode,
     roomCamera: roomRuntime?.camera
+      ? { ...roomRuntime.camera, isoZoom: cameraControls.isoZoom }
+      : { isoZoom: cameraControls.isoZoom }
   });
 }
 
@@ -1624,6 +1647,13 @@ function installDebugApi() {
           z: camera.position.z
         },
         obstruction: renderEngine.cameraObstruction
+      };
+    },
+    get cameraControls() {
+      return {
+        isoZoom: cameraControls.isoZoom,
+        isoMinZoom: cameraControls.isoMinZoom,
+        isoMaxZoom: cameraControls.isoMaxZoom
       };
     },
     get clickMove() {
@@ -1733,6 +1763,9 @@ function installDebugApi() {
     },
     setCameraMode(mode) {
       return setCameraMode(mode);
+    },
+    setIsoZoom(value) {
+      return setIsoZoom(value, { snap: true });
     },
     toggleDebugOverlay() {
       return setRoomDebugOverlay(!roomDebugVisible);

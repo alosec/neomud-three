@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T16:36:00.000Z",
+  "updated": "2026-05-29T16:45:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -102,10 +102,15 @@
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"
+        },
+        {
+          "id": 10,
+          "body": "Iso camera zoom added: mouse wheel in Iso mode adjusts a bounded zoom multiplier used by the render-engine isometric camera. Debug API exposes cameraControls, and Town Square screenshot QA verifies wheel-down zooms out and wheel-up zooms back in.",
+          "created": "2026-05-29T16:45:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T16:36:00Z"
+      "updated": "2026-05-29T16:45:00Z"
     },
     {
       "id": "neo-1fb2",

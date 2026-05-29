@@ -223,8 +223,9 @@ export function createRenderEngine(canvas) {
 }
 
 function updateIsometricCamera({ camera, cameraTarget, cameraDesired, cameraLookTarget, player, roomCamera = {}, dt = 1 / 60, snap = false }) {
-  const distance = roomCamera.isoDistance ?? 19.5;
-  const height = roomCamera.isoHeight ?? 17.5;
+  const zoom = roomCamera.isoZoom ?? 1;
+  const distance = (roomCamera.isoDistance ?? 19.5) * zoom;
+  const height = (roomCamera.isoHeight ?? 17.5) * zoom;
   const angle = roomCamera.isoAngle ?? Math.PI * 0.25;
   const targetHeight = roomCamera.isoTargetHeight ?? 0.8;
   const lookAheadZ = roomCamera.isoLookAheadZ ?? -1.2;
