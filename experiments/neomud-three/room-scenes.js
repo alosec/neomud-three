@@ -6659,6 +6659,9 @@ function addTempleRuntimeFinish(root, materials) {
   });
   const baseTrim = [];
   const wallPilasterCaps = [];
+  const upperWallRibs = [];
+  const ceilingRibs = [];
+  const altarFrame = [];
   const sideFloorBands = [];
   const aisleBreaks = [];
   const centerRunnerShade = [];
@@ -6671,6 +6674,8 @@ function addTempleRuntimeFinish(root, materials) {
     for (const z of [-31.8, -24.2, -16.6, -9.0, -1.4, 6.2, 13.8]) {
       wallPilasterCaps.push({ x: side * 13.42, y: 1.08, z, width: 0.24, height: 0.18, depth: 1.72 });
       wallPilasterCaps.push({ x: side * 13.42, y: 5.35, z, width: 0.2, height: 0.16, depth: 1.48 });
+      upperWallRibs.push({ x: side * 13.22, y: 7.35, z, width: 0.32, height: 3.6, depth: 0.18 });
+      upperWallRibs.push({ x: side * 12.85, y: 8.95, z, width: 0.18, height: 0.18, depth: 2.35 });
     }
 
     sideFloorBands.push({ x: side * 7.35, y: 0.028, z: -8.0, width: 1.55, depth: 52.0 });
@@ -6680,10 +6685,20 @@ function addTempleRuntimeFinish(root, materials) {
   for (const z of [-30.5, -23.0, -15.5, -8.0, -0.5, 7.0, 14.5]) {
     aisleBreaks.push({ x: 0, y: 0.031, z, width: 4.2, depth: 0.16 });
   }
+  for (const z of [-31.8, -24.2, -16.6, -9.0, -1.4, 6.2, 13.8]) {
+    ceilingRibs.push({ x: 0, y: 9.82, z, width: 20.4, height: 0.18, depth: 0.18 });
+    ceilingRibs.push({ x: -5.2, y: 9.35, z, width: 0.16, height: 0.16, depth: 2.05 });
+    ceilingRibs.push({ x: 5.2, y: 9.35, z, width: 0.16, height: 0.16, depth: 2.05 });
+  }
+  altarFrame.push({ x: -4.55, y: 4.02, z: 20.42, width: 0.18, height: 3.02, depth: 0.18 });
+  altarFrame.push({ x: 4.55, y: 4.02, z: 20.42, width: 0.18, height: 3.02, depth: 0.18 });
   centerRunnerShade.push({ x: 0, y: 0.034, z: -8.1, width: 2.35, depth: 44.5 });
 
   addInstancedBoxes(root, materials.trim, baseTrim, "temple-runtime-wall-base-trim", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.windowReveal ?? materials.trim, wallPilasterCaps, "temple-runtime-pilaster-caps", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.windowReveal ?? materials.trim, upperWallRibs, "temple-runtime-upper-wall-ribs", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.ceilingWarmShadow ?? materials.trim, ceilingRibs, "temple-runtime-ceiling-rhythm", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.trim, altarFrame, "temple-runtime-altar-frame", { castShadow: false, receiveShadow: true });
   addInstancedSurfaceRects(root, {
     sideBand: floorBandMaterial,
     aisleBreak: floorBandMaterial,
