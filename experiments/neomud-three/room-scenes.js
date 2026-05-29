@@ -93,23 +93,23 @@ const MARKET_COLLIDERS = [
 ];
 
 const MAGIC_SHOP = {
-  width: 25,
-  depth: 18,
-  halfX: 12.5,
-  halfZ: 9,
-  westExitX: -11.55,
-  eastExitX: 11.55,
-  exitHalfZ: 2.45
+  width: 31,
+  depth: 23,
+  halfX: 15.5,
+  halfZ: 11.5,
+  westExitX: -14.25,
+  eastExitX: 14.25,
+  exitHalfZ: 3.0
 };
 
 const MAGIC_SHOP_COLLIDERS = [
-  { id: "north-shelves", center: [0, -8.15], size: [23.2, 1.45] },
-  { id: "south-shelves", center: [0, 8.15], size: [23.2, 1.45] },
-  { id: "display-case", center: [-0.7, 3.55], size: [4.65, 1.35] },
-  { id: "counter", center: [4.25, -3.45], size: [4.2, 1.35] },
+  { id: "north-shelves", center: [0, -10.45], size: [28.2, 1.45] },
+  { id: "south-shelves", center: [0, 10.45], size: [28.2, 1.45] },
+  { id: "display-case", center: [-1.1, 4.85], size: [4.65, 1.35] },
+  { id: "counter", center: [5.4, -4.65], size: [4.2, 1.35] },
   { id: "orb-dais", center: [2.25, 0.65], size: [1.45, 1.45] },
-  { id: "scroll-table", center: [-5.3, -3.65], size: [2.4, 1.35] },
-  { id: "potion-cabinet", center: [-6.8, 4.75], size: [2.0, 1.15] }
+  { id: "scroll-table", center: [-6.7, -4.85], size: [2.4, 1.35] },
+  { id: "potion-cabinet", center: [-8.2, 5.95], size: [2.0, 1.15] }
 ];
 
 const FORGE = {
@@ -838,7 +838,7 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
   syncEntities();
 
   return {
-    spawn: { position: new THREE.Vector3(-8.4, 0, 0), heading: Math.PI / 2 },
+    spawn: { position: new THREE.Vector3(-10.6, 0, 0), heading: Math.PI / 2 },
     status: "The Enchanted Emporium: authored arcane shop with shelves, display case, floating crystals, Enchantress Lyra, and real west/east exits.",
     environment: {
       background: 0x1d1730,
@@ -846,16 +846,17 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
       fogDensity: 0.006
     },
     camera: {
-      distance: 2.85,
-      height: 3.75,
-      sideOffset: -3.65,
-      lookAhead: 4.8,
-      targetHeight: 1.05
+      distance: 5.45,
+      height: 4.35,
+      sideOffset: -2.65,
+      lookAhead: 5.4,
+      targetHeight: 1.08,
+      minCameraDistance: 2.45
     },
     syncEntities,
     spawnFor(fromRoomId) {
-      if (fromRoomId === "town:market") return { position: new THREE.Vector3(-8.4, 0, 0), heading: Math.PI / 2 };
-      if (fromRoomId === "town:forge") return { position: new THREE.Vector3(8.5, 0, 0), heading: -Math.PI / 2 };
+      if (fromRoomId === "town:market") return { position: new THREE.Vector3(-10.6, 0, 0), heading: Math.PI / 2 };
+      if (fromRoomId === "town:forge") return { position: new THREE.Vector3(10.8, 0, 0), heading: -Math.PI / 2 };
       return this.spawn;
     },
     clamp(position) {
@@ -2176,9 +2177,9 @@ function makeMagicShopMaterials() {
 
 function addMagicShopStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.arcaneFloor, MAGIC_SHOP.width, MAGIC_SHOP.depth);
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_magic_shop.webp`, MAGIC_SHOP.eastExitX + 4.6, 4.7, 0, 13.2, 7.45, {
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_magic_shop.webp`, MAGIC_SHOP.eastExitX + 5.5, 4.35, 0, 13.4, 7.5, {
     rotationY: -Math.PI / 2,
-    opacity: 0.34
+    opacity: 0.2
   });
 
   addMagicShopArchitecture(root, materials);
@@ -2212,29 +2213,29 @@ function addMagicShopStage(root, materials, worldRoot) {
 
 function addMagicShopArchitecture(root, materials) {
   const walls = [
-    { x: 0, y: 2.65, z: -8.85, width: MAGIC_SHOP.width, height: 5.3, depth: 0.3 },
-    { x: 0, y: 2.65, z: 8.85, width: MAGIC_SHOP.width, height: 5.3, depth: 0.3 },
-    { x: 12.38, y: 2.75, z: -4.8, width: 0.3, height: 5.5, depth: 8.4 },
-    { x: 12.38, y: 2.75, z: 4.8, width: 0.3, height: 5.5, depth: 8.4 },
-    { x: -12.38, y: 2.75, z: -4.8, width: 0.3, height: 5.5, depth: 8.4 },
-    { x: -12.38, y: 2.75, z: 4.8, width: 0.3, height: 5.5, depth: 8.4 }
+    { x: 0, y: 2.95, z: -11.35, width: MAGIC_SHOP.width, height: 5.9, depth: 0.3 },
+    { x: 0, y: 2.95, z: 11.35, width: MAGIC_SHOP.width, height: 5.9, depth: 0.3 },
+    { x: 15.38, y: 3.05, z: -6.0, width: 0.3, height: 6.1, depth: 10.6 },
+    { x: 15.38, y: 3.05, z: 6.0, width: 0.3, height: 6.1, depth: 10.6 },
+    { x: -15.38, y: 3.05, z: -6.0, width: 0.3, height: 6.1, depth: 10.6 },
+    { x: -15.38, y: 3.05, z: 6.0, width: 0.3, height: 6.1, depth: 10.6 }
   ];
   const timber = [
-    { x: 0, y: 0.14, z: -8.6, width: MAGIC_SHOP.width, height: 0.22, depth: 0.22 },
-    { x: 0, y: 0.14, z: 8.6, width: MAGIC_SHOP.width, height: 0.22, depth: 0.22 },
-    { x: 0, y: 5.08, z: -8.56, width: MAGIC_SHOP.width, height: 0.18, depth: 0.22 },
-    { x: 0, y: 5.08, z: 8.56, width: MAGIC_SHOP.width, height: 0.18, depth: 0.22 },
-    { x: 11.95, y: 2.7, z: -2.85, width: 0.22, height: 5.4, depth: 0.22 },
-    { x: 11.95, y: 2.7, z: 2.85, width: 0.22, height: 5.4, depth: 0.22 },
-    { x: -11.95, y: 2.7, z: -2.85, width: 0.22, height: 5.4, depth: 0.22 },
-    { x: -11.95, y: 2.7, z: 2.85, width: 0.22, height: 5.4, depth: 0.22 }
+    { x: 0, y: 0.14, z: -11.1, width: MAGIC_SHOP.width, height: 0.22, depth: 0.22 },
+    { x: 0, y: 0.14, z: 11.1, width: MAGIC_SHOP.width, height: 0.22, depth: 0.22 },
+    { x: 0, y: 5.65, z: -11.06, width: MAGIC_SHOP.width, height: 0.18, depth: 0.22 },
+    { x: 0, y: 5.65, z: 11.06, width: MAGIC_SHOP.width, height: 0.18, depth: 0.22 },
+    { x: 14.95, y: 3.0, z: -3.45, width: 0.22, height: 6.0, depth: 0.22 },
+    { x: 14.95, y: 3.0, z: 3.45, width: 0.22, height: 6.0, depth: 0.22 },
+    { x: -14.95, y: 3.0, z: -3.45, width: 0.22, height: 6.0, depth: 0.22 },
+    { x: -14.95, y: 3.0, z: 3.45, width: 0.22, height: 6.0, depth: 0.22 }
   ];
 
   addInstancedBoxes(root, materials.arcaneWall, walls, "magic-shop-walls");
   addInstancedBoxes(root, materials.darkTimber, timber, "magic-shop-wall-trim");
-  addBox(root, materials.portalDark, 12.43, 1.56, 0, 0.18, 3.12, 2.4);
-  addBox(root, materials.trimLight, 12.25, 3.12, 0, 0.18, 0.22, 3.45);
-  addBox(root, materials.trimLight, -12.25, 0.08, 0, 0.18, 0.16, MAGIC_SHOP.exitHalfZ * 2.05, { castShadow: false });
+  addBox(root, materials.portalDark, 15.43, 1.72, 0, 0.18, 3.44, 2.9);
+  addBox(root, materials.trimLight, 15.25, 3.42, 0, 0.18, 0.22, 4.05);
+  addBox(root, materials.trimLight, -15.25, 0.08, 0, 0.18, 0.16, MAGIC_SHOP.exitHalfZ * 2.05, { castShadow: false });
 }
 
 function addMagicShopShelves(root, materials) {
@@ -2248,8 +2249,8 @@ function addMagicShopShelves(root, materials) {
   ]);
 
   for (const side of [-1, 1]) {
-    const z = side * 7.72;
-    for (const x of [-8.6, -4.4, -0.2, 4.0, 8.2]) {
+    const z = side * 10.02;
+    for (const x of [-10.8, -5.4, 0, 5.4, 10.8]) {
       wood.push({ x, y: 1.0, z, width: 3.35, height: 0.22, depth: 0.62 });
       wood.push({ x, y: 1.84, z, width: 3.35, height: 0.18, depth: 0.56 });
       wood.push({ x, y: 2.72, z, width: 3.35, height: 0.18, depth: 0.5 });
@@ -2284,25 +2285,25 @@ function addMagicShopShelves(root, materials) {
 }
 
 function addMagicShopDisplay(root, materials) {
-  addBox(root, materials.velvet, -0.7, 0.54, 3.55, 4.35, 0.42, 1.08);
-  addBox(root, materials.glassCase, -0.7, 1.05, 3.55, 4.15, 0.64, 0.92, { castShadow: false });
-  addBox(root, materials.trimLight, -2.15, 1.24, 3.08, 0.36, 0.08, 0.18, { castShadow: false });
-  addBox(root, materials.crystalGold, -0.55, 1.27, 3.08, 0.28, 0.08, 0.18, { castShadow: false });
-  addBox(root, materials.crystalBlue, 0.98, 1.23, 3.08, 0.32, 0.08, 0.18, { castShadow: false });
+  addBox(root, materials.velvet, -1.1, 0.54, 4.85, 4.35, 0.42, 1.08);
+  addBox(root, materials.glassCase, -1.1, 1.05, 4.85, 4.15, 0.64, 0.92, { castShadow: false });
+  addBox(root, materials.trimLight, -2.55, 1.24, 4.38, 0.36, 0.08, 0.18, { castShadow: false });
+  addBox(root, materials.crystalGold, -0.95, 1.27, 4.38, 0.28, 0.08, 0.18, { castShadow: false });
+  addBox(root, materials.crystalBlue, 0.58, 1.23, 4.38, 0.32, 0.08, 0.18, { castShadow: false });
 
-  addBox(root, materials.darkTimber, 4.25, 0.58, -3.45, 4.2, 0.78, 1.28);
-  addBox(root, materials.timber, 4.25, 1.1, -3.45, 4.45, 0.22, 1.42);
-  addBox(root, materials.crystalViolet, 3.22, 1.34, -3.48, 0.22, 0.16, 0.22, { castShadow: false });
-  addBox(root, materials.crystalBlue, 4.18, 1.36, -3.38, 0.2, 0.18, 0.2, { castShadow: false });
-  addBox(root, materials.trimLight, 5.15, 1.32, -3.48, 0.72, 0.12, 0.16, { castShadow: false });
+  addBox(root, materials.darkTimber, 5.4, 0.58, -4.65, 4.2, 0.78, 1.28);
+  addBox(root, materials.timber, 5.4, 1.1, -4.65, 4.45, 0.22, 1.42);
+  addBox(root, materials.crystalViolet, 4.37, 1.34, -4.68, 0.22, 0.16, 0.22, { castShadow: false });
+  addBox(root, materials.crystalBlue, 5.33, 1.36, -4.58, 0.2, 0.18, 0.2, { castShadow: false });
+  addBox(root, materials.trimLight, 6.3, 1.32, -4.68, 0.72, 0.12, 0.16, { castShadow: false });
 
-  addBox(root, materials.darkTimber, -5.3, 0.52, -3.65, 2.35, 0.3, 1.16);
-  addBox(root, materials.timber, -5.3, 0.88, -3.65, 2.56, 0.16, 1.32);
-  addBox(root, materials.trimLight, -5.78, 1.08, -3.7, 0.78, 0.12, 0.18, { castShadow: false, rotationY: 0.15 });
-  addBox(root, materials.trimLight, -4.75, 1.08, -3.56, 0.72, 0.12, 0.18, { castShadow: false, rotationY: -0.18 });
+  addBox(root, materials.darkTimber, -6.7, 0.52, -4.85, 2.35, 0.3, 1.16);
+  addBox(root, materials.timber, -6.7, 0.88, -4.85, 2.56, 0.16, 1.32);
+  addBox(root, materials.trimLight, -7.18, 1.08, -4.9, 0.78, 0.12, 0.18, { castShadow: false, rotationY: 0.15 });
+  addBox(root, materials.trimLight, -6.15, 1.08, -4.76, 0.72, 0.12, 0.18, { castShadow: false, rotationY: -0.18 });
 
-  addBox(root, materials.darkTimber, -6.8, 0.78, 4.75, 1.9, 1.56, 0.84);
-  addBox(root, materials.glassCase, -6.8, 1.52, 4.34, 1.65, 0.72, 0.12, { castShadow: false });
+  addBox(root, materials.darkTimber, -8.2, 0.78, 5.95, 1.9, 1.56, 0.84);
+  addBox(root, materials.glassCase, -8.2, 1.52, 5.54, 1.65, 0.72, 0.12, { castShadow: false });
 }
 
 function addMagicShopCrystals(root, materials) {
@@ -2354,9 +2355,9 @@ function addMagicShopRunes(root, materials) {
 
 function addMagicShopExitAffordances(root, materials) {
   addTextBoard(root, "Market", {
-    x: -10.85,
-    y: 2.52,
-    z: -2.95,
+    x: -13.65,
+    y: 2.8,
+    z: -3.5,
     width: 1.92,
     height: 0.42,
     subtitle: "West",
@@ -2364,9 +2365,9 @@ function addMagicShopExitAffordances(root, materials) {
     renderOrder: 10
   });
   addTextBoard(root, "Forge", {
-    x: 10.82,
-    y: 2.7,
-    z: 2.86,
+    x: 13.65,
+    y: 2.95,
+    z: 3.5,
     width: 1.72,
     height: 0.38,
     subtitle: "East",
