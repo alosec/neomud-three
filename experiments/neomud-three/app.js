@@ -40,6 +40,8 @@ const pointerRaycaster = new THREE.Raycaster();
 const pointerNdc = new THREE.Vector2();
 const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 const clickTargetPoint = new THREE.Vector3();
+const isoScreenForward = new THREE.Vector3();
+const isoScreenRight = new THREE.Vector3();
 
 const keys = new Set();
 let world = null;
@@ -130,6 +132,8 @@ const movement = {
   running: false,
   walkClock: 0,
   clickTarget: null,
+  clickPath: [],
+  clickPathIndex: 0,
   clickTargetMarker: null,
   hoverTarget: null,
   hoverMarker: null,
@@ -780,7 +784,9 @@ function setClickMoveTarget(point) {
   const target = point.clone();
   target.y = 0;
   roomRuntime?.clamp?.(target);
-  movement.clickTarget = target;
+  movement.clickPath = routeClickPath(player.position, target);
+  movement.clickPathIndex = 0;
+  movement.clickTarget = movement.clickPath[0] ?? target;
   ensureClickTargetMarker().position.copy(target).setY(0.055);
   ensureClickTargetMarker().visible = true;
   return {
@@ -788,6 +794,101 @@ function setClickMoveTarget(point) {
     y: target.y,
     z: target.z
   };
+}
+
+function routeClickPath(origin, target) {
+  const directTarget = target.clone();
+  const collider = firstBlockingClickCollider(origin, directTarget);
+  if (!collider) return [directTarget];
+
+  const waypoints = waypointsAroundCollider(origin, directTarget, collider);
+  if (!waypoints.length) return [directTarget];
+  for (const waypoint of waypoints) roomRuntime?.clamp?.(waypoint);
+
+  return [...waypoints, directTarget];
+}
+
+function firstBlockingClickCollider(origin, target) {
+  const colliders = roomRuntime?.debugColliders?.() ?? [];
+  let nearest = null;
+  for (const collider of colliders) {
+    const hit = segmentHitInflatedCollider(origin, target, collider, 0.2);
+    if (hit && hit.t > 0.025 && hit.t < 0.975 && (!nearest || hit.t < nearest.t)) {
+      nearest = { ...hit, collider };
+    }
+  }
+  return nearest?.collider ?? null;
+}
+
+function waypointsAroundCollider(origin, target, collider) {
+  if (!collider?.center || !collider?.size) return [];
+  const [cx, cz] = collider.center;
+  const [width, depth] = collider.size;
+  const radius = Number(collider.radius ?? 0.42) + 0.75;
+  const minX = cx - width / 2 - radius;
+  const maxX = cx + width / 2 + radius;
+  const minZ = cz - depth / 2 - radius;
+  const maxZ = cz + depth / 2 + radius;
+  const routes = [
+    [new THREE.Vector3(minX, 0, origin.z), new THREE.Vector3(minX, 0, target.z)],
+    [new THREE.Vector3(maxX, 0, origin.z), new THREE.Vector3(maxX, 0, target.z)],
+    [new THREE.Vector3(origin.x, 0, minZ), new THREE.Vector3(target.x, 0, minZ)],
+    [new THREE.Vector3(origin.x, 0, maxZ), new THREE.Vector3(target.x, 0, maxZ)]
+  ];
+
+  let best = null;
+  let bestScore = Infinity;
+  for (const route of routes) {
+    if (
+      firstBlockingClickCollider(origin, route[0]) ||
+      firstBlockingClickCollider(route[0], route[1]) ||
+      firstBlockingClickCollider(route[1], target)
+    ) {
+      continue;
+    }
+    const score = origin.distanceTo(route[0]) + route[0].distanceTo(route[1]) + route[1].distanceTo(target);
+    if (score < bestScore) {
+      best = route;
+      bestScore = score;
+    }
+  }
+  if (best) return best;
+
+  return [];
+}
+
+function segmentHitInflatedCollider(origin, target, collider, extraRadius = 0) {
+  if (!collider?.center || !collider?.size) return null;
+  const [cx, cz] = collider.center;
+  const [width, depth] = collider.size;
+  const radius = Number(collider.radius ?? 0.42) + extraRadius;
+  const minX = cx - width / 2 - radius;
+  const maxX = cx + width / 2 + radius;
+  const minZ = cz - depth / 2 - radius;
+  const maxZ = cz + depth / 2 + radius;
+  const dx = target.x - origin.x;
+  const dz = target.z - origin.z;
+  let tMin = 0;
+  let tMax = 1;
+  const xRange = segmentAxisRange(origin.x, dx, minX, maxX);
+  if (!xRange) return null;
+  tMin = Math.max(tMin, xRange.min);
+  tMax = Math.min(tMax, xRange.max);
+  const zRange = segmentAxisRange(origin.z, dz, minZ, maxZ);
+  if (!zRange) return null;
+  tMin = Math.max(tMin, zRange.min);
+  tMax = Math.min(tMax, zRange.max);
+  if (tMin > tMax || tMax < 0 || tMin > 1) return null;
+  return { t: THREE.MathUtils.clamp(tMin, 0, 1), colliderId: collider.id ?? "" };
+}
+
+function segmentAxisRange(origin, delta, min, max) {
+  if (Math.abs(delta) < 0.00001) {
+    return origin >= min && origin <= max ? { min: 0, max: 1 } : null;
+  }
+  const t1 = (min - origin) / delta;
+  const t2 = (max - origin) / delta;
+  return { min: Math.min(t1, t2), max: Math.max(t1, t2) };
 }
 
 function handleGroundClick(point) {
@@ -954,6 +1055,8 @@ function clearSelectionTarget() {
 
 function clearClickMoveTarget() {
   movement.clickTarget = null;
+  movement.clickPath = [];
+  movement.clickPathIndex = 0;
   clearHoldMove();
   if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
 }
@@ -1581,7 +1684,10 @@ function updatePlayer(dt) {
   const keyboardForwardInput = axis("KeyW", "ArrowUp") - axis("KeyS", "ArrowDown");
   const isoOrbitInput = cameraMode === "isometric" ? axis("ArrowRight") - axis("ArrowLeft") : 0;
   const turnInput = axis("KeyD", cameraMode === "platform" ? "ArrowRight" : null) - axis("KeyA", cameraMode === "platform" ? "ArrowLeft" : null);
-  const strafeInput = axis("KeyE") - axis("KeyQ");
+  const lateralInput = axis("KeyD") - axis("KeyA");
+  const strafeInput = cameraMode === "isometric"
+    ? lateralInput
+    : axis("KeyE") - axis("KeyQ");
   const running = keys.has("ShiftLeft") || keys.has("ShiftRight");
   const hasKeyboardMove = keyboardForwardInput !== 0 || strafeInput !== 0 || turnInput !== 0;
   if (hasKeyboardMove && movement.clickTarget) clearClickMoveTarget();
@@ -1593,7 +1699,9 @@ function updatePlayer(dt) {
     toTarget.y = 0;
     const distance = toTarget.length();
     if (distance <= controls.clickArriveDistance) {
-      clearClickMoveTarget();
+      movement.clickPathIndex += 1;
+      movement.clickTarget = movement.clickPath[movement.clickPathIndex] ?? null;
+      if (!movement.clickTarget) clearClickMoveTarget();
     } else {
       desiredClickDirection = toTarget.normalize();
       movement.heading = Math.atan2(desiredClickDirection.x, -desiredClickDirection.z);
@@ -1614,16 +1722,34 @@ function updatePlayer(dt) {
 
   if (desiredClickDirection) {
     desired.copy(desiredClickDirection);
+  } else if (cameraMode === "isometric") {
+    isoScreenForward.copy(player.position).sub(camera.position);
+    isoScreenForward.y = 0;
+    if (isoScreenForward.lengthSq() < 0.0001) {
+      isoScreenForward.set(Math.sin(movement.heading), 0, -Math.cos(movement.heading));
+    } else {
+      isoScreenForward.normalize();
+    }
+    isoScreenRight.set(isoScreenForward.z, 0, -isoScreenForward.x).normalize();
+    if (keyboardForwardInput !== 0) {
+      desired.addScaledVector(isoScreenForward, keyboardForwardInput);
+    }
+    if (strafeInput !== 0) {
+      desired.addScaledVector(isoScreenRight, strafeInput);
+    }
+    if (desired.lengthSq() > 0.0001) {
+      movement.heading = Math.atan2(desired.x, -desired.z);
+    }
   } else if (forwardInput !== 0) {
     desired.addScaledVector(forward, forwardInput < 0 ? forwardInput * controls.backpedalScale : forwardInput);
   }
-  if (strafeInput !== 0) {
+  if (cameraMode === "platform" && strafeInput !== 0) {
     desired.addScaledVector(right, strafeInput * controls.strafeScale);
   }
   if (desired.lengthSq() > 1) desired.normalize();
 
   const hasMoveIntent = desired.lengthSq() > 0;
-  const targetSpeed = running && forwardInput > 0 ? controls.runSpeed : controls.walkSpeed;
+  const targetSpeed = running && (cameraMode === "isometric" ? hasMoveIntent : forwardInput > 0) ? controls.runSpeed : controls.walkSpeed;
   const airControl = movement.grounded ? 1 : controls.maxAirControl;
   const blend = (1 - Math.pow(hasMoveIntent ? controls.acceleration : controls.braking, dt)) * airControl;
   movement.velocity.lerp(desired.multiplyScalar(targetSpeed), blend);
@@ -1774,6 +1900,15 @@ function installDebugApi() {
         target: movement.clickTarget
           ? { x: movement.clickTarget.x, y: movement.clickTarget.y, z: movement.clickTarget.z }
           : null,
+        finalTarget: movement.clickPath.length
+          ? {
+              x: movement.clickPath[movement.clickPath.length - 1].x,
+              y: movement.clickPath[movement.clickPath.length - 1].y,
+              z: movement.clickPath[movement.clickPath.length - 1].z
+            }
+          : null,
+        pathLength: movement.clickPath.length,
+        pathIndex: movement.clickPathIndex,
         markerVisible: Boolean(movement.clickTargetMarker?.visible),
         holdActive: movement.holdMoveActive
       };

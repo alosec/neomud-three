@@ -44,10 +44,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - The game now defaults to `Iso`; `?camera=platform` remains available for
      the behind-character view.
    - Iso defaults to a slightly pulled-back zoom, and left/right arrow keys now
-     rotate the Iso camera orbit instead of turning the avatar. The unresolved
-     follow-up is a deliberate keyboard movement setting for Iso: either
-     character-relative movement, screen-relative movement, or separate bindings.
-     Do not overload this into the current patch without a clear setting model.
+     rotate the Iso camera orbit instead of turning the avatar. Iso keyboard
+     movement is now screen/camera-relative for WASD and ArrowUp/ArrowDown,
+     while ArrowLeft/ArrowRight are camera orbit. A future settings pass can
+     expose alternate bindings if needed.
    - Real canvas clicks on Iso interactables now preserve the interaction panel
      instead of closing it through the follow-up canvas click handler.
    - Town Square screenshot QA now captures paired `Iso` and `Platform` plaza
@@ -60,6 +60,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Iso click-to-move uses existing room collision pushout for target placement:
      clicks landing inside a collider clamp outside it, while ordinary clicks
      beyond props remain valid until a real pathfinding/navmesh pass exists.
+   - First obstacle-routing slice exists: if a direct Iso click path crosses a
+     rectangular room collider, the client creates simple side waypoints around
+     the blocker. Town Square QA verifies clicking across the fountain produces
+     a multi-waypoint path and arrives on the far side.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
@@ -91,10 +95,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      close and real attack/ability commands. Item/loot hover parity exists for
      the Hidden Cave server-loot path, but should be audited across future
      authored rooms as they gain live drops.
-   - Click-to-move still uses direct steering plus existing collider pushout
-     rather than true pathfinding/navmesh around obstacles. Do not fake
-     pathfinding by invalidating any straight line that crosses a collider; that
-     breaks ordinary ARPG clicks in prop-heavy scenes.
+   - Click-to-move now has first-pass waypoint routing around one rectangular
+     blocker, but it is not a full navmesh. Multi-obstacle rooms, dynamic
+     blockers, and optimal paths still need a real pathing layer later.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.

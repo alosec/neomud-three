@@ -71,17 +71,45 @@ async function main() {
     const zoomBefore = await page.evaluate(() => window.__neomudThreeDebug.cameraControls.isoZoom);
     assert.ok(zoomBefore > 1, `expected Iso default to start slightly zoomed out, got ${zoomBefore}`);
     const orbitBefore = await page.evaluate(() => window.__neomudThreeDebug.cameraControls.isoOrbitAngle);
+    const orbitPlayerBefore = await page.evaluate(() => window.__neomudThreeDebug.player);
     await page.keyboard.down("ArrowRight");
     await page.waitForTimeout(360);
     await page.keyboard.up("ArrowRight");
     await settleFrames(page);
     const orbitAfter = await page.evaluate(() => ({
       camera: window.__neomudThreeDebug.camera,
+      player: window.__neomudThreeDebug.player,
       controls: window.__neomudThreeDebug.cameraControls
     }));
     assert.ok(
       orbitAfter.controls.isoOrbitAngle > orbitBefore + 0.2,
       `expected ArrowRight to rotate Iso camera orbit, got ${JSON.stringify({ orbitBefore, orbitAfter })}`
+    );
+    assert.ok(
+      Math.hypot(orbitAfter.player.x - orbitPlayerBefore.x, orbitAfter.player.z - orbitPlayerBefore.z) < 0.08,
+      `expected ArrowRight Iso orbit to avoid moving the avatar, got ${JSON.stringify({ orbitPlayerBefore, orbitAfter })}`
+    );
+    const keyboardMoveBefore = await page.evaluate(() => ({
+      camera: window.__neomudThreeDebug.camera,
+      player: window.__neomudThreeDebug.player
+    }));
+    await page.keyboard.down("KeyW");
+    await page.waitForTimeout(450);
+    await page.keyboard.up("KeyW");
+    await settleFrames(page);
+    const keyboardMoveAfter = await page.evaluate(() => window.__neomudThreeDebug.player);
+    const screenForwardDot = (() => {
+      const fx = keyboardMoveBefore.player.x - keyboardMoveBefore.camera.position.x;
+      const fz = keyboardMoveBefore.player.z - keyboardMoveBefore.camera.position.z;
+      const fl = Math.hypot(fx, fz);
+      const dx = keyboardMoveAfter.x - keyboardMoveBefore.player.x;
+      const dz = keyboardMoveAfter.z - keyboardMoveBefore.player.z;
+      const dl = Math.hypot(dx, dz);
+      return fl > 0 && dl > 0 ? ((fx / fl) * (dx / dl)) + ((fz / fl) * (dz / dl)) : 0;
+    })();
+    assert.ok(
+      screenForwardDot > 0.72,
+      `expected W in Iso to move along screen/camera forward after orbit, got ${JSON.stringify({ screenForwardDot, keyboardMoveBefore, keyboardMoveAfter })}`
     );
     await page.mouse.move(640, 430);
     await page.mouse.wheel(0, 620);
@@ -136,12 +164,22 @@ async function main() {
 
     const beyondPropMove = await page.evaluate(() => {
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 10.4, heading: 0 });
-      return window.__neomudThreeDebug.clickGround({ x: 0, z: -3.4 });
+      return window.__neomudThreeDebug.clickGround({ x: 0, z: -6 });
     });
     assert.equal(beyondPropMove.type, "move");
+    const routedMove = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
     assert.ok(
-      beyondPropMove.target.z < -2.8,
-      `expected ordinary click beyond fountain to remain valid until navmesh exists, got ${JSON.stringify(beyondPropMove)}`
+      routedMove.pathLength >= 3 && routedMove.finalTarget.z < -5.5,
+      `expected click beyond fountain to route around collider with waypoints, got ${JSON.stringify({ beyondPropMove, routedMove })}`
+    );
+    await page.waitForTimeout(6500);
+    const routedAfter = await page.evaluate(() => ({
+      player: window.__neomudThreeDebug.player,
+      clickMove: window.__neomudThreeDebug.clickMove
+    }));
+    assert.ok(
+      routedAfter.player.z < -5.2 && Math.abs(routedAfter.player.x) < 1.0 && !routedAfter.clickMove.active,
+      `expected avatar to route around fountain and reach far side target, got ${JSON.stringify(routedAfter)}`
     );
 
     await page.evaluate(() => {

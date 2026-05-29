@@ -23,7 +23,9 @@ Playable Three.js lab:
   strafe, Shift to run, Space to jump, diagonal movement works, and the
   behind-character Platform camera follows heading. In Iso mode, left/right
   arrow keys now rotate the isometric camera orbit instead of turning the
-  avatar, which better matches the click-to-move action-RPG feel.
+  avatar, and WASD/ArrowUp/ArrowDown movement is screen/camera-relative rather
+  than avatar-heading-relative, which better matches the click-to-move
+  action-RPG feel.
 - The main client intentionally supports two visual modes, not one discarded
   prototype camera: `Platform`, the behind-character/pointer-lock platformer
   POV, and `Iso`, the elevated bird's-eye/action-RPG POV. The product direction
@@ -74,6 +76,10 @@ Playable Three.js lab:
   Town Square fountain clamp outside the collider, while ordinary clicks beyond
   props remain valid until a true pathfinding/navmesh pass exists. Town Square
   QA captures this as `town-shot-isometric-blocked-target.png`.
+  The first practical click router now adds simple waypoints around rectangular
+  room colliders when a direct click path is blocked. Town Square QA clicks from
+  the south side of the fountain to the far side, verifies a multi-waypoint path
+  is created, and waits for the avatar to route around the fountain and arrive.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

@@ -74,12 +74,14 @@ async function main() {
     assert.equal(await page.locator('[data-camera-mode="isometric"].active').count(), 1);
     const clickStart = await page.evaluate(() => window.__neomudThreeDebug.player);
     const clickTarget = await page.evaluate(() => window.__neomudThreeDebug.setClickMoveTarget({ x: 0, z: -7 }));
-    assert.deepEqual(await page.evaluate(() => window.__neomudThreeDebug.clickMove), {
-      active: true,
-      target: clickTarget,
-      markerVisible: true,
-      holdActive: false
-    });
+    const clickMoveState = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
+    assert.deepEqual(clickMoveState.target, clickTarget);
+    assert.deepEqual(clickMoveState.finalTarget, clickTarget);
+    assert.equal(clickMoveState.active, true);
+    assert.equal(clickMoveState.markerVisible, true);
+    assert.equal(clickMoveState.holdActive, false);
+    assert.equal(clickMoveState.pathLength, 1);
+    assert.equal(clickMoveState.pathIndex, 0);
     await page.waitForTimeout(900);
     const clickAfter = await page.evaluate(() => window.__neomudThreeDebug.player);
     assert.ok(clickAfter.z > clickStart.z + 1.8, `expected click-to-move to advance toward target, got ${JSON.stringify({ clickStart, clickAfter, clickTarget })}`);
