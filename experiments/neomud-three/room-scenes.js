@@ -3727,7 +3727,8 @@ function addSunlitClearingStage(root, materials, worldRoot) {
   ], "sunlit-clearing-surfaces");
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_clearing.webp`, 0, 8.8, -19.2, 34, 18.0, {
-    opacity: 0.16
+    opacity: 0.32,
+    castShadow: false
   });
   addSunlitClearingTreeRing(root, materials);
   addSunlitClearingDressing(root, materials);
@@ -3760,9 +3761,9 @@ function addSunlitClearingTreeRing(root, materials) {
     { x: -12.4, z: -10.6, scale: 1.8, rotationY: 0.32 },
     { x: 11.8, z: -10.2, scale: 1.72, rotationY: -0.36 },
     { x: -12.2, z: 9.4, scale: 1.56, rotationY: -0.18 },
-    { x: 12.5, z: 8.8, scale: 1.58, rotationY: 0.44 },
+    { x: 15.3, z: 11.4, scale: 1.28, rotationY: 0.44 },
     { x: -15.2, z: -1.6, scale: 1.28, rotationY: 0.16 },
-    { x: 15.0, z: -2.1, scale: 1.34, rotationY: -0.22 },
+    { x: 15.8, z: -3.6, scale: 1.18, rotationY: -0.22 },
     { x: -5.4, z: -15.1, scale: 1.22, rotationY: 0.28 },
     { x: 5.7, z: -15.0, scale: 1.26, rotationY: -0.3 }
   ]);
