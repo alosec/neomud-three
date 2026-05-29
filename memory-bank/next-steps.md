@@ -60,10 +60,11 @@ High leverage next work:
    - The next serious geometry pass should move one named landmark or graybox room slice into Blender source and GLB validation instead of adding more direct mesh code.
 
 3a. Continue player avatar production.
-   - The visible player is now a v8 articulated low-poly fantasy adventurer proxy with a smaller overall scale, narrower cloak silhouette, capsule limbs, staff silhouette, and dedicated idle/walk/run/jump review in Avatar Lab. Xbot remains a hidden technical/reference asset, not the rendered character.
+   - The visible player is now the Xbot/Mixamo-style skinned GLB baseline with real idle/walk/run/jump animation and the `xbot-stylized-teal-v3` material treatment.
    - Do not swap to another random example model.
    - Next character work should be an authored or deliberately sourced skinned adventurer GLB with documented license, forward axis, scale, idle/walk/run clips, and fixed QA screenshots.
-   - If a full GLB is not practical yet, improve the proxy only when it clearly helps silhouette/proportions in `avatar-lab.html` and authored-room screenshots without pushing Town Square over its 240-call budget.
+   - Do not reintroduce rigid unskinned costume overlays unless Avatar Lab proves rear, side, running, and jump poses are clean. The last overlay attempt was rejected for floating/bulky artifacts.
+   - If a full GLB is not practical yet, restrict avatar work to material/lighting/camera improvements that clearly help `avatar-lab.html` and authored-room screenshots without pushing Town Square over its 240-call budget.
 
 4. Connect NeoMud gameplay surfaces.
    - Clicking/approaching an NPC should open a DOM interaction panel.

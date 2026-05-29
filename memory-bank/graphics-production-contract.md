@@ -31,6 +31,8 @@ A real player character asset must define:
 - Material/texture slots for clothing, hair, skin, equipment, and optional cloak.
 - QA screenshots from rear, side, and running states.
 
+Rigid costume overlays on the current Xbot baseline are not accepted by default. They must either be skinned/bound to the character or pass Avatar Lab rear, side, run, and jump screenshots without floating planes, bulky boxes, or obvious pose mismatch.
+
 Do not swap in random example models just because they animate. The model has to match the game identity and the movement/camera scale.
 
 ## Current Corrective Pass

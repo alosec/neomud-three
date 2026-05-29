@@ -40,6 +40,7 @@ Each MUD room should feel like a compact stage: clear identity, clear exits, rea
 - New reusable props enter the prop zoo before entering game rooms.
 - New character art must define source/license, rig/clip compatibility, forward axis, scale, and QA screenshots.
 - The current Xbot avatar is an animation placeholder, not accepted final character art.
+- Do not add rigid, unskinned costume overlays to the player unless Avatar Lab proves rear, side, run, and jump poses are clean. Prior unbound overlay attempts produced floating/bulky artifacts.
 
 ## QA Rules
 
