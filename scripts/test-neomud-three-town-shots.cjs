@@ -86,6 +86,29 @@ async function main() {
     await page.screenshot({ path: isoTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-plaza", path: isoTarget });
 
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.setCameraMode("platform");
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 10.4, heading: 0 });
+    });
+    await settleFrames(page);
+    const platformCamera = await page.evaluate(() => window.__neomudThreeDebug.camera);
+    assert.equal(platformCamera.mode, "platform");
+    assert.equal(platformCamera.obstruction, null, `expected clear Platform plaza camera, got ${JSON.stringify(platformCamera)}`);
+    assert.ok(
+      platformCamera.position.y < isoCamera.position.y - 6,
+      `expected Platform camera to return to behind-character height after Iso, got ${JSON.stringify({ isoCamera, platformCamera })}`
+    );
+    assert.equal(await page.locator('[data-camera-mode="platform"].active').count(), 1);
+    const platformTarget = path.join(qaDir, "town-shot-platform-plaza.png");
+    await page.screenshot({ path: platformTarget, animations: "disabled" });
+    screenshots.push({ id: "platform-plaza", path: platformTarget });
+
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
+    });
+    await settleFrames(page);
+
     const oldWren = await page.evaluate(() =>
       window.__neomudThreeDebug.room.entities.find((entity) => entity.id === "npc:old_wren")
     );

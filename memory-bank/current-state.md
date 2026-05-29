@@ -54,6 +54,10 @@ Playable Three.js lab:
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.
+  Town Square screenshot QA now captures both `town-shot-isometric-plaza.png`
+  and `town-shot-platform-plaza.png` in the same run, proving the visual mode
+  switch can return from the bird's-eye POV to the behind-character POV without
+  silently breaking Platform review.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

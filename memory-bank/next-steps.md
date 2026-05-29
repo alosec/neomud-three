@@ -41,6 +41,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      removes one with evidence. `Iso` is the strategic default direction for
      Diablo-like gameplay; `Platform` remains valuable for traversal and
      representational review from behind the avatar.
+   - Town Square screenshot QA now captures paired `Iso` and `Platform` plaza
+     views in one run and asserts that switching back from `Iso` restores the
+     lower behind-character camera mode.
    - First click slice exists: Iso mode raycasts canvas clicks to the ground plane, checks nearby interactables and exit trigger volumes, clamps movement targets through the current room runtime, shows a destination marker, and steers the avatar toward the clicked point. Keyboard movement cancels the click target.
    - Click-and-hold movement now exists for open ground in Iso mode: holding the primary pointer continuously updates the destination marker until release, which better matches Diablo-like movement.
    - Iso mode now has bounded mouse-wheel zoom for player comfort and QA review, without changing room art or server authority.
