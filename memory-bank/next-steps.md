@@ -105,6 +105,8 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - The top HUD action chip now reports contextual intent/state: clicked NPC
      approach, clicked exit travel, click movement, server work, and active
      attacking have distinct labels/states instead of collapsing to `Walk`.
+     Live server-backed combat QA verifies `Attacking` after attack-mode
+     confirmation.
    - General server/tutorial/presence messages now have a focused HUD event
      toast instead of disappearing into the log only. Offline QA injects
      `system_message` and `tutorial` messages and verifies the visible title and

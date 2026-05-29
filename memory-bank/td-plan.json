@@ -1,11 +1,40 @@
 {
-  "updated": "2026-05-29T21:11:00.000Z",
+  "updated": "2026-05-29T21:23:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-a5ef",
+      "project": "NeoMud",
+      "title": "Verify HUD combat state after server attack confirmation",
+      "description": "Make the contextual HUD action chip update immediately when the Kotlin server confirms attack mode and add server-backed QA proving the chip shows Attacking during live combat.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "hud",
+        "combat",
+        "server-authoritative",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "attack_mode_update now refreshes the player HUD immediately after server state changes. Server-backed QA verifies that after Digit1 starts attack mode on the Giant Forest Spider and the server confirms selectedTargetId/attackMode, debug.hud reports actionState=combat and action=Attacking before issuing Stop Attack.",
+          "created": "2026-05-29T21:23:00Z"
+        }
+      ],
+      "created": "2026-05-29T21:23:00Z",
+      "updated": "2026-05-29T21:23:00Z"
+    },
     {
       "id": "neo-c91e",
       "project": "NeoMud",

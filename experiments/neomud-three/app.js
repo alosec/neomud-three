@@ -339,6 +339,7 @@ function handleServerMessage(message) {
       };
       appendLog(lastCombatResult.message);
       if (activePanel === "interaction") renderPanel(activePanel);
+      updatePlayerHud();
       break;
     case "combat_hit": {
       clearPendingCombatCommand();

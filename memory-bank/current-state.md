@@ -97,7 +97,9 @@ Playable Three.js lab:
   `Open unavailable`.
   The top HUD action chip now reports the player intent/state instead of only
   movement gait: `Approach`, `Travel`, `Moving`, `Working`, and `Attacking`
-  are shown when click routing, server actions, or combat are active.
+  are shown when click routing, server actions, or combat are active. Server
+  attack-mode confirmations refresh the HUD immediately, and server-backed QA
+  verifies `Attacking` during live combat.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside

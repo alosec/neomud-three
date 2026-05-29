@@ -349,6 +349,9 @@ async function main() {
       assert.equal(engagedCombatActions[0]?.hotkey, "1");
       assert.equal(engagedCombatActions[0]?.command, "stop_attack");
       assert.equal(engagedCombatActions[0]?.enabled, true);
+      const attackingHud = await page.evaluate(() => window.__neomudThreeDebug.hud);
+      assert.equal(attackingHud.actionState, "combat", `expected HUD to show active attack state: ${JSON.stringify(attackingHud)}`);
+      assert.equal(attackingHud.action, "Attacking");
       await page.keyboard.press("Digit1");
       const hotkeyStop = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
       assert.equal(hotkeyStop?.targetId, "npc:forest_spider");
