@@ -112,6 +112,12 @@ async function main() {
     const npcClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), oldWren);
     assert.deepEqual(npcClick, { type: "interactable", id: "npc:old_wren", kind: "npc" });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    const selectedNpc = await page.evaluate(() => window.__neomudThreeDebug.selection);
+    assert.equal(selectedNpc.markerVisible, true);
+    assert.equal(selectedNpc.target.id, "npc:old_wren");
+    const selectionTarget = path.join(qaDir, "town-shot-isometric-selection-target.png");
+    await page.screenshot({ path: selectionTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-selection-target", path: selectionTarget });
     await page.keyboard.press("Escape");
 
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);

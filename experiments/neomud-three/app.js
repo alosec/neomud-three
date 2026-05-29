@@ -123,7 +123,9 @@ const movement = {
   clickTarget: null,
   clickTargetMarker: null,
   hoverTarget: null,
-  hoverMarker: null
+  hoverMarker: null,
+  selectionTarget: null,
+  selectionMarker: null
 };
 
 const playableKeys = new Set([
@@ -529,6 +531,7 @@ function setRoom(roomId, options = {}) {
   }));
   if (!roomRuntime) return;
   nearbyInteractable = null;
+  selectedInteractable = null;
   updateInteractionPrompt();
   refreshRoomDebugOverlay();
   renderEngine.applyEnvironment(roomRuntime.environment);
@@ -545,6 +548,7 @@ function setRoom(roomId, options = {}) {
   movement.walkClock = 0;
   clearClickMoveTarget();
   clearHoverTarget();
+  clearSelectionTarget();
   player.rotation.set(0, -movement.heading, 0);
 
   roomName.textContent = room.name;
@@ -718,6 +722,7 @@ function handleGroundClick(point) {
   if (clickTarget.type === "interactable") {
     clearClickMoveTarget();
     clearHoverTarget();
+    setSelectionTarget(clickTarget);
     nearbyInteractable = clickTarget.entity;
     interactWithNearby();
     return {
@@ -730,6 +735,7 @@ function handleGroundClick(point) {
   if (clickTarget.type === "exit") {
     clearClickMoveTarget();
     clearHoverTarget();
+    setSelectionTarget(clickTarget);
     enterExitTarget(clickTarget.targetId);
     return {
       type: "exit",
@@ -738,6 +744,7 @@ function handleGroundClick(point) {
   }
 
   clearHoverTarget();
+  clearSelectionTarget();
   return {
     type: "move",
     target: setClickMoveTarget(target)
@@ -802,14 +809,47 @@ function setHoverTargetFromPoint(point) {
   const marker = ensureHoverMarker();
   marker.position.copy(target.position).setY(0.07);
   marker.visible = true;
+  document.body.dataset.isoTarget = target.type;
   updateInteractionPrompt();
   return movement.hoverTarget;
 }
 
 function clearHoverTarget() {
-  if (!movement.hoverTarget && !movement.hoverMarker?.visible) return;
+  if (!movement.hoverTarget && !movement.hoverMarker?.visible) {
+    delete document.body.dataset.isoTarget;
+    return;
+  }
   movement.hoverTarget = null;
   if (movement.hoverMarker) movement.hoverMarker.visible = false;
+  delete document.body.dataset.isoTarget;
+  updateInteractionPrompt();
+}
+
+function setSelectionTarget(target) {
+  if (!target || target.type === "move") {
+    clearSelectionTarget();
+    return null;
+  }
+
+  movement.selectionTarget = {
+    type: target.type,
+    id: target.entity?.id ?? target.targetId,
+    kind: target.entity?.kind ?? "",
+    label: target.label,
+    targetId: target.targetId ?? ""
+  };
+
+  const marker = ensureSelectionMarker();
+  marker.position.copy(target.position).setY(0.09);
+  marker.visible = true;
+  updateInteractionPrompt();
+  return movement.selectionTarget;
+}
+
+function clearSelectionTarget() {
+  if (!movement.selectionTarget && !movement.selectionMarker?.visible) return;
+  movement.selectionTarget = null;
+  if (movement.selectionMarker) movement.selectionMarker.visible = false;
   updateInteractionPrompt();
 }
 
@@ -866,6 +906,46 @@ function ensureHoverMarker() {
   group.visible = false;
   renderEngine.scene.add(group);
   movement.hoverMarker = group;
+  return group;
+}
+
+function ensureSelectionMarker() {
+  if (movement.selectionMarker) return movement.selectionMarker;
+  const group = new THREE.Group();
+  group.name = "Isometric selected target marker";
+  group.userData.cameraIgnore = true;
+
+  const outer = new THREE.Mesh(
+    new THREE.TorusGeometry(0.82, 0.038, 8, 48),
+    new THREE.MeshBasicMaterial({ color: 0xffd36b, transparent: true, opacity: 0.92, depthWrite: false })
+  );
+  outer.rotation.x = Math.PI / 2;
+
+  const inner = new THREE.Mesh(
+    new THREE.TorusGeometry(0.54, 0.018, 8, 40),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.42, depthWrite: false })
+  );
+  inner.rotation.x = Math.PI / 2;
+
+  const cardinal = new THREE.InstancedMesh(
+    new THREE.BoxGeometry(0.2, 0.026, 0.055),
+    new THREE.MeshBasicMaterial({ color: 0xfff1c2, transparent: true, opacity: 0.88, depthWrite: false }),
+    4
+  );
+  const dummy = new THREE.Object3D();
+  for (let index = 0; index < 4; index += 1) {
+    const angle = index * Math.PI * 0.5;
+    dummy.position.set(Math.sin(angle) * 0.82, 0.025, Math.cos(angle) * 0.82);
+    dummy.rotation.y = angle;
+    dummy.updateMatrix();
+    cardinal.setMatrixAt(index, dummy.matrix);
+  }
+  cardinal.instanceMatrix.needsUpdate = true;
+
+  group.add(outer, inner, cardinal);
+  group.visible = false;
+  renderEngine.scene.add(group);
+  movement.selectionMarker = group;
   return group;
 }
 
@@ -1415,6 +1495,11 @@ function updatePlayer(dt) {
     const hoverPulse = 1 + Math.sin(performance.now() * 0.007) * 0.06;
     movement.hoverMarker.scale.setScalar(hoverPulse);
   }
+  if (movement.selectionMarker?.visible) {
+    movement.selectionMarker.rotation.y -= dt * 0.6;
+    const selectedPulse = 1 + Math.sin(performance.now() * 0.004) * 0.035;
+    movement.selectionMarker.scale.setScalar(selectedPulse);
+  }
   movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
@@ -1521,6 +1606,13 @@ function installDebugApi() {
         promptVisible: Boolean(interactionPrompt && !interactionPrompt.classList.contains("hidden"))
       };
     },
+    get selection() {
+      return {
+        active: Boolean(movement.selectionTarget),
+        target: movement.selectionTarget,
+        markerVisible: Boolean(movement.selectionMarker?.visible)
+      };
+    },
     get effects() {
       return {
         pickup: renderEngine.pickupEffectCount
@@ -1616,6 +1708,7 @@ function installDebugApi() {
       movement.running = false;
       clearClickMoveTarget();
       clearHoverTarget();
+      clearSelectionTarget();
       player.rotation.set(0, -movement.heading, 0);
       updateCamera(1, true);
       return this.player;
@@ -1632,6 +1725,10 @@ function installDebugApi() {
     clearHover() {
       clearHoverTarget();
       return this.hover;
+    },
+    clearSelection() {
+      clearSelectionTarget();
+      return this.selection;
     },
     reconnectServer() {
       serverState.client?.close();

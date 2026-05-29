@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T15:50:00.000Z",
+  "updated": "2026-05-29T16:05:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -82,10 +82,15 @@
           "id": 5,
           "body": "First hover targeting slice implemented: Iso mode classifies pointer/ground targets, shows a world hover marker plus concise Click prompt for NPCs/items/exits, and clears hover on click, room switch, player placement, pointer leave, or panel state. Town Square screenshot QA now verifies Old Wren hover and North Gate hover before existing click routing.",
           "created": "2026-05-29T15:50:00Z"
+        },
+        {
+          "id": 6,
+          "body": "Selection affordance slice added: clicking an interactable in Iso mode now leaves a selected-target world ring while the interaction panel is open, and body cursor state changes on hoverable NPC/item/exit targets. Town Square screenshot QA now captures isometric-selection-target and budget remains within the 240-call gate.",
+          "created": "2026-05-29T16:05:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T15:50:00Z"
+      "updated": "2026-05-29T16:05:00Z"
     },
     {
       "id": "neo-1fb2",

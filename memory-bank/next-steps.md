@@ -37,7 +37,7 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - First visual-mode slice exists: the HUD now supports `Platform` and `Iso` camera modes. Platform preserves the behind-character/pointer-lock camera; Iso provides the first elevated action-RPG camera and keeps the cursor visible.
    - First click slice exists: Iso mode raycasts canvas clicks to the ground plane, checks nearby interactables and exit trigger volumes, clamps movement targets through the current room runtime, shows a destination marker, and steers the avatar toward the clicked point. Keyboard movement cancels the click target.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
-   - First hover slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, and show a concise `Click ...` interaction prompt before the user commits. Town Square screenshot QA verifies Old Wren hover and North Gate hover.
+   - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
 
    Acceptance for the first slice:
@@ -54,8 +54,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
 
    Remaining first-slice gap:
    - Selection feedback needs stronger object-level affordance language:
-     target outlines/material response, selected target persistence, better
-     cursor states, and item/loot hover parity across authored rooms.
+     target outlines/material response, target persistence rules after panel
+     close, better hostile/combat target states, and item/loot hover parity
+     across authored rooms.
    - Click-to-move still uses direct steering plus existing collider pushout,
      not pathfinding or navmesh.
 

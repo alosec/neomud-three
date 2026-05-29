@@ -13,6 +13,11 @@ body[data-input-mode="play"][data-camera-mode="platform"] {
   cursor: none;
 }
 
+body[data-camera-mode="isometric"][data-iso-target="interactable"] #scene,
+body[data-camera-mode="isometric"][data-iso-target="exit"] #scene {
+  cursor: pointer;
+}
+
 button,
 input {
   font: inherit;
