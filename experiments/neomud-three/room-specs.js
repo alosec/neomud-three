@@ -279,6 +279,37 @@ export const TOWN_SQUARE_SPEC = {
         { x: 46, z: 26, width: 7.0, height: 1.16, depth: 2.34, scale: 1.0, rotationY: -Math.PI / 2 - 0.34 },
         { x: 44, z: 38, width: 5.8, height: 1.0, depth: 2.0, scale: 0.94, rotationY: -Math.PI / 2 + 0.16 }
       ]
+    },
+    {
+      id: "far-horizon-terraces",
+      ring: "far",
+      kind: "context-masses",
+      masses: [
+        { material: "forestMossLight", x: -34, y: 1.05, z: -52, width: 28, height: 2.1, depth: 3.0 },
+        { material: "forestMossLight", x: 0, y: 1.28, z: -53, width: 34, height: 2.55, depth: 3.2 },
+        { material: "forestMossLight", x: 34, y: 1.0, z: -52, width: 28, height: 2.0, depth: 3.0 },
+        { material: "foliageDark", x: -32, y: 2.45, z: -54.2, width: 30, height: 2.0, depth: 2.4 },
+        { material: "foliageDark", x: 4, y: 2.75, z: -55.0, width: 38, height: 2.3, depth: 2.5 },
+        { material: "foliageDark", x: 38, y: 2.35, z: -54.2, width: 28, height: 1.9, depth: 2.4 },
+        { material: "forestMossLight", x: -34, y: 1.0, z: 52, width: 28, height: 2.0, depth: 3.0 },
+        { material: "forestMossLight", x: 0, y: 1.22, z: 53, width: 34, height: 2.45, depth: 3.2 },
+        { material: "forestMossLight", x: 34, y: 1.0, z: 52, width: 28, height: 2.0, depth: 3.0 },
+        { material: "foliageDark", x: -34, y: 2.3, z: 54.2, width: 30, height: 1.85, depth: 2.4 },
+        { material: "foliageDark", x: 2, y: 2.62, z: 55.0, width: 38, height: 2.15, depth: 2.5 },
+        { material: "foliageDark", x: 36, y: 2.32, z: 54.2, width: 30, height: 1.85, depth: 2.4 },
+        { material: "forestMossLight", x: -52, y: 1.18, z: -31, width: 3.0, height: 2.35, depth: 30 },
+        { material: "forestMossLight", x: -53, y: 1.28, z: 4, width: 3.2, height: 2.55, depth: 36 },
+        { material: "forestMossLight", x: -52, y: 1.1, z: 38, width: 3.0, height: 2.2, depth: 25 },
+        { material: "foliageDark", x: -54.4, y: 2.55, z: -30, width: 2.4, height: 2.0, depth: 32 },
+        { material: "foliageDark", x: -55.0, y: 2.72, z: 5, width: 2.5, height: 2.25, depth: 36 },
+        { material: "foliageDark", x: -54.2, y: 2.35, z: 38, width: 2.4, height: 1.9, depth: 26 },
+        { material: "forestMossLight", x: 52, y: 1.18, z: -31, width: 3.0, height: 2.35, depth: 30 },
+        { material: "forestMossLight", x: 53, y: 1.28, z: 4, width: 3.2, height: 2.55, depth: 36 },
+        { material: "forestMossLight", x: 52, y: 1.1, z: 38, width: 3.0, height: 2.2, depth: 25 },
+        { material: "foliageDark", x: 54.4, y: 2.55, z: -30, width: 2.4, height: 2.0, depth: 32 },
+        { material: "foliageDark", x: 55.0, y: 2.72, z: 5, width: 2.5, height: 2.25, depth: 36 },
+        { material: "foliageDark", x: 54.2, y: 2.35, z: 38, width: 2.4, height: 1.9, depth: 26 }
+      ]
     }
   ],
   landmarks: [

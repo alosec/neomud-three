@@ -1274,9 +1274,9 @@ export function buildSunlitClearingRoom({ root, worldRoot, npcs = [], roomItems 
     spawn: { position: new THREE.Vector3(11.3, 0, 3.6), heading: -Math.PI / 2 },
     status: "Sunlit Clearing: authored sanctuary clearing with wildflowers, fallen logs, large trees, warm light, and a real west exit.",
     environment: {
-      background: 0x9ec9b4,
-      fog: 0x9fc9b2,
-      fogDensity: 0.01
+      background: 0x86a789,
+      fog: 0x78926f,
+      fogDensity: 0.0065
     },
     camera: {
       distance: 8.45,
@@ -4053,7 +4053,7 @@ function forestPathTriggers() {
 function makeSunlitClearingMaterials() {
   return {
     meadowGrass: new THREE.MeshStandardMaterial({ color: 0x6f9b55, roughness: 0.88, metalness: 0 }),
-    lightGrass: new THREE.MeshStandardMaterial({ color: 0x9fbd61, roughness: 0.86, metalness: 0 }),
+    lightGrass: new THREE.MeshStandardMaterial({ color: 0x91aa55, roughness: 0.88, metalness: 0 }),
     flowerGold: new THREE.MeshBasicMaterial({ color: 0xffd86e, transparent: true, opacity: 0.92 }),
     flowerPink: new THREE.MeshBasicMaterial({ color: 0xff91b8, transparent: true, opacity: 0.9 }),
     flowerBlue: new THREE.MeshBasicMaterial({ color: 0x8fb9ff, transparent: true, opacity: 0.86 }),
@@ -4065,16 +4065,25 @@ function makeSunlitClearingMaterials() {
 function addSunlitClearingStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.meadowGrass, SUNLIT_CLEARING.width, SUNLIT_CLEARING.depth);
   addInstancedSurfaceRects(root, materials, [
-    { material: "lightGrass", x: 0, z: 0, width: 22.0, depth: 18.0, y: 0.024 },
     { material: "road", x: -8.4, z: 3.6, width: 15.0, depth: 4.0, y: 0.026 },
     { material: "packedDirt", x: -13.2, z: 3.6, width: 5.2, depth: 5.4, y: 0.018 }
   ], "sunlit-clearing-surfaces");
+  addIrregularGroundPatches(root, materials, [
+    { material: "lightGrass", x: -1.0, z: -1.0, width: 21.0, depth: 17.0, y: 0.025, rotationZ: -0.04, seed: 41 },
+    { material: "forestMossLight", x: -6.2, z: 6.0, width: 7.2, depth: 4.8, y: 0.027, rotationZ: 0.18, seed: 42 },
+    { material: "forestMossLight", x: 5.8, z: -5.8, width: 6.4, depth: 4.2, y: 0.027, rotationZ: -0.18, seed: 43 },
+    { material: "forestShadow", x: 9.8, z: 5.4, width: 5.4, depth: 5.8, y: 0.026, rotationZ: 0.26, seed: 44 },
+    { material: "packedDirt", x: -11.8, z: 3.6, width: 6.6, depth: 5.2, y: 0.029, rotationZ: 0.04, seed: 45 }
+  ], "sunlit-clearing-ground-patches");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_clearing.webp`, 0, 8.8, -19.2, 34, 18.0, {
-    opacity: 0.32,
-    unlit: true,
-    castShadow: false
+  addStylizedForestBackdrop(root, materials, {
+    visualRole: "sunlit-clearing-stylized-backdrop",
+    zOffset: 2.2,
+    xScale: 1.02,
+    zScale: 0.86,
+    pathShiftX: -8.4
   });
+  addSunlitClearingHorizonWrap(root, materials);
   addSunlitClearingTreeRing(root, materials);
   addSunlitClearingDressing(root, materials);
   addSunlitClearingExitAffordances(root, materials);
@@ -4118,14 +4127,38 @@ function addSunlitClearingTreeRing(root, materials) {
     new THREE.DodecahedronGeometry(1, 0),
     materials.foliage,
     [
-      { x: -9.2, y: 7.2, z: -10.8, scale: [2.4, 0.82, 1.8], rotationY: 0.24 },
-      { x: 9.0, y: 7.15, z: -10.8, scale: [2.35, 0.82, 1.8], rotationY: -0.24 },
-      { x: -12.5, y: 6.45, z: 2.6, scale: [2.1, 0.76, 1.6], rotationY: -0.18 },
-      { x: 12.5, y: 6.42, z: 2.2, scale: [2.1, 0.76, 1.6], rotationY: 0.2 }
+      { x: -9.6, y: 6.95, z: -12.4, scale: [2.05, 0.7, 1.55], rotationY: 0.24 },
+      { x: 9.4, y: 6.9, z: -12.2, scale: [2.0, 0.7, 1.55], rotationY: -0.24 },
+      { x: -13.4, y: 6.2, z: 4.2, scale: [1.75, 0.65, 1.35], rotationY: -0.18 },
+      { x: 13.4, y: 6.15, z: 3.8, scale: [1.75, 0.65, 1.35], rotationY: 0.2 }
     ],
     "sunlit-clearing-high-canopy",
     { castShadow: false, receiveShadow: false }
   );
+}
+
+function addSunlitClearingHorizonWrap(root, materials) {
+  const ridges = [
+    { x: -18.0, y: 1.25, z: -18.2, width: 10.0, height: 2.5, depth: 2.2, rotationY: -0.16, material: "forestShadow" },
+    { x: -7.8, y: 1.35, z: -20.0, width: 12.0, height: 2.7, depth: 2.3, rotationY: 0.08, material: "foliageDark" },
+    { x: 6.8, y: 1.28, z: -20.4, width: 12.8, height: 2.55, depth: 2.2, rotationY: -0.08, material: "foliageDark" },
+    { x: 18.0, y: 1.22, z: -18.4, width: 10.0, height: 2.44, depth: 2.2, rotationY: 0.18, material: "forestShadow" },
+    { x: -19.0, y: 1.08, z: -5.2, width: 2.0, height: 2.16, depth: 15.4, rotationY: 0.04, material: "forestShadow" },
+    { x: 19.0, y: 1.08, z: -5.0, width: 2.0, height: 2.16, depth: 15.4, rotationY: -0.04, material: "forestShadow" },
+    { x: -18.4, y: 0.7, z: 9.6, width: 2.2, height: 1.4, depth: 7.8, rotationY: -0.1, material: "forestMossLight" },
+    { x: 18.4, y: 0.7, z: 9.6, width: 2.2, height: 1.4, depth: 7.8, rotationY: 0.1, material: "forestMossLight" }
+  ];
+  const byMaterial = new Map();
+  for (const ridge of ridges) {
+    if (!byMaterial.has(ridge.material)) byMaterial.set(ridge.material, []);
+    byMaterial.get(ridge.material).push(ridge);
+  }
+  for (const [materialKey, boxes] of byMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `sunlit-clearing-horizon-${materialKey}`, {
+      castShadow: false,
+      receiveShadow: true
+    });
+  }
 }
 
 function addSunlitClearingDressing(root, materials) {
