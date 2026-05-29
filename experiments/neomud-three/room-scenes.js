@@ -1630,6 +1630,9 @@ function addMarketShopfronts(root, materials) {
   ]);
   const windows = [];
   const upperWindows = [];
+  const doors = [];
+  const signs = [];
+  const signTrim = [];
 
   for (const side of [-1, 1]) {
     const z = side * 8.25;
@@ -1651,6 +1654,17 @@ function addMarketShopfronts(root, materials) {
       upperWindows.push({ x: x - 1.2, y: 4.54, z: frontZ - side * 0.065, width: 0.58, height: 0.74, depth: 0.08 });
       upperWindows.push({ x: x + 1.2, y: 4.54, z: frontZ - side * 0.065, width: 0.58, height: 0.74, depth: 0.08 });
     }
+    for (const [x, doorMaterial] of [[-12.2, "darkTimber"], [-3.6, "portalDark"], [5.0, "darkTimber"]]) {
+      doors.push({ x, y: 1.18, z: frontZ - side * 0.085, width: 1.08, height: 2.1, depth: 0.1, material: doorMaterial });
+      trim.push({ x: x - 0.62, y: 1.22, z: frontZ - side * 0.12, width: 0.1, height: 2.28, depth: 0.08 });
+      trim.push({ x: x + 0.62, y: 1.22, z: frontZ - side * 0.12, width: 0.1, height: 2.28, depth: 0.08 });
+      trim.push({ x, y: 2.4, z: frontZ - side * 0.12, width: 1.34, height: 0.1, depth: 0.08 });
+    }
+    for (const [x, width] of [[-12.2, 1.4], [-3.6, 1.62], [5.0, 1.32]]) {
+      signs.push({ x, y: 3.34, z: frontZ - side * 0.12, width, height: 0.34, depth: 0.08 });
+      signTrim.push({ x, y: 3.57, z: frontZ - side * 0.13, width: width + 0.22, height: 0.06, depth: 0.06 });
+      signTrim.push({ x, y: 3.12, z: frontZ - side * 0.13, width: width + 0.22, height: 0.06, depth: 0.06 });
+    }
 
     awnings.get(side < 0 ? "awningBlue" : "awningGold").push({ x: -11.8, y: 1.62, z: side * 6.84, width: 5.6, height: 0.18, depth: 1.15 });
     awnings.get(side < 0 ? "awningGold" : "awningRed").push({ x: 3.2, y: 1.62, z: side * 6.84, width: 6.8, height: 0.18, depth: 1.15 });
@@ -1665,6 +1679,10 @@ function addMarketShopfronts(root, materials) {
   addInstancedBoxes(root, materials.darkStone, dark, "market-shopfront-curbs", { castShadow: false });
   addInstancedBoxes(root, materials.windowDark, windows, "market-shopfront-windows", { castShadow: false, receiveShadow: false });
   addInstancedBoxes(root, materials.windowDark, upperWindows, "market-shopfront-upper-windows", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.darkTimber, doors.filter((door) => door.material === "darkTimber"), "market-shopfront-doors-dark");
+  addInstancedBoxes(root, materials.portalDark, doors.filter((door) => door.material === "portalDark"), "market-shopfront-doors-shadow", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.sign, signs, "market-shopfront-sign-boards", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.trimLight, signTrim, "market-shopfront-sign-trim", { castShadow: false, receiveShadow: true });
   for (const [materialKey, boxes] of awnings) {
     addInstancedBoxes(root, material(materials, materialKey), boxes, `market-shopfront-awning-${materialKey}`);
   }
@@ -1751,13 +1769,13 @@ function addMarketOverheadDressing(root, materials) {
   const hangers = [];
 
   for (const [index, x] of [-10.8, -4.4, 2.4, 9.2].entries()) {
-    cables.push({ x, y: 4.75, z: 0, width: 0.04, height: 0.04, depth: 10.6 });
+    cables.push({ x, y: 6.25, z: 0, width: 0.022, height: 0.022, depth: 8.4 });
     const materialKey = index % 3 === 0 ? "awningBlue" : index % 3 === 1 ? "awningGold" : "awningRed";
-    clothByMaterial.get(materialKey).push({ x: x + 0.18, y: 4.42, z: -1.55, width: 0.06, height: 0.34, depth: 1.72 });
-    clothByMaterial.get(materialKey).push({ x: x + 0.18, y: 4.42, z: 1.48, width: 0.06, height: 0.3, depth: 1.56 });
+    clothByMaterial.get(materialKey).push({ x: x + 0.18, y: 5.76, z: -1.55, width: 0.045, height: 0.22, depth: 1.18 });
+    clothByMaterial.get(materialKey).push({ x: x + 0.18, y: 5.76, z: 1.48, width: 0.045, height: 0.2, depth: 1.08 });
     for (const z of [-3.6, 0, 3.6]) {
-      hangers.push({ x, y: 4.42, z, width: 0.032, height: 0.34, depth: 0.032 });
-      lanterns.push({ x, y: 4.16, z, scale: [0.075, 0.075, 0.075] });
+      hangers.push({ x, y: 5.82, z, width: 0.022, height: 0.22, depth: 0.022 });
+      lanterns.push({ x, y: 5.64, z, scale: [0.058, 0.058, 0.058] });
     }
   }
 

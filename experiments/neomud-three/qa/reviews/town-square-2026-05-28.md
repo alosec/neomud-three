@@ -407,3 +407,18 @@ Total: 11/12
 Visual delta: lightened and unified the approved town road, plaza paver, packed-dirt, path-edge, and contact-shadow materials. This reduces the excessively muddy outdoor blocks without changing layout or adding new assets.
 
 Remaining visual gap: the town will not get substantially better through material tinting alone. Next meaningful outdoor work should target authored terrain/backdrop boundaries or rebuild one landmark in Blender-level geometry.
+
+## Pass: Market Street Facade Rhythm And View Clearance
+
+- Navigation readability: 2/2. Market Street still clearly leads west/east, and the Forge/Magic Shop endpoints remain visible.
+- Scale believability: 1/2. Added doors, signboards, and trim to the repeated shopfronts so the street reads less like identical wall blocks. The building geometry is still simple and runtime-authored.
+- Semantic match: 2/2. Door/sign rhythm improves the merchant-street premise without changing room semantics.
+- Interaction clarity: 2/2. Blacksmith Torren, Forge/Magic Shop affordances, and exit thresholds are unchanged.
+- Server sync: 2/2. Offline smoke passes; server protocol and movement authority were not changed.
+- Performance: 2/2. Latest Market smoke reports 134 calls / 55,338 triangles / 32 textures / 80 geometries, within budget.
+
+Total: 11/12
+
+Visual delta: added instanced shop doors/signboards/sign trim and raised/thinned the overhead cable/lantern dressing so it no longer cuts across the main play view as aggressively.
+
+Remaining visual gap: Market Street is more readable, but the long facades still need authored massing variation or a Blender-source pass before they feel production-quality.
