@@ -566,6 +566,23 @@ async function main() {
     assert.match(await page.locator(".combat-actions").textContent(), /server-authoritative command path/i);
     assert.equal(await page.locator("[data-combat-command]").count(), 2);
     assert.equal(await page.locator("[data-combat-command]:disabled").count(), 2);
+    await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
+      type: "combat_hit",
+      attackerName: "Guest Adventurer",
+      defenderName: "Giant Forest Spider",
+      damage: 7,
+      defenderHp: 18,
+      defenderMaxHp: 32,
+      isPlayerDefender: false,
+      defenderId: "npc:forest_spider"
+    }));
+    await page.waitForFunction(
+      () => document.querySelector(".target-frame.hostile")?.textContent?.includes("18/32"),
+      null,
+      { timeout: 2_000 }
+    );
+    const spiderHealth = await page.evaluate(() => window.__neomudThreeDebug.server.targetHealth["npc:forest_spider"]);
+    assert.deepEqual(spiderHealth, { current: 18, max: 32 });
     await saveScreenshot(page, "offline-hostile-target-panel.png");
     await page.keyboard.press("Escape");
 

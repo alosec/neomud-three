@@ -55,6 +55,7 @@ let nearbyInteractable = null;
 let selectedInteractable = null;
 let lastInteractionResult = null;
 let lastCombatResult = null;
+const targetHealthById = new Map();
 let pickupFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
 let cameraMode = urlParams.get("camera") === "platform" ? "platform" : "isometric";
@@ -319,6 +320,13 @@ function handleServerMessage(message) {
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "combat_hit": {
+      const defenderId = message.defenderId || (!message.isPlayerDefender ? serverState.selectedTargetId : "");
+      if (!message.isPlayerDefender && defenderId) {
+        targetHealthById.set(defenderId, {
+          current: Math.max(0, Number(message.defenderHp) || 0),
+          max: Math.max(1, Number(message.defenderMaxHp) || 1)
+        });
+      }
       const outcome = message.isMiss
         ? "misses"
         : message.isDodge
@@ -346,6 +354,10 @@ function handleServerMessage(message) {
         serverState.selectedTargetId = null;
         serverState.attackMode = false;
       }
+      targetHealthById.set(message.npcId, {
+        current: 0,
+        max: targetHealthById.get(message.npcId)?.max ?? 1
+      });
       lastCombatResult = {
         success: true,
         targetName: message.npcName ?? "Target",
@@ -1139,6 +1151,8 @@ function isHostileEntity(entity) {
 
 function targetHealthForEntity(entity) {
   if (!isHostileEntity(entity)) return null;
+  const liveHealth = targetHealthById.get(entity.id);
+  if (liveHealth) return liveHealth;
   const seed = [...String(entity.id ?? entity.name ?? "target")].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const maxHp = 22 + (seed % 19);
   return {
@@ -2370,6 +2384,7 @@ function installDebugApi() {
         player: serverState.player,
         attackMode: serverState.attackMode,
         selectedTargetId: serverState.selectedTargetId,
+        targetHealth: Object.fromEntries(targetHealthById.entries()),
         pendingMove: serverState.pendingMove,
         lastError: serverState.lastError,
         lastInteractionResult,
@@ -2474,6 +2489,10 @@ function installDebugApi() {
         hover: this.hover,
         selection: this.selection
       };
+    },
+    injectServerMessage(message) {
+      handleServerMessage(message);
+      return this.server;
     },
     reconnectServer() {
       serverState.client?.close();

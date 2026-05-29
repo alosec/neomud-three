@@ -66,7 +66,9 @@ Playable Three.js lab:
   Kotlin WebSocket protocol, while spell/skill actions route through catalog
   IDs when available instead of faking local combat simulation. Once the server
   confirms attack mode, the panel changes to an explicit engaged state with a
-  `Stop Attack` command that sends `attack_toggle(false)`.
+  `Stop Attack` command that sends `attack_toggle(false)`. Hostile target
+  health is now live-state capable: `combat_hit` updates the selected defender
+  HP/max HP in the target frame, and `npc_died` drops that target to 0 HP.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.

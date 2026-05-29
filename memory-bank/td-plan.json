@@ -119,6 +119,11 @@
           "created": "2026-05-29T23:05:00Z"
         },
         {
+          "id": 24,
+          "body": "Hostile target health is now live-state capable: combat_hit messages cache defender HP/max HP by hostile id, npc_died drops the target to 0 HP, and the target frame renders the live server values instead of only deterministic placeholder health. Offline smoke QA injects a combat_hit for Giant Forest Spider and verifies the panel updates to 18/32.",
+          "created": "2026-05-29T23:25:00Z"
+        },
+        {
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"
