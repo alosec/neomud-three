@@ -47,7 +47,7 @@ export function makePlayerAvatar() {
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
     modelScale: state.loaded ? PLAYER_MODEL_SCALE : state.fallbackRig.group.scale.x,
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "clean-xbot-neutral-v2" : "procedural-adventurer-v1",
+    visualTreatment: state.loaded ? "xbot-stylized-teal-v3" : "procedural-adventurer-v1",
     overlay: Boolean(state.overlay),
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
@@ -118,31 +118,20 @@ function makeSkinnedAdventurerOverlay(materials) {
   const group = new THREE.Group();
   group.name = "Xbot fantasy adventurer overlay";
 
-  const cape = new THREE.Group();
-  cape.name = "Adventurer cloak";
-  cape.position.set(0, 1.38, 0.22);
-  group.add(cape);
-  const leftCape = makeCloakPanel(materials.cloak, -1);
-  const rightCape = makeCloakPanel(materials.cloak, 1);
-  leftCape.scale.set(0.48, 0.74, 0.78);
-  rightCape.scale.set(0.48, 0.74, 0.78);
-  cape.add(leftCape, rightCape);
-
-  const tabard = makeTabardPanel(materials.tunic);
-  tabard.position.set(0, 1.22, -0.25);
-  tabard.scale.set(0.54, 0.72, 0.72);
-  group.add(tabard);
+  const frontTabard = makeTabardPanel(materials.tunic);
+  frontTabard.position.set(0, 1.18, -0.28);
+  frontTabard.scale.set(0.42, 0.56, 0.58);
+  group.add(frontTabard);
 
   addOverlayBoxBatch(group, materials.gold, [
-    { x: 0, y: 1.16, z: -0.31, width: 0.12, height: 0.12, depth: 0.04 },
-    { x: 0, y: 1.02, z: -0.02, width: 0.42, height: 0.07, depth: 0.28 }
+    { x: 0, y: 1.18, z: -0.31, width: 0.1, height: 0.1, depth: 0.035 },
+    { x: 0, y: 1.02, z: -0.02, width: 0.36, height: 0.055, depth: 0.24 }
   ], "adventurer-gold-trim");
   addOverlayBoxBatch(group, materials.gem, [
-    { x: 0, y: 1.32, z: -0.31, width: 0.08, height: 0.1, depth: 0.035 }
+    { x: 0, y: 1.32, z: -0.31, width: 0.065, height: 0.08, depth: 0.03 }
   ], "adventurer-gem-trim");
   addOverlayBoxBatch(group, materials.darkLeather, [
-    { x: 0, y: 1.02, z: -0.02, width: 0.58, height: 0.1, depth: 0.34, rotationX: -0.02 },
-    { x: -0.34, y: 0.86, z: 0.05, width: 0.18, height: 0.26, depth: 0.08, rotationZ: 0.08 }
+    { x: 0, y: 1.02, z: -0.02, width: 0.48, height: 0.07, depth: 0.28, rotationX: -0.02 }
   ], "adventurer-leather-gear");
 
   return group;
@@ -220,8 +209,8 @@ function makeTabardPanel(material) {
 
 function styleSkinnedModel(model) {
   const palette = {
-    body: new THREE.Color(0x6f7f79),
-    joints: new THREE.Color(0x211914)
+    body: new THREE.Color(0x405c55),
+    joints: new THREE.Color(0x17120f)
   };
 
   model.traverse((child) => {
@@ -229,9 +218,9 @@ function styleSkinnedModel(model) {
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     for (const material of materials) {
       material.color?.copy(material.name?.includes("Joints") ? palette.joints : palette.body);
-      material.roughness = material.name?.includes("Joints") ? 0.88 : 0.82;
+      material.roughness = material.name?.includes("Joints") ? 0.9 : 0.86;
       material.metalness = 0.02;
-      material.envMapIntensity = 0.18;
+      material.envMapIntensity = 0.12;
       material.needsUpdate = true;
     }
   });
