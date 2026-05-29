@@ -261,8 +261,20 @@ async function main() {
     assert.ok(oldWrenScreen.visible, `expected Old Wren to project into the Iso camera view: ${JSON.stringify(oldWrenScreen)}`);
     await page.mouse.click(oldWrenScreen.x, oldWrenScreen.y);
     await page.waitForFunction(() => window.__neomudThreeDebug.clickMove.pendingInteraction?.id === "npc:old_wren", null, { timeout: 2_000 });
+    const pendingWrenApproach = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
+    assert.equal(pendingWrenApproach.pathClear, true, `expected NPC approach route to clear colliders: ${JSON.stringify(pendingWrenApproach)}`);
     await page.waitForFunction(() => document.querySelector("#panel-title")?.textContent === "Old Wren", null, { timeout: 6_000 });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    const facedWren = await page.evaluate((target) => {
+      const player = window.__neomudThreeDebug.player;
+      const fx = Math.sin(player.heading);
+      const fz = -Math.cos(player.heading);
+      const dx = target.x - player.x;
+      const dz = target.z - player.z;
+      const dl = Math.hypot(dx, dz);
+      return dl > 0 ? fx * (dx / dl) + fz * (dz / dl) : 0;
+    }, oldWren);
+    assert.ok(facedWren > 0.86, `expected avatar to face Old Wren after clicked approach, got dot ${facedWren}`);
     assert.equal(await page.locator("#game-panel.hidden").count(), 0, "expected Iso real-click interaction panel to remain open");
     await page.evaluate(() => document.querySelector("#panel-close")?.click());
 
@@ -304,6 +316,8 @@ async function main() {
     assert.equal(selectedNpc.target.id, "npc:old_wren");
     const pendingNpc = await page.evaluate(() => window.__neomudThreeDebug.clickMove.pendingInteraction);
     assert.equal(pendingNpc.id, "npc:old_wren");
+    const pendingNpcRoute = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
+    assert.equal(pendingNpcRoute.pathClear, true, `expected debug-click NPC approach route to clear colliders: ${JSON.stringify(pendingNpcRoute)}`);
     const selectionTarget = path.join(qaDir, "town-shot-isometric-selection-target.png");
     await page.screenshot({ path: selectionTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-selection-target", path: selectionTarget });

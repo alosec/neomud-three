@@ -1548,6 +1548,7 @@ function startPendingInteraction(entity, options = {}) {
   movement.pendingExit = null;
   const distance = horizontalDistance(player.position, entity.position);
   if (distance <= controls.clickInteractDistance) {
+    facePoint(entity.position);
     clearClickMoveTarget();
     movement.pendingInteractable = null;
     nearbyInteractable = entity;
@@ -1595,6 +1596,7 @@ function updatePendingInteraction() {
   if (horizontalDistance(player.position, pending.position) > controls.clickInteractDistance) return;
 
   movement.pendingInteractable = null;
+  facePoint(entity.position ?? pending.position);
   clearClickMoveTarget();
   nearbyInteractable = entity;
   interactWithNearby(entity, {
@@ -1620,15 +1622,71 @@ function approachPointForInteractable(entity) {
   const fromTarget = player.position.clone().sub(position);
   fromTarget.y = 0;
   if (fromTarget.lengthSq() < 0.0001) fromTarget.set(0, 0, 1);
+  const baseAngle = Math.atan2(fromTarget.x, fromTarget.z);
+  const approachDistance = Math.max(1.08, controls.clickInteractDistance * 0.72);
+  const candidateOffsets = [0, Math.PI * 0.25, -Math.PI * 0.25, Math.PI * 0.5, -Math.PI * 0.5, Math.PI * 0.75, -Math.PI * 0.75, Math.PI];
+
+  let best = null;
+  let bestScore = Infinity;
+  for (const offset of candidateOffsets) {
+    const angle = baseAngle + offset;
+    const candidate = position.clone().add(new THREE.Vector3(Math.sin(angle) * approachDistance, 0, Math.cos(angle) * approachDistance));
+    candidate.y = 0;
+    roomRuntime?.clamp?.(candidate);
+    if (horizontalDistance(candidate, position) < 0.72) continue;
+    if (firstBlockingClickCollider(candidate, position)) continue;
+    const path = routeClickPath(player.position, candidate);
+    const pathClear = routeSegmentsClear(player.position, path);
+    if (!path.length || !pathClear) continue;
+    const pathDistance = pathDistanceFrom(player.position, path);
+    const turnPenalty = Math.abs(offset) * 0.32;
+    const score = pathDistance + turnPenalty;
+    if (score < bestScore) {
+      best = candidate;
+      bestScore = score;
+    }
+  }
+
+  if (best) return best;
+
   fromTarget.normalize();
-  const point = position.clone().addScaledVector(fromTarget, Math.max(1.08, controls.clickInteractDistance * 0.72));
-  point.y = 0;
-  roomRuntime?.clamp?.(point);
-  return point;
+  const fallback = position.clone().addScaledVector(fromTarget, approachDistance);
+  fallback.y = 0;
+  roomRuntime?.clamp?.(fallback);
+  return fallback;
 }
 
 function horizontalDistance(a, b) {
   return Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.z ?? 0) - (b?.z ?? 0));
+}
+
+function routeSegmentsClear(origin, path) {
+  if (!path?.length) return false;
+  let current = origin;
+  for (const waypoint of path) {
+    if (firstBlockingClickCollider(current, waypoint)) return false;
+    current = waypoint;
+  }
+  return true;
+}
+
+function pathDistanceFrom(origin, path) {
+  let distance = 0;
+  let current = origin;
+  for (const waypoint of path) {
+    distance += current.distanceTo(waypoint);
+    current = waypoint;
+  }
+  return distance;
+}
+
+function facePoint(point) {
+  if (!point) return;
+  const dx = (point.x ?? 0) - player.position.x;
+  const dz = (point.z ?? 0) - player.position.z;
+  if (Math.hypot(dx, dz) < 0.0001) return;
+  movement.heading = Math.atan2(dx, -dz);
+  player.rotation.y = -movement.heading;
 }
 
 function applyTargetObjectHighlight(target, mode = null) {

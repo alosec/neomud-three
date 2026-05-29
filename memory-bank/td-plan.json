@@ -1,11 +1,40 @@
 {
-  "updated": "2026-05-29T20:19:00.000Z",
+  "updated": "2026-05-29T20:32:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-f7b2",
+      "project": "NeoMud",
+      "title": "Polish clicked interaction approach routing",
+      "description": "Improve the Diablo-like click-to-interact flow so NPC/item/feature clicks choose a clear approach point around the target instead of blindly using the current player-target vector, then face the avatar toward the selected object before opening the panel.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "isometric",
+        "interaction",
+        "playability",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Interaction approach selection now samples multiple candidate points around the target, rejects candidates with blocked final line-of-sight, scores clear click routes, and falls back to the old vector only when no candidate is viable. Clicked interactions face the avatar toward the target before opening the panel. Town Square screenshot QA asserts Old Wren approach routes are collider-clear and the avatar faces Old Wren after a real Iso click.",
+          "created": "2026-05-29T20:32:00Z"
+        }
+      ],
+      "created": "2026-05-29T20:32:00Z",
+      "updated": "2026-05-29T20:32:00Z"
+    },
     {
       "id": "neo-e61c",
       "project": "NeoMud",

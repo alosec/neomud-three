@@ -43,8 +43,12 @@ Playable Three.js lab:
   now uses an approach flow instead of opening distant panels instantly: clicking
   an interactable selects/highlights it, routes the avatar to an approach point,
   and opens the interaction panel only once the avatar reaches interaction
-  range. Debug state exposes the pending interaction target and Town Square QA
-  verifies Old Wren real-click/debug-click approach behavior. Iso mode also has
+  range. The approach point is now sampled from several clear positions around
+  the target instead of blindly using the current player-target vector, and the
+  avatar faces the selected object before the panel opens. Debug state exposes
+  the pending interaction target and Town Square QA verifies Old Wren
+  real-click/debug-click approach behavior, collider-clear approach routes, and
+  post-approach facing. Iso mode also has
   first-pass hover targeting for clickable NPCs/items/exits: hovered targets get
   a small world marker and a concise DOM prompt, clicked interactables get a
   persistent selected-target ring while the interaction panel is open, and the
