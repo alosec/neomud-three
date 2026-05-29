@@ -7154,10 +7154,18 @@ function horizontalDistanceSq(a, b) {
 
 function configureBlenderTempleScene(scene) {
   scene.name = "town-temple-blender-level";
+  const approvedMaterials = makeTempleMaterials();
   scene.traverse((object) => {
     if (!object.isMesh) return;
     object.castShadow = object.name.startsWith("VIS_");
     object.receiveShadow = object.name.startsWith("VIS_");
+    if (object.name.includes("MAT_temple_pew_warm_oak")) {
+      object.material = approvedMaterials.pewOak;
+    } else if (object.name.includes("MAT_temple_pew_dark_endgrain")) {
+      object.material = approvedMaterials.pewEndgrain;
+    } else if (object.name.includes("MAT_temple_pew_worn_edge")) {
+      object.material = approvedMaterials.pewWornEdge;
+    }
     if (object.material) {
       const materials = Array.isArray(object.material) ? object.material : [object.material];
       for (const material of materials) {

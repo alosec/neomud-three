@@ -536,9 +536,9 @@ const MATERIAL_DEFINITION_LIST = [
   colorMaterial("temple.dawn.runner", "dawnRunner", "temple", "cathedral-aisle-runner", 0xb79a62, { roughness: 0.82 }),
   colorMaterial("temple.trim.limestone", "trim", "temple", "stone-trim", 0xbeb39c, { roughness: 0.65 }),
   colorMaterial("temple.ceiling.warm-shadow", "ceilingWarmShadow", "temple", "cathedral-ceiling", 0x7c6a4e, { roughness: 0.92, emissive: 0x2b2115, emissiveIntensity: 0.18 }),
-  colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x8a633a, { roughness: 0.84 }),
-  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x5c381f, { roughness: 0.9 }),
-  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0xa07442, { roughness: 0.8 }),
+  proceduralMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", () => woodGrainTexture("temple-pew-warm-oak-grain", "#7a4d28", [116, 72, 36], [52, 30, 14]), { color: 0x9a6838, roughness: 0.86 }),
+  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x64401f, { roughness: 0.92 }),
+  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0xbc864a, { roughness: 0.78 }),
   colorMaterial("temple.window.frame", "windowFrame", "temple", "window-frame", 0x58452f, { roughness: 0.52, metalness: 0.18 }),
   colorMaterial("temple.window.reveal", "windowReveal", "temple", "window-reveal", 0xa79b83, { roughness: 0.86 }),
   {
