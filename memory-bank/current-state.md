@@ -59,6 +59,10 @@ Playable Three.js lab:
   boards now carry exit target metadata and are directly raycast-clickable in
   Iso mode; clicking the Gate board or Forest Edge -> Forest Path gateway board
   routes through the same selected pending-exit path as trigger-volume clicks.
+  Authored fixtures can now opt into the same real-object click path with
+  `interactableAffordance` metadata; the Hidden Cave moss-covered chest is the
+  first covered fixture, and offline smoke QA clicks the visible chest mesh
+  directly before falling back to proximity panel checks.
   Hover/proximity action language now respects entity
   semantics: normal NPCs read as `Talk to`, loot reads as `Pick up`, generic
   objects read as `Inspect`, and hostile forest entities read as `Engage`.
@@ -401,7 +405,7 @@ Test status:
 - The offline smoke test also verifies Magic Shop collider/entity metadata, moves near Enchantress Lyra, opens the interaction panel, and returns to Market Street through the physical west exit.
 - The offline smoke test also verifies Forge collider/entity metadata, moves near Grimjaw the Artificer, opens the interaction panel, and returns to Magic Shop through the physical west exit.
 - The offline smoke test also verifies Forest Edge/Forest Path collision metadata and opens the Forest Rat and Shadow Wolf interaction panels.
-- The offline smoke test also verifies Deep Forest collider/entity metadata, opens the Giant Forest Spider interaction panel in offline mode, physically traverses Forest Path -> Deep Forest -> Hidden Cave -> Deep Forest -> Forest Path, and verifies the Hidden Cave moss-covered stone chest prompt/panel content with the server action disabled.
+- The offline smoke test also verifies Deep Forest collider/entity metadata, opens the Giant Forest Spider interaction panel in offline mode, physically traverses Forest Path -> Deep Forest -> Hidden Cave -> Deep Forest -> Forest Path, clicks the authored Hidden Cave chest mesh as a real Iso world target, and verifies the Hidden Cave moss-covered stone chest prompt/panel content with the server action disabled.
 - The offline smoke test also verifies Sunlit Clearing collider metadata and physical Forest Path -> Sunlit Clearing -> Forest Path traversal.
 - `scripts/test-neomud-three-server.cjs` runs the server-backed browser test. It requires the Kotlin server on `127.0.0.1:8080`, waits for guest auth, verifies Temple sync, crosses physical exit triggers for Temple -> Town Square -> Market Street -> Magic Shop -> Forge -> Magic Shop -> Market Street -> Town Square -> North Gate -> Forest Edge -> Forest Path -> Deep Forest -> Hidden Cave -> Deep Forest -> Forest Path -> Sunlit Clearing -> Forest Path -> Forest Edge -> North Gate -> Town Square -> Tavern -> Town Square -> Temple, asserts server-confirmed room transitions, verifies visible entities mirror the live server NPC list instead of falling back to static hostile NPC placements, verifies the Hidden Cave chest can send a live `interact_feature` command and receive `interact_result`, verifies rendered cave loot can send `pickup_item` / `pickup_coins` when loot exists, verifies HUD and in-world pickup feedback, and verifies the Inventory panel reflects the pickup.
 - If the server-backed test times out on auth with `Too many guest sessions`, restart the local `com.neomud.server.ApplicationKt` process and rerun the test; this is local session saturation rather than a renderer failure.

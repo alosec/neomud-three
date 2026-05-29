@@ -96,9 +96,12 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      room move. Town Square physical exit boards and shared authored-room
      gateway labels now carry exit target metadata and are raycast-clickable
      surfaces, with QA covering direct Gate and Forest Path board clicks before
-     trigger-volume fallback. Next implementation should extend this
-     object-level clickability to authored interactable fixtures, not only
-     exits.
+     trigger-volume fallback. Authored fixtures can now use
+     `interactableAffordance` metadata for the same object-level raycast path;
+     the Hidden Cave chest is the first covered fixture, with offline smoke QA
+     clicking the visible mesh. Next interaction work should expand this
+     contract to repeated NPC/item marker components so world objects become
+     clickable by default instead of relying on ground proximity.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, keep a selected-target ring on a clicked interactable while its panel is open, and pulse the actual target scene group on hover/selection. Town Square screenshot QA verifies Old Wren hover/selection object highlighting and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
    - Feature prompts now preserve semantic verbs too: treasure/drop features such as the Hidden Cave chest read as `Open` rather than generic `Pick up`.

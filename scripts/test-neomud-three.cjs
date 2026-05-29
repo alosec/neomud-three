@@ -721,6 +721,38 @@ async function main() {
     assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
 
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.placePlayer({ x: 1.25, z: -0.85, heading: -Math.PI / 2 });
+    });
+    await settleFrames(page);
+    const chestScreen = await page.evaluate(({ x, z }) =>
+      window.__neomudThreeDebug.worldToScreen({ x, y: 0.9, z })
+    , caveChest);
+    assert.ok(chestScreen.visible, `expected physical cave chest to be visible for raycast click: ${JSON.stringify(chestScreen)}`);
+    await page.mouse.click(chestScreen.x, chestScreen.y);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.clickMove.pendingInteraction?.id === "cave_chest" ||
+        document.querySelector("#panel-title")?.textContent?.trim() === "moss-covered stone chest",
+      null,
+      { timeout: 2_000 }
+    );
+    const physicalChestClick = await page.evaluate(() => ({
+      pendingInteraction: window.__neomudThreeDebug.clickMove.pendingInteraction,
+      selection: window.__neomudThreeDebug.selection,
+      panelTitle: document.querySelector("#panel-title")?.textContent?.trim() ?? ""
+    }));
+    assert.ok(
+      physicalChestClick.pendingInteraction?.id === "cave_chest" || physicalChestClick.panelTitle === "moss-covered stone chest",
+      `expected clicking the authored chest mesh to select or approach cave_chest: ${JSON.stringify(physicalChestClick)}`
+    );
+    assert.equal(
+      physicalChestClick.selection?.target?.id,
+      "cave_chest",
+      `expected authored chest mesh click to select cave_chest: ${JSON.stringify(physicalChestClick)}`
+    );
+    await page.keyboard.press("Escape");
+    await page.evaluate(() => window.__neomudThreeDebug.cancelIsoTargeting());
     const caveChestHover = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.hoverGround({ x, z }), caveChest);
     assert.equal(caveChestHover.label, "Open moss-covered stone chest");
     await page.evaluate(() => window.__neomudThreeDebug.clearHover());
@@ -754,6 +786,7 @@ async function main() {
     assert.equal(afterRoomSwitchSelection.actionBadgeVisible, false);
     assert.equal(afterRoomSwitchSelection.actionBadgeValue, "");
     assert.equal(afterRoomSwitchSelection.selectedInteractableId, "");
+    await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform"));
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 21.6, heading: Math.PI }));
     await page.keyboard.down("w");

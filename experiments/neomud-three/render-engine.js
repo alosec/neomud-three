@@ -120,7 +120,7 @@ export function createRenderEngine(canvas) {
       const targets = [];
       worldRoot.traverse((object) => {
         if (!object.visible || !object.isMesh) return;
-        if (object.userData?.exitAffordance) targets.push(object);
+        if (worldTargetAffordanceForObject(object)) targets.push(object);
       });
       return targets.length ? raycaster.intersectObjects(targets, false) : [];
     },
@@ -342,6 +342,15 @@ export function createRenderEngine(canvas) {
       renderer.setAnimationLoop(callback);
     }
   };
+}
+
+function worldTargetAffordanceForObject(object) {
+  for (let current = object; current; current = current.parent) {
+    if (current.userData?.exitAffordance || current.userData?.interactableAffordance) {
+      return current.userData.exitAffordance ?? current.userData.interactableAffordance;
+    }
+  }
+  return null;
 }
 
 function updateIsometricCamera({

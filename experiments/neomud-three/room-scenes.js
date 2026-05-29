@@ -5048,6 +5048,12 @@ function addHiddenCaveChest(root, materials) {
   group.position.set(-3.8, 0, -2.15);
   group.rotation.y = -0.18;
   group.userData.visualRole = "hidden-cave-moss-chest";
+  group.userData.interactableAffordance = {
+    entityId: "cave_chest",
+    label: "moss-covered stone chest",
+    position: group.position.clone(),
+    maxDistance: 1.8
+  };
   root.add(group);
 
   addBox(group, materials.wetStone, 0, 0.12, 0.04, 2.7, 0.24, 1.58);

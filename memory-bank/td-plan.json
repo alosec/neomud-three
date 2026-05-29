@@ -721,10 +721,15 @@
           "id": 41,
           "body": "Shared authored-room exit gateway labels now use fixed mesh boards with exitAffordance metadata, so non-Town-Square gateways can be clicked directly in Iso mode. Text-board debug positions are world-space for grouped gateway labels. Room-shot QA clicks the Forest Edge -> Forest Path gateway board and verifies NORTH pending-exit travel or fast transition to forest:path.",
           "created": "2026-05-30T06:43:00Z"
+        },
+        {
+          "id": 42,
+          "body": "Authored interactable fixtures can now opt into physical object clicking with interactableAffordance metadata. The Hidden Cave moss-covered chest carries cave_chest metadata on its visible mesh group; Iso raycasting resolves that to the existing server-authoritative interaction approach path. Offline smoke QA clicks the authored chest mesh directly and verifies cave_chest selection/pending interaction before the existing proximity panel checks.",
+          "created": "2026-05-30T07:08:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-30T06:43:00Z"
+      "updated": "2026-05-30T07:08:00Z"
     },
     {
       "id": "neo-9c72",

@@ -1019,6 +1019,16 @@ function handleCanvasPointerDown(event) {
     startPendingExit(worldTarget);
     return;
   }
+  if (worldTarget?.type === "interactable") {
+    clearHoldMove();
+    clearHoverTarget();
+    setSelectionTarget(worldTarget);
+    movement.pendingExit = null;
+    const autoEngage = Boolean(isHostileEntity(worldTarget.entity) && serverCanDriveMovement());
+    const autoUse = canAutoUseEntity(worldTarget.entity);
+    startPendingInteraction(worldTarget.entity, { autoEngage, autoUse });
+    return;
+  }
   const point = pointOnGroundFromEvent(event);
   if (!point) return;
   const result = handleGroundClick(point);
@@ -1087,17 +1097,58 @@ function pointOnGroundFromEvent(event) {
 function worldTargetFromEvent(event) {
   setPointerRaycasterFromEvent(event);
   const hit = renderEngine.raycastWorldTargets(pointerRaycaster)[0];
-  const exitAffordance = hit?.object?.userData?.exitAffordance;
-  if (!exitAffordance?.targetId) return null;
-  const room = world.rooms.get(exitAffordance.targetId);
-  const position = exitAffordance.position?.clone?.() ?? new THREE.Vector3(hit.point.x, 0, hit.point.z);
-  const direction = exitAffordance.direction ?? directionForTarget(world.rooms.get(currentRoomId), exitAffordance.targetId);
+  if (!hit) return null;
+  const exitAffordance = worldTargetMetadataForObject(hit.object, "exitAffordance");
+  if (exitAffordance?.targetId) {
+    const room = world.rooms.get(exitAffordance.targetId);
+    const position = exitAffordance.position?.clone?.() ?? new THREE.Vector3(hit.point.x, 0, hit.point.z);
+    const direction = exitAffordance.direction ?? directionForTarget(world.rooms.get(currentRoomId), exitAffordance.targetId);
+    return {
+      type: "exit",
+      targetId: exitAffordance.targetId,
+      direction,
+      position,
+      label: `Travel ${direction ? direction.toLowerCase() : "to"} ${room?.name ?? exitAffordance.label ?? exitAffordance.targetId}`
+    };
+  }
+
+  const interactableAffordance = worldTargetMetadataForObject(hit.object, "interactableAffordance");
+  const entity = interactableFromAffordance(interactableAffordance, hit.point);
+  if (!entity) return null;
   return {
-    type: "exit",
-    targetId: exitAffordance.targetId,
-    direction,
-    position,
-    label: `Travel ${direction ? direction.toLowerCase() : "to"} ${room?.name ?? exitAffordance.label ?? exitAffordance.targetId}`
+    type: "interactable",
+    entity,
+    position: entity.position.clone?.() ?? new THREE.Vector3(hit.point.x, 0, hit.point.z),
+    label: `${actionVerbForEntity(entity)} ${entity.name}`
+  };
+}
+
+function worldTargetMetadataForObject(object, key) {
+  for (let current = object; current; current = current.parent) {
+    if (current.userData?.[key]) return current.userData[key];
+  }
+  return null;
+}
+
+function interactableFromAffordance(affordance, point) {
+  if (!affordance?.entityId) return null;
+  const position = affordance.position?.clone?.() ?? new THREE.Vector3(point?.x ?? 0, 0, point?.z ?? 0);
+  const existing = roomRuntime?.nearestInteractable?.(position, affordance.maxDistance ?? 1.4);
+  if (existing?.id === affordance.entityId) return existing;
+  const debugEntity = roomRuntime?.debugEntities?.().find((entity) => entity.id === affordance.entityId);
+  if (!debugEntity) return null;
+  return {
+    kind: debugEntity.kind,
+    id: debugEntity.id,
+    name: debugEntity.name,
+    role: debugEntity.role ?? "",
+    prompt: debugEntity.prompt,
+    description: debugEntity.description ?? "",
+    actionType: debugEntity.actionType ?? "",
+    itemId: debugEntity.itemId ?? "",
+    coinType: debugEntity.coinType ?? "",
+    quantity: debugEntity.quantity ?? 1,
+    position: new THREE.Vector3(debugEntity.x ?? position.x, 0, debugEntity.z ?? position.z)
   };
 }
 
