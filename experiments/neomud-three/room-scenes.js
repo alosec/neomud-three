@@ -5222,7 +5222,7 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
       id: feature.id,
       name,
       role: "Treasure",
-      prompt: `Pick up: ${name}`,
+      prompt: `${featurePromptVerb(feature.actionType)}: ${name}`,
       description: [feature.description, message].filter(Boolean).join(" "),
       actionType: feature.actionType ?? "",
       position: chestPosition.clone()
@@ -5282,6 +5282,12 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
       position: new THREE.Vector3(x, 0, z)
     });
   }
+}
+
+function featurePromptVerb(actionType = "") {
+  if (actionType === "TREASURE_DROP") return "Open";
+  if (actionType === "PICKUP_ITEM" || actionType === "PICKUP_COINS") return "Pick up";
+  return "Inspect";
 }
 
 function addHiddenCaveCoinPile(root, materials, coins, x, z) {

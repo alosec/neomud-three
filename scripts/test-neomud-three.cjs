@@ -599,16 +599,20 @@ async function main() {
     assertRenderBudget(assert, "forest:cave", budgetReports.at(-1).stats);
 
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
+    const caveChestHover = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.hoverGround({ x, z }), caveChest);
+    assert.equal(caveChestHover.label, "Open moss-covered stone chest");
+    await page.evaluate(() => window.__neomudThreeDebug.clearHover());
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
     await page.waitForFunction(
       () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
       null,
       { timeout: 2_000 }
     );
-    assert.match(await page.locator("#interaction-prompt").textContent(), /moss-covered stone chest/i);
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Open moss-covered stone chest/i);
     await page.keyboard.press("f");
     assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
     assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), true);
+    assert.equal(await page.locator('[data-interact-feature="cave_chest"]').textContent(), "Open unavailable");
     assert.match(await page.locator("#panel-content").textContent(), /preserved|vial|gloves|untouched/i);
     await page.keyboard.press("Escape");
 

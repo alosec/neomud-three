@@ -863,6 +863,7 @@ function actionVerbForEntity(entity) {
   if (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS") return "Pick up";
   const promptVerb = String(entity.prompt ?? "").split(":")[0]?.trim().toLowerCase();
   if (promptVerb === "engage") return "Engage";
+  if (promptVerb === "open") return "Open";
   if (promptVerb === "talk") return "Talk to";
   if (promptVerb === "inspect") return "Inspect";
   if (entity.kind === "npc") return "Talk to";
@@ -1339,7 +1340,7 @@ function interactionPanel() {
     </div>
     <div class="panel-actions">
       ${hasServerAction
-        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction ? escapeHtml(actionLabel) : escapeHtml(entity.actionConsumed ? actionLabel : "Server action unavailable")}</button>`
+        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction ? escapeHtml(actionLabel) : escapeHtml(entity.actionConsumed ? actionLabel : `${actionLabel} unavailable`)}</button>`
         : ""}
       <button type="button" data-panel-target="log">Open log</button>
       <button type="button" data-panel-target="map">Map</button>
@@ -1390,6 +1391,7 @@ function hostileActionFrame(entity) {
 
 function serverActionLabel(entity) {
   if (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS") return "Pick up";
+  if (entity.actionType === "TREASURE_DROP") return "Open";
   return "Use";
 }
 

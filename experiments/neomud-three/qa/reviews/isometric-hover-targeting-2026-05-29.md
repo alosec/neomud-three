@@ -21,6 +21,9 @@ Implemented:
   and a compact hostile target frame/health bar in the interaction panel.
 - Added disabled hostile action slots for `Basic Attack` and a class skill with
   explicit server-authoritative command-path messaging.
+- Corrected feature action wording so treasure/drop features such as the Hidden
+  Cave chest read as `Open`, not `Pick up`; disabled action buttons preserve
+  the action verb, e.g. `Open unavailable`.
 - Cleared hover state on pointer leave, click commit, room switch, and debug player placement so stale affordances do not leak between rooms.
 - Exposed hover helpers through `window.__neomudThreeDebug` for screenshot QA.
 
@@ -48,6 +51,8 @@ Evidence:
 - Offline smoke QA verifies Giant Forest Spider opens a hostile target frame with a target health bar.
 - Offline smoke QA verifies the hostile action row exists, has two disabled
   combat command slots, and explains the server-authority requirement.
+- Offline smoke QA verifies the Hidden Cave chest hover/proximity/action button
+  use `Open` semantics.
 - `qa/latest/offline-hostile-target-panel.png` captures the hostile target panel for direct visual review.
 
 Remaining gap:
