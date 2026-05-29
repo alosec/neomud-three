@@ -111,4 +111,5 @@ High leverage next work:
    - The articulated avatar v7 spends some of the reclaimed budget and leaves current Town Square full smoke at roughly 32k triangles and 231/240 draw calls. Keep future avatar or Town Square detail work budget-aware, and prefer reclaiming room draw calls before adding more visible complexity.
    - The Temple window batching pass reclaimed more than 100 full-smoke draw calls, and the altar retable spends part of that headroom while keeping full smoke at 276 calls.
    - Stone ground trim and gate trim are now in Prop Zoo and applied to Town Square; add the next Prop Zoo items only when they unlock that landmark pass: a better NPC staging prop, a smoke/effects prop, or a true optimized texture-delivery path.
+   - The central fountain now has a larger civic landmark pass with stepped base, larger basin/water, upper bowl, falling water, and small instanced jets. Further plaza work should connect the fountain to gameplay/NPC staging rather than only enlarging the prop.
    - Keep Town Square under the current render budget and update fixed screenshots.

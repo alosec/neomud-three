@@ -5234,54 +5234,76 @@ function addTownSpecFountain(root, materials, fountainSpec) {
   const group = new THREE.Group();
   group.position.set(fountainSpec.x, 0, fountainSpec.z);
   root.add(group);
+  const radius = fountainSpec.radius ?? 2.55;
 
-  const apron = new THREE.Mesh(new THREE.CylinderGeometry(4.6, 4.9, 0.16, 12), materials.stone);
+  const apron = new THREE.Mesh(new THREE.CylinderGeometry(radius * 2.08, radius * 2.22, 0.18, 12), materials.stone);
   apron.position.y = 0.08;
   apron.rotation.y = Math.PI / 12;
   apron.receiveShadow = true;
   group.add(apron);
 
-  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(2.25, 2.55, 0.54, 32), materials.stone);
-  fountainBase.position.y = 0.34;
+  const step = new THREE.Mesh(new THREE.CylinderGeometry(radius * 1.3, radius * 1.42, 0.22, 32), materials.plazaStone ?? materials.stone);
+  step.position.y = 0.25;
+  step.castShadow = true;
+  step.receiveShadow = true;
+  group.add(step);
+
+  const fountainBase = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.98, radius * 1.12, 0.62, 32), materials.stone);
+  fountainBase.position.y = 0.38;
   fountainBase.castShadow = true;
   fountainBase.receiveShadow = true;
   group.add(fountainBase);
 
-  const innerBasin = new THREE.Mesh(new THREE.CylinderGeometry(1.78, 1.86, 0.2, 32), materials.darkStone);
-  innerBasin.position.y = 0.62;
+  const innerBasin = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.86, radius * 0.92, 0.2, 32), materials.darkStone);
+  innerBasin.position.y = 0.7;
   innerBasin.receiveShadow = true;
   group.add(innerBasin);
 
-  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.66, 1.66, 0.045, 32), materials.water);
-  water.position.y = 0.76;
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.78, radius * 0.78, 0.045, 32), materials.water);
+  water.position.y = 0.84;
   group.add(water);
 
-  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.42, 1.2, 16), materials.stone);
-  column.position.y = 1.28;
+  const column = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.52, 1.42, 16), materials.stone);
+  column.position.y = 1.48;
   column.castShadow = true;
   group.add(column);
 
-  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.64, 0.24, 24), materials.stone);
-  topBowl.position.y = 1.96;
+  const topBowl = new THREE.Mesh(new THREE.CylinderGeometry(1.08, 0.74, 0.28, 24), materials.stone);
+  topBowl.position.y = 2.24;
   topBowl.castShadow = true;
   group.add(topBowl);
 
-  const topWater = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.035, 24), materials.water);
-  topWater.position.y = 2.1;
+  const topWater = new THREE.Mesh(new THREE.CylinderGeometry(0.84, 0.84, 0.035, 24), materials.water);
+  topWater.position.y = 2.4;
   group.add(topWater);
 
   const fallingWater = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.045, 0.065, 1.08, 12),
+    new THREE.CylinderGeometry(0.05, 0.07, 1.3, 12),
     new THREE.MeshBasicMaterial({ color: 0xaee8ff, transparent: true, opacity: 0.38 })
   );
-  fallingWater.position.y = 1.47;
+  fallingWater.position.y = 1.68;
   group.add(fallingWater);
 
-  const spray = new THREE.PointLight(0xaee8ff, 4.4, 10);
-  spray.position.set(0, 2.1, 0);
+  const jetMaterial = new THREE.MeshBasicMaterial({ color: 0xb9eeff, transparent: true, opacity: 0.26, depthWrite: false });
+  const jets = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.028, 0.04, 0.9, 8), jetMaterial, 4);
+  const dummy = new THREE.Object3D();
+  [
+    [-0.78, 1.42, 0],
+    [0.78, 1.42, 0],
+    [0, 1.42, -0.78],
+    [0, 1.42, 0.78]
+  ].forEach(([x, y, z], index) => {
+    dummy.position.set(x, y, z);
+    dummy.updateMatrix();
+    jets.setMatrixAt(index, dummy.matrix);
+  });
+  group.add(jets);
+
+  const spray = new THREE.PointLight(0xaee8ff, 3.2, 10);
+  spray.position.set(0, 2.3, 0);
   group.add(spray);
 
-  return { water, topBowl, topWater, fallingWater };
+  return { water, topBowl, topWater, fallingWater, jets };
 }
 
 function addTownSpecSignpost(root, materials, signpostSpec) {

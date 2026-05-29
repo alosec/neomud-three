@@ -292,7 +292,7 @@ export const TOWN_SQUARE_SPEC = {
     }
   ],
   features: {
-    fountain: { x: 0, z: 0, radius: 2.25 }
+    fountain: { x: 0, z: 0, radius: 2.55 }
   },
   entities: {
     npcPlacements: {
