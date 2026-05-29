@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T07:24:00.000Z",
+  "updated": "2026-05-29T19:58:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-b84f",
+      "project": "NeoMud",
+      "title": "Expose multiple catalog-driven hostile actions",
+      "description": "Expand the hostile action row beyond a single class ability by deriving multiple real offensive spells and supported combat skills from the existing catalog, keeping every executable slot on the server-authoritative command path.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "isometric",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Hostile actions now expose Basic Attack plus up to three catalog-derived abilities. Offensive spells are listed before supported combat skills, so the offline Paladin profile shows Smite and Bash, while the live Warrior path still exposes Bash through the Kotlin skill command. Directional Kick remains excluded until the Iso UI can choose its required direction intentionally.",
+          "created": "2026-05-29T19:58:00Z"
+        }
+      ],
+      "created": "2026-05-29T19:58:00Z",
+      "updated": "2026-05-29T19:58:00Z"
+    },
     {
       "id": "neo-a7e3",
       "project": "NeoMud",

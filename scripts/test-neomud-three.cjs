@@ -582,8 +582,8 @@ async function main() {
     assert.equal(await page.locator(".combat-actions").count(), 1);
     assert.match(await page.locator(".combat-actions").textContent(), /Basic Attack/i);
     assert.match(await page.locator(".combat-actions").textContent(), /server-authoritative command path/i);
-    assert.equal(await page.locator("[data-combat-command]").count(), 2);
-    assert.equal(await page.locator("[data-combat-command]:disabled").count(), 2);
+    assert.equal(await page.locator("[data-combat-command]").count(), 3);
+    assert.equal(await page.locator("[data-combat-command]:disabled").count(), 3);
     const offlineCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
     assert.equal(offlineCombatActions[0]?.hotkey, "1");
     assert.equal(offlineCombatActions[0]?.command, "attack");
@@ -597,6 +597,13 @@ async function main() {
     assert.equal(offlineCombatActions[1]?.resourceReady, true);
     assert.equal(offlineCombatActions[1]?.unavailableReason, "Server unavailable");
     assert.equal(offlineCombatActions[1]?.enabled, false);
+    assert.equal(offlineCombatActions[2]?.hotkey, "3");
+    assert.equal(offlineCombatActions[2]?.kind, "skill");
+    assert.equal(offlineCombatActions[2]?.skillId, "BASH");
+    assert.equal(offlineCombatActions[2]?.command, "skill:BASH");
+    assert.equal(offlineCombatActions[2]?.cooldownTicks, 3);
+    assert.match(offlineCombatActions[2]?.detail ?? "", /3t cooldown/);
+    assert.equal(offlineCombatActions[2]?.unavailableReason, "Server unavailable");
     await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
       type: "spell_cast_result",
       success: false,
@@ -609,6 +616,8 @@ async function main() {
     assert.equal(noManaCombatActions[1]?.spellId, "SMITE");
     assert.equal(noManaCombatActions[1]?.resourceReady, false);
     assert.equal(noManaCombatActions[1]?.resourceWarning, "Need 5 MP");
+    assert.equal(noManaCombatActions[2]?.skillId, "BASH");
+    assert.equal(noManaCombatActions[2]?.resourceReady, true);
     const combatEffectsBeforeSpell = await page.evaluate(() => window.__neomudThreeDebug.effects.combat);
     await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
       type: "spell_effect",

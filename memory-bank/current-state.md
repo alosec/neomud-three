@@ -73,11 +73,15 @@ Playable Three.js lab:
   selected hostile ring also carries a small in-world HP bar that mirrors the
   same live HP state. The action row updates optimistically after successful
   WebSocket sends, then reconciles to server `attack_mode_update` / combat
-  messages. The second hostile action is now catalog-driven: PALADIN/offline
-  exposes `cast:SMITE`, WARRIOR/server-backed exposes `skill:BASH`, and
-  `skill_effect`, `spell_cast_result`, and `spell_effect` messages update the
-  combat result frame, target HP, player MP/HP where applicable, selected-target
-  HP bar, and world-space feedback without creating a local combat simulation.
+  messages. Hostile actions are now multi-slot and catalog-driven: offensive
+  spells are listed before supported combat skills, PALADIN/offline exposes
+  both `cast:SMITE` and `skill:BASH`, WARRIOR/server-backed exposes
+  `skill:BASH`, and `skill_effect`, `spell_cast_result`, and `spell_effect`
+  messages update the combat result frame, target HP, player MP/HP where
+  applicable, selected-target HP bar, and world-space feedback without creating
+  a local combat simulation. Digit/Numpad 1-4 hotkeys now map to the rendered
+  action definitions. Directional `KICK` remains excluded until the Iso UI can
+  choose its required knockback direction intentionally.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside

@@ -920,13 +920,8 @@ function handleKeyDown(event) {
 }
 
 function handleCombatHotkey(event) {
-  const indexByCode = {
-    Digit1: 0,
-    Numpad1: 0,
-    Digit2: 1,
-    Numpad2: 1
-  };
-  const index = indexByCode[event.code];
+  const match = event.code.match(/^(?:Digit|Numpad)([1-4])$/);
+  const index = match ? Number(match[1]) - 1 : undefined;
   if (index === undefined || !selectedInteractable || !isHostileEntity(selectedInteractable)) return false;
   const action = combatActionOptions(selectedInteractable)[index];
   if (!action?.enabled) return false;
@@ -2347,9 +2342,9 @@ function hostileActionFrame(entity) {
       </div>
       ${combatResult}
       <div class="combat-action-grid">
-        ${actions.map((action, index) => `
+        ${actions.map((action) => `
           <button type="button"${action.enabled ? "" : " disabled"} data-combat-command="${escapeHtml(action.command)}">
-            <kbd>${index + 1}</kbd>
+            <kbd>${escapeHtml(action.hotkey)}</kbd>
             <span>
               <strong>${escapeHtml(action.label)}</strong>
               <small>${escapeHtml(action.detail)}</small>
@@ -2362,49 +2357,11 @@ function hostileActionFrame(entity) {
 }
 
 function combatActionOptions(entity) {
-  const spell = combatSpellForProfile();
-  const skill = spell ? null : combatSkillForProfile();
-  const ability = spell
-    ? {
-        kind: "spell",
-        id: spell.id,
-        name: spell.name,
-        command: `cast:${spell.id}`,
-        detail: abilityDetail(spell.manaCost, spell.cooldownTicks, "Spell"),
-        manaCost: spell.manaCost ?? 0,
-        cooldownTicks: spell.cooldownTicks ?? 0,
-        resourceReady: (spell.manaCost ?? 0) <= playerProfile.mp,
-        resourceWarning: (spell.manaCost ?? 0) <= playerProfile.mp ? "" : `Need ${spell.manaCost ?? 0} MP`
-      }
-    : skill
-      ? {
-          kind: "skill",
-          id: skill.id,
-          name: skill.name,
-          command: `skill:${skill.id}`,
-          detail: abilityDetail(skill.manaCost, skill.cooldownTicks, "Skill"),
-          manaCost: skill.manaCost ?? 0,
-          cooldownTicks: skill.cooldownTicks ?? 0,
-          resourceReady: (skill.manaCost ?? 0) <= playerProfile.mp,
-          resourceWarning: (skill.manaCost ?? 0) <= playerProfile.mp ? "" : `Need ${skill.manaCost ?? 0} MP`
-        }
-      : null;
+  const abilities = combatAbilitiesForProfile();
   const combatReady = Boolean(serverCanDriveMovement());
   const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
   const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
-  const abilityUnavailable = !ability
-    ? "No combat ability"
-    : !combatReady
-      ? "Server unavailable"
-      : !ability.resourceReady
-        ? ability.resourceWarning
-        : "";
-  const abilityDetailText = !ability
-    ? "No combat ability"
-    : ability.resourceReady
-      ? ability.detail
-      : `${ability.resourceWarning} / ${ability.detail}`;
-  return [
+  const actions = [
     {
       hotkey: "1",
       kind: "attack",
@@ -2414,24 +2371,37 @@ function combatActionOptions(entity) {
       detail: pendingCombat ? "Awaiting server" : engaged ? "Disengage" : "Weapon strike",
       command: engaged ? "stop_attack" : "attack",
       enabled: combatReady && !pendingCombat
-    },
-    {
-      hotkey: "2",
-      kind: ability?.kind ?? "ability",
-      abilityId: ability?.id ?? "",
-      spellId: ability?.kind === "spell" ? ability.id : "",
-      skillId: ability?.kind === "skill" ? ability.id : "",
-      manaCost: ability?.manaCost ?? 0,
-      cooldownTicks: ability?.cooldownTicks ?? 0,
-      label: pendingCombat?.command === ability?.command ? "Working..." : ability?.name ?? "Class Skill",
-      detail: pendingCombat?.command === ability?.command ? "Awaiting server" : abilityDetailText,
-      command: ability?.command ?? "ability",
-      unavailableReason: abilityUnavailable,
-      resourceReady: ability?.resourceReady ?? false,
-      resourceWarning: ability?.resourceWarning ?? "",
-      enabled: combatReady && Boolean(ability) && ability.resourceReady && !pendingCombat
     }
   ];
+
+  for (const [index, ability] of abilities.entries()) {
+    const unavailableReason = !combatReady
+      ? "Server unavailable"
+      : !ability.resourceReady
+        ? ability.resourceWarning
+        : "";
+    const detail = ability.resourceReady
+      ? ability.detail
+      : `${ability.resourceWarning} / ${ability.detail}`;
+    actions.push({
+      hotkey: String(index + 2),
+      kind: ability.kind,
+      abilityId: ability.id,
+      spellId: ability.kind === "spell" ? ability.id : "",
+      skillId: ability.kind === "skill" ? ability.id : "",
+      manaCost: ability.manaCost,
+      cooldownTicks: ability.cooldownTicks,
+      label: pendingCombat?.command === ability.command ? "Working..." : ability.name,
+      detail: pendingCombat?.command === ability.command ? "Awaiting server" : detail,
+      command: ability.command,
+      unavailableReason,
+      resourceReady: ability.resourceReady,
+      resourceWarning: ability.resourceWarning,
+      enabled: combatReady && ability.resourceReady && !pendingCombat
+    });
+  }
+
+  return actions;
 }
 
 function abilityDetail(manaCost = 0, cooldownTicks = 0, fallback = "Ability") {
@@ -2441,22 +2411,84 @@ function abilityDetail(manaCost = 0, cooldownTicks = 0, fallback = "Ability") {
   return parts.join(" / ") || fallback;
 }
 
-function combatSpellForProfile() {
-  const classDef = world.catalogs.classesById.get(playerProfile.classId);
-  const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
-  if (!schools.size) return null;
-  return world.catalogs.spells.find((candidate) => (
-    schools.has(candidate.school)
-    && (candidate.levelRequired ?? 1) <= playerProfile.level
-  )) ?? null;
+function combatAbilitiesForProfile() {
+  const abilities = [];
+  const seenCommands = new Set();
+  for (const spell of combatSpellsForProfile()) {
+    const ability = combatSpellAbility(spell);
+    if (seenCommands.has(ability.command)) continue;
+    seenCommands.add(ability.command);
+    abilities.push(ability);
+  }
+  for (const skill of combatSkillsForProfile()) {
+    const ability = combatSkillAbility(skill);
+    if (seenCommands.has(ability.command)) continue;
+    seenCommands.add(ability.command);
+    abilities.push(ability);
+  }
+  return abilities.slice(0, 3);
 }
 
-function combatSkillForProfile() {
+function combatSpellAbility(spell) {
+  const manaCost = spell.manaCost ?? 0;
+  const resourceReady = manaCost <= playerProfile.mp;
+  return {
+    kind: "spell",
+    id: spell.id,
+    name: spell.name,
+    command: `cast:${spell.id}`,
+    detail: abilityDetail(manaCost, spell.cooldownTicks, "Spell"),
+    manaCost,
+    cooldownTicks: spell.cooldownTicks ?? 0,
+    resourceReady,
+    resourceWarning: resourceReady ? "" : `Need ${manaCost} MP`
+  };
+}
+
+function combatSkillAbility(skill) {
+  const manaCost = skill.manaCost ?? 0;
+  const resourceReady = manaCost <= playerProfile.mp;
+  return {
+    kind: "skill",
+    id: skill.id,
+    name: skill.name,
+    command: `skill:${skill.id}`,
+    detail: abilityDetail(manaCost, skill.cooldownTicks, "Skill"),
+    manaCost,
+    cooldownTicks: skill.cooldownTicks ?? 0,
+    resourceReady,
+    resourceWarning: resourceReady ? "" : `Need ${manaCost} MP`
+  };
+}
+
+function combatSpellsForProfile() {
+  const classDef = world.catalogs.classesById.get(playerProfile.classId);
+  const schools = classDef?.magicSchools ?? {};
+  if (!Object.keys(schools).length) return [];
+  return world.catalogs.spells
+    .filter((candidate) => (
+      Object.prototype.hasOwnProperty.call(schools, candidate.school)
+    && (candidate.levelRequired ?? 1) <= playerProfile.level
+    && (candidate.schoolLevel ?? 1) <= (schools[candidate.school] ?? 0)
+    && candidate.targetType === "ENEMY"
+    && (candidate.spellType === "DAMAGE" || candidate.spellType === "DOT")
+    ))
+    .sort((a, b) => (a.levelRequired ?? 1) - (b.levelRequired ?? 1) || a.name.localeCompare(b.name));
+}
+
+function combatSkillsForProfile() {
   const classDef = world.catalogs.classesById.get(playerProfile.classId);
   const skillIds = classDef?.skills ?? [];
   return skillIds
     .map((skillId) => world.catalogs.skillsById.get(skillId))
-    .find((skill) => skill && !skill.isPassive && skill.category === "combat") ?? null;
+    .filter((skill) => skill && !skill.isPassive && skill.category === "combat" && supportedHostileSkill(skill));
+}
+
+function supportedHostileSkill(skill) {
+  // KICK requires a direction encoded into the target id on the current server
+  // protocol. Keep it out of the hotbar until the Iso UI can choose that
+  // direction intentionally.
+  return skill.id === "BASH";
 }
 
 function serverActionLabel(entity) {
