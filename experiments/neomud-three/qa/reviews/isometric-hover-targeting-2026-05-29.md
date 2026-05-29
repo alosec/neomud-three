@@ -15,6 +15,8 @@ Implemented:
   back or move closer without switching visual modes.
 - Tightened target action language so prompts use entity semantics: `Talk to`,
   `Engage`, `Inspect`, or `Pick up` instead of treating every NPC as talkable.
+- Added first-pass hostile target treatment: red selected-target marker colors
+  and a compact hostile target frame/health bar in the interaction panel.
 - Cleared hover state on pointer leave, click commit, room switch, and debug player placement so stale affordances do not leak between rooms.
 - Exposed hover helpers through `window.__neomudThreeDebug` for screenshot QA.
 
@@ -37,6 +39,7 @@ Evidence:
 - Town Square screenshot QA verifies Old Wren hover before click-interact and North Gate hover before click-exit routing.
 - The Town Square QA budget remains under gate at `232/240` draw calls with target markers visible.
 - Offline smoke QA verifies hostile Forest Rat and Shadow Wolf hover/proximity prompts read as `Engage`.
+- Offline smoke QA verifies Giant Forest Spider opens a hostile target frame with a target health bar.
 
 Remaining gap:
 

@@ -41,6 +41,10 @@ Playable Three.js lab:
   release, closer to Diablo-style movement than single-click-only navigation.
   The Iso camera has bounded mouse-wheel zoom, with debug/QA coverage proving
   wheel down pulls the camera back and wheel up brings it closer.
+  Hostile interactables now get a distinct combat-affordance treatment: red
+  selected-target marker colors plus a compact hostile target frame/health bar
+  in the interaction panel. This is a UI/targeting slice, not a local combat
+  simulation.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.

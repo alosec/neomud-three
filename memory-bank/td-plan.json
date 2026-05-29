@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T16:45:00.000Z",
+  "updated": "2026-05-29T16:56:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -107,10 +107,15 @@
           "id": 10,
           "body": "Iso camera zoom added: mouse wheel in Iso mode adjusts a bounded zoom multiplier used by the render-engine isometric camera. Debug API exposes cameraControls, and Town Square screenshot QA verifies wheel-down zooms out and wheel-up zooms back in.",
           "created": "2026-05-29T16:45:00Z"
+        },
+        {
+          "id": 11,
+          "body": "First hostile target affordance slice added: hostile interactables use red selected-target marker colors and the interaction panel renders a compact hostile target frame with deterministic health bar. Smoke QA verifies Giant Forest Spider opens the hostile target frame. This is target UI only, not a local combat simulation.",
+          "created": "2026-05-29T16:56:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T16:45:00Z"
+      "updated": "2026-05-29T16:56:00Z"
     },
     {
       "id": "neo-1fb2",

@@ -41,6 +41,7 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
+   - Hostile targets now get first-pass combat affordance treatment: red selected-target marker colors plus a compact hostile target frame/health bar in the interaction panel. This is explicit target UI only; combat authority still belongs on the server/game model.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
 
    Acceptance for the first slice:
@@ -61,8 +62,8 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    Remaining first-slice gap:
    - Selection feedback needs stronger object-level affordance language:
      target outlines/material response, target persistence rules after panel
-     close, real hostile/combat target states, and item/loot hover parity
-     across authored rooms.
+     close, real attack/ability commands, and item/loot hover parity across
+     authored rooms.
    - Click-to-move still uses direct steering plus existing collider pushout,
      not pathfinding or navmesh.
 

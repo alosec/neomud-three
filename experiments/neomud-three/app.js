@@ -849,6 +849,20 @@ function actionVerbForEntity(entity) {
   return "Inspect";
 }
 
+function isHostileEntity(entity) {
+  return String(entity?.prompt ?? "").toLowerCase().startsWith("engage:");
+}
+
+function targetHealthForEntity(entity) {
+  if (!isHostileEntity(entity)) return null;
+  const seed = [...String(entity.id ?? entity.name ?? "target")].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const maxHp = 22 + (seed % 19);
+  return {
+    current: maxHp,
+    max: maxHp
+  };
+}
+
 function setHoverTargetFromPoint(point) {
   const target = classifyGroundPoint(point);
   if (target.type === "move") {
@@ -898,6 +912,10 @@ function setSelectionTarget(target) {
   };
 
   const marker = ensureSelectionMarker();
+  const hostile = target.entity ? isHostileEntity(target.entity) : false;
+  marker.userData.outerMaterial?.color.setHex(hostile ? 0xff6b57 : 0xffd36b);
+  marker.userData.innerMaterial?.color.setHex(hostile ? 0xffd0c8 : 0xffffff);
+  marker.userData.cardinalMaterial?.color.setHex(hostile ? 0xff9b72 : 0xfff1c2);
   marker.position.copy(target.position).setY(0.09);
   marker.visible = true;
   updateInteractionPrompt();
@@ -1002,6 +1020,9 @@ function ensureSelectionMarker() {
   cardinal.instanceMatrix.needsUpdate = true;
 
   group.add(outer, inner, cardinal);
+  group.userData.outerMaterial = outer.material;
+  group.userData.innerMaterial = inner.material;
+  group.userData.cardinalMaterial = cardinal.material;
   group.visible = false;
   renderEngine.scene.add(group);
   movement.selectionMarker = group;
@@ -1256,6 +1277,20 @@ function interactionPanel() {
 
   const body = entity.dialogue || entity.description || `${entity.name} is present in ${world.rooms.get(currentRoomId)?.name ?? "this room"}.`;
   const kindLabel = entity.kind === "npc" ? entity.role || "NPC" : entity.role || "Item";
+  const hostile = isHostileEntity(entity);
+  const targetHealth = targetHealthForEntity(entity);
+  const targetFrame = hostile && targetHealth
+    ? `
+      <div class="target-frame hostile">
+        <div class="target-frame-row">
+          <small>Hostile target</small>
+          <strong>${escapeHtml(entity.name)}</strong>
+          <span>${targetHealth.current}/${targetHealth.max}</span>
+        </div>
+        <div class="target-health"><span style="transform: scaleX(${targetHealth.current / targetHealth.max})"></span></div>
+      </div>
+    `
+    : "";
   const hasServerAction = Boolean(entity.actionType);
   const canUseServerAction = hasServerAction && serverCanDriveMovement() && !entity.actionConsumed;
   const actionLabel = entity.actionConsumed
@@ -1272,6 +1307,7 @@ function interactionPanel() {
     : "";
   return htmlFragment(`
     <p>${escapeHtml(kindLabel)} / ${escapeHtml(world.rooms.get(currentRoomId)?.name ?? currentRoomId)}</p>
+    ${targetFrame}
     <div class="list">
       <div class="list-card">
         <strong>${escapeHtml(entity.name)}</strong>
