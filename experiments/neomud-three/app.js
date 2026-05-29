@@ -125,7 +125,9 @@ const movement = {
   hoverTarget: null,
   hoverMarker: null,
   selectionTarget: null,
-  selectionMarker: null
+  selectionMarker: null,
+  holdMoveActive: false,
+  holdMovePointerId: null
 };
 
 const playableKeys = new Set([
@@ -190,6 +192,8 @@ async function main() {
   canvas.addEventListener("pointermove", handleCanvasPointerMove);
   canvas.addEventListener("pointerleave", clearHoverTarget);
   canvas.addEventListener("pointerdown", handleCanvasPointerDown);
+  canvas.addEventListener("pointerup", handleCanvasPointerUp);
+  canvas.addEventListener("pointercancel", handleCanvasPointerCancel);
   playButton.addEventListener("click", requestPlayMode);
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
   for (const button of cameraModeButtons) {
@@ -672,6 +676,12 @@ function handleCanvasPointerMove(event) {
     clearHoverTarget();
     return;
   }
+  if (movement.holdMoveActive && event.pointerId === movement.holdMovePointerId && (event.buttons & 1) === 1) {
+    setClickMoveTarget(point);
+    clearHoverTarget();
+    clearSelectionTarget();
+    return;
+  }
   setHoverTargetFromPoint(point);
 }
 
@@ -683,7 +693,30 @@ function handleCanvasPointerDown(event) {
   setInputMode("play");
   const point = pointOnGroundFromEvent(event);
   if (!point) return;
-  handleGroundClick(point);
+  const result = handleGroundClick(point);
+  if (result?.type === "move") {
+    movement.holdMoveActive = true;
+    movement.holdMovePointerId = event.pointerId;
+    canvas.setPointerCapture?.(event.pointerId);
+  } else {
+    clearHoldMove();
+  }
+}
+
+function handleCanvasPointerUp(event) {
+  if (event.pointerId !== movement.holdMovePointerId) return;
+  clearHoldMove();
+  canvas.releasePointerCapture?.(event.pointerId);
+}
+
+function handleCanvasPointerCancel(event) {
+  if (event.pointerId !== movement.holdMovePointerId) return;
+  clearHoldMove();
+}
+
+function clearHoldMove() {
+  movement.holdMoveActive = false;
+  movement.holdMovePointerId = null;
 }
 
 function isHudPointerTarget(target) {
@@ -859,6 +892,7 @@ function clearSelectionTarget() {
 
 function clearClickMoveTarget() {
   movement.clickTarget = null;
+  clearHoldMove();
   if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
 }
 
@@ -1598,7 +1632,8 @@ function installDebugApi() {
         target: movement.clickTarget
           ? { x: movement.clickTarget.x, y: movement.clickTarget.y, z: movement.clickTarget.z }
           : null,
-        markerVisible: Boolean(movement.clickTargetMarker?.visible)
+        markerVisible: Boolean(movement.clickTargetMarker?.visible),
+        holdActive: movement.holdMoveActive
       };
     },
     get hover() {

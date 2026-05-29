@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T16:26:00.000Z",
+  "updated": "2026-05-29T16:36:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -97,10 +97,15 @@
           "id": 8,
           "body": "Selection lifetime tightened: selected-target ring is now scoped to the interaction panel and clears on Escape/close or when opening a non-interaction panel. Town Square screenshot QA asserts the marker clears after closing Old Wren.",
           "created": "2026-05-29T16:26:00Z"
+        },
+        {
+          "id": 9,
+          "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
+          "created": "2026-05-29T16:36:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T16:26:00Z"
+      "updated": "2026-05-29T16:36:00Z"
     },
     {
       "id": "neo-1fb2",

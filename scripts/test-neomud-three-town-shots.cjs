@@ -123,6 +123,32 @@ async function main() {
     assert.equal(clearedSelection.markerVisible, false);
     assert.equal(clearedSelection.active, false);
 
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
+    });
+    await settleFrames(page);
+    const beforeHold = await page.evaluate(() => window.__neomudThreeDebug.player);
+    await page.mouse.move(690, 565);
+    await page.mouse.down();
+    await page.mouse.move(850, 590, { steps: 8 });
+    await page.waitForTimeout(550);
+    const duringHold = await page.evaluate(() => ({
+      player: window.__neomudThreeDebug.player,
+      clickMove: window.__neomudThreeDebug.clickMove
+    }));
+    assert.equal(duringHold.clickMove.holdActive, true);
+    assert.ok(duringHold.clickMove.markerVisible, `expected visible hold-move marker: ${JSON.stringify(duringHold)}`);
+    assert.ok(
+      Math.hypot(duringHold.player.x - beforeHold.x, duringHold.player.z - beforeHold.z) > 0.45,
+      `expected click-and-hold drag to move avatar in Iso mode: ${JSON.stringify({ beforeHold, duringHold })}`
+    );
+    await page.mouse.up();
+    const afterHold = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
+    assert.equal(afterHold.holdActive, false);
+    const holdTarget = path.join(qaDir, "town-shot-isometric-hold-move.png");
+    await page.screenshot({ path: holdTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-hold-move", path: holdTarget });
+
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
     const budget = budgetStatus("town:square", stats);
     assertRenderBudget(assert, "town:square", stats);

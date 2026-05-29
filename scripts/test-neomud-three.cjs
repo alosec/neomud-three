@@ -74,7 +74,8 @@ async function main() {
     assert.deepEqual(await page.evaluate(() => window.__neomudThreeDebug.clickMove), {
       active: true,
       target: clickTarget,
-      markerVisible: true
+      markerVisible: true,
+      holdActive: false
     });
     await page.waitForTimeout(900);
     const clickAfter = await page.evaluate(() => window.__neomudThreeDebug.player);
