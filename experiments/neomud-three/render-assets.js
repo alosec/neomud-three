@@ -660,6 +660,24 @@ const MATERIAL_DEFINITION_LIST = [
   colorMaterial("town.tree.trunk", "trunk", "town", "tree", 0x4f321b, { roughness: 0.92 }),
   proceduralMaterial("town.tree.foliage", "foliage", "town", "foliage", () => foliageTexture("town-foliage-painted", "#5f8152", [132, 164, 88], [42, 73, 47]), { color: 0x6f925e, roughness: 0.98 }),
   proceduralMaterial("town.tree.foliage.dark", "foliageDark", "town", "foliage", () => foliageTexture("town-foliage-painted", "#5f8152", [132, 164, 88], [42, 73, 47]), { color: 0x496f48, roughness: 0.99 }),
+  {
+    id: "town.sky.soft-cloud-band",
+    legacyKey: "skyCloud",
+    family: "town",
+    kind: "transparent-sky-accent",
+    intendedUse: ["outdoor-distance", "sky-breakup"],
+    roughness: 1,
+    metalness: 0,
+    alpha: true,
+    approved: true,
+    create: () => new THREE.MeshBasicMaterial({
+      color: 0xf4ead0,
+      transparent: true,
+      opacity: 0.22,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    })
+  },
   colorMaterial("forest.ground.moss", "forestGround", "forest", "forest-ground", 0x536c43, { roughness: 0.99 }),
   proceduralMaterial("forest.path.earth", "forestTrail", "forest", "forest-trail", roadTexture, { color: 0x8d764f, roughness: 0.98 }),
   colorMaterial("forest.ground.shadow", "forestShadow", "forest", "forest-shadow", 0x42583a, { roughness: 1 }),
@@ -830,6 +848,7 @@ export function makeTownMaterials() {
     trunk: createApprovedMaterial("town.tree.trunk"),
     foliage: createApprovedMaterial("town.tree.foliage"),
     foliageDark: createApprovedMaterial("town.tree.foliage.dark"),
+    skyCloud: createApprovedMaterial("town.sky.soft-cloud-band"),
     forestGround: createApprovedMaterial("forest.ground.moss"),
     forestTrail: createApprovedMaterial("forest.path.earth"),
     forestShadow: createApprovedMaterial("forest.ground.shadow"),

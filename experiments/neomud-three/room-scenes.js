@@ -353,6 +353,7 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
   const townColliders = townCollidersFromSpec(spec);
 
   addTownPerimeterDepthBase(root, materials);
+  addTownSkyDepth(root, materials);
   addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
   addTownSpecSurfaces(root, materials, spec);
   const fountain = addTownSpecFountain(root, materials, spec.features.fountain);
@@ -6053,6 +6054,45 @@ function addTownPerimeterDepthBase(root, materials) {
     { x: 44.0, y: 5.9, z: 1, width: 3.2, height: 0.76, depth: 15.2, rotationY: 0.05 },
     { x: 43.2, y: 5.45, z: 22, width: 3.1, height: 0.68, depth: 13.0, rotationY: -0.12 }
   ], "town-square-distant-roof-silhouette-band", { castShadow: false, receiveShadow: true });
+}
+
+function addTownSkyDepth(root, materials) {
+  const cloudPuffs = [
+    { x: -38, y: 13.5, z: -59, width: 8.2, height: 1.35, depth: 1.1, rotationY: 0.15 },
+    { x: -29, y: 14.1, z: -60, width: 10.5, height: 1.65, depth: 1.2, rotationY: -0.08 },
+    { x: -7, y: 15.0, z: -61, width: 12.8, height: 1.9, depth: 1.35, rotationY: 0.04 },
+    { x: 5, y: 14.6, z: -60, width: 8.4, height: 1.35, depth: 1.05, rotationY: -0.12 },
+    { x: 28, y: 13.8, z: -59, width: 10.8, height: 1.7, depth: 1.2, rotationY: 0.1 },
+    { x: 39, y: 14.3, z: -60, width: 7.5, height: 1.24, depth: 1.0, rotationY: -0.2 },
+    { x: -34, y: 14.0, z: 59, width: 10.0, height: 1.45, depth: 1.1, rotationY: Math.PI - 0.12 },
+    { x: -10, y: 15.1, z: 61, width: 13.5, height: 1.9, depth: 1.3, rotationY: Math.PI + 0.06 },
+    { x: 2, y: 14.7, z: 60, width: 9.2, height: 1.38, depth: 1.0, rotationY: Math.PI - 0.1 },
+    { x: 31, y: 14.2, z: 59, width: 11.5, height: 1.65, depth: 1.2, rotationY: Math.PI + 0.18 },
+    { x: -59, y: 14.5, z: -28, width: 9.6, height: 1.45, depth: 1.12, rotationY: Math.PI / 2 - 0.1 },
+    { x: -61, y: 15.1, z: -8, width: 13.0, height: 1.85, depth: 1.24, rotationY: Math.PI / 2 + 0.06 },
+    { x: -60, y: 14.4, z: 18, width: 9.2, height: 1.36, depth: 1.05, rotationY: Math.PI / 2 - 0.16 },
+    { x: 59, y: 14.3, z: -24, width: 10.6, height: 1.5, depth: 1.08, rotationY: -Math.PI / 2 + 0.12 },
+    { x: 61, y: 15.0, z: 4, width: 13.8, height: 1.9, depth: 1.3, rotationY: -Math.PI / 2 - 0.04 },
+    { x: 60, y: 14.1, z: 27, width: 8.6, height: 1.3, depth: 1.0, rotationY: -Math.PI / 2 + 0.18 }
+  ];
+
+  const mesh = addInstancedGeometry(
+    root,
+    new THREE.DodecahedronGeometry(1, 0),
+    materials.skyCloud,
+    cloudPuffs.map((puff) => ({
+      x: puff.x,
+      y: puff.y,
+      z: puff.z,
+      rotationY: puff.rotationY,
+      scale: [puff.width, puff.height, puff.depth]
+    })),
+    "town-square-soft-cloud-depth",
+    { castShadow: false, receiveShadow: false }
+  );
+  mesh.renderOrder = -8;
+  mesh.userData = { visualRole: "soft-sky-depth", count: cloudPuffs.length };
+  return mesh;
 }
 
 function addTownContactShadows(root, materials, shadows = []) {
