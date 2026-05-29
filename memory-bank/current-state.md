@@ -58,6 +58,11 @@ Playable Three.js lab:
   and `town-shot-platform-plaza.png` in the same run, proving the visual mode
   switch can return from the bird's-eye POV to the behind-character POV without
   silently breaking Platform review.
+  Iso click-to-move now resolves direct destinations against room collision
+  metadata before placing the movement marker, so clicks through blocked civic
+  props such as the Town Square fountain stop at the near walkable edge instead
+  of asking the avatar to run into the collider. Town Square QA captures this as
+  `town-shot-isometric-blocked-target.png`.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

@@ -105,6 +105,22 @@ async function main() {
 
     await page.evaluate(() => {
       window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 10.4, heading: 0 });
+    });
+    await settleFrames(page);
+    const blockedMove = await page.evaluate(() => window.__neomudThreeDebug.clickGround({ x: 0, z: 0 }));
+    assert.equal(blockedMove.type, "move");
+    assert.ok(
+      blockedMove.target.z > 2.2 && blockedMove.target.z < 9.8,
+      `expected click target behind fountain to resolve to near walkable edge, got ${JSON.stringify(blockedMove)}`
+    );
+    const resolvedTarget = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
+    assert.ok(resolvedTarget.markerVisible, `expected resolved target marker to stay visible: ${JSON.stringify(resolvedTarget)}`);
+    const blockedTarget = path.join(qaDir, "town-shot-isometric-blocked-target.png");
+    await page.screenshot({ path: blockedTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-blocked-target", path: blockedTarget });
+
+    await page.evaluate(() => {
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
     });
     await settleFrames(page);

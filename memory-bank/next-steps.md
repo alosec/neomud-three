@@ -48,6 +48,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Click-and-hold movement now exists for open ground in Iso mode: holding the primary pointer continuously updates the destination marker until release, which better matches Diablo-like movement.
    - Iso mode now has bounded mouse-wheel zoom for player comfort and QA review, without changing room art or server authority.
    - Iso mode now has right-click cancel for player control: destination movement, hover, selection, and open panels clear without opening the browser context menu.
+   - Iso click-to-move now resolves direct targets against room collider metadata
+     before committing the destination marker. The first QA case clicks through
+     the Town Square fountain and verifies the destination stops at the near
+     walkable edge instead of inside/behind the obstruction.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
@@ -79,8 +83,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      close and real attack/ability commands. Item/loot hover parity exists for
      the Hidden Cave server-loot path, but should be audited across future
      authored rooms as they gain live drops.
-   - Click-to-move still uses direct steering plus existing collider pushout,
-     not pathfinding or navmesh.
+   - Click-to-move now avoids committing direct targets beyond the first collider
+     intersection, but it still uses direct steering plus existing collider
+     pushout rather than true pathfinding/navmesh around obstacles.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.

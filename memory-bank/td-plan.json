@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T18:10:00.000Z",
+  "updated": "2026-05-29T18:38:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -137,10 +137,15 @@
           "id": 16,
           "body": "Room debug entity serialization consolidated through one helper so action type, item id, coin type, quantity, prompt, and position metadata are exposed consistently across authored rooms. Verified offline smoke, Town Square screenshots, and server-backed QA.",
           "created": "2026-05-29T17:55:00Z"
+        },
+        {
+          "id": 17,
+          "body": "Iso click-to-move target placement now resolves against room collider metadata before committing the destination marker. Town Square QA clicks through the fountain and verifies the marker stops at the near walkable edge instead of inside/behind the obstruction. This is still direct steering, not full navmesh/pathfinding.",
+          "created": "2026-05-29T18:38:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T17:55:00Z"
+      "updated": "2026-05-29T18:38:00Z"
     },
     {
       "id": "neo-61d4",
