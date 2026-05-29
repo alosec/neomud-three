@@ -131,11 +131,13 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      MP warning. The player HUD now includes a compact MP bar/value beside HP,
      and QA verifies MP changes after spell-cast server messages. Skill/spell
      effects now produce named world-space feedback such as `BASH -n` and
-     `Smite -n` instead of generic damage-only text. Action details now include
-     catalog cooldown values such as `1t cooldown` or `3t cooldown` without
-     simulating local cooldown state. Directional skill targeting now has a
-     first server-compatible `KICK` slice; richer per-school cast visuals remain
-     open.
+     `Smite -n` instead of generic damage-only text. Spell effects now resolve
+     catalog school/id metadata and render a school-colored impact ring; skill
+     effects render a distinct physical burst, with latest-effect metadata
+     exposed for QA. Action details now include catalog cooldown values such as
+     `1t cooldown` or `3t cooldown` without simulating local cooldown state.
+     Directional skill targeting now has a first server-compatible `KICK`
+     slice. Richer projectile/travel animations remain open.
      Item/loot hover parity exists for the Hidden Cave server-loot path, but
      should be audited across future authored rooms as they gain live drops.
    - Click-to-move now has first-pass visibility-graph waypoint routing over

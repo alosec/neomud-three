@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-29T20:05:00.000Z",
+  "updated": "2026-05-29T20:10:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-d2f7",
+      "project": "NeoMud",
+      "title": "Add school-aware combat effect visuals",
+      "description": "Upgrade generic skill/spell floating text into a small systematic effect layer where spells carry school metadata and skills/spells render distinct impact bursts that QA can verify.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "visual-feedback",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Combat effects now carry latest-effect metadata for QA. Spell feedback resolves catalog school/id, renders a school-colored ring burst, and exposes school/abilityId in debug state; skills render a distinct physical burst. Offline QA verifies Smite resolves as priest/SMITE and server-backed QA verifies live Bash resolves as skill/BASH.",
+          "created": "2026-05-29T20:10:00Z"
+        }
+      ],
+      "created": "2026-05-29T20:10:00Z",
+      "updated": "2026-05-29T20:10:00Z"
+    },
     {
       "id": "neo-c4a9",
       "project": "NeoMud",

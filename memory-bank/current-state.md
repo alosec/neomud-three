@@ -90,10 +90,14 @@ Playable Three.js lab:
   HP, and offline QA verifies the MP bar/value updates when a spell result
   drives current MP to zero. Skill/spell effects now emit named world-space
   feedback instead of generic damage-only text, so live Bash and injected Smite
-  are readable as distinct ability events. Combat action details now include
-  catalog cooldown metadata, so Smite reads with `1t cooldown` and Bash with
-  `3t cooldown` while server authority remains responsible for actual cooldown
-  enforcement.
+  are readable as distinct ability events. Combat feedback now has a small
+  systematic visual layer: spell effects resolve catalog school/id metadata and
+  render school-colored impact rings, while skill effects render a different
+  physical burst. Debug exposes the latest combat effect metadata so QA can
+  verify `Smite` as `priest`/`SMITE` and live `BASH` as a skill. Combat action
+  details now include catalog cooldown metadata, so Smite reads with
+  `1t cooldown` and Bash with `3t cooldown` while server authority remains
+  responsible for actual cooldown enforcement.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.

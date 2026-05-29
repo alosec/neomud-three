@@ -59,6 +59,8 @@ export function createRenderEngine(canvas) {
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
   let roomDebug = emptyRoomDebugSummary(false);
   let cameraObstruction = null;
+  let lastCombatEffect = null;
+  const combatEffectHistory = [];
 
   return {
     renderer,
@@ -74,6 +76,13 @@ export function createRenderEngine(canvas) {
     },
     get combatEffectCount() {
       return combatEffects.length;
+    },
+    get combatEffectSummary() {
+      return {
+        count: combatEffects.length,
+        latest: lastCombatEffect ? { ...lastCombatEffect } : null,
+        recent: combatEffectHistory.map((effect) => ({ ...effect }))
+      };
     },
     get interactionEffectCount() {
       return interactionEffects.length;
@@ -228,18 +237,33 @@ export function createRenderEngine(canvas) {
       });
       return pickupEffects.length;
     },
-    showCombatEffect({ position = player.position, text = "", kind = "hit" } = {}) {
+    showCombatEffect({ position = player.position, text = "", kind = "hit", school = "", abilityId = "" } = {}) {
       const basePosition = position.clone?.() ?? new THREE.Vector3(position.x ?? 0, position.y ?? 0, position.z ?? 0);
-      const sprite = createCombatTextSprite(text, kind);
+      const sprite = createCombatTextSprite(text, kind, school);
       sprite.position.copy(basePosition).add(new THREE.Vector3(0, 2.95, 0));
       sprite.renderOrder = 30;
+      const burst = createCombatBurst(kind, school);
+      if (burst) {
+        burst.position.copy(basePosition).add(new THREE.Vector3(0, 0.08, 0));
+        effectRoot.add(burst);
+      }
       effectRoot.add(sprite);
+      lastCombatEffect = {
+        text: String(text),
+        kind,
+        school,
+        abilityId
+      };
+      combatEffectHistory.push(lastCombatEffect);
+      if (combatEffectHistory.length > 8) combatEffectHistory.shift();
       combatEffects.push({
         sprite,
+        burst,
         born: performance.now(),
-        duration: kind === "defeat" ? 1900 : 1300,
+        duration: kind === "defeat" ? 1900 : kind === "spell" ? 1700 : kind === "skill" ? 1500 : 1300,
         startY: sprite.position.y,
         baseScale: sprite.scale.clone(),
+        burstScale: burst?.scale.clone() ?? null,
         material: sprite.material
       });
       return combatEffects.length;
@@ -559,24 +583,12 @@ function updatePickupEffects(pickupEffects, effectRoot) {
   }
 }
 
-function createCombatTextSprite(text, kind = "hit") {
+function createCombatTextSprite(text, kind = "hit", school = "") {
   const canvas = document.createElement("canvas");
   canvas.width = 384;
   canvas.height = 128;
   const ctx = canvas.getContext("2d");
-  const color = kind === "defeat"
-    ? "#ffe18f"
-    : kind === "interaction"
-      ? "#b8ffd2"
-    : kind === "spell"
-      ? "#99c8ff"
-      : kind === "skill"
-        ? "#ffd87a"
-    : kind === "miss"
-      ? "#c8d7ff"
-      : kind === "player"
-        ? "#ff9b84"
-        : "#ffd0a6";
+  const color = combatEffectColor(kind, school);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.font = "900 56px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
   ctx.textAlign = "center";
@@ -600,6 +612,50 @@ function createCombatTextSprite(text, kind = "hit") {
   return sprite;
 }
 
+function combatEffectColor(kind = "hit", school = "") {
+  const schoolColors = {
+    priest: "#fff0a8",
+    mage: "#9fd2ff",
+    druid: "#9cffb2",
+    kai: "#ffd29a",
+    bard: "#f1b3ff"
+  };
+  return kind === "spell" && schoolColors[school]
+    ? schoolColors[school]
+    : kind === "defeat"
+    ? "#ffe18f"
+    : kind === "interaction"
+      ? "#b8ffd2"
+    : kind === "spell"
+      ? "#99c8ff"
+      : kind === "skill"
+        ? "#ffd87a"
+    : kind === "miss"
+      ? "#c8d7ff"
+      : kind === "player"
+        ? "#ff9b84"
+        : "#ffd0a6";
+}
+
+function createCombatBurst(kind = "hit", school = "") {
+  if (kind !== "spell" && kind !== "skill") return null;
+  const color = new THREE.Color(combatEffectColor(kind, school));
+  const geometry = kind === "spell"
+    ? new THREE.RingGeometry(0.46, 0.88, 32)
+    : new THREE.CircleGeometry(0.72, 6);
+  const material = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: kind === "spell" ? 0.58 : 0.36,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.renderOrder = 24;
+  return mesh;
+}
+
 function updateCombatEffects(combatEffects, effectRoot) {
   const now = performance.now();
   for (let index = combatEffects.length - 1; index >= 0; index -= 1) {
@@ -609,10 +665,24 @@ function updateCombatEffects(combatEffects, effectRoot) {
     effect.sprite.material.opacity = Math.max(0, 1 - t);
     const scale = 1 + t * 0.16;
     effect.sprite.scale.set(effect.baseScale.x * scale, effect.baseScale.y * scale, effect.baseScale.z);
+    if (effect.burst) {
+      const burstScale = 1 + t * 1.2;
+      effect.burst.scale.set(
+        effect.burstScale.x * burstScale,
+        effect.burstScale.y * burstScale,
+        effect.burstScale.z
+      );
+      effect.burst.material.opacity = Math.max(0, (1 - t) * 0.58);
+    }
     if (t >= 1) {
       effectRoot.remove(effect.sprite);
       effect.sprite.material.map?.dispose?.();
       effect.sprite.material.dispose?.();
+      if (effect.burst) {
+        effectRoot.remove(effect.burst);
+        effect.burst.geometry?.dispose?.();
+        effect.burst.material?.dispose?.();
+      }
       combatEffects.splice(index, 1);
     }
   }

@@ -392,7 +392,8 @@ function handleServerMessage(message) {
         defenderId: message.targetId,
         label: message.skillName ?? "Skill",
         amount: Math.max(0, Number(message.damage) || 0),
-        kind: "skill"
+        kind: "skill",
+        abilityId: message.skillName ?? ""
       });
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
@@ -434,11 +435,14 @@ function handleServerMessage(message) {
       };
       appendLog(lastCombatResult.message);
       if (!message.isPlayerTarget) {
+        const spell = spellForEffectMessage(message);
         showCombatAbilityFeedback({
           defenderId: targetId,
           label: message.spellName ?? "Spell",
           amount,
-          kind: "spell"
+          kind: "spell",
+          school: spell?.school ?? "",
+          abilityId: spell?.id ?? message.spellName ?? ""
         });
       }
       if (activePanel === "interaction") renderPanel(activePanel);
@@ -731,13 +735,23 @@ function showCombatHitFeedback(message, defenderId = "") {
   });
 }
 
-function showCombatAbilityFeedback({ defenderId = "", label = "Ability", amount = 0, kind = "skill" } = {}) {
+function showCombatAbilityFeedback({ defenderId = "", label = "Ability", amount = 0, kind = "skill", school = "", abilityId = "" } = {}) {
   const text = amount > 0 ? `${label} -${amount}` : label;
   renderEngine.showCombatEffect({
     position: combatFeedbackPosition(defenderId, false),
     text,
-    kind
+    kind,
+    school,
+    abilityId
   });
+}
+
+function spellForEffectMessage(message) {
+  const byId = message.spellId ? world.catalogs.spellsById.get(message.spellId) : null;
+  if (byId) return byId;
+  const name = String(message.spellName ?? "").toLowerCase();
+  if (!name) return null;
+  return world.catalogs.spells.find((spell) => spell.name.toLowerCase() === name || spell.id.toLowerCase() === name) ?? null;
 }
 
 function showCombatDefeatFeedback(npcId) {
@@ -2780,6 +2794,19 @@ function clearPendingCombatCommand() {
   pendingCombatCommand = null;
 }
 
+function expireStaleCombatCommand() {
+  if (!pendingCombatCommand) return;
+  if (performance.now() - pendingCombatCommand.startedAt < 6500) return;
+  lastCombatResult = {
+    success: false,
+    targetName: pendingCombatCommand.targetName,
+    message: `${pendingCombatCommand.label} did not receive a server confirmation.`
+  };
+  appendLog(`${pendingCombatCommand.targetName}: ${lastCombatResult.message}`);
+  clearPendingCombatCommand();
+  if (activePanel === "interaction") renderPanel(activePanel);
+}
+
 function shortDirection(direction) {
   return direction
     .replace("NORTH", "N")
@@ -2945,6 +2972,7 @@ function updatePlayer(dt) {
   updateSelectionHealthBar();
   updateSelectionActionBadge();
   updateTargetObjectHighlight();
+  expireStaleCombatCommand();
   movement.running = (clickMoveRunning || running) && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
@@ -3197,6 +3225,8 @@ function installDebugApi() {
       return {
         pickup: renderEngine.pickupEffectCount,
         combat: renderEngine.combatEffectCount,
+        combatLatest: renderEngine.combatEffectSummary.latest,
+        combatRecent: renderEngine.combatEffectSummary.recent,
         interaction: renderEngine.interactionEffectCount
       };
     },

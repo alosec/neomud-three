@@ -634,6 +634,11 @@ async function main() {
       combatEffectsBeforeSpell,
       { timeout: 2_000 }
     );
+    const spellEffect = await page.evaluate(() => window.__neomudThreeDebug.effects.combatLatest);
+    assert.equal(spellEffect?.kind, "spell");
+    assert.equal(spellEffect?.school, "priest");
+    assert.equal(spellEffect?.abilityId, "SMITE");
+    assert.match(spellEffect?.text ?? "", /Smite -9/);
     const spellResult = await page.evaluate(() => window.__neomudThreeDebug.server.lastCombatResult);
     assert.match(spellResult.message, /casts Smite/i);
     assert.deepEqual(await page.evaluate(() => window.__neomudThreeDebug.server.targetHealth["npc:forest_spider"]), { current: 23, max: 32 });

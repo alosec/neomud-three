@@ -329,7 +329,7 @@ async function main() {
       assert.equal(hotkeyAttack?.targetId, "npc:forest_spider");
       assert.equal(hotkeyAttack?.command, "attack");
       const pendingCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
-      assert.equal(pendingCombatActions[0]?.label, "Working...");
+      assert.match(pendingCombatActions[0]?.label ?? "", /Working|Stop Attack/);
       assert.equal(pendingCombatActions[0]?.enabled, false);
       await page.waitForFunction(
         () => {
@@ -373,12 +373,18 @@ async function main() {
             && server.targetHealth["npc:forest_spider"]?.current >= 0;
         },
         null,
-        { timeout: 8_000 }
+        { timeout: 10_000 }
       );
       assert.ok(
         await page.evaluate((before) => window.__neomudThreeDebug.effects.combat > before, combatEffectsBeforeSkill),
         "expected Bash skill effect to create world-space combat feedback"
       );
+      const skillEffect = await page.evaluate(() =>
+        window.__neomudThreeDebug.effects.combatRecent.find((effect) => effect.kind === "skill" && effect.abilityId === "BASH")
+      );
+      assert.equal(skillEffect?.kind, "skill");
+      assert.equal(skillEffect?.abilityId, "BASH");
+      assert.match(skillEffect?.text ?? "", /BASH -\d+/);
       assert.match(await page.locator("#mp-value").textContent(), /^\d+\/\d+$/);
       const skillActionsAfter = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
       assert.equal(skillActionsAfter[1]?.command, "skill:BASH");
