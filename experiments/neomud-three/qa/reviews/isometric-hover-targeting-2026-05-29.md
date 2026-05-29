@@ -40,6 +40,7 @@ Evidence:
 - The Town Square QA budget remains under gate at `232/240` draw calls with target markers visible.
 - Offline smoke QA verifies hostile Forest Rat and Shadow Wolf hover/proximity prompts read as `Engage`.
 - Offline smoke QA verifies Giant Forest Spider opens a hostile target frame with a target health bar.
+- `qa/latest/offline-hostile-target-panel.png` captures the hostile target panel for direct visual review.
 
 Remaining gap:
 

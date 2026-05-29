@@ -556,6 +556,7 @@ async function main() {
     assert.match(await page.locator("#panel-content").textContent(), /Hostile target/i);
     assert.match(await page.locator(".target-health").textContent(), /^\s*$/);
     assert.equal(await page.locator(".target-frame.hostile").count(), 1);
+    await saveScreenshot(page, "offline-hostile-target-panel.png");
     await page.keyboard.press("Escape");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.0, z: -3.2, heading: -Math.PI / 2 }));
