@@ -149,6 +149,7 @@ const movement = {
   selectionTarget: null,
   selectionMarker: null,
   selectionHealthBar: null,
+  selectionActionBadge: null,
   targetObjectHighlight: null,
   pendingInteractable: null,
   holdMoveActive: false,
@@ -1284,6 +1285,7 @@ function setSelectionTarget(target) {
   marker.position.copy(target.position).setY(0.09);
   marker.visible = true;
   updateSelectionHealthBar(target.entity ?? null);
+  updateSelectionActionBadge(target.entity ?? null);
   applyTargetObjectHighlight(movement.selectionTarget, "selected");
   updateInteractionPrompt();
   return movement.selectionTarget;
@@ -1294,6 +1296,7 @@ function clearSelectionTarget() {
   movement.selectionTarget = null;
   if (movement.selectionMarker) movement.selectionMarker.visible = false;
   updateSelectionHealthBar(null);
+  updateSelectionActionBadge(null);
   applyTargetObjectHighlight(movement.hoverTarget, movement.hoverTarget ? "hover" : null);
   updateInteractionPrompt();
 }
@@ -1318,6 +1321,37 @@ function updateSelectionHealthBar(entity = selectedInteractable) {
   bar.userData.value = `${Math.round(health.current)}/${Math.round(health.max)}`;
   bar.userData.ratio = ratio;
   return bar.userData;
+}
+
+function updateSelectionActionBadge(entity = selectedInteractable) {
+  const badge = ensureSelectionActionBadge();
+  const hostile = entity ? isHostileEntity(entity) : Boolean(movement.selectionTarget?.hostile);
+  if (!entity || hostile || !movement.selectionMarker?.visible) {
+    badge.visible = false;
+    badge.userData.value = "";
+    badge.userData.actionType = "";
+    return null;
+  }
+
+  const action = actionVerbForEntity(entity);
+  const actionType = entity.actionType ?? "";
+  const color = actionBadgeColor(entity, action);
+  badge.userData.body.material.color.setHex(color.body);
+  badge.userData.icon.material.color.setHex(color.icon);
+  badge.userData.accent.material.color.setHex(color.accent);
+  badge.userData.value = action;
+  badge.userData.actionType = actionType;
+  badge.userData.entityId = entity.id ?? "";
+  badge.visible = true;
+  return badge.userData;
+}
+
+function actionBadgeColor(entity, action) {
+  if (entity?.actionType === "PICKUP_COINS") return { body: 0x372a10, icon: 0xffd36b, accent: 0xfff1a8 };
+  if (entity?.actionType === "PICKUP_ITEM") return { body: 0x102a2b, icon: 0x75fff0, accent: 0xc7fff7 };
+  if (String(action).toLowerCase() === "open") return { body: 0x2f2113, icon: 0xffb35c, accent: 0xffe0aa };
+  if (String(action).toLowerCase().startsWith("talk")) return { body: 0x18273a, icon: 0x7fb7ff, accent: 0xd5e9ff };
+  return { body: 0x24202f, icon: 0xbca8ff, accent: 0xf1eaff };
 }
 
 function startPendingInteraction(entity, options = {}) {
@@ -1567,6 +1601,60 @@ function ensureSelectionHealthBar() {
   group.userData.fill = fill;
   marker.add(group);
   movement.selectionHealthBar = group;
+  return group;
+}
+
+function ensureSelectionActionBadge() {
+  if (movement.selectionActionBadge) return movement.selectionActionBadge;
+  const marker = ensureSelectionMarker();
+  const group = new THREE.Group();
+  group.name = "Selected action affordance badge";
+  group.userData.cameraIgnore = true;
+  group.position.set(0, 1.62, 0);
+  group.visible = false;
+
+  const body = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.58, 0.32),
+    new THREE.MeshBasicMaterial({
+      color: 0x2f2113,
+      transparent: true,
+      opacity: 0.88,
+      depthWrite: false,
+      depthTest: false,
+      side: THREE.DoubleSide
+    })
+  );
+  const icon = new THREE.Mesh(
+    new THREE.CircleGeometry(0.09, 18),
+    new THREE.MeshBasicMaterial({
+      color: 0xffb35c,
+      transparent: true,
+      opacity: 0.96,
+      depthWrite: false,
+      depthTest: false,
+      side: THREE.DoubleSide
+    })
+  );
+  icon.position.set(-0.13, 0, 0.012);
+
+  const accent = new THREE.Mesh(
+    new THREE.BoxGeometry(0.16, 0.045, 0.012),
+    new THREE.MeshBasicMaterial({
+      color: 0xffe0aa,
+      transparent: true,
+      opacity: 0.92,
+      depthWrite: false,
+      depthTest: false
+    })
+  );
+  accent.position.set(0.11, 0, 0.018);
+
+  group.add(body, icon, accent);
+  group.userData.body = body;
+  group.userData.icon = icon;
+  group.userData.accent = accent;
+  marker.add(group);
+  movement.selectionActionBadge = group;
   return group;
 }
 
@@ -2332,8 +2420,12 @@ function updatePlayer(dt) {
     if (movement.selectionHealthBar?.visible) {
       movement.selectionHealthBar.rotation.y = -movement.selectionMarker.rotation.y;
     }
+    if (movement.selectionActionBadge?.visible) {
+      movement.selectionActionBadge.rotation.y = -movement.selectionMarker.rotation.y;
+    }
   }
   updateSelectionHealthBar();
+  updateSelectionActionBadge();
   updateTargetObjectHighlight();
   movement.running = (clickMoveRunning || running) && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
@@ -2524,6 +2616,9 @@ function installDebugApi() {
         healthBarVisible: Boolean(movement.selectionHealthBar?.visible),
         healthBarValue: movement.selectionHealthBar?.userData?.value ?? "",
         healthBarRatio: movement.selectionHealthBar?.userData?.ratio ?? 0,
+        actionBadgeVisible: Boolean(movement.selectionActionBadge?.visible),
+        actionBadgeValue: movement.selectionActionBadge?.userData?.value ?? "",
+        actionBadgeType: movement.selectionActionBadge?.userData?.actionType ?? "",
         objectHighlighted: movement.targetObjectHighlight?.mode === "selected"
       };
     },

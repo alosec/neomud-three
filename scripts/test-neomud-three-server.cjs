@@ -425,6 +425,11 @@ async function main() {
       );
       assert.match(await page.locator("#interaction-prompt").textContent(), /Pick up/i);
       await page.keyboard.press("f");
+      const lootSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
+      assert.equal(lootSelection.actionBadgeVisible, true);
+      assert.equal(lootSelection.actionBadgeValue, "Pick up");
+      assert.equal(lootSelection.actionBadgeType, lootTarget.actionType);
+      assert.equal(lootSelection.healthBarVisible, false);
       assert.equal(await page.locator(`[data-interact-feature="${lootTarget.id}"]`).textContent(), "Pick up");
       const beforePickupMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
       await page.locator(`[data-interact-feature="${lootTarget.id}"]`).click();
