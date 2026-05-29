@@ -51,10 +51,12 @@ const TAVERN = {
 };
 
 const TAVERN_TABLES = [
-  { id: "table-northwest", x: -4.65, z: -7.1, rotation: 0.18, collider: { width: 2.35, depth: 1.78 } },
-  { id: "table-northeast", x: 4.2, z: -6.72, rotation: -0.24, collider: { width: 2.35, depth: 1.78 } },
-  { id: "table-southwest", x: -3.35, z: 6.35, rotation: 0.42, collider: { width: 2.35, depth: 1.78 } },
-  { id: "table-southeast", x: 5.95, z: 5.05, rotation: -0.12, collider: { width: 2.35, depth: 1.78 } }
+  { id: "table-northwest", x: -4.85, z: -7.2, rotation: 0.18, collider: { width: 1.75, depth: 1.32 } },
+  { id: "table-north", x: 0.1, z: -7.45, rotation: -0.08, collider: { width: 1.75, depth: 1.32 } },
+  { id: "table-northeast", x: 5.05, z: -6.9, rotation: -0.24, collider: { width: 1.75, depth: 1.32 } },
+  { id: "table-southwest", x: -4.55, z: 6.75, rotation: 0.42, collider: { width: 1.75, depth: 1.32 } },
+  { id: "table-south", x: 0.5, z: 6.95, rotation: 0.08, collider: { width: 1.75, depth: 1.32 } },
+  { id: "table-southeast", x: 6.15, z: 5.35, rotation: -0.12, collider: { width: 1.75, depth: 1.32 } }
 ];
 
 const MARKET = {

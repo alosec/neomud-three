@@ -50,11 +50,11 @@ export const TOWN_SQUARE_SPEC = {
       kind: "backdrop",
       asset: "townHorizonDay",
       x: 0,
-      y: 13.6,
+      y: 11.2,
       z: -48,
       width: 136,
-      height: 44,
-      opacity: 0.94
+      height: 34,
+      opacity: 0.64
     },
     {
       id: "far-hills-south",
@@ -62,12 +62,12 @@ export const TOWN_SQUARE_SPEC = {
       kind: "backdrop",
       asset: "townHorizonDay",
       x: 0,
-      y: 13.6,
+      y: 11.2,
       z: 52,
       rotationY: Math.PI,
       width: 136,
-      height: 44,
-      opacity: 0.72
+      height: 34,
+      opacity: 0.58
     },
     {
       id: "far-hills-east",
@@ -75,12 +75,12 @@ export const TOWN_SQUARE_SPEC = {
       kind: "backdrop",
       asset: "townHorizonDay",
       x: 52,
-      y: 13.6,
+      y: 11.2,
       z: 0,
       rotationY: -Math.PI / 2,
       width: 136,
-      height: 44,
-      opacity: 0.72
+      height: 34,
+      opacity: 0.58
     },
     {
       id: "far-hills-west",
@@ -88,12 +88,12 @@ export const TOWN_SQUARE_SPEC = {
       kind: "backdrop",
       asset: "townHorizonDay",
       x: -52,
-      y: 13.6,
+      y: 11.2,
       z: 0,
       rotationY: Math.PI / 2,
       width: 136,
-      height: 44,
-      opacity: 0.72
+      height: 34,
+      opacity: 0.58
     },
     {
       id: "outer-ground-and-roads",
@@ -116,14 +116,29 @@ export const TOWN_SQUARE_SPEC = {
       kind: "wall-runs",
       material: "stone",
       runs: [
-        { x: -16.4, z: -25.1, width: 11.2, height: 1.25, depth: 0.8 },
-        { x: 16.4, z: -25.1, width: 11.2, height: 1.25, depth: 0.8 },
-        { x: -20.2, z: 25.1, width: 9.6, height: 1.25, depth: 0.8 },
-        { x: 20.2, z: 25.1, width: 9.6, height: 1.25, depth: 0.8 },
-        { x: -25.1, z: -15.7, width: 0.8, height: 1.25, depth: 11.8 },
-        { x: -25.1, z: 15.7, width: 0.8, height: 1.25, depth: 11.8 },
-        { x: 25.1, z: -15.7, width: 0.8, height: 1.25, depth: 11.8 },
-        { x: 25.1, z: 15.7, width: 0.8, height: 1.25, depth: 11.8 }
+        { x: -16.4, z: -25.1, width: 11.2, height: 1.9, depth: 0.8 },
+        { x: 16.4, z: -25.1, width: 11.2, height: 1.9, depth: 0.8 },
+        { x: -20.2, z: 25.1, width: 9.6, height: 1.9, depth: 0.8 },
+        { x: 20.2, z: 25.1, width: 9.6, height: 1.9, depth: 0.8 },
+        { x: -25.1, z: -15.7, width: 0.8, height: 1.9, depth: 11.8 },
+        { x: -25.1, z: 15.7, width: 0.8, height: 1.9, depth: 11.8 },
+        { x: 25.1, z: -15.7, width: 0.8, height: 1.9, depth: 11.8 },
+        { x: 25.1, z: 15.7, width: 0.8, height: 1.9, depth: 11.8 }
+      ]
+    },
+    {
+      id: "perimeter-rowhouses",
+      ring: "middle",
+      kind: "context-masses",
+      masses: [
+        { material: "plasterQuiet", x: -15.5, y: 2.1, z: -29.2, width: 8.2, height: 4.2, depth: 4.0 },
+        { material: "plasterQuiet", x: 15.5, y: 2.1, z: -29.2, width: 8.2, height: 4.2, depth: 4.0 },
+        { material: "plasterQuiet", x: -29.2, y: 1.9, z: 0, width: 4.0, height: 3.8, depth: 9.0 },
+        { material: "plasterQuiet", x: 29.2, y: 1.9, z: 0, width: 4.0, height: 3.8, depth: 9.0 },
+        { material: "roofQuiet", x: -15.5, y: 4.62, z: -29.2, width: 8.8, height: 0.85, depth: 4.7 },
+        { material: "roofQuiet", x: 15.5, y: 4.62, z: -29.2, width: 8.8, height: 0.85, depth: 4.7 },
+        { material: "roofQuiet", x: -29.2, y: 4.22, z: 0, width: 4.7, height: 0.85, depth: 9.6 },
+        { material: "roofQuiet", x: 29.2, y: 4.22, z: 0, width: 4.7, height: 0.85, depth: 9.6 }
       ]
     },
     {
@@ -202,7 +217,7 @@ export const TOWN_SQUARE_SPEC = {
         z: -0.2,
         rotationY: -Math.PI / 2,
         width: 11.6,
-        height: 6.0,
+        height: 7.4,
         depth: 6.6,
         floors: 2,
         roofMaterial: "roof",
@@ -210,7 +225,7 @@ export const TOWN_SQUARE_SPEC = {
         facadeMaterial: "plasterFacade",
         sign: true,
         awning: null,
-        roofHeight: 1.78,
+        roofHeight: 2.15,
         dormers: 0
       },
       stalls: [
@@ -277,7 +292,7 @@ export const TOWN_SQUARE_SPEC = {
         z: 0,
         rotationY: Math.PI / 2,
         width: 12.4,
-        height: 6.2,
+        height: 7.8,
         depth: 7.0,
         floors: 2,
         roofMaterial: "roofRed",
@@ -285,7 +300,7 @@ export const TOWN_SQUARE_SPEC = {
         facadeMaterial: "plasterFacadeWarm",
         sign: false,
         awning: null,
-        roofHeight: 1.92,
+        roofHeight: 2.35,
         chimney: true,
         dormers: 1
       }
