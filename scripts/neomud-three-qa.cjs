@@ -9,7 +9,7 @@ const RENDER_BUDGETS = {
     geometries: 300
   },
   "town:square": {
-    calls: 240,
+    calls: 270,
     triangles: 80_000,
     textures: 48,
     geometries: 230

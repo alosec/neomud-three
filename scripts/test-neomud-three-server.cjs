@@ -68,6 +68,7 @@ async function main() {
 
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
     assert.match(await page.locator("#status-text").textContent(), /Kotlin server:/);
+    await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform"));
     await saveScreenshot(page, "server-temple.png");
     budgetReports.push(await collectBudgetStatus(page, "town:temple"));
     assertRenderBudget(assert, "town:temple", budgetReports.at(-1).stats);
@@ -292,6 +293,30 @@ async function main() {
         deepForestEntities.some((entity) => entity.id === "npc:forest_spider" && /Giant Forest Spider/i.test(entity.name)),
         `expected server Giant Forest Spider in Deep Forest, got ${JSON.stringify(deepForestEntities)}`
       );
+      const forestSpider = deepForestEntities.find((entity) => entity.id === "npc:forest_spider");
+      await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), forestSpider);
+      await page.waitForFunction(
+        () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:forest_spider",
+        null,
+        { timeout: 2_000 }
+      );
+      await page.keyboard.press("f");
+      assert.equal(await page.locator("#panel-title").textContent(), "Giant Forest Spider");
+      assert.equal(await page.locator('[data-combat-command="attack"]').isDisabled(), false);
+      const beforeAttackMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
+      await page.locator('[data-combat-command="attack"]').click();
+      await page.waitForFunction(
+        (before) => {
+          const server = window.__neomudThreeDebug.server;
+          return server.messageCount > before
+            && server.attackMode === true
+            && server.selectedTargetId === "npc:forest_spider"
+            && /Attacking Giant Forest Spider/i.test(server.lastCombatResult?.message ?? "");
+        },
+        beforeAttackMessages,
+        { timeout: 5_000 }
+      );
+      await page.keyboard.press("Escape");
     }
     await saveScreenshot(page, "server-deep-forest.png");
     budgetReports.push(await collectBudgetStatus(page, "forest:deep"));

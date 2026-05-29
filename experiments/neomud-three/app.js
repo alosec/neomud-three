@@ -54,6 +54,7 @@ let exitCooldownUntil = 0;
 let nearbyInteractable = null;
 let selectedInteractable = null;
 let lastInteractionResult = null;
+let lastCombatResult = null;
 let pickupFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
 let cameraMode = urlParams.get("camera") === "platform" ? "platform" : "isometric";
@@ -77,6 +78,8 @@ const serverState = {
   inventory: [],
   equipment: {},
   coins: null,
+  attackMode: false,
+  selectedTargetId: null,
   pendingMove: null,
   lastError: "",
   messageCount: 0
@@ -304,6 +307,52 @@ function handleServerMessage(message) {
       break;
     case "system_message":
       appendLog(message.message);
+      break;
+    case "attack_mode_update":
+      serverState.attackMode = Boolean(message.enabled);
+      lastCombatResult = {
+        success: true,
+        targetName: selectedInteractable?.name ?? "Target",
+        message: serverState.attackMode ? "Attack mode enabled." : "Attack mode disabled."
+      };
+      appendLog(lastCombatResult.message);
+      if (activePanel === "interaction") renderPanel(activePanel);
+      break;
+    case "combat_hit": {
+      const outcome = message.isMiss
+        ? "misses"
+        : message.isDodge
+          ? "is dodged by"
+          : message.isParry
+            ? "is parried by"
+            : `hits for ${message.damage} damage`;
+      const line = `${message.attackerName} ${outcome} ${message.defenderName}.`;
+      lastCombatResult = {
+        success: !message.isPlayerDefender,
+        targetName: message.defenderName ?? selectedInteractable?.name ?? "Target",
+        message: `${line} ${message.defenderHp}/${message.defenderMaxHp} HP.`
+      };
+      appendLog(lastCombatResult.message);
+      if (message.isPlayerDefender) {
+        playerProfile.hp = Math.max(0, Number(message.defenderHp) || 0);
+        playerProfile.maxHp = Math.max(1, Number(message.defenderMaxHp) || playerProfile.maxHp);
+        updatePlayerHud();
+      }
+      if (activePanel === "interaction") renderPanel(activePanel);
+      break;
+    }
+    case "npc_died":
+      if (serverState.selectedTargetId === message.npcId) {
+        serverState.selectedTargetId = null;
+        serverState.attackMode = false;
+      }
+      lastCombatResult = {
+        success: true,
+        targetName: message.npcName ?? "Target",
+        message: `${message.npcName ?? "Target"} defeated.`
+      };
+      appendLog(lastCombatResult.message);
+      if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "interact_result":
       lastInteractionResult = {
@@ -555,6 +604,7 @@ function setRoom(roomId, options = {}) {
   if (!roomRuntime) return;
   nearbyInteractable = null;
   selectedInteractable = null;
+  lastCombatResult = null;
   updateInteractionPrompt();
   refreshRoomDebugOverlay();
   renderEngine.applyEnvironment(roomRuntime.environment);
@@ -1427,6 +1477,9 @@ function renderPanel(panelId) {
   for (const button of panelContent.querySelectorAll("[data-interact-feature]")) {
     button.addEventListener("click", () => useSelectedInteractable(button.dataset.interactFeature));
   }
+  for (const button of panelContent.querySelectorAll("[data-combat-command]")) {
+    button.addEventListener("click", () => useCombatCommand(button.dataset.combatCommand));
+  }
   for (const button of panelContent.querySelectorAll("[data-room-target]")) {
     button.addEventListener("click", () => {
       requestMove(button.dataset.roomDirection, button.dataset.roomTarget);
@@ -1677,21 +1730,32 @@ function hostileActionFrame(entity) {
   const classDef = world.catalogs.classesById.get(playerProfile.classId);
   const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
   const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
+  const combatReady = Boolean(serverCanDriveMovement());
   const actions = [
     {
       label: "Basic Attack",
       detail: "Weapon strike",
-      command: "attack"
+      command: "attack",
+      enabled: combatReady
     },
     {
       label: spell?.name ?? "Class Skill",
       detail: spell ? `${spell.manaCost} MP` : "Ability",
-      command: spell ? `cast:${spell.id}` : "skill"
+      command: spell ? `cast:${spell.id}` : "skill",
+      enabled: combatReady && Boolean(spell)
     }
   ];
   const authorityText = serverCanDriveMovement()
-    ? "Combat command routing is pending server protocol support."
+    ? "Server-authoritative combat commands are available."
     : "Combat requires a live server-authoritative command path.";
+  const combatResult = lastCombatResult
+    ? `
+      <div class="combat-result ${lastCombatResult.success ? "success" : "warning"}">
+        <small>${lastCombatResult.success ? "combat command sent" : "combat update"}</small>
+        <span>${escapeHtml(lastCombatResult.message)}</span>
+      </div>
+    `
+    : "";
 
   return `
     <div class="combat-actions" data-target-id="${escapeHtml(entity.id)}">
@@ -1699,9 +1763,10 @@ function hostileActionFrame(entity) {
         <strong>Actions</strong>
         <span>${escapeHtml(authorityText)}</span>
       </div>
+      ${combatResult}
       <div class="combat-action-grid">
         ${actions.map((action, index) => `
-          <button type="button" disabled data-combat-command="${escapeHtml(action.command)}">
+          <button type="button"${action.enabled ? "" : " disabled"} data-combat-command="${escapeHtml(action.command)}">
             <kbd>${index + 1}</kbd>
             <span>
               <strong>${escapeHtml(action.label)}</strong>
@@ -1811,6 +1876,9 @@ function updateInteractionPrompt() {
 
 function interactWithNearby(entity = nearbyInteractable) {
   if (!entity) return;
+  if (!entity.hostile || lastCombatResult?.targetName !== entity.name) {
+    lastCombatResult = null;
+  }
   selectedInteractable = { ...entity };
   lastInteractionResult = null;
   appendLog(`${selectedInteractable.prompt}.`);
@@ -1858,6 +1926,79 @@ function sendSelectedInteractableCommand(entity) {
     return serverState.client.sendPickupCoins(entity.coinType ?? "all");
   }
   return serverState.client.sendInteractFeature(entity.id);
+}
+
+function useCombatCommand(command) {
+  const target = selectedInteractable;
+  if (!target?.hostile) return;
+
+  if (!serverCanDriveMovement()) {
+    lastCombatResult = {
+      success: false,
+      targetName: target.name,
+      message: "Combat requires a live Kotlin server session."
+    };
+    appendLog(`${target.name}: ${lastCombatResult.message}`);
+    if (activePanel === "interaction") renderPanel(activePanel);
+    return;
+  }
+
+  let sent = false;
+  if (command === "attack") {
+    const selected = serverState.client.sendSelectTarget(target.id);
+    const enabled = serverState.client.sendAttackToggle(true);
+    sent = selected && enabled;
+    if (sent) {
+      serverState.selectedTargetId = target.id;
+      lastCombatResult = {
+        success: true,
+        targetName: target.name,
+        message: `Attacking ${target.name}.`
+      };
+      appendLog(`Attacking ${target.name} through the Kotlin server...`);
+      updateStatusText(`Attacking ${target.name}...`);
+    }
+  } else if (command?.startsWith("cast:")) {
+    const spellId = command.slice("cast:".length);
+    const selected = serverState.client.sendSelectTarget(target.id);
+    const cast = serverState.client.sendCastSpell(spellId, target.id);
+    sent = selected && cast;
+    if (sent) {
+      serverState.selectedTargetId = target.id;
+      lastCombatResult = {
+        success: true,
+        targetName: target.name,
+        message: `Casting ${spellId} at ${target.name}.`
+      };
+      appendLog(`Casting ${spellId} at ${target.name} through the Kotlin server...`);
+      updateStatusText(`Casting at ${target.name}...`);
+    }
+  } else if (command?.startsWith("skill:")) {
+    const skillId = command.slice("skill:".length);
+    const selected = serverState.client.sendSelectTarget(target.id);
+    const skill = serverState.client.sendUseSkill(skillId, target.id);
+    sent = selected && skill;
+    if (sent) {
+      serverState.selectedTargetId = target.id;
+      lastCombatResult = {
+        success: true,
+        targetName: target.name,
+        message: `Using ${skillId} on ${target.name}.`
+      };
+      appendLog(`Using ${skillId} on ${target.name} through the Kotlin server...`);
+      updateStatusText(`Using skill on ${target.name}...`);
+    }
+  }
+
+  if (!sent) {
+    lastCombatResult = {
+      success: false,
+      targetName: target.name,
+      message: "Could not send the combat command."
+    };
+    appendLog(`${target.name}: ${lastCombatResult.message}`);
+  }
+  if (activePanel === "interaction") renderPanel(activePanel);
 }
 
 function shortDirection(direction) {
@@ -2208,9 +2349,12 @@ function installDebugApi() {
         authenticated: serverState.authenticated,
         phase: serverState.phase,
         player: serverState.player,
+        attackMode: serverState.attackMode,
+        selectedTargetId: serverState.selectedTargetId,
         pendingMove: serverState.pendingMove,
         lastError: serverState.lastError,
         lastInteractionResult,
+        lastCombatResult,
         messageCount: serverState.messageCount,
         npcs: serverState.npcs.map((npc) => ({
           id: npc.id ?? npc.npcId ?? "",

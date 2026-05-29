@@ -739,6 +739,32 @@ p {
   text-align: right;
 }
 
+.combat-result {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 8px;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 210, 130, 0.25);
+  color: #ead6a8;
+  background: rgba(54, 38, 10, 0.44);
+}
+
+.combat-result.warning {
+  border-color: rgba(255, 137, 108, 0.3);
+  color: #ffd0c1;
+  background: rgba(58, 18, 13, 0.48);
+}
+
+.combat-result small {
+  color: #a99f8a;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.combat-result span {
+  font-size: 12px;
+}
+
 .combat-action-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

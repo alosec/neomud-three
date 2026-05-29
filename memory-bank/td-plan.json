@@ -109,6 +109,11 @@
           "created": "2026-05-29T22:10:00Z"
         },
         {
+          "id": 22,
+          "body": "Live hostile Basic Attack is now wired through the Kotlin protocol instead of remaining a disabled placeholder: the client sends select_target plus attack_toggle for the selected hostile, tracks attack_mode_update/combat_hit/npc_died responses, and exposes combat state in the debug API. Server-backed QA verifies Giant Forest Spider can be selected and attack mode enabled.",
+          "created": "2026-05-29T22:40:00Z"
+        },
+        {
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"

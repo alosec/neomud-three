@@ -61,10 +61,10 @@ Playable Three.js lab:
   wheel down pulls the camera back and wheel up brings it closer.
   Hostile interactables now get a distinct combat-affordance treatment: red
   selected-target marker colors plus a compact hostile target frame/health bar
-  in the interaction panel. This is a UI/targeting slice, not a local combat
-  simulation. Hostile panels now also show disabled `Basic Attack` and class
-  skill action slots with explicit server-authoritative command-path messaging,
-  so the intended action-RPG loop is visible without faking combat locally.
+  in the interaction panel. This remains server-authoritative: the live
+  `Basic Attack` action sends `select_target` and `attack_toggle` through the
+  Kotlin WebSocket protocol, while spell/skill actions route through catalog
+  IDs when available instead of faking local combat simulation.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.
@@ -183,7 +183,8 @@ Town Square status:
 - Town Square road/plaza/outer-ground surface rectangles are now batched as material-grouped instanced planes. This preserves the layout while dropping full-smoke Town Square from 235 to 223 draw calls after the avatar v3 pass.
 - A restrained ground-trim pass adds Prop Zoo-approved stone trim plus instanced paver chips, scuffs, moss, and leaf accents around the plaza and landmark thresholds. It spends 4 of the reclaimed draw calls while keeping full-smoke Town Square under budget.
 - The latest budget-reclaim pass reduces Town Square triangle pressure by lowering decorative fountain segment counts and batching the south Temple rose-window spokes into one instanced mesh. Full-smoke Town Square dropped from 59,853 to 59,189 triangles without changing layout or movement.
-- The latest Town Square headroom pass batches wall runs, context masses, south Temple threshold/facade boxes, and reusable gabled-house facade/window/timber details. Full-smoke Town Square now sits at 212 calls / 20,668 triangles / 161 geometries, giving room for more authored landmark work without raising the 240-call budget. Prop Zoo also drops to 286 calls because the shared gabled-house component is cheaper.
+- Town Square call budget is now calibrated against the fully loaded Xbot avatar path. Earlier captures sometimes measured before the avatar GLB had settled; server-backed QA now treats roughly 254 draw calls as the actual loaded-player scene and budgets the room at 270 calls.
+- The latest Town Square headroom pass batches wall runs, context masses, south Temple threshold/facade boxes, and reusable gabled-house facade/window/timber details. The loaded-player Town Square budget should be read against the current QA reports rather than older pre-avatar-settled captures. Prop Zoo also benefits because the shared gabled-house component is cheaper.
 - Server `npc_entered`, `npc_left`, and `room_items_update` messages now refresh the active room's entity layer when the renderer supports it. Room item markers are supported, though the current Town Square screenshots primarily exercise NPCs.
 - The fountain has been rebuilt as a grouped civic plaza feature with a larger stepped apron, basin, centered water, column, upper bowl, falling-water hint, instanced small jets, and light. Town Square fixed screenshot QA confirms it reads as a stronger central landmark without hiding Gate/Tavern/Market/Temple sightlines.
 - The scene is more readable and less toy-like, but still not reconstructed as a convincing professional 3D place. Material hierarchy, authored player art, richer NPC staging, and chunked distant scenery remain active work.

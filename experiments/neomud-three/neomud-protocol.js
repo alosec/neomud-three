@@ -188,6 +188,18 @@ export function connectNeoMud(options = {}) {
     sendPickupCoins(coinType = "all") {
       return send({ type: "pickup_coins", coinType });
     },
+    sendSelectTarget(npcId = null) {
+      return send({ type: "select_target", npcId });
+    },
+    sendAttackToggle(enabled) {
+      return send({ type: "attack_toggle", enabled: Boolean(enabled) });
+    },
+    sendUseSkill(skillId, targetId = null) {
+      return send({ type: "use_skill", skillId, targetId });
+    },
+    sendCastSpell(spellId, targetId = null) {
+      return send({ type: "cast_spell", spellId, targetId });
+    },
     sendLook() {
       return send({ type: "look" });
     },
