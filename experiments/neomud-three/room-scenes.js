@@ -6697,6 +6697,7 @@ function addGatehouseLandmark(root, materials, landmark) {
   addBox(group, materials.darkTimber, 0, 4.1, -22.1, 6.6, 0.56, 0.42);
   addBox(group, materials.portalDark, landmark.portal.x, landmark.portal.height / 2, landmark.portal.z, landmark.portal.width, landmark.portal.height, landmark.portal.depth);
   addGatehouseTrim(group, materials, landmark);
+  addGatehouseMasonryDetail(group, materials, landmark);
   addPortalFrame(root, materials, portalFrameSpec(landmark));
 }
 
@@ -6750,6 +6751,48 @@ function addGatehouseTrim(root, materials, landmark) {
     "north-gate-portal-trim",
     { castShadow: false, receiveShadow: false }
   );
+}
+
+function addGatehouseMasonryDetail(root, materials, landmark) {
+  const frontZ = Math.max(...landmark.towers.map((tower) => tower.z + tower.depth / 2)) + 0.07;
+  const stoneTrim = [];
+  const darkTrim = [];
+  const lightTrim = [];
+  const banners = [];
+
+  for (const tower of landmark.towers) {
+    const side = Math.sign(tower.x) || 1;
+    stoneTrim.push({ x: tower.x - side * tower.width * 0.42, y: tower.height * 0.5, z: frontZ, width: 0.24, height: tower.height * 0.76, depth: 0.16 });
+    stoneTrim.push({ x: tower.x + side * tower.width * 0.42, y: tower.height * 0.5, z: frontZ, width: 0.24, height: tower.height * 0.76, depth: 0.16 });
+    stoneTrim.push({ x: tower.x, y: tower.height * 0.74, z: frontZ + 0.01, width: tower.width * 0.64, height: 0.16, depth: 0.14 });
+    stoneTrim.push({ x: tower.x, y: tower.height * 0.34, z: frontZ + 0.01, width: tower.width * 0.64, height: 0.14, depth: 0.14 });
+    darkTrim.push({ x: tower.x, y: tower.height * 0.18, z: frontZ + 0.02, width: tower.width * 0.7, height: 0.16, depth: 0.12 });
+    banners.push({ x: tower.x - side * tower.width * 0.34, y: tower.height * 0.48, z: frontZ + 0.035, width: 0.12, height: 2.8, depth: 0.04 });
+  }
+
+  for (const x of [-2.72, 2.72]) {
+    lightTrim.push({ x, y: 2.45, z: frontZ + 0.04, width: 0.16, height: 4.5, depth: 0.08 });
+  }
+  lightTrim.push({ x: 0, y: 4.78, z: frontZ + 0.045, width: 5.7, height: 0.14, depth: 0.08 });
+  lightTrim.push({ x: 0, y: 5.62, z: frontZ + 0.035, width: 7.6, height: 0.2, depth: 0.1 });
+  darkTrim.push({ x: 0, y: 5.94, z: frontZ + 0.04, width: 6.8, height: 0.28, depth: 0.1 });
+
+  addInstancedBoxes(root, materials.darkStone, stoneTrim, "north-gate-masonry-depth");
+  addInstancedBoxes(root, materials.portalDark, darkTrim, "north-gate-masonry-shadows", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.trimLight, lightTrim, "north-gate-arch-highlight", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.awningGold, banners, "north-gate-hanging-banners", { castShadow: false, receiveShadow: true });
+
+  const arch = new THREE.Mesh(
+    new THREE.TorusGeometry(2.75, 0.09, 8, 32, Math.PI),
+    materials.trimLight
+  );
+  arch.name = "north-gate-stone-arch";
+  arch.position.set(0, 4.72, frontZ + 0.06);
+  arch.rotation.set(0, 0, Math.PI);
+  arch.scale.y = 0.72;
+  arch.castShadow = false;
+  arch.receiveShadow = true;
+  root.add(arch);
 }
 
 function battlementBoxesFor(x, y, z, width, depth) {
