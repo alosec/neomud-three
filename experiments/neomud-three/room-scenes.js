@@ -7158,9 +7158,12 @@ function addTempleRuntimeFinish(root, materials) {
   const upperWallRibs = [];
   const ceilingRibs = [];
   const altarFrame = [];
+  const altarSidePanels = [];
+  const altarGoldAccents = [];
   const sideFloorBands = [];
   const aisleBreaks = [];
   const centerRunnerShade = [];
+  const altarFloorFocus = [];
 
   for (const side of [-1, 1]) {
     const wallX = side * 13.68;
@@ -7188,21 +7191,40 @@ function addTempleRuntimeFinish(root, materials) {
   }
   altarFrame.push({ x: -4.55, y: 4.02, z: 20.42, width: 0.18, height: 3.02, depth: 0.18 });
   altarFrame.push({ x: 4.55, y: 4.02, z: 20.42, width: 0.18, height: 3.02, depth: 0.18 });
+  for (const side of [-1, 1]) {
+    altarSidePanels.push({ x: side * 7.2, y: 3.65, z: 21.48, width: 1.55, height: 4.25, depth: 0.12 });
+    altarSidePanels.push({ x: side * 9.25, y: 3.15, z: 21.5, width: 1.18, height: 3.25, depth: 0.12 });
+    altarGoldAccents.push({ x: side * 7.2, y: 5.92, z: 21.38, width: 1.82, height: 0.16, depth: 0.1 });
+    altarGoldAccents.push({ x: side * 7.2, y: 1.42, z: 21.38, width: 1.82, height: 0.16, depth: 0.1 });
+    altarGoldAccents.push({ x: side * 9.25, y: 4.92, z: 21.38, width: 1.38, height: 0.14, depth: 0.1 });
+  }
   centerRunnerShade.push({ x: 0, y: 0.034, z: -8.1, width: 2.35, depth: 44.5 });
+  altarFloorFocus.push({ x: 0, y: 0.037, z: 15.6, width: 7.8, depth: 4.2 });
+  altarFloorFocus.push({ x: 0, y: 0.038, z: 19.1, width: 9.2, depth: 2.6 });
 
   addInstancedBoxes(root, materials.trim, baseTrim, "temple-runtime-wall-base-trim", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.windowReveal ?? materials.trim, wallPilasterCaps, "temple-runtime-pilaster-caps", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.windowReveal ?? materials.trim, upperWallRibs, "temple-runtime-upper-wall-ribs", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.ceilingWarmShadow ?? materials.trim, ceilingRibs, "temple-runtime-ceiling-rhythm", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.trim, altarFrame, "temple-runtime-altar-frame", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.windowReveal ?? materials.trim, altarSidePanels, "temple-runtime-altar-side-panels", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.dawnRunner ?? materials.trim, altarGoldAccents, "temple-runtime-altar-gold-accents", { castShadow: false, receiveShadow: true });
   addInstancedSurfaceRects(root, {
     sideBand: floorBandMaterial,
     aisleBreak: floorBandMaterial,
-    centerShade: floorShadeMaterial
+    centerShade: floorShadeMaterial,
+    altarFocus: new THREE.MeshBasicMaterial({
+      color: 0xd2bd7a,
+      transparent: true,
+      opacity: 0.16,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    })
   }, [
     ...sideFloorBands.map((band) => ({ ...band, material: "sideBand" })),
     ...aisleBreaks.map((band) => ({ ...band, material: "aisleBreak" })),
-    ...centerRunnerShade.map((band) => ({ ...band, material: "centerShade" }))
+    ...centerRunnerShade.map((band) => ({ ...band, material: "centerShade" })),
+    ...altarFloorFocus.map((band) => ({ ...band, material: "altarFocus" }))
   ], "temple-runtime-floor-trim");
 }
 
