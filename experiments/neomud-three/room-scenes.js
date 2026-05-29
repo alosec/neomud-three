@@ -1096,9 +1096,9 @@ export function buildForestEdgeRoom({ root, worldRoot, npcs = [], roomItems = []
     spawn: { position: new THREE.Vector3(0, 0, 13.1), heading: 0 },
     status: "Forest Edge: authored wilderness threshold with South gate return, North forest path, tree collision, and server-driven hostile Forest Rat.",
     environment: {
-      background: 0x3d5140,
-      fog: 0x384b3b,
-      fogDensity: 0.014
+      background: 0x62776a,
+      fog: 0x4b604f,
+      fogDensity: 0.011
     },
     camera: {
       distance: 8.0,
@@ -3336,23 +3336,7 @@ function addForestEdgeStage(root, materials, worldRoot) {
   ], "forest-edge-moss-patches");
   addForestGroundBreakup(root, materials, "edge");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4, {
-    unlit: true,
-    castShadow: false,
-    receiveShadow: false
-  });
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, -15.8, 7.4, -4.2, 26, 16.2, {
-    rotationY: Math.PI / 2,
-    opacity: 0.72,
-    unlit: true,
-    castShadow: false
-  });
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 15.8, 7.4, -4.2, 26, 16.2, {
-    rotationY: -Math.PI / 2,
-    opacity: 0.72,
-    unlit: true,
-    castShadow: false
-  });
+  addStylizedForestBackdrop(root, materials);
   addForestEdgeDepthLayers(root, materials);
   addForestEdgeSouthTownWall(root, materials);
   addForestEdgeTrees(root, materials);
@@ -3369,6 +3353,57 @@ function addForestEdgeStage(root, materials, worldRoot) {
   const shaftLight = new THREE.PointLight(0xffd58a, 2.2, 11.5);
   shaftLight.position.set(-2.8, 4.5, -4.8);
   root.add(shaftLight);
+}
+
+function addStylizedForestBackdrop(root, materials) {
+  const trunks = [];
+  const darkCanopy = [];
+  const lightCanopy = [];
+  const shrubBands = [];
+  const pathBands = [];
+  const ridgeBands = [];
+
+  for (const [x, z, scale, lean] of [
+    [-17.2, -20.8, 1.25, -0.1], [-13.4, -23.2, 1.5, 0.08], [-9.6, -24.2, 1.1, -0.06],
+    [-5.4, -25.0, 1.32, 0.04], [5.2, -25.0, 1.28, -0.05], [9.4, -24.0, 1.08, 0.07],
+    [13.5, -23.0, 1.48, -0.04], [17.2, -20.6, 1.22, 0.1],
+    [-18.4, -10.8, 1.05, 0.05], [18.2, -10.6, 1.02, -0.04]
+  ]) {
+    trunks.push({ x, y: 3.0 * scale, z, width: 0.5 * scale, height: 6.0 * scale, depth: 0.5 * scale, rotationZ: lean });
+    darkCanopy.push({ x, y: 7.1 * scale, z: z + 0.15, scale: [2.4 * scale, 0.85 * scale, 1.65 * scale], rotationY: x * 0.03 });
+    lightCanopy.push({ x: x + 0.55, y: 7.75 * scale, z: z - 0.25, scale: [1.45 * scale, 0.55 * scale, 1.05 * scale], rotationY: -x * 0.025 });
+  }
+
+  for (const [x, z, width, height, depth] of [
+    [-12.8, -18.8, 7.8, 1.45, 1.0], [12.8, -18.8, 7.8, 1.45, 1.0],
+    [-18.4, -4.8, 1.0, 1.65, 18.0], [18.4, -4.8, 1.0, 1.65, 18.0],
+    [-9.0, -24.4, 7.4, 1.15, 0.9], [9.0, -24.4, 7.4, 1.15, 0.9]
+  ]) {
+    shrubBands.push({ x, y: height / 2, z, width, height, depth });
+  }
+
+  for (const [x, z, width, depth] of [
+    [0, -20.4, 5.0, 8.8],
+    [0, -26.0, 3.2, 5.0]
+  ]) {
+    pathBands.push({ material: "forestTrail", x, z, width, depth, y: 0.028 });
+  }
+
+  for (const [x, z, width, height, depth] of [
+    [-20.0, -29.0, 12.0, 2.0, 1.2],
+    [-7.0, -30.4, 12.6, 2.35, 1.2],
+    [7.0, -30.2, 12.4, 2.2, 1.2],
+    [20.0, -29.0, 12.0, 2.0, 1.2]
+  ]) {
+    ridgeBands.push({ x, y: height / 2, z, width, height, depth });
+  }
+
+  addInstancedSurfaceRects(root, materials, pathBands, "forest-edge-stylized-backdrop-path");
+  addInstancedBoxes(root, materials.forestShadow ?? materials.foliageDark, ridgeBands, "forest-edge-stylized-backdrop-ridges", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.trunk, trunks, "forest-edge-stylized-backdrop-trunks", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.foliageDark, shrubBands, "forest-edge-stylized-backdrop-shrubs", { castShadow: false, receiveShadow: true });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliageDark, darkCanopy, "forest-edge-stylized-backdrop-dark-canopy", { castShadow: false, receiveShadow: false });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliage, lightCanopy, "forest-edge-stylized-backdrop-light-canopy", { castShadow: false, receiveShadow: false });
 }
 
 function addForestEdgeSouthTownWall(root, materials) {
