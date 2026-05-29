@@ -85,7 +85,10 @@ Playable Three.js lab:
   orbit offsets and uses the first clear angle instead of leaving the avatar
   hidden behind foreground geometry. Debug state reports
   `camera.obstruction.avoided` and `avoidanceAngle`, and Town Square screenshot
-  QA captures this as `town-shot-isometric-camera-avoidance.png`.
+  QA captures this as `town-shot-isometric-camera-avoidance.png`. Tight-room
+  blockers now also get a transient low-opacity material clone when no sampled
+  Iso orbit angle clears the avatar ray; Town Square QA verifies this fallback
+  in the Tavern as `town-shot-tavern-iso-fade.png`.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

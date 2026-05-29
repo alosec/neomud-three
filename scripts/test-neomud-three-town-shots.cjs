@@ -319,6 +319,25 @@ async function main() {
     }, "town-shots-report.json");
 
     await page.evaluate(() => {
+      window.__neomudThreeDebug.setRoom("town:tavern");
+      window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.setIsoOrbitAngle(0);
+    });
+    await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:tavern", null, { timeout: 5_000 });
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.placePlayer({ x: 8, z: 10, heading: 0 });
+    });
+    await settleFrames(page);
+    const tavernObstruction = await page.evaluate(() => window.__neomudThreeDebug.camera.obstruction);
+    assert.ok(
+      tavernObstruction?.faded,
+      `expected tight Tavern Iso obstruction to fade the foreground blocker, got ${JSON.stringify(tavernObstruction)}`
+    );
+    const fadeTarget = path.join(qaDir, "town-shot-tavern-iso-fade.png");
+    await page.screenshot({ path: fadeTarget, animations: "disabled" });
+    screenshots.push({ id: "tavern-iso-fade", path: fadeTarget });
+
+    await page.evaluate(() => {
       window.__neomudThreeDebug.setRoom("town:square");
       window.__neomudThreeDebug.setCameraMode("isometric");
     });

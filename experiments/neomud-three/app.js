@@ -2022,6 +2022,11 @@ function installDebugApi() {
     setIsoZoom(value) {
       return setIsoZoom(value, { snap: true });
     },
+    setIsoOrbitAngle(value) {
+      cameraControls.isoOrbitAngle = Number.isFinite(Number(value)) ? Number(value) : 0;
+      updateCamera(1, true);
+      return cameraControls.isoOrbitAngle;
+    },
     toggleDebugOverlay() {
       return setRoomDebugOverlay(!roomDebugVisible);
     },

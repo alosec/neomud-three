@@ -51,6 +51,7 @@ export function createRenderEngine(canvas) {
   const cameraBlockers = [];
   const isoProbeDesired = new THREE.Vector3();
   const isoProbeLookTarget = new THREE.Vector3();
+  const cameraFadeMaterials = new Map();
   let isoCameraAvoidanceAngle = 0;
   const pickupEffects = [];
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
@@ -76,6 +77,7 @@ export function createRenderEngine(canvas) {
       return cameraObstruction;
     },
     replaceWorld(factory) {
+      restoreCameraFadeMaterials(cameraFadeMaterials);
       disposeObjectTree(worldRoot);
       worldRoot.clear();
       disposeRoomDebugLayer(debugRoot);
@@ -143,9 +145,11 @@ export function createRenderEngine(canvas) {
         });
         isoCameraAvoidanceAngle = isoResult.avoidanceAngle;
         cameraObstruction = isoResult.obstruction;
+        updateCameraFadeMaterials(cameraFadeMaterials, isoResult.fadeTarget);
         return;
       }
 
+      restoreCameraFadeMaterials(cameraFadeMaterials);
       const forward = new THREE.Vector3(Math.sin(heading), 0, -Math.cos(heading));
       const right = new THREE.Vector3(Math.cos(heading), 0, Math.sin(heading));
       const distance = roomCamera.distance ?? 9.8;
@@ -292,15 +296,18 @@ function updateIsometricCamera({
     cameraTarget.lerp(cameraLookTarget, Math.min(1, dt * 4.8));
   }
   camera.lookAt(cameraTarget);
+  const fadeTarget = Math.abs(avoidanceAngle) > 0.02 ? null : desiredAvoidance.fadeTarget;
   return {
     avoidanceAngle,
     obstruction: desiredAvoidance.obstruction
       ? {
           ...desiredAvoidance.obstruction,
           avoided: Math.abs(avoidanceAngle) > 0.02,
-          avoidanceAngle: Number(avoidanceAngle.toFixed(3))
+          avoidanceAngle: Number(avoidanceAngle.toFixed(3)),
+          faded: Boolean(fadeTarget)
         }
-      : null
+      : null,
+    fadeTarget
   };
 }
 
@@ -324,8 +331,9 @@ function chooseIsometricAvoidanceAngle({
 
   const offsets = [0, 0.36, -0.36, 0.72, -0.72, 1.08, -1.08];
   let firstObstruction = null;
+  let firstFadeTarget = null;
   for (const offset of offsets) {
-    const obstruction = probeIsometricObstruction({
+    const probe = probeIsometricObstruction({
       player,
       angle: baseAngle + offset,
       distance,
@@ -339,10 +347,12 @@ function chooseIsometricAvoidanceAngle({
       probeDesired,
       probeLookTarget
     });
+    const obstruction = probe.obstruction;
     if (!firstObstruction && obstruction) firstObstruction = obstruction;
-    if (!obstruction) return { angle: offset, obstruction: firstObstruction };
+    if (!firstFadeTarget && probe.object) firstFadeTarget = probe.object;
+    if (!obstruction) return { angle: offset, obstruction: firstObstruction, fadeTarget: null };
   }
-  return { angle: 0, obstruction: firstObstruction };
+  return { angle: 0, obstruction: firstObstruction, fadeTarget: firstFadeTarget };
 }
 
 function probeIsometricObstruction({
@@ -368,7 +378,7 @@ function probeIsometricObstruction({
   return resolveCameraObstruction(probeLookTarget, probeDesired, worldRoot, raycaster, direction, blockers, {
     minDistance: 2.15,
     margin: 0.42
-  }).obstruction;
+  });
 }
 
 function resolveCameraObstruction(origin, desired, worldRoot, raycaster, direction, blockers, options = {}) {
@@ -397,11 +407,63 @@ function resolveCameraObstruction(origin, desired, worldRoot, raycaster, directi
   return {
     position: origin.clone().addScaledVector(direction, adjustedDistance),
     obstruction: {
+      objectId: hit.object.uuid,
       objectName: hit.object.name || hit.object.parent?.name || "unnamed",
       distance: Number(hit.distance.toFixed(3)),
       adjustedDistance: Number(adjustedDistance.toFixed(3))
-    }
+    },
+    object: hit.object
   };
+}
+
+function updateCameraFadeMaterials(fadedObjects, fadeTarget) {
+  for (const [uuid, record] of fadedObjects) {
+    if (fadeTarget && uuid === fadeTarget.uuid) continue;
+    record.object.material = record.originalMaterial;
+    disposeMaterial(record.fadeMaterial);
+    fadedObjects.delete(uuid);
+  }
+
+  if (!fadeTarget || fadedObjects.has(fadeTarget.uuid)) return;
+  const originalMaterial = fadeTarget.material;
+  const fadeMaterial = cloneFadeMaterial(originalMaterial);
+  if (!fadeMaterial) return;
+  fadedObjects.set(fadeTarget.uuid, {
+    object: fadeTarget,
+    originalMaterial,
+    fadeMaterial
+  });
+  fadeTarget.material = fadeMaterial;
+}
+
+function restoreCameraFadeMaterials(fadedObjects) {
+  for (const record of fadedObjects.values()) {
+    record.object.material = record.originalMaterial;
+    disposeMaterial(record.fadeMaterial);
+  }
+  fadedObjects.clear();
+}
+
+function cloneFadeMaterial(material) {
+  if (Array.isArray(material)) return material.map((entry) => configureFadeMaterial(entry.clone?.()));
+  return configureFadeMaterial(material?.clone?.());
+}
+
+function configureFadeMaterial(material) {
+  if (!material) return null;
+  material.transparent = true;
+  material.opacity = Math.min(material.opacity ?? 1, 0.1);
+  material.depthWrite = false;
+  material.needsUpdate = true;
+  return material;
+}
+
+function disposeMaterial(material) {
+  if (Array.isArray(material)) {
+    for (const entry of material) entry?.dispose?.();
+    return;
+  }
+  material?.dispose?.();
 }
 
 function isCameraBlockingObject(object) {

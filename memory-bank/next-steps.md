@@ -68,6 +68,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      ray is blocked, the renderer samples nearby orbit angles and rotates to the
      first clear view when possible. Town Square screenshot QA verifies one
      obstructed plaza placement and records `town-shot-isometric-camera-avoidance.png`.
+     When no sampled angle clears the ray, the current foreground blocker gets
+     a transient low-opacity material clone; QA verifies that fallback in the
+     Tavern as `town-shot-tavern-iso-fade.png`.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
@@ -103,9 +106,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      blocker, but it is not a full navmesh. Multi-obstacle rooms, dynamic
      blockers, and optimal paths still need a real pathing layer later.
    - Iso camera obstruction avoidance is also first-pass. It handles simple
-     foreground occluders by orbit sampling, but tight interiors can still have
-     no clear sampled angle; later work needs per-room camera volumes and
-     transparent/fade treatment for unavoidable blockers.
+     foreground occluders by orbit sampling and fades one unavoidable blocker
+     when no sampled angle works. Later work still needs per-room camera volumes
+     and stronger multi-object occluder fading for cramped interiors.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.

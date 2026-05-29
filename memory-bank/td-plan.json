@@ -219,10 +219,15 @@
           "id": 1,
           "body": "Implemented first bounded orbit-sampling pass: when the Iso camera ray to the avatar is blocked, the renderer samples nearby orbit offsets and uses the first clear angle when possible. Debug camera state reports avoided/avoidanceAngle, and Town Square screenshot QA captures isometric-camera-avoidance.",
           "created": "2026-05-29T20:20:00Z"
+        },
+        {
+          "id": 2,
+          "body": "Added fallback occluder fading for tight Iso cases where no sampled orbit clears the avatar ray. The renderer clones/restores only the current blocking object's material, debug state reports faded=true, and Town Square QA verifies the Tavern fallback screenshot.",
+          "created": "2026-05-29T20:48:00Z"
         }
       ],
       "created": "2026-05-29T20:07:00Z",
-      "updated": "2026-05-29T20:20:00Z"
+      "updated": "2026-05-29T20:48:00Z"
     },
     {
       "id": "neo-61d4",
