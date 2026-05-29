@@ -5409,7 +5409,7 @@ function addTownContextTrees(root, materials, trees = []) {
   group.userData = { visualRole: "context-tree-line", count: trees.length };
   root.add(group);
 
-  const trunkGeometry = new THREE.CylinderGeometry(0.22, 0.34, 2.55, 8);
+  const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.32, 3.35, 8);
   const lowerGeometry = new THREE.DodecahedronGeometry(1, 0);
   const upperGeometry = new THREE.DodecahedronGeometry(1, 0);
   const trunkMesh = new THREE.InstancedMesh(trunkGeometry, materials.trunk, trees.length);
@@ -5423,18 +5423,18 @@ function addTownContextTrees(root, materials, trees = []) {
     dummy.rotation.set(0, rotationY, 0);
     dummy.scale.setScalar(scale);
 
-    dummy.position.set(tree.x, 1.28 * scale, tree.z);
-    dummy.scale.set(scale, scale, scale);
+    dummy.position.set(tree.x, 1.68 * scale, tree.z);
+    dummy.scale.set(0.94 * scale, scale, 0.94 * scale);
     dummy.updateMatrix();
     trunkMesh.setMatrixAt(index, dummy.matrix);
 
-    dummy.position.set(tree.x, 3.05 * scale, tree.z);
-    dummy.scale.set(1.62 * scale, 1.05 * scale, 1.42 * scale);
+    dummy.position.set(tree.x, 3.88 * scale, tree.z);
+    dummy.scale.set(1.38 * scale, 1.0 * scale, 1.2 * scale);
     dummy.updateMatrix();
     lowerMesh.setMatrixAt(index, dummy.matrix);
 
-    dummy.position.set(tree.x + 0.36 * Math.cos(rotationY) * scale, 3.78 * scale, tree.z + 0.36 * Math.sin(rotationY) * scale);
-    dummy.scale.set(1.12 * scale, 0.92 * scale, 1.02 * scale);
+    dummy.position.set(tree.x + 0.3 * Math.cos(rotationY) * scale, 4.58 * scale, tree.z + 0.3 * Math.sin(rotationY) * scale);
+    dummy.scale.set(0.94 * scale, 0.86 * scale, 0.86 * scale);
     dummy.updateMatrix();
     upperMesh.setMatrixAt(index, dummy.matrix);
   });

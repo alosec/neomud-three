@@ -321,21 +321,21 @@ export const TOWN_SQUARE_SPEC = {
   },
   props: {
     lamps: [
-      { x: -6.1, z: -5.5 },
-      { x: 6.1, z: -5.5 },
-      { x: -6.1, z: 5.5 },
-      { x: 6.1, z: 5.5 }
+      { x: -4.9, z: -4.7 },
+      { x: 4.9, z: -4.7 },
+      { x: -5.35, z: 4.95 },
+      { x: 5.35, z: 4.95 }
     ],
     stringLights: [
-      { from: [-6.1, 2.42, -5.5], to: [6.1, 2.42, -5.5], bulbs: 6, sag: 0.14 },
-      { from: [-6.1, 2.28, -5.5], to: [-6.1, 2.28, 5.5], bulbs: 5, sag: 0.1 },
-      { from: [6.1, 2.28, -5.5], to: [6.1, 2.28, 5.5], bulbs: 5, sag: 0.1 }
+      { from: [-4.9, 3.72, -4.7], to: [4.9, 3.72, -4.7], bulbs: 5, sag: 0.1 },
+      { from: [-5.35, 3.46, 4.95], to: [-4.9, 3.72, -4.7], bulbs: 4, sag: 0.08 },
+      { from: [5.35, 3.46, 4.95], to: [4.9, 3.72, -4.7], bulbs: 4, sag: 0.08 }
     ],
     benches: [
-      { x: -5.2, z: 8.2, rotationY: -0.38 },
-      { x: 5.2, z: 8.2, rotationY: 0.38 },
-      { x: -8.6, z: -2.6, rotationY: Math.PI / 2 },
-      { x: 8.6, z: 2.6, rotationY: -Math.PI / 2 }
+      { x: -6.7, z: 5.65, rotationY: -0.58 },
+      { x: 6.7, z: 5.65, rotationY: 0.58 },
+      { x: -7.25, z: -5.2, rotationY: Math.PI / 2 - 0.12 },
+      { x: 7.25, z: -5.2, rotationY: -Math.PI / 2 + 0.12 }
     ],
     planters: [
       { x: -12.8, z: -8.3, width: 2.8, depth: 0.9, rotationY: 0.2 },
