@@ -677,9 +677,9 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
     spawn: { position: new THREE.Vector3(-8.4, 0, 0), heading: Math.PI / 2 },
     status: "The Enchanted Emporium: authored arcane shop with shelves, display case, floating crystals, Enchantress Lyra, and real west/east exits.",
     environment: {
-      background: 0x151126,
-      fog: 0x17142a,
-      fogDensity: 0.02
+      background: 0x1d1730,
+      fog: 0x231b36,
+      fogDensity: 0.006
     },
     camera: {
       distance: 2.85,
@@ -1823,18 +1823,22 @@ function addMagicShopStage(root, materials, worldRoot) {
   const crystals = addMagicShopCrystals(root, materials);
   const runes = addMagicShopRunes(root, materials);
 
-  const ambientFill = new THREE.HemisphereLight(0xaaa7ff, 0x160f1d, 0.82);
+  const ambientFill = new THREE.HemisphereLight(0xd9d3ff, 0x30213c, 1.75);
   root.add(ambientFill);
 
-  const shopGlow = new THREE.PointLight(0x98dfff, 2.6, 12);
-  shopGlow.position.set(0.6, 4.2, 0.4);
+  const shopGlow = new THREE.PointLight(0xc3f2ff, 4.8, 15);
+  shopGlow.position.set(0.6, 4.4, 0.4);
   root.add(shopGlow);
 
-  const counterGlow = new THREE.PointLight(0xd797ff, 1.9, 7.5);
-  counterGlow.position.set(3.6, 2.2, -2.8);
+  const counterGlow = new THREE.PointLight(0xf0b8ff, 3.2, 9.5);
+  counterGlow.position.set(3.6, 2.45, -2.8);
   root.add(counterGlow);
 
-  const eastGlow = new THREE.PointLight(0xffc778, 1.55, 6.5);
+  const floorFill = new THREE.PointLight(0x9dc7ff, 1.9, 10.5);
+  floorFill.position.set(-4.8, 2.35, 3.8);
+  root.add(floorFill);
+
+  const eastGlow = new THREE.PointLight(0xffd794, 1.85, 7.5);
   eastGlow.position.set(10.2, 2.7, 0);
   root.add(eastGlow);
 
