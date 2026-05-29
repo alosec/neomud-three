@@ -483,11 +483,11 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   return {
     ...glbRuntime,
     camera: {
-      distance: 9.35,
-      height: 4.65,
-      sideOffset: -1.05,
-      lookAhead: 4.0,
-      targetHeight: 1.02
+      distance: 8.55,
+      height: 3.35,
+      sideOffset: -0.9,
+      lookAhead: 3.6,
+      targetHeight: 1.08
     },
     syncEntities,
     spawnFor(fromRoomId) {

@@ -25,6 +25,10 @@ BAR_X = -11.05
 BAR_Z = -3.9
 FIREPLACE_X = -13.05
 FIREPLACE_Z = 6.65
+WALL_HEIGHT = 6.2
+WALL_Y = WALL_HEIGHT / 2
+CEILING_Y = 5.72
+RAFTER_Y = 5.42
 
 TABLES = [
     ("northwest", -4.85, -7.2, 0.18, 1.75, 1.32),
@@ -211,18 +215,18 @@ def build_level():
     for index, x in enumerate([-11.2, -8.4, -5.6, -2.8, 0, 2.8, 5.6, 8.4, 11.2], start=1):
         cube3(f"VIS_floor_plank_line_{index:02d}", x, 0.035, 0, 0.08, 0.05, DEPTH - 0.35, wood, semantic="floor_plank")
 
-    cube3("VIS_west_bar_wall", -HALF_X + 0.18, 2.35, 0, 0.42, 4.7, DEPTH, plaster_warm, semantic="west_bar_wall")
-    cube3("VIS_north_wall", 0, 2.35, -HALF_Z + 0.18, WIDTH, 4.7, 0.42, plaster, semantic="north_wall")
-    cube3("VIS_south_wall", 0, 2.35, HALF_Z - 0.18, WIDTH, 4.7, 0.42, plaster, semantic="south_wall")
-    cube3("VIS_east_door_pier_north", HALF_X - 0.35, 2.25, -6.85, 0.5, 4.5, 6.6, wood_dark, semantic="east_door_pier")
-    cube3("VIS_east_door_pier_south", HALF_X - 0.35, 2.25, 6.85, 0.5, 4.5, 6.6, wood_dark, semantic="east_door_pier")
-    cube3("VIS_east_door_header", HALF_X - 0.38, 4.18, 0, 0.52, 0.45, 5.6, wood_dark, semantic="east_door_header")
+    cube3("VIS_west_bar_wall", -HALF_X + 0.18, WALL_Y, 0, 0.42, WALL_HEIGHT, DEPTH, plaster_warm, semantic="west_bar_wall")
+    cube3("VIS_north_wall", 0, WALL_Y, -HALF_Z + 0.18, WIDTH, WALL_HEIGHT, 0.42, plaster, semantic="north_wall")
+    cube3("VIS_south_wall", 0, WALL_Y, HALF_Z - 0.18, WIDTH, WALL_HEIGHT, 0.42, plaster, semantic="south_wall")
+    cube3("VIS_east_door_pier_north", HALF_X - 0.35, WALL_Y, -6.85, 0.5, WALL_HEIGHT, 6.6, wood_dark, semantic="east_door_pier")
+    cube3("VIS_east_door_pier_south", HALF_X - 0.35, WALL_Y, 6.85, 0.5, WALL_HEIGHT, 6.6, wood_dark, semantic="east_door_pier")
+    cube3("VIS_east_door_header", HALF_X - 0.38, 5.28, 0, 0.52, 0.45, 5.6, wood_dark, semantic="east_door_header")
     cube3("VIS_east_threshold_glow", HALF_X - 1.2, 0.04, 0, 1.8, 0.04, 5.8, gold, semantic="east_exit_glow")
 
     for index, z in enumerate([-9.5, -6.35, -3.2, 0, 3.2, 6.35, 9.5], start=1):
-        cube3(f"VIS_ceiling_plank_{index:02d}", 0, 4.32, z, WIDTH - 0.9, 0.09, 0.38, wood, semantic="ceiling_plank")
+        cube3(f"VIS_ceiling_plank_{index:02d}", 0, CEILING_Y, z, WIDTH - 0.9, 0.09, 0.38, wood, semantic="ceiling_plank")
     for index, x in enumerate([-11.2, -5.6, 0, 5.6, 11.2], start=1):
-        cube3(f"VIS_ceiling_rafter_{index:02d}", x, 4.05, 0, 0.26, 0.3, DEPTH - 0.65, wood_dark, semantic="ceiling_rafter")
+        cube3(f"VIS_ceiling_rafter_{index:02d}", x, RAFTER_Y, 0, 0.26, 0.3, DEPTH - 0.65, wood_dark, semantic="ceiling_rafter")
 
     # Bar, shelves, bottles, and service staging.
     cube3("VIS_bar_base", BAR_X, 0.72, BAR_Z, 1.05, 1.44, 8.7, wood_dark, semantic="bar_counter")
@@ -262,8 +266,8 @@ def build_level():
         cube3(f"VIS_stool_{index:02d}_stem", x, 0.36, z, 0.14, 0.58, 0.14, wood, semantic="stool_leg")
 
     for index, (x, z, mat) in enumerate([(-6.8, -10.68, cloth_red), (0.2, -10.68, blue), (6.8, -10.68, gold), (-6.8, 10.68, gold), (0, 10.68, cloth_red), (6.8, 10.68, blue)], start=1):
-        cube3(f"VIS_wall_panel_frame_{index:02d}", x, 2.56, z, 1.18, 1.42, 0.09, wood_dark, semantic="wall_panel")
-        cube3(f"VIS_wall_panel_color_{index:02d}", x, 2.56, z + (0.06 if z < 0 else -0.06), 0.82, 0.96, 0.045, mat, semantic="wall_panel_color")
+        cube3(f"VIS_wall_panel_frame_{index:02d}", x, 3.25, z, 1.18, 1.42, 0.09, wood_dark, semantic="wall_panel")
+        cube3(f"VIS_wall_panel_color_{index:02d}", x, 3.25, z + (0.06 if z < 0 else -0.06), 0.82, 0.96, 0.045, mat, semantic="wall_panel_color")
 
     cube3("VIS_locked_cellar_trapdoor", 3.35, 0.08, 1.15, 2.55, 0.11, 1.45, wood_dark, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
     cube3("VIS_trapdoor_crossbar", 3.35, 0.19, 1.15, 2.15, 0.08, 0.14, trim, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
@@ -275,9 +279,9 @@ def build_level():
     cube3("COL_fireplace", FIREPLACE_X + 0.18, 0.95, FIREPLACE_Z, 1.45, 1.9, 2.9, None, kind="collision", collider="box", collider_id="fireplace")
     cube3("TRG_exit_east_square", HALF_X - 0.45, 1.4, 0, 1.25, 2.8, 5.8, trigger, kind="trigger", trigger_type="exit", direction="EAST", target_room="town:square", prompt="Return to Town Square")
     marker3("SPAWN_player", 9.6, 0.9, 0, "spawn", spawn_id="player", heading_degrees=-90)
-    marker3("CAMERA_tavern_cutaway", 5.4, 3.3, 0, "camera_zone", camera_id="tavern_cutaway", distance=7.75, height=3.45, look_ahead=3.25)
+    marker3("CAMERA_tavern_cutaway", 5.4, 3.3, 0, "camera_zone", camera_id="tavern_cutaway", distance=8.55, height=3.4, look_ahead=3.6)
     marker3("LIGHTS_tavern_ambient_fill", 0, 3.1, 0, "light", display_type="SINGLE_ARROW", light_id="ambient_fill", light_type="hemisphere", intensity=0.78, sky_color="#ffd8a8", ground_color="#26160f")
-    marker3("LIGHTS_room_warm", -1.0, 4.0, -0.8, "light", display_type="SINGLE_ARROW", light_id="room_warm", light_type="point", intensity=5.2, distance=21.0, color="#ffa85a")
+    marker3("LIGHTS_room_warm", -1.0, 5.35, -0.8, "light", display_type="SINGLE_ARROW", light_id="room_warm", light_type="point", intensity=5.2, distance=21.0, color="#ffa85a")
     marker3("LIGHTS_fireplace_warm", FIREPLACE_X + 1.35, 2.0, FIREPLACE_Z, "light", display_type="SINGLE_ARROW", light_id="fireplace_warm", light_type="point", intensity=6.2, distance=10.5, color="#ff7d2f")
     marker3("LIGHTS_door_cool_fill", HALF_X - 0.7, 2.8, 0, "light", display_type="SINGLE_ARROW", light_id="door_cool_fill", light_type="point", intensity=1.45, distance=10.6, color="#d9e5ff")
 
@@ -290,7 +294,7 @@ def build_level():
     fire_light.data.color = (1.0, 0.42, 0.16)
     tag(fire_light, "light", light_id="preview_fireplace_warm", light_type="point", intensity=3.2)
 
-    bpy.ops.object.light_add(type="POINT", location=to_blender_location(-1.0, 4.0, -0.8))
+    bpy.ops.object.light_add(type="POINT", location=to_blender_location(-1.0, 5.35, -0.8))
     room_light = bpy.context.object
     room_light.name = "LIGHTS_preview_room_warm"
     room_light.data.energy = 420
