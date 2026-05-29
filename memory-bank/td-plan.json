@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T08:08:00Z",
+  "updated": "2026-05-30T08:18:00Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -4249,10 +4249,10 @@
       "description": "Audit and improve whether NeoMud Three is actually playable as a server-authoritative game client rather than only a visual walkthrough. Map each player-facing interaction to the Kotlin server protocol: login/session, room_info sync, move/exit commands, NPC selection/talk/combat, item pickup, feature interaction, inventory/equipment, combat state, death/health/mana feedback, and room graph discovery. Identify gaps where the Three client is visual-only, static/offline-only, or relying on local assumptions. Produce concrete fixes/tests so a player can follow a coherent loop: enter room, understand available actions, click/move/interact, see server-confirmed results, and continue without state drift.",
       "type": "task",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "closed",
       "parent": "neo-3361",
-      "close_reason": "",
+      "close_reason": "documented",
       "labels": [
         "neomud-three",
         "server-authoritative",
@@ -4266,10 +4266,15 @@
           "id": 0,
           "body": "User raised a broader concern: beyond visual polish, we need to think through whether the game is actually playable based on how the Three client interacts with the Kotlin server.",
           "created": "2026-05-30T07:31:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Added memory-bank/server-playability-audit.md documenting the current authoritative server boundary, risks, rules, and next server-backed QA targets.",
+          "created": "2026-05-30T08:18:00Z"
         }
       ],
       "created": "2026-05-30T07:31:00Z",
-      "updated": "2026-05-30T07:31:00Z"
+      "updated": "2026-05-30T08:18:00Z"
     },
     {
       "id": "neo-3361.2",
@@ -4278,10 +4283,10 @@
       "description": "Design and then implement a coherent combat loop for NeoMud Three that fits an isometric action-RPG client over the NeoMud server. Define target selection, auto-attack, ability slots/hotkeys, cooldown/resource display, hostile telegraph/readability, damage feedback, player HP/MP state, death/flee/stop-attack behavior, server message handling, and how turn/tick-based MUD combat should feel in a click-first 3D client. Inventory/class/catalog data should drive available abilities; the client must not fake authoritative combat outcomes. Deliver a written combat design note, protocol/state mapping, UI affordance plan, and browser/server QA proving a simple hostile encounter is understandable and playable.",
       "type": "task",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "closed",
       "parent": "neo-3361.1",
-      "close_reason": "",
+      "close_reason": "documented",
       "labels": [
         "neomud-three",
         "combat",
@@ -4295,10 +4300,15 @@
           "id": 0,
           "body": "User noted combat has not really been designed. Existing basic attack/skill wiring is not enough; we need an intentional combat design for the isometric client over the MUD server.",
           "created": "2026-05-30T07:33:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Added memory-bank/combat-design.md defining the server-authoritative isometric ARPG combat target, non-negotiables, current shape, player loop, implementation tickets, and QA acceptance.",
+          "created": "2026-05-30T08:18:00Z"
         }
       ],
       "created": "2026-05-30T07:33:00Z",
-      "updated": "2026-05-30T07:33:00Z"
+      "updated": "2026-05-30T08:18:00Z"
     },
     {
       "id": "neo-1fb2.98",
