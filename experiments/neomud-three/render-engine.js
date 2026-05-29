@@ -95,17 +95,19 @@ export function createRenderEngine(canvas) {
     },
     get textBoards() {
       const boards = [];
+      const worldPosition = new THREE.Vector3();
       worldRoot.traverse((object) => {
         const board = object.userData?.textBoard;
         if (!board) return;
+        object.getWorldPosition(worldPosition);
         boards.push({
           text: board.text ?? "",
           subtitle: board.subtitle ?? "",
           palette: board.palette ?? "",
           billboard: Boolean(board.billboard),
-          x: object.position.x,
-          y: object.position.y,
-          z: object.position.z,
+          x: worldPosition.x,
+          y: worldPosition.y,
+          z: worldPosition.z,
           rotationY: object.rotation?.y ?? 0,
           exitTarget: object.userData?.exitAffordance?.targetId ?? "",
           exitDirection: object.userData?.exitAffordance?.direction ?? "",

@@ -1459,7 +1459,14 @@ function setHoverTargetFromPoint(point) {
     clearHoverTarget();
     return null;
   }
+  return setHoverTarget(target);
+}
 
+function setHoverTarget(target) {
+  if (!target || target.type === "move") {
+    clearHoverTarget();
+    return null;
+  }
   movement.hoverTarget = {
     type: target.type,
     id: target.entity?.id ?? target.targetId,

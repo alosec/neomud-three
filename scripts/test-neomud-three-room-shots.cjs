@@ -102,6 +102,8 @@ async function main() {
       }
     }
 
+    await assertPhysicalGatewayClick(page);
+
     assert.deepEqual(failedRequests, []);
     assert.deepEqual(consoleErrors, []);
 
@@ -151,6 +153,41 @@ function assertRoomContract(assert, room) {
     assert.ok(trigger.targetId, `expected ${room.id} trigger to declare targetId: ${JSON.stringify(trigger)}`);
     assert.ok(trigger.direction, `expected ${room.id} trigger to declare direction: ${JSON.stringify(trigger)}`);
     assert.ok(trigger.prompt, `expected ${room.id} trigger to declare prompt: ${JSON.stringify(trigger)}`);
+  }
+}
+
+async function assertPhysicalGatewayClick(page) {
+  await page.evaluate(() => {
+    window.__neomudThreeDebug.setRoom("forest:edge");
+    window.__neomudThreeDebug.setCameraMode("isometric");
+    window.__neomudThreeDebug.placePlayer({ x: 0, z: 13.1, heading: 0 });
+  });
+  await settleFrames(page);
+  const board = await page.evaluate(() =>
+    window.__neomudThreeDebug.room.textBoards.find((candidate) =>
+      candidate.text === "Forest Path" && candidate.exitTarget === "forest:path"
+    )
+  );
+  assert.ok(board, `expected Forest Edge gateway board to expose exit metadata`);
+  assert.equal(board.type, "mesh");
+  assert.equal(board.billboard, false);
+  const screen = await page.evaluate((candidate) =>
+    window.__neomudThreeDebug.worldToScreen({ x: candidate.x, y: candidate.y, z: candidate.z })
+  , board);
+  assert.ok(screen.visible, `expected Forest Path gateway board to be visible for clicking: ${JSON.stringify({ board, screen })}`);
+  await page.mouse.click(screen.x, screen.y);
+  await page.waitForFunction(() =>
+    window.__neomudThreeDebug.clickMove.pendingExit?.targetId === "forest:path" ||
+    window.__neomudThreeDebug.currentRoomId === "forest:path",
+  null, { timeout: 3_000 });
+  const state = await page.evaluate(() => ({
+    roomId: window.__neomudThreeDebug.currentRoomId,
+    pendingExit: window.__neomudThreeDebug.clickMove.pendingExit,
+    selection: window.__neomudThreeDebug.selection
+  }));
+  if (state.roomId !== "forest:path") {
+    assert.equal(state.pendingExit?.direction, "NORTH", `expected Forest Path board click to create NORTH pending exit: ${JSON.stringify(state)}`);
+    assert.equal(state.selection?.target?.targetId, "forest:path", `expected Forest Path board click to select exit target: ${JSON.stringify(state)}`);
   }
 }
 

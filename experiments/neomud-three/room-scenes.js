@@ -4069,7 +4069,7 @@ function addExitGateway(root, materials, trigger, options = {}) {
   addBox(group, postMaterial, rightX, height / 2, 0, 0.24, height, 0.28);
   addBox(group, lintelMaterial, 0, height + 0.08, 0, span + 0.64, 0.24, 0.32);
   if (options.showLabel !== false) {
-    addTextBoard(group, trigger.affordance.label, {
+    const board = addTextBoard(group, trigger.affordance.label, {
       x: 0,
       y: height + 0.54,
       z: 0.04,
@@ -4077,8 +4077,15 @@ function addExitGateway(root, materials, trigger, options = {}) {
       height: options.labelHeight ?? 0.5,
       subtitle: trigger.affordance.subtitle,
       palette: options.palette ?? "green",
-      renderOrder: 10
+      renderOrder: 10,
+      billboard: false
     });
+    board.userData.exitAffordance = {
+      targetId: trigger.targetId,
+      direction: trigger.direction,
+      label: trigger.affordance.label,
+      position: new THREE.Vector3(x, 0, z)
+    };
   }
 
   return group;
