@@ -77,7 +77,7 @@ const RENDER_BUDGETS = {
   "material-lab": {
     calls: 420,
     triangles: 120_000,
-    textures: 64,
+    textures: 66,
     geometries: 260
   },
   "prop-zoo": {

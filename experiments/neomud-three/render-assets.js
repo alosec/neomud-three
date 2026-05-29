@@ -161,25 +161,43 @@ function valueNoise(ctx, width, height, base, flecks, alpha, random) {
 }
 
 function packedDirtTexture() {
-  return proceduralTexture("town-packed-dirt", [10, 10], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#596647", 640, 0.038, random);
-    ctx.strokeStyle = "rgba(38, 48, 34, 0.04)";
+  return proceduralTexture("town-packed-dirt-v2", [10, 10], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#627044", 760, 0.032, random);
+    ctx.strokeStyle = "rgba(34, 48, 28, 0.045)";
     ctx.lineWidth = 1.2;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 14; i++) {
       ctx.beginPath();
       const y = random() * height;
       ctx.moveTo(0, y);
       ctx.bezierCurveTo(width * 0.25, y + random() * 18 - 9, width * 0.75, y + random() * 18 - 9, width, y + random() * 12 - 6);
       ctx.stroke();
     }
+    for (let i = 0; i < 42; i++) {
+      const x = random() * width;
+      const y = random() * height;
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, 8 + random() * 24);
+      gradient.addColorStop(0, `rgba(112, 135, 72, ${0.018 + random() * 0.025})`);
+      gradient.addColorStop(1, "rgba(112, 135, 72, 0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x - 28, y - 28, 56, 56);
+    }
   });
 }
 
 function roadTexture() {
-  return proceduralTexture("town-road-gravel", [7, 7], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#8e8976", 680, 0.038, random);
-    ctx.fillStyle = "rgba(48, 43, 35, 0.04)";
-    for (let i = 0; i < 92; i++) {
+  return proceduralTexture("town-road-gravel-v2", [7, 7], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#8d7b55", 760, 0.032, random);
+    ctx.strokeStyle = "rgba(82, 62, 38, 0.055)";
+    ctx.lineWidth = 1.25;
+    for (let i = 0; i < 18; i++) {
+      const x = random() * width;
+      ctx.beginPath();
+      ctx.moveTo(x, -8);
+      ctx.bezierCurveTo(x + random() * 20 - 10, height * 0.3, x + random() * 24 - 12, height * 0.72, x + random() * 16 - 8, height + 8);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(58, 45, 31, 0.045)";
+    for (let i = 0; i < 130; i++) {
       ctx.beginPath();
       ctx.ellipse(random() * width, random() * height, 1 + random() * 3, 0.8 + random() * 2.4, random() * Math.PI, 0, Math.PI * 2);
       ctx.fill();
@@ -188,9 +206,9 @@ function roadTexture() {
 }
 
 function plazaPaverTexture() {
-  return proceduralTexture("town-plaza-pavers", [2.8, 2.8], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#a79d82", 340, 0.04, random);
-    ctx.strokeStyle = "rgba(58, 52, 44, 0.078)";
+  return proceduralTexture("town-plaza-pavers-v2", [2.8, 2.8], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#b2a06f", 420, 0.032, random);
+    ctx.strokeStyle = "rgba(70, 58, 38, 0.105)";
     ctx.lineWidth = 1;
     const cell = 56;
     for (let y = -cell; y < height + cell; y += cell) {
@@ -198,6 +216,66 @@ function plazaPaverTexture() {
         const jitter = ((x / cell + y / cell) % 2) * 12;
         ctx.strokeRect(x + jitter, y, cell + 8, cell - 2);
       }
+    }
+    ctx.strokeStyle = "rgba(245, 220, 148, 0.045)";
+    for (let i = 0; i < 22; i++) {
+      const y = random() * height;
+      ctx.beginPath();
+      ctx.moveTo(random() * width * 0.25, y);
+      ctx.lineTo(width * (0.58 + random() * 0.4), y + random() * 18 - 9);
+      ctx.stroke();
+    }
+  });
+}
+
+function roofTileTexture(id, base, seam) {
+  return proceduralTexture(id, [3.2, 3.2], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, base, 380, 0.025, random);
+    ctx.strokeStyle = seam;
+    ctx.lineWidth = 1.1;
+    const tileW = 34;
+    const tileH = 28;
+    for (let y = -tileH; y < height + tileH; y += tileH) {
+      const offset = Math.round(y / tileH) % 2 ? tileW * 0.5 : 0;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y + random() * 1.5 - 0.75);
+      ctx.stroke();
+      for (let x = -tileW; x < width + tileW; x += tileW) {
+        ctx.beginPath();
+        ctx.moveTo(x + offset, y);
+        ctx.lineTo(x + offset + random() * 2 - 1, y + tileH);
+        ctx.stroke();
+      }
+    }
+  });
+}
+
+function foliageTexture(id, base, light, shadow) {
+  return proceduralTexture(id, [3.8, 3.8], (ctx, width, height, random) => {
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, width, height);
+    for (let i = 0; i < 95; i++) {
+      const x = random() * width;
+      const y = random() * height;
+      const radius = 5 + random() * 14;
+      const useLight = random() > 0.46;
+      const color = useLight ? light : shadow;
+      const alpha = useLight ? 0.08 + random() * 0.08 : 0.06 + random() * 0.08;
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      gradient.addColorStop(0, `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`);
+      gradient.addColorStop(1, `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0)`);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    }
+    ctx.strokeStyle = `rgba(${shadow[0]}, ${shadow[1]}, ${shadow[2]}, 0.05)`;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 18; i++) {
+      const y = random() * height;
+      ctx.beginPath();
+      ctx.moveTo(-8, y);
+      ctx.bezierCurveTo(width * 0.35, y + random() * 18 - 9, width * 0.7, y + random() * 18 - 9, width + 8, y + random() * 12 - 6);
+      ctx.stroke();
     }
   });
 }
@@ -489,9 +567,9 @@ const MATERIAL_DEFINITION_LIST = [
     approved: true,
     create: () => standardMaterial({ map: texture("millhavenCobblestone", [3.7, 3.7]), color: 0x8f8a74, roughness: 0.94, metalness: 0 })
   },
-  proceduralMaterial("town.road.gravel", "road", "town", "road", roadTexture, { color: 0xaea07c, roughness: 0.97 }),
-  proceduralMaterial("town.plaza.pavers", "plazaStone", "town", "plaza", plazaPaverTexture, { color: 0xb4a57f, roughness: 0.92 }),
-  proceduralMaterial("town.ground.packed-dirt", "packedDirt", "town", "ground", packedDirtTexture, { color: 0x74815d, roughness: 0.99 }),
+  proceduralMaterial("town.road.gravel", "road", "town", "road", roadTexture, { color: 0x9f8859, roughness: 0.96 }),
+  proceduralMaterial("town.plaza.pavers", "plazaStone", "town", "plaza", plazaPaverTexture, { color: 0xab9565, roughness: 0.9 }),
+  proceduralMaterial("town.ground.packed-dirt", "packedDirt", "town", "ground", packedDirtTexture, { color: 0x657449, roughness: 0.98 }),
   colorMaterial("town.path.edge", "pathEdge", "town", "path-edge", 0x77704d, { roughness: 0.92 }),
   {
     id: "town.stone.limestone",
@@ -573,19 +651,19 @@ const MATERIAL_DEFINITION_LIST = [
     approved: true,
     create: () => standardMaterial({ map: plasterWashTexture("town-facade-warm-plaster", "#b09470", [72, 56, 40]), color: 0xb4936d, roughness: 0.92 })
   },
-  colorMaterial("town.roof.teal", "roof", "town", "roof", 0x27545a, { roughness: 0.88 }),
-  colorMaterial("town.roof.red", "roofRed", "town", "roof", 0x5d2c25, { roughness: 0.9 }),
-  colorMaterial("town.roof.quiet", "roofQuiet", "town", "background-roof", 0x435f56, { roughness: 0.94 }),
+  proceduralMaterial("town.roof.teal", "roof", "town", "roof", () => roofTileTexture("town-roof-teal-tiles", "#244f50", "rgba(13, 34, 34, 0.22)"), { color: 0x2f6565, roughness: 0.9 }),
+  proceduralMaterial("town.roof.red", "roofRed", "town", "roof", () => roofTileTexture("town-roof-teal-tiles", "#244f50", "rgba(13, 34, 34, 0.22)"), { color: 0x744033, roughness: 0.92 }),
+  proceduralMaterial("town.roof.quiet", "roofQuiet", "town", "background-roof", () => roofTileTexture("town-roof-teal-tiles", "#244f50", "rgba(13, 34, 34, 0.22)"), { color: 0x587166, roughness: 0.95 }),
   colorMaterial("town.awning.red", "awningRed", "town", "awning", 0xa24532, { roughness: 0.76 }),
   colorMaterial("town.awning.blue", "awningBlue", "town", "awning", 0x385d7a, { roughness: 0.76 }),
   colorMaterial("town.awning.gold", "awningGold", "town", "awning", 0x9b7435, { roughness: 0.82 }),
   colorMaterial("town.tree.trunk", "trunk", "town", "tree", 0x4f321b, { roughness: 0.92 }),
-  colorMaterial("town.tree.foliage", "foliage", "town", "foliage", 0x638457, { roughness: 0.97 }),
-  colorMaterial("town.tree.foliage.dark", "foliageDark", "town", "foliage", 0x32553d, { roughness: 0.98 }),
-  colorMaterial("forest.ground.moss", "forestGround", "forest", "forest-ground", 0x5f7f50, { roughness: 0.98 }),
-  colorMaterial("forest.path.earth", "forestTrail", "forest", "forest-trail", 0x967f57, { roughness: 0.97 }),
-  colorMaterial("forest.ground.shadow", "forestShadow", "forest", "forest-shadow", 0x536d43, { roughness: 1 }),
-  colorMaterial("forest.ground.light-moss", "forestMossLight", "forest", "forest-moss-highlight", 0x78915b, { roughness: 0.96 }),
+  proceduralMaterial("town.tree.foliage", "foliage", "town", "foliage", () => foliageTexture("town-foliage-painted", "#5f8152", [132, 164, 88], [42, 73, 47]), { color: 0x6f925e, roughness: 0.98 }),
+  proceduralMaterial("town.tree.foliage.dark", "foliageDark", "town", "foliage", () => foliageTexture("town-foliage-painted", "#5f8152", [132, 164, 88], [42, 73, 47]), { color: 0x496f48, roughness: 0.99 }),
+  colorMaterial("forest.ground.moss", "forestGround", "forest", "forest-ground", 0x536c43, { roughness: 0.99 }),
+  proceduralMaterial("forest.path.earth", "forestTrail", "forest", "forest-trail", roadTexture, { color: 0x8d764f, roughness: 0.98 }),
+  colorMaterial("forest.ground.shadow", "forestShadow", "forest", "forest-shadow", 0x42583a, { roughness: 1 }),
+  colorMaterial("forest.ground.light-moss", "forestMossLight", "forest", "forest-moss-highlight", 0x60764c, { roughness: 0.98 }),
   colorMaterial("town.sign.gold", "sign", "town", "sign", 0xd2ad62, { roughness: 0.58, metalness: 0.04 }),
   colorMaterial("town.portal.dark", "portalDark", "town", "doorway", 0x362313, { roughness: 0.72, emissive: 0x160e08, emissiveIntensity: 0.5 }),
   {

@@ -3327,8 +3327,10 @@ function addForestEdgeStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.forestGround ?? materials.foliageDark, FOREST_EDGE.width, FOREST_EDGE.depth);
   addInstancedSurfaceRects(root, materials, [
     { material: "forestTrail", x: 0, z: 0, width: 5.8, depth: FOREST_EDGE.depth, y: 0.022 },
-    { material: "forestMossLight", x: 0, z: 10.8, width: 10.4, depth: 6.4, y: 0.016 },
-    { material: "forestMossLight", x: 0, z: -12.2, width: 7.8, depth: 6.8, y: 0.018 }
+    { material: "forestMossLight", x: -7.2, z: 9.6, width: 4.4, depth: 3.2, y: 0.016, rotationZ: -0.18 },
+    { material: "forestMossLight", x: 7.4, z: 10.8, width: 4.1, depth: 3.4, y: 0.017, rotationZ: 0.16 },
+    { material: "forestMossLight", x: -7.6, z: -12.6, width: 3.8, depth: 3.7, y: 0.018, rotationZ: 0.22 },
+    { material: "forestMossLight", x: 7.8, z: -11.5, width: 3.6, depth: 3.2, y: 0.018, rotationZ: -0.2 }
   ], "forest-edge-surfaces");
   addForestGroundBreakup(root, materials, "edge");
 
