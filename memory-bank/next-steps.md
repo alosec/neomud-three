@@ -119,8 +119,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    Remaining first-slice gap:
    - Selection feedback now has first-pass object response through target-group
      pulsing plus temporary material tint/emissive response on highlighted
-     target meshes/sprites. It still needs target persistence rules after panel
-     close and deeper ability-command affordances.
+     target meshes/sprites. Interaction panel close now preserves the selected
+     world target until explicit cancel, room change, or a non-interaction panel
+     clears it. Deeper ability-command affordances remain open.
      Item/loot hover parity exists for the Hidden Cave server-loot path, but
      should be audited across future authored rooms as they gain live drops.
    - Click-to-move now has first-pass visibility-graph waypoint routing over

@@ -264,7 +264,7 @@ async function main() {
     await page.waitForFunction(() => document.querySelector("#panel-title")?.textContent === "Old Wren", null, { timeout: 6_000 });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
     assert.equal(await page.locator("#game-panel.hidden").count(), 0, "expected Iso real-click interaction panel to remain open");
-    await page.keyboard.press("Escape");
+    await page.evaluate(() => document.querySelector("#panel-close")?.click());
 
     const beforeClick = await page.evaluate(() => window.__neomudThreeDebug.player);
     await page.mouse.click(760, 525);
@@ -309,8 +309,13 @@ async function main() {
     screenshots.push({ id: "isometric-selection-target", path: selectionTarget });
     await page.waitForFunction(() => document.querySelector("#panel-title")?.textContent === "Old Wren", null, { timeout: 6_000 });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
-    await page.evaluate(() => window.__neomudThreeDebug.cancelIsoTargeting());
+    await page.evaluate(() => document.querySelector("#panel-close")?.click());
     await page.waitForFunction(() => document.querySelector("#game-panel")?.classList.contains("hidden"), null, { timeout: 2_000 });
+    const persistedSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
+    assert.equal(persistedSelection.active, true);
+    assert.equal(persistedSelection.markerVisible, true);
+    assert.equal(persistedSelection.target.id, "npc:old_wren");
+    await page.evaluate(() => window.__neomudThreeDebug.cancelIsoTargeting());
     const clearedSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(clearedSelection.markerVisible, false);
     assert.equal(clearedSelection.active, false);

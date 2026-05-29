@@ -1937,9 +1937,9 @@ function openPanel(panelId) {
   updateInteractionPrompt();
 }
 
-function closePanel() {
+function closePanel({ clearSelection = false } = {}) {
   activePanel = null;
-  clearSelectionTarget({ clearInteractable: true });
+  if (clearSelection) clearSelectionTarget({ clearInteractable: true });
   panel.classList.add("hidden");
   updatePanelButtons();
   updateInteractionPrompt();
