@@ -3107,7 +3107,7 @@ function addForestEdgeStage(root, materials, worldRoot) {
   addForestEdgeSouthTownWall(root, materials);
   addForestEdgeTrees(root, materials);
   addForestEdgeDressing(root, materials);
-  addForestEdgeExitAffordances(root);
+  addForestEdgeExitAffordances(root, materials);
 
   const ambientFill = new THREE.HemisphereLight(0xbdd4bd, 0x26371f, 0.86);
   root.add(ambientFill);
@@ -3251,7 +3251,7 @@ function addForestEdgeDressing(root, materials) {
   );
 }
 
-function addForestEdgeExitAffordances(root) {
+function addForestEdgeExitAffordances(root, materials) {
   for (const trigger of forestEdgeTriggers()) {
     const threshold = trigger.affordance.threshold;
     addExitThreshold(root, {
@@ -3262,6 +3262,7 @@ function addForestEdgeExitAffordances(root) {
       color: threshold.color,
       opacity: 0.2
     });
+    addExitGateway(root, materials, trigger, { palette: "green" });
   }
 }
 
@@ -3382,7 +3383,7 @@ function addForestPathStage(root, materials, worldRoot) {
   addForestPathDepth(root, materials);
   addForestPathTrees(root, materials);
   addForestPathDressing(root, materials);
-  addForestPathExitAffordances(root);
+  addForestPathExitAffordances(root, materials);
 
   addTextBoard(root, "Deep Forest", {
     x: 0,
@@ -3491,7 +3492,7 @@ function addForestPathDressing(root, materials) {
   );
 }
 
-function addForestPathExitAffordances(root) {
+function addForestPathExitAffordances(root, materials) {
   for (const trigger of forestPathTriggers()) {
     const threshold = trigger.affordance.threshold;
     addExitThreshold(root, {
@@ -3502,7 +3503,57 @@ function addForestPathExitAffordances(root) {
       color: threshold.color,
       opacity: 0.18
     });
+    addExitGateway(root, materials, trigger, { palette: trigger.direction === "EAST" ? "gold" : "green" });
   }
+}
+
+function addExitGateway(root, materials, trigger, options = {}) {
+  const threshold = trigger.affordance?.threshold;
+  if (!threshold) return null;
+
+  const [x, , z] = threshold.center;
+  const span = trigger.direction === "EAST" || trigger.direction === "WEST" ? threshold.size[1] : threshold.size[0];
+  const rotationY = exitGatewayRotation(trigger.direction);
+  const height = options.height ?? 2.85;
+  const group = new THREE.Group();
+  group.position.set(x, 0, z);
+  group.rotation.y = rotationY;
+  group.userData = {
+    visualRole: "physical-exit-gateway",
+    direction: trigger.direction,
+    targetId: trigger.targetId,
+    label: trigger.affordance.label
+  };
+  root.add(group);
+
+  const postMaterial = materials.darkTimber ?? materials.timber;
+  const lintelMaterial = materials.timber ?? materials.darkTimber;
+  const leftX = -span / 2 - 0.18;
+  const rightX = span / 2 + 0.18;
+  addBox(group, postMaterial, leftX, height / 2, 0, 0.24, height, 0.28);
+  addBox(group, postMaterial, rightX, height / 2, 0, 0.24, height, 0.28);
+  addBox(group, lintelMaterial, 0, height + 0.08, 0, span + 0.64, 0.24, 0.32);
+  if (options.showLabel !== false) {
+    addTextBoard(group, trigger.affordance.label, {
+      x: 0,
+      y: height + 0.54,
+      z: 0.04,
+      width: options.labelWidth ?? Math.max(2.2, Math.min(3.6, trigger.affordance.label.length * 0.24)),
+      height: options.labelHeight ?? 0.5,
+      subtitle: trigger.affordance.subtitle,
+      palette: options.palette ?? "green",
+      renderOrder: 10
+    });
+  }
+
+  return group;
+}
+
+function exitGatewayRotation(direction) {
+  if (direction === "SOUTH") return Math.PI;
+  if (direction === "EAST") return -Math.PI / 2;
+  if (direction === "WEST") return Math.PI / 2;
+  return 0;
 }
 
 function addForestPathEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
@@ -3653,7 +3704,7 @@ function addSunlitClearingStage(root, materials, worldRoot) {
   });
   addSunlitClearingTreeRing(root, materials);
   addSunlitClearingDressing(root, materials);
-  addSunlitClearingExitAffordances(root);
+  addSunlitClearingExitAffordances(root, materials);
   const butterflies = addSunlitClearingButterflies(root, materials);
 
   const ambientFill = new THREE.HemisphereLight(0xffefbd, 0x3f5b2d, 1.08);
@@ -3774,18 +3825,19 @@ function addSunlitClearingButterflies(root, materials) {
   return group;
 }
 
-function addSunlitClearingExitAffordances(root) {
-  addTextBoard(root, "Forest Path", {
-    x: -13.35,
-    y: 1.9,
-    z: 1.0,
-    width: 2.48,
-    height: 0.46,
-    subtitle: "West",
-    palette: "green",
-    renderOrder: 9
-  });
-  addExitThreshold(root, { x: SUNLIT_CLEARING.westExitX, z: 3.6, width: 1.2, depth: SUNLIT_CLEARING.exitHalfZ * 2, color: 0xf3dd84, opacity: 0.2 });
+function addSunlitClearingExitAffordances(root, materials) {
+  for (const trigger of sunlitClearingTriggers()) {
+    const threshold = trigger.affordance.threshold;
+    addExitThreshold(root, {
+      x: threshold.center[0],
+      z: threshold.center[2],
+      width: threshold.size[0],
+      depth: threshold.size[1],
+      color: threshold.color,
+      opacity: 0.2
+    });
+    addExitGateway(root, materials, trigger, { palette: "green" });
+  }
 }
 
 function addSunlitClearingEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
@@ -3893,7 +3945,7 @@ function addDeepForestStage(root, materials, worldRoot) {
   addDeepForestTrees(root, materials);
   addDeepForestRoots(root, materials);
   addDeepForestCaveAndHiddenAffordances(root, materials);
-  addDeepForestExitAffordances(root);
+  addDeepForestExitAffordances(root, materials);
   const webs = addDeepForestWebs(root, materials);
   const mist = addDeepForestMist(root, materials);
 
@@ -4018,7 +4070,7 @@ function addDeepForestMist(root, materials) {
   return group;
 }
 
-function addDeepForestExitAffordances(root) {
+function addDeepForestExitAffordances(root, materials) {
   for (const trigger of deepForestTriggers()) {
     const threshold = trigger.affordance.threshold;
     addExitThreshold(root, {
@@ -4029,17 +4081,8 @@ function addDeepForestExitAffordances(root) {
       color: threshold.color,
       opacity: 0.18
     });
+    addExitGateway(root, materials, trigger, { palette: trigger.direction === "WEST" ? "blue" : "green" });
   }
-  addTextBoard(root, "Forest Path", {
-    x: 0,
-    y: 1.82,
-    z: 18.8,
-    width: 2.42,
-    height: 0.45,
-    subtitle: "South",
-    palette: "green",
-    renderOrder: 9
-  });
 }
 
 function addDeepForestEntities(root, materials, worldRoot, world, npcs, roomItems, interactables) {
@@ -4203,7 +4246,7 @@ function addHiddenCaveStage(root, materials, worldRoot) {
   const moss = addHiddenCaveMoss(root, materials);
   const mist = addHiddenCaveMist(root, materials);
   addHiddenCaveChest(root, materials);
-  addHiddenCaveExitAffordance(root);
+  addHiddenCaveExitAffordance(root, materials);
 
   const ambientFill = new THREE.HemisphereLight(0x8ed4c7, 0x060809, 0.62);
   root.add(ambientFill);
@@ -4394,7 +4437,7 @@ function addHiddenCaveChest(root, materials) {
   });
 }
 
-function addHiddenCaveExitAffordance(root) {
+function addHiddenCaveExitAffordance(root, materials) {
   for (const trigger of hiddenCaveTriggers()) {
     const threshold = trigger.affordance.threshold;
     addExitThreshold(root, {
