@@ -249,6 +249,7 @@ async function main() {
     const hoverState = await page.evaluate(() => window.__neomudThreeDebug.hover);
     assert.equal(hoverState.markerVisible, true);
     assert.equal(hoverState.objectHighlighted, true);
+    assert.ok(hoverState.objectHighlightMaterialCount > 0, `expected hover target material response: ${JSON.stringify(hoverState)}`);
     assert.equal(hoverState.promptVisible, true);
     assert.match(hoverState.prompt, /Click Talk to Old Wren/);
     const hoverTarget = path.join(qaDir, "town-shot-isometric-hover-target.png");
@@ -299,6 +300,7 @@ async function main() {
     const selectedNpc = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(selectedNpc.markerVisible, true);
     assert.equal(selectedNpc.objectHighlighted, true);
+    assert.ok(selectedNpc.objectHighlightMaterialCount > 0, `expected selected target material response: ${JSON.stringify(selectedNpc)}`);
     assert.equal(selectedNpc.target.id, "npc:old_wren");
     const pendingNpc = await page.evaluate(() => window.__neomudThreeDebug.clickMove.pendingInteraction);
     assert.equal(pendingNpc.id, "npc:old_wren");
@@ -312,6 +314,7 @@ async function main() {
     const clearedSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(clearedSelection.markerVisible, false);
     assert.equal(clearedSelection.active, false);
+    assert.equal(clearedSelection.objectHighlightMaterialCount, 0);
 
     await page.evaluate(() => {
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });

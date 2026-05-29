@@ -1520,7 +1520,8 @@ function horizontalDistance(a, b) {
 function applyTargetObjectHighlight(target, mode = null) {
   const current = movement.targetObjectHighlight;
   const nextObject = target?.id ? findTargetSceneObject(target) : null;
-  if (current?.object && current.object !== nextObject) restoreTargetObjectHighlight(current.object);
+  if (current?.object && current.object === nextObject && current.mode === mode) return;
+  if (current?.object && (current.object !== nextObject || current.mode !== mode)) restoreTargetObjectHighlight(current);
   if (!nextObject || !mode) {
     movement.targetObjectHighlight = null;
     return;
@@ -1532,18 +1533,24 @@ function applyTargetObjectHighlight(target, mode = null) {
   movement.targetObjectHighlight = {
     object: nextObject,
     mode,
-    startedAt: performance.now()
+    startedAt: performance.now(),
+    materialRecords: applyTargetMaterialHighlight(nextObject, mode)
   };
 }
 
-function restoreTargetObjectHighlight(object) {
-  if (!object?.userData?.isoTargetBaseScale) return;
-  object.scale.copy(object.userData.isoTargetBaseScale);
+function restoreTargetObjectHighlight(highlight) {
+  const object = highlight?.object ?? highlight;
+  if (object?.userData?.isoTargetBaseScale) object.scale.copy(object.userData.isoTargetBaseScale);
+  for (const record of highlight?.materialRecords ?? []) {
+    record.object.material = record.originalMaterial;
+    disposeHighlightMaterial(record.highlightMaterial);
+  }
 }
 
 function updateTargetObjectHighlight() {
   const highlight = movement.targetObjectHighlight;
   if (!highlight?.object?.parent) {
+    restoreTargetObjectHighlight(highlight);
     movement.targetObjectHighlight = null;
     return;
   }
@@ -1552,6 +1559,60 @@ function updateTargetObjectHighlight() {
   const selected = highlight.mode === "selected";
   const pulse = selected ? 1.07 + Math.sin(age) * 0.025 : 1.035 + Math.sin(age) * 0.014;
   highlight.object.scale.set(base.x * pulse, base.y * (selected ? 1.02 : 1.01), base.z * pulse);
+  updateTargetMaterialHighlight(highlight, selected ? 0.22 + Math.sin(age) * 0.06 : 0.1 + Math.sin(age) * 0.035);
+}
+
+function applyTargetMaterialHighlight(object, mode) {
+  const records = [];
+  const selected = mode === "selected";
+  const tint = selected
+    ? object.userData?.kind === "npc" && movement.selectionTarget?.hostile ? 0xff7a66 : 0xffd36b
+    : 0x8fffe2;
+  object.traverse((child) => {
+    if (records.length >= 10 || (!child.isMesh && !child.isSprite) || !child.material) return;
+    const materials = Array.isArray(child.material) ? child.material : [child.material];
+    const cloned = materials.map((material) => {
+      const clone = material.clone?.();
+      if (!clone) return null;
+      if (clone.color) clone.color.lerp(new THREE.Color(tint), selected ? 0.28 : 0.18);
+      if (clone.emissive) {
+        clone.emissive = new THREE.Color(tint);
+        clone.emissiveIntensity = Math.max(clone.emissiveIntensity ?? 0, selected ? 0.42 : 0.24);
+      }
+      if (clone.opacity !== undefined && clone.transparent) clone.opacity = Math.min(1, (clone.opacity ?? 1) + 0.08);
+      clone.needsUpdate = true;
+      return clone;
+    });
+    if (cloned.some((material) => !material)) {
+      for (const material of cloned) material?.dispose?.();
+      return;
+    }
+    const highlightMaterial = Array.isArray(child.material) ? cloned : cloned[0];
+    records.push({
+      object: child,
+      originalMaterial: child.material,
+      highlightMaterial
+    });
+    child.material = highlightMaterial;
+  });
+  return records;
+}
+
+function updateTargetMaterialHighlight(highlight, intensity) {
+  for (const record of highlight.materialRecords ?? []) {
+    const materials = Array.isArray(record.highlightMaterial) ? record.highlightMaterial : [record.highlightMaterial];
+    for (const material of materials) {
+      if (material.emissiveIntensity !== undefined) material.emissiveIntensity = Math.max(material.emissiveIntensity ?? 0, intensity);
+    }
+  }
+}
+
+function disposeHighlightMaterial(material) {
+  if (Array.isArray(material)) {
+    for (const entry of material) entry?.dispose?.();
+    return;
+  }
+  material?.dispose?.();
 }
 
 function findTargetSceneObject(target) {
@@ -2849,6 +2910,9 @@ function installDebugApi() {
         target: movement.hoverTarget,
         markerVisible: Boolean(movement.hoverMarker?.visible),
         objectHighlighted: movement.targetObjectHighlight?.mode === "hover",
+        objectHighlightMaterialCount: movement.targetObjectHighlight?.mode === "hover"
+          ? movement.targetObjectHighlight.materialRecords?.length ?? 0
+          : 0,
         prompt: interactionPrompt?.textContent ?? "",
         promptVisible: Boolean(interactionPrompt && !interactionPrompt.classList.contains("hidden"))
       };
@@ -2874,7 +2938,10 @@ function installDebugApi() {
               enabled: Boolean(action.enabled)
             }))
           : [],
-        objectHighlighted: movement.targetObjectHighlight?.mode === "selected"
+        objectHighlighted: movement.targetObjectHighlight?.mode === "selected",
+        objectHighlightMaterialCount: movement.targetObjectHighlight?.mode === "selected"
+          ? movement.targetObjectHighlight.materialRecords?.length ?? 0
+          : 0
       };
     },
     get effects() {
