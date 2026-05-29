@@ -8,6 +8,15 @@ The fork now treats NeoMud as a real client/server game:
 - Three.js browser client owns rendering, camera, local input feel, and UI projection.
 - Static world JSON remains a local reference/fallback, not the final authority when the server is connected.
 
+Product north star:
+
+> Server-authoritative isometric action RPG client over a MUD world graph.
+
+That means the Kotlin server and NeoMud room graph stay authoritative, while
+the browser presents those rooms through a Diablo/Dark Alliance-like action RPG
+client: elevated/isometric camera, click-to-move, click-to-interact, readable
+loot/NPC/exit affordances, and fast room-to-room flow.
+
 Authority boundary:
 
 - Browser connects to `/game` with `experiments/neomud-three/neomud-protocol.js`.
@@ -31,3 +40,7 @@ Near-term target:
 - Convert room builders into reusable components.
 - Preserve existing NeoMud room descriptions, exits, NPCs, catalogs, tutorials, inventory, and combat messages as the game spine.
 - Use generated textures and cutouts as assets for reusable components rather than one-off billboards.
+- Shift primary input/camera work from third-person chase tuning toward a
+  click-first isometric ARPG control slice: ground raycast, visible destination
+  marker, click-to-walk, clickable exits/interactables, and server-authoritative
+  command routing.

@@ -4,7 +4,19 @@ Updated: 2026-05-27
 
 This is the reset from proof-of-concept hacking toward a real Three.js game client.
 
-The core move: stop treating Three.js as a pile of room-specific meshes in `app.js`. Treat it as a renderer fed by NeoMud server state and world content specs.
+The core move: stop treating Three.js as a pile of room-specific meshes in
+`app.js`. Treat it as an isometric action RPG renderer/client fed by NeoMud
+server state and world content specs.
+
+North star:
+
+> Server-authoritative isometric action RPG client over a MUD world graph.
+
+The gameplay reference is closer to Diablo 3 / Baldur's Gate: Dark Alliance
+than a third-person RPG: elevated camera, click-to-move, click-to-interact,
+clear loot/NPC/exit affordances, and room-to-room action-RPG flow. The MUD room
+graph remains the world structure; the Three.js client makes each semantic room
+feel like an explorable ARPG stage.
 
 ## Target Shape
 
@@ -20,7 +32,7 @@ flowchart LR
     Adapter["Protocol adapter"]
     Store["Client game state store"]
     Commands["Command router"]
-    Input["Input controller"]
+    Input["Isometric input controller"]
     UI["DOM / future HTML-in-Canvas UI"]
   end
 
@@ -103,10 +115,13 @@ flowchart TD
 Use normal Three game architecture:
 
 - One persistent renderer, scene, camera rig, and game loop.
+- Elevated/isometric camera as the primary play camera; third-person chase can
+  remain a debug/alternate mode, but should not drive the main UX.
+- `Raycaster` ground picking for click-to-move and world-object picking for
+  exits, NPCs, items, and interactables.
 - One disposable `THREE.Group` for the current room/zone.
 - `TextureLoader` and material cache behind an asset manager, not scattered inside room builders.
 - `InstancedMesh` for repeated cobbles, stalls, columns, trees, lamps, roof tiles when counts grow.
-- `Raycaster` for interactable selection and hover hints.
 - Bounding boxes or a simple collision map now; move to navmesh/physics only when geometry needs it.
 - Later: `GLTFLoader` for proper authored/generated models instead of composing everything from boxes.
 
@@ -166,16 +181,22 @@ The room spec should be explicit enough to make visual QA meaningful:
    - Extract render engine, scene registry, component kit, and game-state adapter.
    - Keep Temple/Town behavior identical while moving code.
 
-2. Temple quality bar.
+2. Isometric ARPG control slice.
+   - Add a Diablo-like elevated camera mode.
+   - Add raycast ground click-to-move with a visible destination marker.
+   - Make clickable exits route through the existing server-authoritative move command.
+   - Keep WASD/debug movement available, but stop treating third-person chase camera tuning as the primary design center.
+
+3. Temple quality bar.
    - Make the cathedral visually convincing: readable walls, proper windows, portal, altar, lighting, floor color patches.
    - QA with screenshots and a short manual Canary walk.
 
-3. Town Square rebuild.
+4. Town Square rebuild.
    - Stop using the flat background as the main illusion.
    - Build physical streets, building rows, stalls, fountain, roads, portals, NPC areas.
    - Use the original generated image as reference/composition, not as the whole scene.
 
-4. Gameplay surfaces.
+5. Gameplay surfaces.
    - NPC hover/selection.
    - Interactable prompts.
    - Inventory and dialogue panels.

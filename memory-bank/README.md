@@ -4,8 +4,12 @@ This memory bank tracks the `alosec/neomud-three` fork work.
 
 Current fork intent:
 
+- Product north star: build a server-authoritative isometric action RPG client
+  over a MUD world graph.
 - Keep the original NeoMud world graph, room data, NPC data, and client/server context as the gameplay spine.
-- Build a Three.js traversable renderer over selected rooms, starting with Temple of the Dawn and Town Square.
+- Present selected rooms through a Diablo/Dark Alliance-style Three.js client:
+  elevated/isometric camera, click-to-move, click NPCs/items/exits, readable
+  loot/interactable affordances, and action-RPG room flow.
 - Use generated texture content for physical room surfaces and reusable components.
 - Avoid upstream submissions until Alex explicitly asks for one.
 

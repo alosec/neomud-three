@@ -2,6 +2,12 @@
 
 High leverage next work:
 
+North star: NeoMud Three is now targeting a server-authoritative isometric
+action RPG client over a MUD world graph. The immediate product reference is
+Diablo 3 / Baldur's Gate: Dark Alliance-style play: elevated camera,
+click-to-move, click-to-interact, readable loot/NPC/exit affordances, and
+action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
+
 0. Use the new production pipeline for all visual work.
    - Treat `memory-bank/production-workflow.md` as the operating contract.
    - One pass must name one target, one problem, one hypothesis, constraints, and evidence.
@@ -30,6 +36,18 @@ High leverage next work:
    - Preserve the MUD/server authority boundary: click actions should route through the same command path as keyboard movement, physical triggers, DOM interactions, and server-backed room/item/NPC messages.
    - First implementation should be a small slice: elevated camera mode in Town Square, raycast ground click target, visible destination marker, click-to-walk toward the point, and click an exit affordance to issue the normal move command.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
+
+   Acceptance for the first slice:
+   - A player can enter Town Square, click a reachable ground point, and watch
+     the avatar walk toward it without using WASD.
+   - A visible destination marker appears on click and clears/repositions
+     predictably.
+   - Clicking the Gate/Temple/Tavern/Market exit affordance routes through the
+     same move command path as physical triggers.
+   - The elevated camera keeps all four primary landmark directions readable
+     from the central plaza.
+   - Existing keyboard movement still works as fallback/debug.
+   - Offline smoke and Town Square screenshot QA pass.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.

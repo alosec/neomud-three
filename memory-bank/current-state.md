@@ -7,6 +7,9 @@ Fork:
 - GitHub fork exists at `github.com/alosec/neomud-three`.
 - Local branch is `neomud-three-lab`.
 - Local `origin` is `https://github.com/alosec/neomud-three.git`.
+- Product north star is now: server-authoritative isometric action RPG client
+  over a MUD world graph. The desired feel is closer to Diablo 3 / Baldur's
+  Gate: Dark Alliance than a third-person RPG camera experiment.
 
 Playable Three.js lab:
 
@@ -198,6 +201,11 @@ Local app/server status:
 
 Known rough edges:
 
+- The current runtime is still primarily tuned around third-person/chase camera
+  movement. That is now a transitional state, not the target. Next input/camera
+  work should build a small Diablo-like click-to-move slice with elevated camera,
+  destination marker, clickable exits/interactables, and existing
+  server-authoritative command routing.
 - The workflow itself now has an explicit anti-overcorrection guard, because
   recent avatar scale/camera/detail passes showed a tendency to swing too far
   from one piece of feedback. Future visual passes that touch scale, camera,
