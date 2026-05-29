@@ -303,6 +303,34 @@ async function main() {
       await page.keyboard.press("f");
       assert.equal(await page.locator("#panel-title").textContent(), "Giant Forest Spider");
       assert.equal(await page.locator('[data-combat-command="attack"]').isDisabled(), false);
+      await page.keyboard.press("Digit1");
+      const hotkeyAttack = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
+      assert.equal(hotkeyAttack?.targetId, "npc:forest_spider");
+      assert.equal(hotkeyAttack?.command, "attack");
+      await page.waitForFunction(
+        () => {
+          const server = window.__neomudThreeDebug.server;
+          return server.attackMode === true
+            && server.selectedTargetId === "npc:forest_spider"
+            && server.pendingCombatCommand === null;
+        },
+        null,
+        { timeout: 5_000 }
+      );
+      await page.keyboard.press("Digit1");
+      const hotkeyStop = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
+      assert.equal(hotkeyStop?.targetId, "npc:forest_spider");
+      assert.equal(hotkeyStop?.command, "stop_attack");
+      await page.waitForFunction(
+        () => {
+          const server = window.__neomudThreeDebug.server;
+          return server.attackMode === false
+            && server.selectedTargetId === null
+            && server.pendingCombatCommand === null;
+        },
+        null,
+        { timeout: 5_000 }
+      );
       await page.keyboard.press("Escape");
       await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), forestSpider);
       const clickResult = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), forestSpider);

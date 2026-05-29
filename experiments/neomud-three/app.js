@@ -798,6 +798,8 @@ function handleKeyDown(event) {
     return;
   }
 
+  if (handleCombatHotkey(event)) return;
+
   if ((event.code === "KeyF" || event.code === "Enter") && nearbyInteractable && !activePanel) {
     event.preventDefault();
     interactWithNearby();
@@ -809,6 +811,22 @@ function handleKeyDown(event) {
     if (event.code === "Space" && !keys.has("Space")) movement.jumpQueued = true;
     keys.add(event.code);
   }
+}
+
+function handleCombatHotkey(event) {
+  const indexByCode = {
+    Digit1: 0,
+    Numpad1: 0,
+    Digit2: 1,
+    Numpad2: 1
+  };
+  const index = indexByCode[event.code];
+  if (index === undefined || !selectedInteractable || !isHostileEntity(selectedInteractable)) return false;
+  const action = combatActionOptions(selectedInteractable)[index];
+  if (!action?.enabled) return false;
+  event.preventDefault();
+  useCombatCommand(action.command);
+  return true;
 }
 
 function handleKeyUp(event) {
@@ -2018,28 +2036,9 @@ function interactionPanel() {
 }
 
 function hostileActionFrame(entity) {
-  const classDef = world.catalogs.classesById.get(playerProfile.classId);
-  const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
-  const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
+  const actions = combatActionOptions(entity);
   const combatReady = Boolean(serverCanDriveMovement());
   const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
-  const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
-  const actions = [
-    {
-      label: pendingCombat?.command === "attack" || pendingCombat?.command === "stop_attack"
-        ? "Working..."
-        : engaged ? "Stop Attack" : "Basic Attack",
-      detail: pendingCombat ? "Awaiting server" : engaged ? "Disengage" : "Weapon strike",
-      command: engaged ? "stop_attack" : "attack",
-      enabled: combatReady && !pendingCombat
-    },
-    {
-      label: pendingCombat?.command?.startsWith("cast:") ? "Working..." : spell?.name ?? "Class Skill",
-      detail: pendingCombat?.command?.startsWith("cast:") ? "Awaiting server" : spell ? `${spell.manaCost} MP` : "Ability",
-      command: spell ? `cast:${spell.id}` : "skill",
-      enabled: combatReady && Boolean(spell) && !pendingCombat
-    }
-  ];
   const authorityText = serverCanDriveMovement()
     ? engaged
       ? "Engaged through the Kotlin combat loop."
@@ -2077,6 +2076,31 @@ function hostileActionFrame(entity) {
       </div>
     </div>
   `;
+}
+
+function combatActionOptions(entity) {
+  const classDef = world.catalogs.classesById.get(playerProfile.classId);
+  const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
+  const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
+  const combatReady = Boolean(serverCanDriveMovement());
+  const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
+  const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
+  return [
+    {
+      label: pendingCombat?.command === "attack" || pendingCombat?.command === "stop_attack"
+        ? "Working..."
+        : engaged ? "Stop Attack" : "Basic Attack",
+      detail: pendingCombat ? "Awaiting server" : engaged ? "Disengage" : "Weapon strike",
+      command: engaged ? "stop_attack" : "attack",
+      enabled: combatReady && !pendingCombat
+    },
+    {
+      label: pendingCombat?.command?.startsWith("cast:") ? "Working..." : spell?.name ?? "Class Skill",
+      detail: pendingCombat?.command?.startsWith("cast:") ? "Awaiting server" : spell ? `${spell.manaCost} MP` : "Ability",
+      command: spell ? `cast:${spell.id}` : "skill",
+      enabled: combatReady && Boolean(spell) && !pendingCombat
+    }
+  ];
 }
 
 function serverActionLabel(entity) {
