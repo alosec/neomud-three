@@ -35,7 +35,6 @@ export function makePlayerAvatar() {
     activeAction: null,
     activeName: "Loading",
     model: null,
-    overlay: null,
     renderMode: "procedural"
   };
 
@@ -45,8 +44,8 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "xbot-adventurer-overlay-v2" : "procedural-adventurer-v1",
-    overlay: Boolean(state.overlay),
+    visualTreatment: state.loaded ? "clean-xbot-neutral-v1" : "procedural-adventurer-v1",
+    overlay: false,
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
   });
@@ -77,7 +76,7 @@ async function loadSkinnedHero(state, materials) {
     const gltf = await new GLTFLoader().loadAsync(PLAYER_MODEL_URL);
     const model = gltf.scene;
     model.name = "Xbot skinned player rig";
-    model.scale.setScalar(0.94);
+    model.scale.setScalar(0.82);
     model.rotation.y = Math.PI;
     model.visible = true;
 
@@ -91,10 +90,6 @@ async function loadSkinnedHero(state, materials) {
 
     state.model = model;
     state.visualRoot.add(model);
-    state.overlay = makeSkinnedAdventurerOverlay(materials);
-    state.overlay.scale.setScalar(0.58);
-    state.overlay.position.set(0, 0.08, -0.02);
-    state.visualRoot.add(state.overlay);
     state.mixer = new THREE.AnimationMixer(model);
     state.actions = Object.fromEntries(
       gltf.animations.map((clip) => {
@@ -251,26 +246,18 @@ function makeTabardPanel(material) {
 
 function styleSkinnedModel(model) {
   const palette = {
-    cloth: new THREE.Color(0x1f6170),
-    leather: new THREE.Color(0x6b4128),
-    dark: new THREE.Color(0x24180f)
+    body: new THREE.Color(0x405463),
+    joints: new THREE.Color(0x1a1714)
   };
 
   model.traverse((child) => {
     if (!child.isMesh || !child.material) return;
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     for (const material of materials) {
-      if (material.map) {
-        material.userData.neomudOriginalMap = material.map;
-        material.map = null;
-      }
-      material.color?.copy(material.name?.includes("Joints") ? palette.leather : palette.cloth);
-      material.roughness = 0.78;
-      material.metalness = 0.04;
-      material.envMapIntensity = 0.45;
-      if (material.name?.includes("Joints")) {
-        material.color?.lerp(palette.dark, 0.28);
-      }
+      material.color?.copy(material.name?.includes("Joints") ? palette.joints : palette.body);
+      material.roughness = material.name?.includes("Joints") ? 0.86 : 0.74;
+      material.metalness = 0.02;
+      material.envMapIntensity = 0.32;
       material.needsUpdate = true;
     }
   });
@@ -436,16 +423,6 @@ function updateSkinnedAnimation(state, frame) {
   state.shadow.scale.set(shadowScale * 1.12, shadowScale * 0.88, 1);
   state.shadow.material.opacity = grounded ? 0.22 : 0.12;
 
-  if (state.overlay) {
-    const sway = Math.sin(frame.walkClock * 0.72) * moveAmount;
-    state.overlay.rotation.x = damp(state.overlay.rotation.x, grounded ? -0.02 * moveAmount : 0.08, 10, frame.dt);
-    state.overlay.rotation.z = damp(state.overlay.rotation.z, -frame.strafeInput * 0.035 - frame.turnInput * 0.025, 10, frame.dt);
-    const cloak = state.overlay.getObjectByName("Adventurer cloak");
-    if (cloak) {
-      cloak.rotation.x = damp(cloak.rotation.x, -0.08 - moveAmount * 0.12 + Math.max(0, frame.verticalVelocity) * 0.01, 8, frame.dt);
-      cloak.rotation.z = sway * 0.035;
-    }
-  }
 }
 
 function playSkinnedAction(state, actionName, fadeDuration) {

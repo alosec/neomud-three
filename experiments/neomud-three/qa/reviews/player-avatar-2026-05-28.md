@@ -109,3 +109,17 @@ Total: 8/10
 Visual delta: restored a fantasy costume layer over the animated Xbot baseline, forced the underlying skinned materials into a teal/leather palette instead of grey mannequin textures, scaled the overlay down after screenshot review, and shared overlay geometry so the Avatar Lab budget remains valid.
 
 Remaining visual gap: this is the current best runtime bridge because it preserves real animation and improves the read, but the correct long-term fix remains a documented-license or Blender-authored skinned adventurer GLB.
+
+## Score After Clean Xbot Neutral Baseline
+
+- Animation continuity: 2/2. The visible player remains the loaded `Xbot.glb` rig, so idle/walk/run clips are still the on-screen animation source.
+- Silhouette: 1/2. Removing the procedural cloak/staff/satchel overlay eliminates the worst pasted-on geometry. The neutral body/joint palette is cleaner than the raw mannequin, but it is still not character art.
+- Art direction match: 1/2. The player now reads as a temporary neutral animated reference instead of a bad self-authored costume. This is a stronger baseline for replacement, not a final fantasy avatar.
+- Performance: 2/2. The runtime no longer draws overlay meshes, reducing avatar complexity while preserving the skinned rig.
+- QA coverage: 2/2. Lab QA, authored screenshots, and offline smoke assert `visualTreatment: clean-xbot-neutral-v1`, `overlay: false`, and `proxy: false`.
+
+Total: 8/10
+
+Visual delta: removed the live procedural adventurer overlay from `Xbot.glb`, scaled the rig slightly smaller, and applied only a minimal neutral body/joint material treatment so the player no longer reads as a nude mannequin or a kitbashed block costume.
+
+Repo rule: do not reintroduce procedural costume overlays on the live player. The next major avatar improvement should be a properly sourced or Blender-authored skinned adventurer GLB with documented license metadata and compatible idle/walk/run clips.
