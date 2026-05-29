@@ -202,6 +202,7 @@ def build_level():
     plaster_warm = material("MAT_tavern_warm_plaster", (0.52, 0.40, 0.28, 1), roughness=0.88)
     wood_dark = material("MAT_tavern_dark_oak", (0.13, 0.07, 0.035, 1), roughness=0.86)
     wood = material("MAT_tavern_worn_wood", (0.34, 0.19, 0.09, 1), roughness=0.8)
+    ceiling_cutaway = material("MAT_tavern_iso_hidden_ceiling", (0.24, 0.13, 0.06, 1), roughness=0.84)
     trim = material("MAT_tavern_worn_trim", (0.70, 0.53, 0.30, 1), roughness=0.68)
     stone = material("MAT_tavern_soot_stone", (0.16, 0.14, 0.13, 1), roughness=0.94)
     cloth_red = material("MAT_tavern_muted_red_cloth", (0.52, 0.10, 0.08, 1), roughness=0.82)
@@ -224,9 +225,9 @@ def build_level():
     cube3("VIS_east_threshold_glow", HALF_X - 1.2, 0.04, 0, 1.8, 0.04, 5.8, gold, semantic="east_exit_glow")
 
     for index, z in enumerate([-9.5, -6.35, -3.2, 0, 3.2, 6.35, 9.5], start=1):
-        cube3(f"VIS_ceiling_plank_{index:02d}", 0, CEILING_Y, z, WIDTH - 0.9, 0.09, 0.38, wood, semantic="ceiling_plank")
+        cube3(f"VIS_ceiling_plank_{index:02d}", 0, CEILING_Y, z, WIDTH - 0.9, 0.09, 0.38, ceiling_cutaway, semantic="ceiling_plank")
     for index, x in enumerate([-11.2, -5.6, 0, 5.6, 11.2], start=1):
-        cube3(f"VIS_ceiling_rafter_{index:02d}", x, RAFTER_Y, 0, 0.26, 0.3, DEPTH - 0.65, wood_dark, semantic="ceiling_rafter")
+        cube3(f"VIS_ceiling_rafter_{index:02d}", x, RAFTER_Y, 0, 0.26, 0.3, DEPTH - 0.65, ceiling_cutaway, semantic="ceiling_rafter")
 
     # Bar, shelves, bottles, and service staging.
     cube3("VIS_bar_base", BAR_X, 0.72, BAR_Z, 1.05, 1.44, 8.7, wood_dark, semantic="bar_counter")

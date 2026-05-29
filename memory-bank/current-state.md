@@ -19,14 +19,19 @@ Playable Three.js lab:
 - It builds a playable vertical slice across `town:temple`, `town:square`, `town:market`, `town:magic_shop`, `town:forge`, `town:gate`, `forest:edge`, `forest:path`, `forest:deep`, `forest:cave`, `forest:clearing`, and `town:tavern`.
 - By default, the lab connects to the Kotlin/JVM NeoMud server at `ws://127.0.0.1:8080/game`, logs in as an ephemeral guest, and treats `room_info` / `move_ok` as the authoritative room state.
 - `?offline=1` disables the server path and uses the static room graph fallback.
-- Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
+- Movement is sane enough to be the baseline: WASD for walk/turn, Q/E for
+  strafe, Shift to run, Space to jump, diagonal movement works, and the
+  behind-character Platform camera follows heading. In Iso mode, left/right
+  arrow keys now rotate the isometric camera orbit instead of turning the
+  avatar, which better matches the click-to-move action-RPG feel.
 - The main client intentionally supports two visual modes, not one discarded
   prototype camera: `Platform`, the behind-character/pointer-lock platformer
   POV, and `Iso`, the elevated bird's-eye/action-RPG POV. The product direction
   is `Iso` for Diablo-like click-first play, while `Platform` remains a useful
   visual/debug/playability option for behind-the-character traversal review.
   Future camera work should preserve both modes unless a task explicitly removes
-  one with QA evidence. Iso mode now
+  one with QA evidence. The game now defaults to `Iso`; `?camera=platform`
+  remains available for the behind-character mode. Iso mode now
   has the first click-to-move slice: canvas clicks raycast to the ground plane,
   show a destination marker, and steer the avatar toward the target while
   preserving keyboard movement as fallback. The ground-click path also checks
@@ -54,6 +59,12 @@ Playable Three.js lab:
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.
+  Real canvas clicks on Iso interactables now keep the interaction panel open;
+  the follow-up canvas click no longer closes the panel after the pointerdown
+  interaction path opens it. Town Square QA verifies a real click on Old Wren
+  leaves the panel visible. Iso also defaults to a slightly pulled-back zoom and
+  supports left/right arrow orbit rotation, with Town Square QA asserting both
+  the default zoom and ArrowRight orbit behavior.
   Town Square screenshot QA now captures both `town-shot-isometric-plaza.png`
   and `town-shot-platform-plaza.png` in the same run, proving the visual mode
   switch can return from the bird's-eye POV to the behind-character POV without
@@ -235,6 +246,11 @@ Tavern status:
 - `town:tavern` now loads from a Blender-authored GLB room package instead of the old procedural JavaScript interior as the primary runtime path.
 - The source-image workflow is explicit: NeoMud's `town_tavern.webp` is copied into `experiments/neomud-three/assets/source/scenes/town_tavern/source.webp`, interpreted in `level-brief.json`, authored in `town_tavern.blend`, exported as `town_tavern.glb`, and validated with the `room` GLB profile.
 - The Rusty Tankard GLB is a cutaway stage with plank floor, side walls, low beams, bar counter, bottle shelves, fireplace, tables/benches, a locked cellar hatch marker, and an open east threshold back to Town Square.
+- The Tavern GLB now puts ceiling planks/rafters into a distinct
+  `MAT_tavern_iso_hidden_ceiling` material batch so Iso mode can hide the roof
+  lattice cleanly without removing tables/bar/floor geometry. Runtime Tavern
+  red/blue/gold/glass wall panels are also hidden in Iso mode to avoid the
+  clipping/noisy painting effect seen from the bird's-eye camera.
 - GLB-authored collision covers the tables, bar, fireplace, and floor bounds so the player cannot clip through the main furniture.
 - Visible meshes are batched by material inside the Blender export script, dropping the runtime Tavern to 30 draw calls while preserving table/bar/fireplace collision and Barkeep overlay behavior.
 - The room uses a room-specific camera rig override because the outdoor follow camera clips badly in interior spaces.

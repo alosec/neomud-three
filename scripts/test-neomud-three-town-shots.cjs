@@ -69,6 +69,20 @@ async function main() {
     assert.equal(isoCamera.mode, "isometric");
     assert.ok(isoCamera.position.y > 12, `expected elevated isometric Town Square camera, got ${JSON.stringify(isoCamera)}`);
     const zoomBefore = await page.evaluate(() => window.__neomudThreeDebug.cameraControls.isoZoom);
+    assert.ok(zoomBefore > 1, `expected Iso default to start slightly zoomed out, got ${zoomBefore}`);
+    const orbitBefore = await page.evaluate(() => window.__neomudThreeDebug.cameraControls.isoOrbitAngle);
+    await page.keyboard.down("ArrowRight");
+    await page.waitForTimeout(360);
+    await page.keyboard.up("ArrowRight");
+    await settleFrames(page);
+    const orbitAfter = await page.evaluate(() => ({
+      camera: window.__neomudThreeDebug.camera,
+      controls: window.__neomudThreeDebug.cameraControls
+    }));
+    assert.ok(
+      orbitAfter.controls.isoOrbitAngle > orbitBefore + 0.2,
+      `expected ArrowRight to rotate Iso camera orbit, got ${JSON.stringify({ orbitBefore, orbitAfter })}`
+    );
     await page.mouse.move(640, 430);
     await page.mouse.wheel(0, 620);
     await settleFrames(page);
@@ -120,6 +134,16 @@ async function main() {
     await page.screenshot({ path: blockedTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-blocked-target", path: blockedTarget });
 
+    const beyondPropMove = await page.evaluate(() => {
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 10.4, heading: 0 });
+      return window.__neomudThreeDebug.clickGround({ x: 0, z: -3.4 });
+    });
+    assert.equal(beyondPropMove.type, "move");
+    assert.ok(
+      beyondPropMove.target.z < -2.8,
+      `expected ordinary click beyond fountain to remain valid until navmesh exists, got ${JSON.stringify(beyondPropMove)}`
+    );
+
     await page.evaluate(() => {
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
     });
@@ -145,6 +169,14 @@ async function main() {
     await page.screenshot({ path: hoverTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-hover-target", path: hoverTarget });
     await page.evaluate(() => window.__neomudThreeDebug.clearHover());
+
+    const oldWrenScreen = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.worldToScreen({ x, y: 1.25, z }), oldWren);
+    assert.ok(oldWrenScreen.visible, `expected Old Wren to project into the Iso camera view: ${JSON.stringify(oldWrenScreen)}`);
+    await page.mouse.click(oldWrenScreen.x, oldWrenScreen.y);
+    await page.waitForTimeout(120);
+    assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    assert.equal(await page.locator("#game-panel.hidden").count(), 0, "expected Iso real-click interaction panel to remain open");
+    await page.keyboard.press("Escape");
 
     const beforeClick = await page.evaluate(() => window.__neomudThreeDebug.player);
     await page.mouse.click(760, 525);

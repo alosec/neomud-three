@@ -61,7 +61,10 @@ async function main() {
     assert.equal(await page.locator("#compass").count(), 1);
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
     assert.match(await page.locator("#hp-value").textContent(), /^86\/86$/);
-    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.camera.mode), "platform");
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.camera.mode), "isometric");
+    assert.equal(await page.locator('[data-camera-mode="isometric"].active').count(), 1);
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform")), "platform");
+    await settleFrames(page);
     assert.equal(await page.locator('[data-camera-mode="platform"].active').count(), 1);
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("isometric")), "isometric");
     await settleFrames(page);

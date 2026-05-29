@@ -10,17 +10,17 @@
   "runtimeGlb": "town_tavern.glb",
   "files": {
     "sourceImageBytes": 51606,
-    "sourceBlendBytes": 145723,
-    "runtimeGlbBytes": 283688
+    "sourceBlendBytes": 146774,
+    "runtimeGlbBytes": 284928
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",
     "profile": "room",
-    "nodes": 27,
-    "meshes": 21,
-    "materials": 12,
+    "nodes": 28,
+    "meshes": 22,
+    "materials": 13,
     "prefixes": {
-      "VIS_": 11,
+      "VIS_": 12,
       "COL_": 9,
       "NAV_": 0,
       "SPAWN_": 1,

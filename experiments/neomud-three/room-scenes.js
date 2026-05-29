@@ -568,10 +568,10 @@ function addTavernRuntimeInteriorFinish(root, materials) {
   addInstancedBoxes(root, materials.darkTimber, darkTimber, "tavern-runtime-wall-dark-timber");
   addInstancedBoxes(root, materials.timber, timber, "tavern-runtime-wall-timber");
   addInstancedBoxes(root, materials.trimLight, trim, "tavern-runtime-wall-trim", { castShadow: false });
-  addInstancedBoxes(root, materials.awningRed, red, "tavern-runtime-wall-red");
-  addInstancedBoxes(root, materials.awningBlue, blue, "tavern-runtime-wall-blue");
-  addInstancedBoxes(root, materials.sign, gold, "tavern-runtime-wall-gold", { castShadow: false });
-  addInstancedBoxes(root, materials.windowDark, glass, "tavern-runtime-wall-glass", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.awningRed, red, "tavern-runtime-wall-red", { hideInIsometric: true });
+  addInstancedBoxes(root, materials.awningBlue, blue, "tavern-runtime-wall-blue", { hideInIsometric: true });
+  addInstancedBoxes(root, materials.sign, gold, "tavern-runtime-wall-gold", { castShadow: false, hideInIsometric: true });
+  addInstancedBoxes(root, materials.windowDark, glass, "tavern-runtime-wall-glass", { castShadow: false, receiveShadow: false, hideInIsometric: true });
 }
 
 function addTavernRuntimeFloorTreatment(root) {
@@ -7252,6 +7252,14 @@ function configureBlenderTavernScene(scene, flameMeshes = []) {
   scene.name = "town-tavern-blender-level";
   scene.traverse((object) => {
     if (!object.isMesh) return;
+    if (
+      object.name.includes("_ceiling_") ||
+      object.name.includes("_roof_") ||
+      object.name.includes("muted_red_cloth") ||
+      object.name.includes("iso_hidden_ceiling")
+    ) {
+      object.userData.hideInIsometric = true;
+    }
     object.castShadow = object.name.startsWith("VIS_");
     object.receiveShadow = object.name.startsWith("VIS_");
     if (!object.material) return;

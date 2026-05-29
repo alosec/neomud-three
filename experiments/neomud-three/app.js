@@ -54,7 +54,7 @@ let selectedInteractable = null;
 let lastInteractionResult = null;
 let pickupFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
-let cameraMode = urlParams.get("camera") === "isometric" ? "isometric" : "platform";
+let cameraMode = urlParams.get("camera") === "platform" ? "platform" : "isometric";
 
 const gameLog = [];
 
@@ -113,10 +113,12 @@ const controls = {
 };
 
 const cameraControls = {
-  isoZoom: 1,
+  isoZoom: 1.08,
   isoMinZoom: 0.68,
   isoMaxZoom: 1.34,
-  isoWheelStep: 0.075
+  isoWheelStep: 0.075,
+  isoOrbitAngle: 0,
+  isoOrbitRate: 1.35
 };
 
 const movement = {
@@ -1050,13 +1052,14 @@ function ensureSelectionMarker() {
   return group;
 }
 
-function requestPlayMode() {
-  closePanel();
-  if (cameraMode === "platform") {
-    canvas.requestPointerLock?.();
-  } else {
+function requestPlayMode(event) {
+  if (cameraMode === "isometric") {
+    event?.preventDefault?.();
     setInputMode("play");
+    return;
   }
+  closePanel();
+  canvas.requestPointerLock?.();
 }
 
 function setInputMode(mode) {
@@ -1576,7 +1579,8 @@ function render() {
 
 function updatePlayer(dt) {
   const keyboardForwardInput = axis("KeyW", "ArrowUp") - axis("KeyS", "ArrowDown");
-  const turnInput = axis("KeyD", "ArrowRight") - axis("KeyA", "ArrowLeft");
+  const isoOrbitInput = cameraMode === "isometric" ? axis("ArrowRight") - axis("ArrowLeft") : 0;
+  const turnInput = axis("KeyD", cameraMode === "platform" ? "ArrowRight" : null) - axis("KeyA", cameraMode === "platform" ? "ArrowLeft" : null);
   const strafeInput = axis("KeyE") - axis("KeyQ");
   const running = keys.has("ShiftLeft") || keys.has("ShiftRight");
   const hasKeyboardMove = keyboardForwardInput !== 0 || strafeInput !== 0 || turnInput !== 0;
@@ -1663,6 +1667,12 @@ function updatePlayer(dt) {
   movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
+  if (isoOrbitInput) {
+    cameraControls.isoOrbitAngle = THREE.MathUtils.euclideanModulo(
+      cameraControls.isoOrbitAngle + isoOrbitInput * cameraControls.isoOrbitRate * dt + Math.PI,
+      Math.PI * 2
+    ) - Math.PI;
+  }
   player.userData.animate?.({
     dt,
     forwardInput,
@@ -1686,8 +1696,8 @@ function updateCamera(dt, snap = false) {
     heading: movement.heading,
     cameraMode,
     roomCamera: roomRuntime?.camera
-      ? { ...roomRuntime.camera, isoZoom: cameraControls.isoZoom }
-      : { isoZoom: cameraControls.isoZoom }
+      ? { ...roomRuntime.camera, isoZoom: cameraControls.isoZoom, isoOrbitAngle: cameraControls.isoOrbitAngle }
+      : { isoZoom: cameraControls.isoZoom, isoOrbitAngle: cameraControls.isoOrbitAngle }
   });
 }
 
@@ -1754,7 +1764,8 @@ function installDebugApi() {
       return {
         isoZoom: cameraControls.isoZoom,
         isoMinZoom: cameraControls.isoMinZoom,
-        isoMaxZoom: cameraControls.isoMaxZoom
+        isoMaxZoom: cameraControls.isoMaxZoom,
+        isoOrbitAngle: cameraControls.isoOrbitAngle
       };
     },
     get clickMove() {
@@ -1864,6 +1875,14 @@ function installDebugApi() {
     },
     setCameraMode(mode) {
       return setCameraMode(mode);
+    },
+    worldToScreen({ x = 0, y = 0, z = 0 } = {}) {
+      const point = new THREE.Vector3(x, y, z).project(camera);
+      return {
+        x: (point.x * 0.5 + 0.5) * window.innerWidth,
+        y: (-point.y * 0.5 + 0.5) * window.innerHeight,
+        visible: point.z >= -1 && point.z <= 1
+      };
     },
     setIsoZoom(value) {
       return setIsoZoom(value, { snap: true });

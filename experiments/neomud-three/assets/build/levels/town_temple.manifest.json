@@ -10,8 +10,8 @@
   "runtimeGlb": "town_temple.glb",
   "files": {
     "sourceImageBytes": 74634,
-    "sourceBlendBytes": 181571,
-    "runtimeGlbBytes": 1471376
+    "sourceBlendBytes": 182474,
+    "runtimeGlbBytes": 1498356
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",

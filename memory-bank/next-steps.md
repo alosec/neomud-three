@@ -41,6 +41,15 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      removes one with evidence. `Iso` is the strategic default direction for
      Diablo-like gameplay; `Platform` remains valuable for traversal and
      representational review from behind the avatar.
+   - The game now defaults to `Iso`; `?camera=platform` remains available for
+     the behind-character view.
+   - Iso defaults to a slightly pulled-back zoom, and left/right arrow keys now
+     rotate the Iso camera orbit instead of turning the avatar. The unresolved
+     follow-up is a deliberate keyboard movement setting for Iso: either
+     character-relative movement, screen-relative movement, or separate bindings.
+     Do not overload this into the current patch without a clear setting model.
+   - Real canvas clicks on Iso interactables now preserve the interaction panel
+     instead of closing it through the follow-up canvas click handler.
    - Town Square screenshot QA now captures paired `Iso` and `Platform` plaza
      views in one run and asserts that switching back from `Iso` restores the
      lower behind-character camera mode.

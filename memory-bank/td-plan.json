@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T18:48:00.000Z",
+  "updated": "2026-05-29T19:12:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -142,10 +142,15 @@
           "id": 17,
           "body": "Corrected the click-target collision approach after user QA: do not invalidate ordinary clicks merely because the straight segment crosses a collider. Destination placement now relies on existing room collision pushout so clicks inside the Town Square fountain clamp outside it, while clicks beyond props remain valid until a real navmesh/pathfinding pass exists.",
           "created": "2026-05-29T18:48:00Z"
+        },
+        {
+          "id": 18,
+          "body": "Iso is now the default camera mode, with ?camera=platform preserving the behind-character mode. Real canvas clicks on Iso interactables no longer close the interaction panel through the follow-up click handler. Iso starts slightly zoomed out and ArrowLeft/ArrowRight rotate the Iso camera orbit. Town Square QA covers default zoom, ArrowRight orbit, real-click Old Wren panel persistence, normal click-to-move, and click target behavior around the fountain.",
+          "created": "2026-05-29T19:12:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T18:48:00Z"
+      "updated": "2026-05-29T19:12:00Z"
     },
     {
       "id": "neo-61d4",
