@@ -68,8 +68,8 @@ export const TOWN_SQUARE_SPEC = {
       y: 13.2,
       z: -61,
       width: 168,
-      height: 44,
-      opacity: 0.96
+      height: 34,
+      opacity: 0.72
     },
     {
       id: "far-hills-south",
@@ -81,8 +81,8 @@ export const TOWN_SQUARE_SPEC = {
       z: 61,
       rotationY: Math.PI,
       width: 168,
-      height: 44,
-      opacity: 0.92
+      height: 34,
+      opacity: 0.68
     },
     {
       id: "far-hills-east",
@@ -94,8 +94,8 @@ export const TOWN_SQUARE_SPEC = {
       z: 0,
       rotationY: -Math.PI / 2,
       width: 168,
-      height: 44,
-      opacity: 0.92
+      height: 34,
+      opacity: 0.68
     },
     {
       id: "far-hills-west",
@@ -107,8 +107,8 @@ export const TOWN_SQUARE_SPEC = {
       z: 0,
       rotationY: Math.PI / 2,
       width: 168,
-      height: 44,
-      opacity: 0.92
+      height: 34,
+      opacity: 0.68
     },
     {
       id: "outer-ground-and-roads",
@@ -139,6 +139,29 @@ export const TOWN_SQUARE_SPEC = {
         { x: -25.1, z: 15.7, width: 0.8, height: 1.9, depth: 11.8 },
         { x: 25.1, z: -15.7, width: 0.8, height: 1.9, depth: 11.8 },
         { x: 25.1, z: 15.7, width: 0.8, height: 1.9, depth: 11.8 }
+      ]
+    },
+    {
+      id: "outer-town-depth-masses",
+      ring: "middle",
+      kind: "context-masses",
+      masses: [
+        { material: "stone", x: -29.6, y: 2.4, z: -26.2, width: 9.8, height: 4.8, depth: 1.2 },
+        { material: "stone", x: 29.6, y: 2.4, z: -26.2, width: 9.8, height: 4.8, depth: 1.2 },
+        { material: "stone", x: -30.2, y: 2.1, z: 26.5, width: 8.6, height: 4.2, depth: 1.1 },
+        { material: "stone", x: 30.2, y: 2.1, z: 26.5, width: 8.6, height: 4.2, depth: 1.1 },
+        { material: "foliageDark", x: -35.5, y: 1.05, z: -15.0, width: 5.4, height: 2.1, depth: 8.6 },
+        { material: "foliageDark", x: -35.7, y: 1.12, z: 14.6, width: 5.6, height: 2.25, depth: 9.2 },
+        { material: "foliageDark", x: 35.5, y: 1.05, z: -15.0, width: 5.4, height: 2.1, depth: 8.6 },
+        { material: "foliageDark", x: 35.7, y: 1.12, z: 14.6, width: 5.6, height: 2.25, depth: 9.2 },
+        { material: "foliage", x: -35.5, y: 2.4, z: -15.0, width: 6.2, height: 1.0, depth: 9.4 },
+        { material: "foliage", x: -35.7, y: 2.55, z: 14.6, width: 6.4, height: 1.08, depth: 10.0 },
+        { material: "foliage", x: 35.5, y: 2.4, z: -15.0, width: 6.2, height: 1.0, depth: 9.4 },
+        { material: "foliage", x: 35.7, y: 2.55, z: 14.6, width: 6.4, height: 1.08, depth: 10.0 },
+        { material: "darkStone", x: -39.8, y: 1.2, z: 0, width: 1.2, height: 2.4, depth: 39.0 },
+        { material: "darkStone", x: 39.8, y: 1.2, z: 0, width: 1.2, height: 2.4, depth: 39.0 },
+        { material: "darkStone", x: 0, y: 1.15, z: -39.8, width: 39.0, height: 2.3, depth: 1.2 },
+        { material: "darkStone", x: 0, y: 1.15, z: 39.8, width: 39.0, height: 2.3, depth: 1.2 }
       ]
     },
     {

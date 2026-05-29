@@ -4593,13 +4593,26 @@ function addHiddenCaveShellDetails(root, materials) {
   ], "hidden-cave-layered-wall-ribs");
 
   addInstancedBoxes(root, materials.caveWall, [
-    { x: -6.8, y: 3.08, z: -5.4, width: 6.6, height: 0.5, depth: 3.2, rotationY: 0.08 },
-    { x: 0.0, y: 3.26, z: -4.9, width: 7.2, height: 0.46, depth: 3.0, rotationY: -0.06 },
-    { x: 6.8, y: 3.02, z: -4.4, width: 5.4, height: 0.5, depth: 2.8, rotationY: 0.12 },
-    { x: -5.2, y: 3.02, z: 4.9, width: 6.2, height: 0.48, depth: 3.0, rotationY: -0.1 },
-    { x: 2.0, y: 3.2, z: 4.9, width: 7.4, height: 0.46, depth: 2.8, rotationY: 0.05 },
-    { x: 8.0, y: 2.94, z: 3.8, width: 3.6, height: 0.42, depth: 2.4, rotationY: -0.12 }
+    { x: -8.4, y: 3.32, z: -6.9, width: 3.9, height: 0.36, depth: 1.35, rotationY: 0.08 },
+    { x: -2.8, y: 3.48, z: -7.15, width: 4.6, height: 0.34, depth: 1.08, rotationY: -0.06 },
+    { x: 3.1, y: 3.4, z: -6.9, width: 4.2, height: 0.34, depth: 1.18, rotationY: 0.1 },
+    { x: 8.4, y: 3.22, z: -6.2, width: 2.8, height: 0.34, depth: 1.22, rotationY: 0.16 },
+    { x: -8.1, y: 3.26, z: 6.95, width: 3.7, height: 0.34, depth: 1.18, rotationY: -0.12 },
+    { x: -2.6, y: 3.5, z: 7.1, width: 4.5, height: 0.32, depth: 1.0, rotationY: 0.07 },
+    { x: 3.2, y: 3.38, z: 6.88, width: 4.1, height: 0.34, depth: 1.1, rotationY: -0.08 },
+    { x: 8.2, y: 3.2, z: 6.1, width: 2.7, height: 0.32, depth: 1.05, rotationY: 0.14 }
   ], "hidden-cave-low-ceiling-plates");
+
+  addInstancedBoxes(root, materials.wetStone, [
+    { x: -7.2, y: 2.18, z: -6.35, width: 0.62, height: 2.15, depth: 0.5, rotationY: 0.2 },
+    { x: -2.4, y: 2.34, z: -6.55, width: 0.52, height: 2.42, depth: 0.46, rotationY: -0.18 },
+    { x: 2.9, y: 2.2, z: -6.4, width: 0.58, height: 2.12, depth: 0.5, rotationY: 0.14 },
+    { x: 7.2, y: 2.06, z: -5.8, width: 0.54, height: 1.86, depth: 0.46, rotationY: -0.08 },
+    { x: -7.6, y: 2.02, z: 6.38, width: 0.56, height: 1.92, depth: 0.5, rotationY: -0.16 },
+    { x: -2.2, y: 2.28, z: 6.58, width: 0.56, height: 2.26, depth: 0.46, rotationY: 0.12 },
+    { x: 3.1, y: 2.08, z: 6.4, width: 0.54, height: 1.96, depth: 0.46, rotationY: -0.1 },
+    { x: 7.5, y: 1.96, z: 5.75, width: 0.5, height: 1.72, depth: 0.42, rotationY: 0.14 }
+  ], "hidden-cave-side-pillars");
 
   addInstancedBoxes(root, materials.dampMoss, [
     { x: -4.3, y: 0.18, z: -2.15, width: 2.85, height: 0.12, depth: 1.55, rotationY: -0.16 },
@@ -4687,15 +4700,15 @@ function addHiddenCaveChest(root, materials) {
   addBox(group, materials.chestMoss, 0.62, 0.62, 0.05, 0.15, 0.22, 0.62, { castShadow: false });
 
   addInstancedBoxes(group, materials.wetStone, [
-    { x: -1.22, y: 0.88, z: 0.62, width: 0.34, height: 1.72, depth: 0.32 },
-    { x: 1.22, y: 0.88, z: 0.62, width: 0.34, height: 1.72, depth: 0.32 },
+    { x: -1.22, y: 0.86, z: 0.62, width: 0.3, height: 1.62, depth: 0.3 },
+    { x: 1.22, y: 0.86, z: 0.62, width: 0.3, height: 1.62, depth: 0.3 },
     { x: -1.72, y: 0.8, z: -0.24, width: 0.28, height: 1.6, depth: 0.34 },
     { x: 1.72, y: 0.8, z: -0.24, width: 0.28, height: 1.6, depth: 0.34 },
     { x: -1.72, y: 1.68, z: -0.24, width: 0.42, height: 0.18, depth: 0.46 },
     { x: 1.72, y: 1.68, z: -0.24, width: 0.42, height: 0.18, depth: 0.46 },
-    { x: 0, y: 1.72, z: 0.62, width: 2.42, height: 0.34, depth: 0.34 },
-    { x: -0.72, y: 1.96, z: 0.62, width: 0.84, height: 0.28, depth: 0.3, rotationY: 0.08 },
-    { x: 0.72, y: 1.96, z: 0.62, width: 0.84, height: 0.28, depth: 0.3, rotationY: -0.08 }
+    { x: 0, y: 1.76, z: 0.62, width: 2.18, height: 0.26, depth: 0.3 },
+    { x: -0.66, y: 2.0, z: 0.62, width: 0.72, height: 0.22, depth: 0.26, rotationY: 0.08 },
+    { x: 0.66, y: 2.0, z: 0.62, width: 0.72, height: 0.22, depth: 0.26, rotationY: -0.08 }
   ], "hidden-cave-chest-alcove-stone");
   addInstancedBoxes(group, materials.chestMoss, [
     { x: -1.24, y: 1.44, z: 0.42, width: 0.08, height: 0.72, depth: 0.12 },
@@ -5763,7 +5776,8 @@ function addTownSpecChunkRings(root, materials, spec) {
           z: mass.z,
           width: mass.width,
           height: mass.height,
-          depth: mass.depth
+          depth: mass.depth,
+          rotationY: mass.rotationY ?? 0
         });
       }
       for (const [materialKey, boxes] of boxesByMaterial) {
