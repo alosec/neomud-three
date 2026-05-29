@@ -1731,11 +1731,12 @@ function hostileActionFrame(entity) {
   const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
   const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
   const combatReady = Boolean(serverCanDriveMovement());
+  const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
   const actions = [
     {
-      label: "Basic Attack",
-      detail: "Weapon strike",
-      command: "attack",
+      label: engaged ? "Stop Attack" : "Basic Attack",
+      detail: engaged ? "Disengage" : "Weapon strike",
+      command: engaged ? "stop_attack" : "attack",
       enabled: combatReady
     },
     {
@@ -1746,8 +1747,13 @@ function hostileActionFrame(entity) {
     }
   ];
   const authorityText = serverCanDriveMovement()
-    ? "Server-authoritative combat commands are available."
+    ? engaged
+      ? "Engaged through the Kotlin combat loop."
+      : "Server-authoritative combat commands are available."
     : "Combat requires a live server-authoritative command path.";
+  const modePill = engaged
+    ? `<span class="combat-mode-pill">Attacking</span>`
+    : "";
   const combatResult = lastCombatResult
     ? `
       <div class="combat-result ${lastCombatResult.success ? "success" : "warning"}">
@@ -1760,7 +1766,7 @@ function hostileActionFrame(entity) {
   return `
     <div class="combat-actions" data-target-id="${escapeHtml(entity.id)}">
       <div class="combat-actions-header">
-        <strong>Actions</strong>
+        <strong>Actions ${modePill}</strong>
         <span>${escapeHtml(authorityText)}</span>
       </div>
       ${combatResult}
@@ -1957,6 +1963,19 @@ function useCombatCommand(command) {
       };
       appendLog(`Attacking ${target.name} through the Kotlin server...`);
       updateStatusText(`Attacking ${target.name}...`);
+    }
+  } else if (command === "stop_attack") {
+    sent = serverState.client.sendAttackToggle(false);
+    if (sent) {
+      serverState.attackMode = false;
+      serverState.selectedTargetId = null;
+      lastCombatResult = {
+        success: true,
+        targetName: target.name,
+        message: `Stopped attacking ${target.name}.`
+      };
+      appendLog(`Stopped attacking ${target.name} through the Kotlin server...`);
+      updateStatusText(`Stopped attacking ${target.name}.`);
     }
   } else if (command?.startsWith("cast:")) {
     const spellId = command.slice("cast:".length);

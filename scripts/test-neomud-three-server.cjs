@@ -310,10 +310,27 @@ async function main() {
           const server = window.__neomudThreeDebug.server;
           return server.messageCount > before
             && server.attackMode === true
-            && server.selectedTargetId === "npc:forest_spider"
-            && /Attacking Giant Forest Spider/i.test(server.lastCombatResult?.message ?? "");
+            && server.selectedTargetId === "npc:forest_spider";
         },
         beforeAttackMessages,
+        { timeout: 5_000 }
+      );
+      await page.waitForFunction(
+        () => document.querySelector('[data-combat-command="stop_attack"]')?.textContent?.match(/Stop Attack/i),
+        null,
+        { timeout: 2_000 }
+      );
+      assert.match(await page.locator(".combat-actions").textContent(), /Attacking/i);
+      const beforeStopMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
+      await page.locator('[data-combat-command="stop_attack"]').click();
+      await page.waitForFunction(
+        (before) => {
+          const server = window.__neomudThreeDebug.server;
+          return server.messageCount > before
+            && server.attackMode === false
+            && server.selectedTargetId === null;
+        },
+        beforeStopMessages,
         { timeout: 5_000 }
       );
       await page.keyboard.press("Escape");

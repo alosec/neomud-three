@@ -64,7 +64,9 @@ Playable Three.js lab:
   in the interaction panel. This remains server-authoritative: the live
   `Basic Attack` action sends `select_target` and `attack_toggle` through the
   Kotlin WebSocket protocol, while spell/skill actions route through catalog
-  IDs when available instead of faking local combat simulation.
+  IDs when available instead of faking local combat simulation. Once the server
+  confirms attack mode, the panel changes to an explicit engaged state with a
+  `Stop Attack` command that sends `attack_toggle(false)`.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.
