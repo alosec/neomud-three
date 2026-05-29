@@ -338,17 +338,17 @@ def sloped_panel_x3(name, x, bottom_y, z, width, height, thickness, top_offset_z
 
 def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight, width=4.65, back_height=0.92, seat_depth=0.98):
     side_profile = [
-        (-0.56, 0.0),
-        (0.52, 0.0),
-        (0.52, 0.52),
-        (0.26, 1.05),
-        (-0.42, 1.18),
-        (-0.56, 0.18),
+        (-0.48, 0.0),
+        (0.50, 0.0),
+        (0.48, 0.34),
+        (0.22, 0.88),
+        (-0.34, 0.98),
+        (-0.48, 0.16),
     ]
 
-    cube3(f"VIS_pew_{pew_id}_seat_plane", x, 0.48, z + 0.06, width, 0.18, seat_depth, wood_mid, semantic="cathedral_pew_seat")
-    cube3(f"VIS_pew_{pew_id}_seat_front_soft_edge", x, 0.58, z + 0.53, width + 0.04, 0.08, 0.08, wood_highlight, semantic="cathedral_pew_worn_edge")
-    cube3(f"VIS_pew_{pew_id}_seat_rear_shadow", x, 0.56, z - 0.42, width - 0.08, 0.08, 0.08, wood_dark, semantic="cathedral_pew_shadow_edge")
+    cube3(f"VIS_pew_{pew_id}_seat_plane", x, 0.48, z + 0.06, width, 0.16, seat_depth, wood_mid, semantic="cathedral_pew_seat")
+    cube3(f"VIS_pew_{pew_id}_seat_front_soft_edge", x, 0.57, z + 0.53, width + 0.04, 0.07, 0.08, wood_highlight, semantic="cathedral_pew_worn_edge")
+    cube3(f"VIS_pew_{pew_id}_seat_rear_shadow", x, 0.55, z - 0.42, width - 0.08, 0.07, 0.08, wood_dark, semantic="cathedral_pew_shadow_edge")
     sloped_panel_x3(
         f"VIS_pew_{pew_id}_back_panel",
         x,
@@ -361,8 +361,8 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight, width=4
         wood_mid,
         semantic="cathedral_pew_backrest",
     )
-    cube3(f"VIS_pew_{pew_id}_top_soft_cap", x, 0.53 + back_height, z - 0.66, width + 0.08, 0.13, 0.14, wood_highlight, semantic="cathedral_pew_worn_edge")
-    cube3(f"VIS_pew_{pew_id}_kneeler_shadow", x, 0.26, z + 0.68, width - 0.58, 0.09, 0.1, wood_dark, semantic="cathedral_pew_kneeler")
+    cube3(f"VIS_pew_{pew_id}_top_soft_cap", x, 0.52 + back_height, z - 0.66, width + 0.08, 0.11, 0.14, wood_highlight, semantic="cathedral_pew_worn_edge")
+    cube3(f"VIS_pew_{pew_id}_kneeler_shadow", x, 0.25, z + 0.68, width - 0.74, 0.075, 0.09, wood_dark, semantic="cathedral_pew_kneeler")
     foot_span = max(0.55, width / 2 - 0.28)
     for foot_x, foot_label in [(-foot_span, "west"), (foot_span, "east")]:
         for foot_z, depth_label in [(z + 0.4, "front"), (z - 0.43, "back")]:
@@ -371,9 +371,9 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight, width=4
                 x + foot_x,
                 0.16,
                 foot_z,
-                0.22,
-                0.32,
                 0.18,
+                0.28,
+                0.16,
                 wood_dark,
                 semantic="cathedral_pew_foot",
             )
@@ -385,19 +385,19 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight, width=4
             end_x,
             0.12,
             z,
-            0.26,
+            0.22,
             side_profile,
-            wood_dark,
+            wood_mid,
             semantic="cathedral_pew_end_panel",
         )
         cube3(
             f"VIS_pew_{pew_id}_{label}_low_plinth",
             end_x,
-            0.2,
+            0.18,
             z + 0.28,
-            0.3,
-            0.12,
-            0.52,
+            0.24,
+            0.1,
+            0.46,
             wood_highlight,
             semantic="cathedral_pew_worn_edge",
         )
