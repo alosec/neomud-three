@@ -3,9 +3,9 @@ export const TOWN_SQUARE_SPEC = {
   name: "Town Square",
   intent: "Readable civic plaza with four authored landmarks tied to real NeoMud exits.",
   size: {
-    width: 46,
-    depth: 46,
-    clamp: { minX: -21.1, maxX: 21.1, minZ: -21.1, maxZ: 21.1 }
+    width: 52,
+    depth: 58,
+    clamp: { minX: -24.6, maxX: 24.6, minZ: -27.4, maxZ: 27.4 }
   },
   spawn: { position: [0, 0, 12.2], heading: 0 },
   entrySpawns: {
@@ -20,10 +20,13 @@ export const TOWN_SQUARE_SPEC = {
     fogDensity: 0.0048
   },
   surfaces: {
-    ground: { material: "packedDirt", width: 46, depth: 46 },
+    ground: { material: "packedDirt", width: 52, depth: 58 },
     paths: [
-      { id: "north-south-main", material: "road", x: 0, z: 0, width: 6.2, depth: 46 },
-      { id: "east-west-main", material: "road", x: 0, z: 0, width: 46, depth: 6.2 },
+      { id: "north-south-main", material: "road", x: 0, z: 0, width: 6.2, depth: 54 },
+      { id: "east-west-main", material: "road", x: 0, z: 0, width: 50, depth: 6.2 },
+      { id: "northwest-walk", material: "road", x: -11.8, z: -13.4, width: 15.2, depth: 3.0, rotationZ: -0.34 },
+      { id: "southeast-walk", material: "road", x: 11.5, z: 13.2, width: 14.4, depth: 2.8, rotationZ: -0.32 },
+      { id: "southwest-green-walk", material: "road", x: -14.2, z: 13.4, width: 10.8, depth: 3.0, rotationZ: 0.38 },
       { id: "tavern-apron", material: "road", x: -14.0, z: 0, width: 11.4, depth: 9.6 },
       { id: "market-apron", material: "road", x: 14.1, z: -1.2, width: 11.6, depth: 10.2 },
       { id: "gate-approach", material: "road", x: 0, z: -15.0, width: 8.2, depth: 12.4 },
@@ -37,10 +40,10 @@ export const TOWN_SQUARE_SPEC = {
       { id: "temple-stoop", material: "plazaStone", x: 0, z: 18.8, y: 0.034, width: 8.8, depth: 3.1 }
     ],
     curbs: [
-      { x: 0, z: -22.3, width: 46, height: 0.16, depth: 0.32 },
-      { x: 0, z: 22.3, width: 46, height: 0.16, depth: 0.32 },
-      { x: -22.3, z: 0, width: 0.32, height: 0.16, depth: 46 },
-      { x: 22.3, z: 0, width: 0.32, height: 0.16, depth: 46 }
+      { x: 0, z: -27.4, width: 52, height: 0.16, depth: 0.32 },
+      { x: 0, z: 27.4, width: 52, height: 0.16, depth: 0.32 },
+      { x: -24.6, z: 0, width: 0.32, height: 0.16, depth: 58 },
+      { x: 24.6, z: 0, width: 0.32, height: 0.16, depth: 58 }
     ],
     contactShadows: [
       { id: "fountain-grounding", x: 0, z: 0, width: 8.6, depth: 8.6 },
@@ -457,7 +460,17 @@ export const TOWN_SQUARE_SPEC = {
       { x: -10.1, z: -18.4, scale: 0.55, rotationY: 1.0 },
       { x: 10.2, z: -18.3, scale: 0.58, rotationY: -1.0 },
       { x: -10.5, z: 18.4, scale: 0.58, rotationY: 0.1 },
-      { x: 10.5, z: 18.3, scale: 0.58, rotationY: -0.1 }
+      { x: 10.5, z: 18.3, scale: 0.58, rotationY: -0.1 },
+      { x: -20.8, z: -3.2, scale: 0.74, rotationY: -0.55 },
+      { x: -21.6, z: 4.2, scale: 0.66, rotationY: 0.3 },
+      { x: -18.6, z: 11.8, scale: 0.72, rotationY: -0.18 },
+      { x: 20.4, z: -9.6, scale: 0.68, rotationY: 0.74 },
+      { x: 21.5, z: 6.8, scale: 0.64, rotationY: -0.62 },
+      { x: 17.4, z: 12.7, scale: 0.62, rotationY: 0.38 },
+      { x: -7.8, z: -22.7, scale: 0.58, rotationY: 0.4 },
+      { x: 7.9, z: -22.4, scale: 0.62, rotationY: -0.38 },
+      { x: -6.4, z: 23.1, scale: 0.58, rotationY: -0.16 },
+      { x: 6.3, z: 23.0, scale: 0.58, rotationY: 0.2 }
     ],
     flowerClusters: [
       { x: -12.8, z: -8.3, material: "awningGold", radius: 0.46, count: 6, scale: 0.85 },

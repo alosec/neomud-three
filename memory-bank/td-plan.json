@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T07:50:00Z",
+  "updated": "2026-05-30T08:08:00Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -4079,7 +4079,7 @@
       "type": "task",
       "priority": 0,
       "status": "in-progress",
-      "status_type": "started",
+      "status_type": "open",
       "parent": "neo-1fb2.8",
       "close_reason": "",
       "labels": [
@@ -4115,10 +4115,15 @@
           "id": 4,
           "body": "First cleanup pass removed the noisiest far ridge/terrace bands from the Town Square spec so the outside edge reads less jumbled. This is only a simplification pass; the larger less-square/explorable district recomposition remains open.",
           "created": "2026-05-30T07:55:00Z"
+        },
+        {
+          "id": 5,
+          "body": "Expanded Town Square traversable bounds, added diagonal walkable bands/side greens, and kept screenshot QA passing. This is a partial civic-district pass; larger semantic recomposition remains open.",
+          "created": "2026-05-30T08:08:00Z"
         }
       ],
       "created": "2026-05-30T07:18:00Z",
-      "updated": "2026-05-30T07:55:00Z"
+      "updated": "2026-05-30T08:08:00Z"
     },
     {
       "id": "neo-1fb2.95",
@@ -4195,10 +4200,10 @@
       "description": "Make the Town Square market read as a distinct, front-facing civic landmark rather than background clutter. Improve its entrance/frontage, silhouette, signage, awnings, stall composition, and approach framing so the player understands where the market is from Iso and Platform views. Resolve the carts/loose props in front of the market so the player cannot visibly clip through them; either add accurate collision volumes, reposition them outside traversal lanes, or replace them with cleaner nonblocking frontage elements. Keep the east exit target, physical click/trigger behavior, route readability, and render budget intact.",
       "type": "task",
       "priority": 0,
-      "status": "in-progress",
-      "status_type": "started",
+      "status": "done",
+      "status_type": "closed",
       "parent": "neo-1fb2.8",
-      "close_reason": "",
+      "close_reason": "implemented",
       "labels": [
         "neomud-three",
         "town-square",
@@ -4227,10 +4232,15 @@
           "id": 3,
           "body": "Added collision coverage for Market Hall stalls and widened market-cart colliders so the visible frontage props are no longer traversal-only decoration. Town Square screenshot QA asserts market cart/stall collider metadata, and offline smoke passes.",
           "created": "2026-05-30T08:10:00Z"
+        },
+        {
+          "id": 4,
+          "body": "Added fixed Market Hall facade identity treatment and kept market cart/stall collider coverage in QA. The rotating/clipping sign remains removed and the market now has stronger forward-facing signage/banners.",
+          "created": "2026-05-30T08:08:00Z"
         }
       ],
       "created": "2026-05-30T07:24:00Z",
-      "updated": "2026-05-30T08:10:00Z"
+      "updated": "2026-05-30T08:08:00Z"
     },
     {
       "id": "neo-3361.1",

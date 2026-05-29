@@ -7786,6 +7786,7 @@ function battlementBoxesFor(x, y, z, width, depth) {
 function addMarketLandmark(root, materials, landmark) {
   const group = addGabledHouse(root, materials, resolveBuildingSpec(materials, landmark.building));
   group.userData = { landmarkId: landmark.id, targetId: landmark.targetId, label: landmark.name };
+  addMarketFacadeIdentity(root, materials, landmark);
   addMarketDetailProps(root, materials);
   for (const stall of landmark.stalls) {
     addComponentMarketStall(root, materials, {
@@ -7797,6 +7798,37 @@ function addMarketLandmark(root, materials, landmark) {
       depth: stall.depth ?? 1.5
     });
   }
+}
+
+function addMarketFacadeIdentity(root, materials, landmark) {
+  const building = landmark.building ?? {};
+  const x = building.x ?? 20.6;
+  const z = building.z ?? -0.2;
+  addTextBoard(root, "Market Hall", {
+    x: x - 4.9,
+    y: 4.95,
+    z: z - 2.7,
+    width: 4.9,
+    height: 0.82,
+    subtitle: "Traders",
+    palette: "blue",
+    rotationY: -Math.PI / 2,
+    billboard: false,
+    renderOrder: 10
+  });
+
+  addInstancedBoxes(root, materials.awningBlue, [
+    { x: x - 5.02, y: 3.9, z: z - 5.55, width: 0.18, height: 2.25, depth: 0.22 },
+    { x: x - 5.02, y: 3.9, z: z + 2.95, width: 0.18, height: 2.25, depth: 0.22 }
+  ], "market-hall-blue-identity-banners", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.awningGold, [
+    { x: x - 5.06, y: 3.92, z: z - 3.95, width: 0.16, height: 1.72, depth: 0.18 },
+    { x: x - 5.06, y: 3.92, z: z + 1.35, width: 0.16, height: 1.72, depth: 0.18 }
+  ], "market-hall-gold-identity-banners", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.darkTimber, [
+    { x: x - 5.12, y: 3.05, z: z - 1.2, width: 0.16, height: 0.16, depth: 7.8 },
+    { x: x - 5.1, y: 4.5, z: z - 1.2, width: 0.18, height: 0.18, depth: 8.4 }
+  ], "market-hall-frontage-rails", { castShadow: false, receiveShadow: true });
 }
 
 function addMarketDetailProps(root, materials) {
