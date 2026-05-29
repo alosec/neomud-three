@@ -3,6 +3,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
 
+const sharedGeometries = new Map();
+
 export function makePlayerAvatar() {
   const root = new THREE.Group();
   root.name = "Player avatar";
@@ -33,6 +35,7 @@ export function makePlayerAvatar() {
     activeAction: null,
     activeName: "Loading",
     model: null,
+    overlay: null,
     renderMode: "procedural"
   };
 
@@ -42,8 +45,8 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "xbot-skinned-visible-v1" : "procedural-adventurer-v1",
-    overlay: false,
+    visualTreatment: state.loaded ? "xbot-adventurer-overlay-v2" : "procedural-adventurer-v1",
+    overlay: Boolean(state.overlay),
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
   });
@@ -88,6 +91,10 @@ async function loadSkinnedHero(state, materials) {
 
     state.model = model;
     state.visualRoot.add(model);
+    state.overlay = makeSkinnedAdventurerOverlay(materials);
+    state.overlay.scale.setScalar(0.58);
+    state.overlay.position.set(0, 0.08, -0.02);
+    state.visualRoot.add(state.overlay);
     state.mixer = new THREE.AnimationMixer(model);
     state.actions = Object.fromEntries(
       gltf.animations.map((clip) => {
@@ -218,7 +225,7 @@ function makeCompactAdventurerRig(materials) {
 }
 
 function addOverlayBoxBatch(root, material, boxes, name) {
-  const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), material, boxes.length);
+  const mesh = new THREE.InstancedMesh(sharedBoxGeometry(), material, boxes.length);
   const dummy = new THREE.Object3D();
   for (const [index, box] of boxes.entries()) {
     dummy.position.set(box.x, box.y, box.z);
@@ -235,15 +242,7 @@ function addOverlayBoxBatch(root, material, boxes, name) {
 }
 
 function makeTabardPanel(material) {
-  const shape = new THREE.Shape();
-  shape.moveTo(-0.34, 0.38);
-  shape.lineTo(0.34, 0.38);
-  shape.lineTo(0.25, -0.58);
-  shape.lineTo(0, -0.74);
-  shape.lineTo(-0.25, -0.58);
-  shape.lineTo(-0.34, 0.38);
-
-  const panel = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
+  const panel = new THREE.Mesh(sharedTabardGeometry(), material);
   panel.name = "Adventurer tabard";
   panel.castShadow = true;
   panel.receiveShadow = true;
@@ -261,13 +260,18 @@ function styleSkinnedModel(model) {
     if (!child.isMesh || !child.material) return;
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     for (const material of materials) {
-      material.color?.lerp(material.name?.includes("Joints") ? palette.leather : palette.cloth, 0.82);
+      if (material.map) {
+        material.userData.neomudOriginalMap = material.map;
+        material.map = null;
+      }
+      material.color?.copy(material.name?.includes("Joints") ? palette.leather : palette.cloth);
       material.roughness = 0.78;
       material.metalness = 0.04;
       material.envMapIntensity = 0.45;
       if (material.name?.includes("Joints")) {
         material.color?.lerp(palette.dark, 0.28);
       }
+      material.needsUpdate = true;
     }
   });
 }
@@ -359,15 +363,7 @@ function makeAdventurerRig(materials) {
 }
 
 function makeCloakPanel(material, side) {
-  const shape = new THREE.Shape();
-  shape.moveTo(0.03 * side, 0.08);
-  shape.lineTo(0.36 * side, 0.02);
-  shape.lineTo(0.27 * side, -0.98);
-  shape.lineTo(0.07 * side, -1.16);
-  shape.lineTo(0.01 * side, -0.22);
-  shape.lineTo(0.03 * side, 0.08);
-
-  const panel = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
+  const panel = new THREE.Mesh(sharedCloakGeometry(side), material);
   panel.rotation.x = -0.1;
   panel.rotation.z = side * 0.045;
   panel.position.set(side * 0.04, 0.04, 0);
@@ -439,6 +435,17 @@ function updateSkinnedAnimation(state, frame) {
   const shadowScale = grounded ? 1 - moveAmount * 0.04 : 0.66;
   state.shadow.scale.set(shadowScale * 1.12, shadowScale * 0.88, 1);
   state.shadow.material.opacity = grounded ? 0.22 : 0.12;
+
+  if (state.overlay) {
+    const sway = Math.sin(frame.walkClock * 0.72) * moveAmount;
+    state.overlay.rotation.x = damp(state.overlay.rotation.x, grounded ? -0.02 * moveAmount : 0.08, 10, frame.dt);
+    state.overlay.rotation.z = damp(state.overlay.rotation.z, -frame.strafeInput * 0.035 - frame.turnInput * 0.025, 10, frame.dt);
+    const cloak = state.overlay.getObjectByName("Adventurer cloak");
+    if (cloak) {
+      cloak.rotation.x = damp(cloak.rotation.x, -0.08 - moveAmount * 0.12 + Math.max(0, frame.verticalVelocity) * 0.01, 8, frame.dt);
+      cloak.rotation.z = sway * 0.035;
+    }
+  }
 }
 
 function playSkinnedAction(state, actionName, fadeDuration) {
@@ -644,12 +651,48 @@ function addCapsule(root, material, x, y, z, radius, length) {
 }
 
 function addBox(root, material, x, y, z, width, height, depth) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
+  const mesh = new THREE.Mesh(sharedBoxGeometry(), material);
   mesh.position.set(x, y, z);
+  mesh.scale.set(width, height, depth);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   root.add(mesh);
   return mesh;
+}
+
+function sharedBoxGeometry() {
+  return sharedGeometry("box", () => new THREE.BoxGeometry(1, 1, 1));
+}
+
+function sharedTabardGeometry() {
+  return sharedGeometry("tabard", () => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-0.34, 0.38);
+    shape.lineTo(0.34, 0.38);
+    shape.lineTo(0.25, -0.58);
+    shape.lineTo(0, -0.74);
+    shape.lineTo(-0.25, -0.58);
+    shape.lineTo(-0.34, 0.38);
+    return new THREE.ShapeGeometry(shape);
+  });
+}
+
+function sharedCloakGeometry(side) {
+  return sharedGeometry(`cloak:${side}`, () => {
+    const shape = new THREE.Shape();
+    shape.moveTo(0.03 * side, 0.08);
+    shape.lineTo(0.36 * side, 0.02);
+    shape.lineTo(0.27 * side, -0.98);
+    shape.lineTo(0.07 * side, -1.16);
+    shape.lineTo(0.01 * side, -0.22);
+    shape.lineTo(0.03 * side, 0.08);
+    return new THREE.ShapeGeometry(shape);
+  });
+}
+
+function sharedGeometry(key, create) {
+  if (!sharedGeometries.has(key)) sharedGeometries.set(key, create());
+  return sharedGeometries.get(key);
 }
 
 function damp(current, target, lambda, dt) {

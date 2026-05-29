@@ -95,3 +95,17 @@ Total: 7/10
 Visual delta: switched the visible player to the articulated procedural adventurer rig already present in `player-avatar.js`, added a dedicated Avatar Lab, and linked it from existing lab pages. The player now has clearer limb motion and less cube-pawn body structure in gameplay screenshots.
 
 Remaining visual gap: v7 is a better proxy and a better QA loop, not final character art. The next major character step should still be an authored/sourced skinned fantasy adventurer GLB or a Blender-authored player asset with compatible animation clips and fixed axis/scale.
+
+## Score After Xbot Adventurer Overlay v2
+
+- Animation continuity: 2/2. The visible player uses the loaded `Xbot.glb` rig again, so idle/walk/run clips remain the actual on-screen motion source.
+- Silhouette: 1/2. Teal cloak/tabard, leather gear, staff, satchel, and gem make the player read less like a raw mannequin from Avatar Lab and Town Square shots. The overlay is still a runtime costume layer, not authored character art.
+- Art direction match: 1/2. The fantasy palette is more coherent with the current diorama rooms, but the base proportions and pasted-on gear still fall below production quality.
+- Performance: 2/2. Shared overlay geometries keep Avatar Lab under budget after the initial overlay attempt exceeded the geometry gate.
+- QA coverage: 2/2. Lab QA, authored room screenshots, and offline smoke assert `visualTreatment: xbot-adventurer-overlay-v2`, `overlay: true`, and continue to pass.
+
+Total: 8/10
+
+Visual delta: restored a fantasy costume layer over the animated Xbot baseline, forced the underlying skinned materials into a teal/leather palette instead of grey mannequin textures, scaled the overlay down after screenshot review, and shared overlay geometry so the Avatar Lab budget remains valid.
+
+Remaining visual gap: this is the current best runtime bridge because it preserves real animation and improves the read, but the correct long-term fix remains a documented-license or Blender-authored skinned adventurer GLB.

@@ -48,7 +48,8 @@ async function main() {
     assert.equal(avatar.loaded, true, `expected avatar to initialize: ${JSON.stringify(avatar)}`);
     assert.equal(avatar.model, "Xbot.glb");
     assert.equal(avatar.animationSource, "Xbot.glb-reference-loaded");
-    assert.equal(avatar.visualTreatment, "xbot-skinned-visible-v1");
+    assert.equal(avatar.visualTreatment, "xbot-adventurer-overlay-v2");
+    assert.equal(avatar.overlay, true);
     assert.equal(avatar.proxy, false);
 
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
