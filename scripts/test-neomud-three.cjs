@@ -575,6 +575,8 @@ async function main() {
     assert.equal(offlineCombatActions[1]?.kind, "spell");
     assert.equal(offlineCombatActions[1]?.spellId, "SMITE");
     assert.equal(offlineCombatActions[1]?.command, "cast:SMITE");
+    assert.equal(offlineCombatActions[1]?.cooldownTicks, 1);
+    assert.match(offlineCombatActions[1]?.detail ?? "", /1t cooldown/);
     assert.equal(offlineCombatActions[1]?.resourceReady, true);
     assert.equal(offlineCombatActions[1]?.unavailableReason, "Server unavailable");
     assert.equal(offlineCombatActions[1]?.enabled, false);

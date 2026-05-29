@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T06:47:00.000Z",
+  "updated": "2026-05-30T07:06:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-f67b",
+      "project": "NeoMud",
+      "title": "Expose catalog cooldowns in hostile actions",
+      "description": "Show existing spell/skill cooldown metadata in the hostile action row and debug state so abilities are easier to read without creating a client-side cooldown simulation.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "ui",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Combat action detail text now combines MP and catalog cooldown metadata, e.g. Smite shows 5 MP / 1t cooldown and Bash shows 3t cooldown. Debug combatActions exposes cooldownTicks. Offline and server-backed QA assert the catalog values.",
+          "created": "2026-05-30T07:06:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:06:00Z",
+      "updated": "2026-05-30T07:06:00Z"
+    },
     {
       "id": "neo-e92a",
       "project": "NeoMud",

@@ -2349,8 +2349,9 @@ function combatActionOptions(entity) {
         id: spell.id,
         name: spell.name,
         command: `cast:${spell.id}`,
-        detail: `${spell.manaCost} MP`,
+        detail: abilityDetail(spell.manaCost, spell.cooldownTicks, "Spell"),
         manaCost: spell.manaCost ?? 0,
+        cooldownTicks: spell.cooldownTicks ?? 0,
         resourceReady: (spell.manaCost ?? 0) <= playerProfile.mp,
         resourceWarning: (spell.manaCost ?? 0) <= playerProfile.mp ? "" : `Need ${spell.manaCost ?? 0} MP`
       }
@@ -2360,8 +2361,9 @@ function combatActionOptions(entity) {
           id: skill.id,
           name: skill.name,
           command: `skill:${skill.id}`,
-          detail: skill.manaCost ? `${skill.manaCost} MP` : "Skill",
+          detail: abilityDetail(skill.manaCost, skill.cooldownTicks, "Skill"),
           manaCost: skill.manaCost ?? 0,
+          cooldownTicks: skill.cooldownTicks ?? 0,
           resourceReady: (skill.manaCost ?? 0) <= playerProfile.mp,
           resourceWarning: (skill.manaCost ?? 0) <= playerProfile.mp ? "" : `Need ${skill.manaCost ?? 0} MP`
         }
@@ -2376,6 +2378,11 @@ function combatActionOptions(entity) {
       : !ability.resourceReady
         ? ability.resourceWarning
         : "";
+  const abilityDetailText = !ability
+    ? "No combat ability"
+    : ability.resourceReady
+      ? ability.detail
+      : `${ability.resourceWarning} / ${ability.detail}`;
   return [
     {
       hotkey: "1",
@@ -2394,8 +2401,9 @@ function combatActionOptions(entity) {
       spellId: ability?.kind === "spell" ? ability.id : "",
       skillId: ability?.kind === "skill" ? ability.id : "",
       manaCost: ability?.manaCost ?? 0,
+      cooldownTicks: ability?.cooldownTicks ?? 0,
       label: pendingCombat?.command === ability?.command ? "Working..." : ability?.name ?? "Class Skill",
-      detail: pendingCombat?.command === ability?.command ? "Awaiting server" : (abilityUnavailable || ability?.detail || "No combat ability"),
+      detail: pendingCombat?.command === ability?.command ? "Awaiting server" : abilityDetailText,
       command: ability?.command ?? "ability",
       unavailableReason: abilityUnavailable,
       resourceReady: ability?.resourceReady ?? false,
@@ -2403,6 +2411,13 @@ function combatActionOptions(entity) {
       enabled: combatReady && Boolean(ability) && ability.resourceReady && !pendingCombat
     }
   ];
+}
+
+function abilityDetail(manaCost = 0, cooldownTicks = 0, fallback = "Ability") {
+  const parts = [];
+  if ((manaCost ?? 0) > 0) parts.push(`${manaCost} MP`);
+  if ((cooldownTicks ?? 0) > 0) parts.push(`${cooldownTicks}t cooldown`);
+  return parts.join(" / ") || fallback;
 }
 
 function combatSpellForProfile() {
@@ -3095,6 +3110,7 @@ function installDebugApi() {
               spellId: action.spellId ?? "",
               skillId: action.skillId ?? "",
               manaCost: action.manaCost ?? 0,
+              cooldownTicks: action.cooldownTicks ?? 0,
               unavailableReason: action.unavailableReason ?? "",
               resourceReady: Boolean(action.resourceReady),
               resourceWarning: action.resourceWarning ?? "",

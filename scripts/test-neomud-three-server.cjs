@@ -312,6 +312,8 @@ async function main() {
       assert.equal(initialCombatActions[1]?.kind, "skill");
       assert.equal(initialCombatActions[1]?.skillId, "BASH");
       assert.equal(initialCombatActions[1]?.command, "skill:BASH");
+      assert.equal(initialCombatActions[1]?.cooldownTicks, 3);
+      assert.match(initialCombatActions[1]?.detail ?? "", /3t cooldown/);
       assert.equal(initialCombatActions[1]?.resourceReady, true);
       assert.equal(initialCombatActions[1]?.unavailableReason, "");
       assert.equal(initialCombatActions[1]?.enabled, true);
