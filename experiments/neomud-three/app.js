@@ -341,6 +341,7 @@ function handleServerMessage(message) {
         message: `${line} ${message.defenderHp}/${message.defenderMaxHp} HP.`
       };
       appendLog(lastCombatResult.message);
+      showCombatHitFeedback(message, defenderId);
       if (message.isPlayerDefender) {
         playerProfile.hp = Math.max(0, Number(message.defenderHp) || 0);
         playerProfile.maxHp = Math.max(1, Number(message.defenderMaxHp) || playerProfile.maxHp);
@@ -364,6 +365,7 @@ function handleServerMessage(message) {
         message: `${message.npcName ?? "Target"} defeated.`
       };
       appendLog(lastCombatResult.message);
+      showCombatDefeatFeedback(message.npcId);
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "interact_result":
@@ -575,6 +577,44 @@ function showPickupFeedback(message) {
   pickupFeedbackTimeout = window.setTimeout(() => {
     pickupFeedback.classList.add("hidden");
   }, 4200);
+}
+
+function showCombatHitFeedback(message, defenderId = "") {
+  const text = message.isMiss
+    ? "Miss"
+    : message.isDodge
+      ? "Dodge"
+      : message.isParry
+        ? "Parry"
+        : `-${Math.max(0, Number(message.damage) || 0)}`;
+  const kind = message.isPlayerDefender
+    ? "player"
+    : (message.isMiss || message.isDodge || message.isParry)
+      ? "miss"
+      : "hit";
+  renderEngine.showCombatEffect({
+    position: combatFeedbackPosition(defenderId, message.isPlayerDefender),
+    text,
+    kind
+  });
+}
+
+function showCombatDefeatFeedback(npcId) {
+  renderEngine.showCombatEffect({
+    position: combatFeedbackPosition(npcId, false),
+    text: "Defeated",
+    kind: "defeat"
+  });
+}
+
+function combatFeedbackPosition(entityId = "", isPlayerDefender = false) {
+  if (isPlayerDefender) return player.position.clone();
+  if (selectedInteractable?.id === entityId && selectedInteractable.position) {
+    return selectedInteractable.position.clone?.() ?? new THREE.Vector3(selectedInteractable.position.x ?? 0, 0, selectedInteractable.position.z ?? 0);
+  }
+  const entity = roomRuntime?.debugEntities?.().find((candidate) => candidate.id === entityId);
+  if (entity) return new THREE.Vector3(entity.x ?? 0, 0, entity.z ?? 0);
+  return player.position.clone();
 }
 
 function updateStatusText(override = null) {
@@ -1970,6 +2010,7 @@ function useCombatCommand(command) {
     sent = selected && enabled;
     if (sent) {
       serverState.selectedTargetId = target.id;
+      serverState.attackMode = true;
       lastCombatResult = {
         success: true,
         targetName: target.name,
@@ -2347,7 +2388,8 @@ function installDebugApi() {
     },
     get effects() {
       return {
-        pickup: renderEngine.pickupEffectCount
+        pickup: renderEngine.pickupEffectCount,
+        combat: renderEngine.combatEffectCount
       };
     },
     get debugOverlay() {

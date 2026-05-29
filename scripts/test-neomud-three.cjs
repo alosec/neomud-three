@@ -583,6 +583,7 @@ async function main() {
     );
     const spiderHealth = await page.evaluate(() => window.__neomudThreeDebug.server.targetHealth["npc:forest_spider"]);
     assert.deepEqual(spiderHealth, { current: 18, max: 32 });
+    await page.waitForFunction(() => window.__neomudThreeDebug.effects.combat > 0, null, { timeout: 2_000 });
     await saveScreenshot(page, "offline-hostile-target-panel.png");
     await page.keyboard.press("Escape");
 

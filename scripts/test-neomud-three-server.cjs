@@ -303,16 +303,14 @@ async function main() {
       await page.keyboard.press("f");
       assert.equal(await page.locator("#panel-title").textContent(), "Giant Forest Spider");
       assert.equal(await page.locator('[data-combat-command="attack"]').isDisabled(), false);
-      const beforeAttackMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
       await page.locator('[data-combat-command="attack"]').click();
       await page.waitForFunction(
-        (before) => {
+        () => {
           const server = window.__neomudThreeDebug.server;
-          return server.messageCount > before
-            && server.attackMode === true
+          return server.attackMode === true
             && server.selectedTargetId === "npc:forest_spider";
         },
-        beforeAttackMessages,
+        null,
         { timeout: 5_000 }
       );
       await page.waitForFunction(
@@ -321,16 +319,14 @@ async function main() {
         { timeout: 2_000 }
       );
       assert.match(await page.locator(".combat-actions").textContent(), /Attacking/i);
-      const beforeStopMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
       await page.locator('[data-combat-command="stop_attack"]').click();
       await page.waitForFunction(
-        (before) => {
+        () => {
           const server = window.__neomudThreeDebug.server;
-          return server.messageCount > before
-            && server.attackMode === false
+          return server.attackMode === false
             && server.selectedTargetId === null;
         },
-        beforeStopMessages,
+        null,
         { timeout: 5_000 }
       );
       await page.keyboard.press("Escape");

@@ -54,6 +54,7 @@ export function createRenderEngine(canvas) {
   const cameraFadeMaterials = new Map();
   let isoCameraAvoidanceAngle = 0;
   const pickupEffects = [];
+  const combatEffects = [];
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
   let roomDebug = emptyRoomDebugSummary(false);
   let cameraObstruction = null;
@@ -69,6 +70,9 @@ export function createRenderEngine(canvas) {
     },
     get pickupEffectCount() {
       return pickupEffects.length;
+    },
+    get combatEffectCount() {
+      return combatEffects.length;
     },
     get roomDebug() {
       return roomDebug;
@@ -220,8 +224,25 @@ export function createRenderEngine(canvas) {
       });
       return pickupEffects.length;
     },
+    showCombatEffect({ position = player.position, text = "", kind = "hit" } = {}) {
+      const basePosition = position.clone?.() ?? new THREE.Vector3(position.x ?? 0, position.y ?? 0, position.z ?? 0);
+      const sprite = createCombatTextSprite(text, kind);
+      sprite.position.copy(basePosition).add(new THREE.Vector3(0, 2.95, 0));
+      sprite.renderOrder = 30;
+      effectRoot.add(sprite);
+      combatEffects.push({
+        sprite,
+        born: performance.now(),
+        duration: kind === "defeat" ? 1900 : 1300,
+        startY: sprite.position.y,
+        baseScale: sprite.scale.clone(),
+        material: sprite.material
+      });
+      return combatEffects.length;
+    },
     render() {
       updatePickupEffects(pickupEffects, effectRoot);
+      updateCombatEffects(combatEffects, effectRoot);
       renderer.render(scene, camera);
       renderStats = {
         calls: renderer.info.render.calls,
@@ -497,6 +518,59 @@ function updatePickupEffects(pickupEffects, effectRoot) {
       for (const material of effect.materials) material.dispose?.();
       effectRoot.remove(effect.group);
       pickupEffects.splice(index, 1);
+    }
+  }
+}
+
+function createCombatTextSprite(text, kind = "hit") {
+  const canvas = document.createElement("canvas");
+  canvas.width = 384;
+  canvas.height = 128;
+  const ctx = canvas.getContext("2d");
+  const color = kind === "defeat"
+    ? "#ffe18f"
+    : kind === "miss"
+      ? "#c8d7ff"
+      : kind === "player"
+        ? "#ff9b84"
+        : "#ffd0a6";
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = "900 56px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.lineWidth = 10;
+  ctx.strokeStyle = "rgba(24, 9, 6, 0.92)";
+  ctx.strokeText(String(text), canvas.width / 2, canvas.height / 2);
+  ctx.fillStyle = color;
+  ctx.fillText(String(text), canvas.width / 2, canvas.height / 2);
+
+  const map = new THREE.CanvasTexture(canvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(2.9, 0.96, 1);
+  return sprite;
+}
+
+function updateCombatEffects(combatEffects, effectRoot) {
+  const now = performance.now();
+  for (let index = combatEffects.length - 1; index >= 0; index -= 1) {
+    const effect = combatEffects[index];
+    const t = Math.min(1, (now - effect.born) / effect.duration);
+    effect.sprite.position.y = effect.startY + t * 1.15;
+    effect.sprite.material.opacity = Math.max(0, 1 - t);
+    const scale = 1 + t * 0.16;
+    effect.sprite.scale.set(effect.baseScale.x * scale, effect.baseScale.y * scale, effect.baseScale.z);
+    if (t >= 1) {
+      effectRoot.remove(effect.sprite);
+      effect.sprite.material.map?.dispose?.();
+      effect.sprite.material.dispose?.();
+      combatEffects.splice(index, 1);
     }
   }
 }

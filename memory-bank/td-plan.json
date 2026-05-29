@@ -124,6 +124,11 @@
           "created": "2026-05-29T23:25:00Z"
         },
         {
+          "id": 25,
+          "body": "Combat hit feedback now appears in the 3D world: combat_hit creates a short-lived floating damage/miss/dodge/parry sprite at the defender position, npc_died can emit Defeated feedback, and debug effects exposes a combat count. Offline smoke QA verifies the injected Giant Forest Spider combat_hit creates a combat effect.",
+          "created": "2026-05-29T23:42:00Z"
+        },
+        {
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"
