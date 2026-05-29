@@ -18,6 +18,12 @@ High leverage next work:
    - Record acceptance verdicts under `experiments/neomud-three/qa/acceptance/` when promoting, rejecting, or redesigning a room/asset. A room can be "interesting" without being accepted; the JSON verdict is the gate.
    - For repeated, close-up, or representationally risky fixtures, create/update a semantic asset spec under `experiments/neomud-three/specs/assets/` before Blender/runtime changes. The spec must define required/forbidden reads, scale and placement constraints, material hierarchy, camera evidence, and acceptance criteria.
 
+0a. Run a global scale/composition pass before adding more content.
+   - Current user QA: all playable rooms read too small/cramped, including Magic Shop, Town Square, Cathedral/Temple, and Tavern.
+   - Treat this as footprint/camera/corridor/spacing work, not prop-detail work.
+   - Acceptance should be screenshot based: avatar should have at least two clear avatar-widths in main corridors, room landmarks should not feel pressed against the camera, and each room should have more breathing room around the primary focal object.
+   - Town Square now has the first scale pass through a 1.18x horizontal spec scale. Next scale work should move to Blender-authored Temple and Tavern through their source-generation scripts, not runtime mesh hacks.
+
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
    - Camera-follow rig math is now inside `render-engine.js`.

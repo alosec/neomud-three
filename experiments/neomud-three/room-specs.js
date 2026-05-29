@@ -522,3 +522,42 @@ export const TOWN_SQUARE_SPEC = {
     }
   ]
 };
+
+export function scaledTownSquareSpec(scale = 1) {
+  if (scale === 1) return TOWN_SQUARE_SPEC;
+  return scaleHorizontalSpec(TOWN_SQUARE_SPEC, scale);
+}
+
+function scaleHorizontalSpec(value, scale, key = "") {
+  if (Array.isArray(value)) {
+    if (key === "position" || key === "center") {
+      return value.map((entry, index) => index === 0 || index === 2 ? scaleNumber(entry, scale) : entry);
+    }
+    if (key === "size" && value.length === 2) {
+      return value.map((entry) => scaleNumber(entry, scale));
+    }
+    if (key === "size" && value.length === 3) {
+      return value.map((entry, index) => index === 0 || index === 2 ? scaleNumber(entry, scale) : entry);
+    }
+    if (key === "from" || key === "to") {
+      return value.map((entry, index) => index === 0 || index === 2 ? scaleNumber(entry, scale) : entry);
+    }
+    return value.map((entry) => scaleHorizontalSpec(entry, scale, key));
+  }
+
+  if (!value || typeof value !== "object") return value;
+
+  const next = {};
+  for (const [childKey, childValue] of Object.entries(value)) {
+    if (["x", "z", "width", "depth", "minX", "maxX", "minZ", "maxZ", "radius", "spacing"].includes(childKey)) {
+      next[childKey] = scaleNumber(childValue, scale);
+    } else {
+      next[childKey] = scaleHorizontalSpec(childValue, scale, childKey);
+    }
+  }
+  return next;
+}
+
+function scaleNumber(value, scale) {
+  return typeof value === "number" ? value * scale : value;
+}

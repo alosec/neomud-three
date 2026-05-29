@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { LEVEL_PACKAGES } from "./level-packages.js";
 import { addRuntimeLightsFromBlenderLevel, buildGlbRoomRuntime } from "./glb-room-runtime.js";
 import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
-import { TOWN_SQUARE_SPEC } from "./room-specs.js";
+import { scaledTownSquareSpec } from "./room-specs.js";
 import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
 import { addTownKitProp } from "./components/town-kit.js";
 import {
@@ -342,7 +342,7 @@ function buildLegacyTempleRoom({ root, worldRoot, onExit }) {
 
 export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
   const materials = makeTownMaterials();
-  const spec = TOWN_SQUARE_SPEC;
+  const spec = scaledTownSquareSpec(1.18);
   const entityLayer = new THREE.Group();
   const interactables = [];
   const landmarkDebug = [];
