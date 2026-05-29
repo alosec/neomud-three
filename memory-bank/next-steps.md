@@ -35,8 +35,8 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - StarCraft II and Dota are useful references for bird-eye camera clarity, but Diablo is the closer mechanics reference because NeoMud Three has one controllable character moving through authored rooms.
    - Preserve the MUD/server authority boundary: click actions should route through the same command path as keyboard movement, physical triggers, DOM interactions, and server-backed room/item/NPC messages.
    - First visual-mode slice exists: the HUD now supports `Platform` and `Iso` camera modes. Platform preserves the behind-character/pointer-lock camera; Iso provides the first elevated action-RPG camera and keeps the cursor visible.
-   - First click slice exists: Iso mode raycasts canvas clicks to the ground plane, clamps the target through the current room runtime, shows a destination marker, and steers the avatar toward the clicked point. Keyboard movement cancels the click target.
-   - Next implementation should add direct world-object selection: click an exit/NPC/item affordance, show hover/selection feedback, and route the resulting action through the same authoritative move/interact/pickup command paths.
+   - First click slice exists: Iso mode raycasts canvas clicks to the ground plane, checks nearby interactables and exit trigger volumes, clamps movement targets through the current room runtime, shows a destination marker, and steers the avatar toward the clicked point. Keyboard movement cancels the click target.
+   - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
 
    Acceptance for the first slice:
@@ -52,9 +52,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Offline smoke and Town Square screenshot QA pass.
 
    Remaining first-slice gap:
-   - Clicking the Gate/Temple/Tavern/Market/NPC/item affordance directly should
-     select that object and route the intended action without requiring the
-     player to manually click the exact ground location first.
+   - Hover/selection feedback should make clickable NPCs, items, and exits read
+     as targets before the player clicks.
+   - Click-to-move still uses direct steering plus existing collider pushout,
+     not pathfinding or navmesh.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.

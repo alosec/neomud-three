@@ -87,6 +87,15 @@ async function main() {
     await page.screenshot({ path: clickTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-click-target", path: clickTarget });
 
+    const oldWren = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.entities.find((entity) => entity.id === "npc:old_wren")
+    );
+    assert.ok(oldWren, "expected Old Wren click target in Town Square");
+    const npcClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), oldWren);
+    assert.deepEqual(npcClick, { type: "interactable", id: "npc:old_wren", kind: "npc" });
+    assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    await page.keyboard.press("Escape");
+
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
     const budget = budgetStatus("town:square", stats);
     assertRenderBudget(assert, "town:square", stats);
@@ -102,6 +111,21 @@ async function main() {
       failedRequests,
       consoleErrors
     }, "town-shots-report.json");
+
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.setRoom("town:square");
+      window.__neomudThreeDebug.setCameraMode("isometric");
+    });
+    await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:square", null, { timeout: 5_000 });
+    const gateTrigger = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.triggers.find((trigger) => trigger.id === "exit-north-gate")
+    );
+    assert.ok(gateTrigger, "expected north Gate trigger for click routing");
+    const exitClick = await page.evaluate((trigger) =>
+      window.__neomudThreeDebug.clickGround({ x: trigger.trigger.center[0], z: trigger.trigger.center[2] })
+    , gateTrigger);
+    assert.deepEqual(exitClick, { type: "exit", targetId: "town:gate" });
+    await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:gate", null, { timeout: 5_000 });
 
     console.log("NeoMud Three Town Square screenshot test passed");
   } finally {

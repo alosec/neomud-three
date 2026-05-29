@@ -661,7 +661,7 @@ function handleCanvasPointerDown(event) {
   setInputMode("play");
   const point = pointOnGroundFromEvent(event);
   if (!point) return;
-  setClickMoveTarget(point);
+  handleGroundClick(point);
 }
 
 function isHudPointerTarget(target) {
@@ -689,6 +689,38 @@ function setClickMoveTarget(point) {
     x: target.x,
     y: target.y,
     z: target.z
+  };
+}
+
+function handleGroundClick(point) {
+  const target = point.clone();
+  target.y = 0;
+
+  const clickedInteractable = roomRuntime?.nearestInteractable?.(target, 1.85) ?? null;
+  if (clickedInteractable) {
+    clearClickMoveTarget();
+    nearbyInteractable = clickedInteractable;
+    interactWithNearby();
+    return {
+      type: "interactable",
+      id: clickedInteractable.id,
+      kind: clickedInteractable.kind
+    };
+  }
+
+  const clickedExitTarget = roomRuntime?.exitAt?.(target) ?? null;
+  if (clickedExitTarget) {
+    clearClickMoveTarget();
+    enterExitTarget(clickedExitTarget);
+    return {
+      type: "exit",
+      targetId: clickedExitTarget
+    };
+  }
+
+  return {
+    type: "move",
+    target: setClickMoveTarget(target)
   };
 }
 
@@ -1453,6 +1485,9 @@ function installDebugApi() {
     },
     setClickMoveTarget({ x = player.position.x, z = player.position.z } = {}) {
       return setClickMoveTarget(new THREE.Vector3(x, 0, z));
+    },
+    clickGround({ x = player.position.x, z = player.position.z } = {}) {
+      return handleGroundClick(new THREE.Vector3(x, 0, z));
     },
     reconnectServer() {
       serverState.client?.close();

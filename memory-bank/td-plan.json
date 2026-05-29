@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T15:18:00.000Z",
+  "updated": "2026-05-29T15:32:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -72,10 +72,15 @@
           "id": 3,
           "body": "First click-to-move slice implemented: Iso mode canvas clicks raycast to the ground plane, clamp through room runtime, show a destination marker, and steer the avatar toward the target. Keyboard movement cancels the click target. QA includes debug API movement plus real browser mouse click in Town Square Iso screenshot test. Remaining gap: direct click selection for exits/NPCs/items.",
           "created": "2026-05-29T15:18:00Z"
+        },
+        {
+          "id": 4,
+          "body": "Direct click routing added: ground clicks now check nearby interactables and exit trigger volumes before defaulting to movement. Town Square QA verifies Old Wren click selection opens the interaction panel and North Gate trigger click routes to town:gate through the existing move path. Remaining gap: hover/selection feedback and pathing.",
+          "created": "2026-05-29T15:32:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T15:18:00Z"
+      "updated": "2026-05-29T15:32:00Z"
     },
     {
       "id": "neo-1fb2",
