@@ -343,9 +343,9 @@ const MATERIAL_DEFINITION_LIST = [
   },
   colorMaterial("temple.trim.limestone", "trim", "temple", "stone-trim", 0xbeb39c, { roughness: 0.65 }),
   colorMaterial("temple.ceiling.warm-shadow", "ceilingWarmShadow", "temple", "cathedral-ceiling", 0x7c6a4e, { roughness: 0.92, emissive: 0x2b2115, emissiveIntensity: 0.18 }),
-  colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x654226, { roughness: 0.82 }),
-  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x3e2817, { roughness: 0.88 }),
-  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0x74502b, { roughness: 0.78 }),
+  colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x8a633a, { roughness: 0.84 }),
+  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x5c381f, { roughness: 0.9 }),
+  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0xa07442, { roughness: 0.8 }),
   colorMaterial("temple.window.frame", "windowFrame", "temple", "window-frame", 0x58452f, { roughness: 0.52, metalness: 0.18 }),
   colorMaterial("temple.window.reveal", "windowReveal", "temple", "window-reveal", 0xa79b83, { roughness: 0.86 }),
   {

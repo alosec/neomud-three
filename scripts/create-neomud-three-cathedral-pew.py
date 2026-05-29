@@ -33,9 +33,9 @@ def build_asset():
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
 
-    wood = temple.material("MAT_temple_pew_warm_oak", (0.33, 0.22, 0.13, 1), roughness=0.82)
-    wood_dark = temple.material("MAT_temple_pew_dark_endgrain", (0.22, 0.14, 0.08, 1), roughness=0.88)
-    wood_highlight = temple.material("MAT_temple_pew_worn_edge", (0.44, 0.30, 0.16, 1), roughness=0.78)
+    wood = temple.material("MAT_temple_pew_warm_oak", (0.46, 0.31, 0.18, 1), roughness=0.84)
+    wood_dark = temple.material("MAT_temple_pew_dark_endgrain", (0.32, 0.20, 0.11, 1), roughness=0.9)
+    wood_highlight = temple.material("MAT_temple_pew_worn_edge", (0.58, 0.42, 0.24, 1), roughness=0.8)
     floor = temple.material("MAT_asset_lab_floor", (0.62, 0.60, 0.52, 1), roughness=0.82)
     collision = temple.material("MAT_debug_collision", (0.1, 0.28, 0.95, 0.18), alpha=0.18)
 

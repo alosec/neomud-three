@@ -28,8 +28,8 @@
   "scores": {
     "representationalSanity": {
       "score": 1,
-      "notes": "The current pass reads more like broad seating than the previous rail-heavy candidate, but the long dark backs still feel too monolithic for calm cathedral pews.",
-      "followUp": "Lighten the backs/end panels or add subtle low-contrast bevel/seat separation without returning to rail/plank clutter."
+      "notes": "The current pass reads more like broad seating than the previous rail-heavy candidate, and the lighter oak value reduces the barricade read. The backs still feel monolithic in repeated rows.",
+      "followUp": "Add subtle low-contrast bevel/seat separation or improve row staggering without returning to rail/plank clutter."
     },
     "cohesion": {
       "score": 1,
@@ -42,9 +42,8 @@
       "followUp": "Use semantic row pitch, aisle width, back height, and altar clearance constraints before export."
     },
     "materialLanguage": {
-      "score": 1,
-      "notes": "The calmer procedural floor/wall materials remove the worst texture clash, but dark pew planes still need better value hierarchy.",
-      "followUp": "Reduce pew back/end-panel darkness or create a lighter approved pew wood variant."
+      "score": 2,
+      "notes": "The calmer procedural floor/wall materials plus lighter approved pew wood family now keep pews below altar and stained-glass prominence for prototype purposes."
     },
     "visualHierarchy": {
       "score": 1,
@@ -63,7 +62,6 @@
   },
   "acceptedAs": null,
   "blockedBy": [
-    "pew material contrast still sits too close to altar and stained-glass prominence",
     "row composition must feel more processional and less like repeated dark blocks"
   ]
 }
