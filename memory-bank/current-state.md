@@ -56,6 +56,9 @@ Playable Three.js lab:
   Server-dropped Hidden Cave item loot now carries `PICKUP_ITEM` action metadata
   and debug metadata, so item drops and coin piles share the same `Pick up`
   hover/proximity/panel affordance path.
+  Room debug entity metadata is now serialized through one shared helper so
+  action type, item id, coin type, quantity, prompt, and position stay available
+  consistently across authored rooms and QA scripts.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.

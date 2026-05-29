@@ -44,6 +44,7 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
    - Feature prompts now preserve semantic verbs too: treasure/drop features such as the Hidden Cave chest read as `Open` rather than generic `Pick up`.
    - Server-dropped Hidden Cave item loot now carries `PICKUP_ITEM` action/debug metadata, giving item drops and coin piles the same `Pick up` affordance path.
+   - Authored room debug entity payloads now use a shared serializer so QA sees action type/item id/coin type/quantity consistently across rooms.
    - Hostile targets now get first-pass combat affordance treatment: red selected-target marker colors plus a compact hostile target frame/health bar in the interaction panel. Hostile panels also show disabled `Basic Attack` and class-skill action slots with explicit server-authoritative command-path messaging. This is explicit target/action UI only; combat authority still belongs on the server/game model.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
 

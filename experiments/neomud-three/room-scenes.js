@@ -402,18 +402,7 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
       return triggerDebugInfo(spec.exits);
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        actionType: entity.actionType ?? "",
-        itemId: entity.itemId ?? "",
-        coinType: entity.coinType ?? "",
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugLandmarks() {
       return landmarkDebug;
@@ -501,19 +490,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       return glbRuntime.spawn;
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        actionType: entity.actionType ?? "",
-        itemId: entity.itemId ?? "",
-        coinType: entity.coinType ?? "",
-        quantity: entity.quantity ?? 1,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     nearestInteractable(position, maxDistance = 2.45) {
       let nearest = null;
@@ -785,19 +762,7 @@ export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       ];
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        actionType: entity.actionType ?? "",
-        itemId: entity.itemId ?? "",
-        coinType: entity.coinType ?? "",
-        quantity: entity.quantity ?? 1,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(MARKET_COLLIDERS, 0.42);
@@ -906,19 +871,7 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
       ];
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        actionType: entity.actionType ?? "",
-        itemId: entity.itemId ?? "",
-        coinType: entity.coinType ?? "",
-        quantity: entity.quantity ?? 1,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(MAGIC_SHOP_COLLIDERS, 0.42);
@@ -1017,15 +970,7 @@ export function buildForgeRoom({ root, worldRoot, npcs = [], roomItems = [], wor
       ];
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(FORGE_COLLIDERS, 0.42);
@@ -1115,15 +1060,7 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
       return northGateTriggers();
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(NORTH_GATE_COLLIDERS, 0.42);
@@ -1203,15 +1140,7 @@ export function buildForestEdgeRoom({ root, worldRoot, npcs = [], roomItems = []
       return forestEdgeTriggers();
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(FOREST_EDGE_COLLIDERS, 0.42);
@@ -1293,15 +1222,7 @@ export function buildForestPathRoom({ root, worldRoot, npcs = [], roomItems = []
       return forestPathTriggers();
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(FOREST_PATH_COLLIDERS, 0.42);
@@ -1379,15 +1300,7 @@ export function buildSunlitClearingRoom({ root, worldRoot, npcs = [], roomItems 
       return sunlitClearingTriggers();
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(SUNLIT_CLEARING_COLLIDERS, 0.42);
@@ -1473,15 +1386,7 @@ export function buildDeepForestRoom({ root, worldRoot, npcs = [], roomItems = []
       return deepForestTriggers();
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(DEEP_FOREST_COLLIDERS, 0.42);
@@ -1566,15 +1471,7 @@ export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], roomCoins
       return hiddenCaveTriggers();
     },
     debugEntities() {
-      return interactables.map((entity) => ({
-        id: entity.id,
-        kind: entity.kind,
-        name: entity.name,
-        role: entity.role ?? "",
-        prompt: entity.prompt,
-        x: entity.position.x,
-        z: entity.position.z
-      }));
+      return interactables.map(debugEntityInfo);
     },
     debugColliders() {
       return debugColliders(HIDDEN_CAVE_COLLIDERS, 0.42);
@@ -7405,6 +7302,22 @@ function debugColliders(colliders, radius = 0.38) {
     size: [...collider.size],
     radius
   }));
+}
+
+function debugEntityInfo(entity) {
+  return {
+    id: entity.id,
+    kind: entity.kind,
+    name: entity.name,
+    role: entity.role ?? "",
+    prompt: entity.prompt,
+    actionType: entity.actionType ?? "",
+    itemId: entity.itemId ?? "",
+    coinType: entity.coinType ?? "",
+    quantity: entity.quantity ?? 1,
+    x: entity.position.x,
+    z: entity.position.z
+  };
 }
 
 function orientedBox(anchor, localX, y, localZ, width, height, depth) {

@@ -27,6 +27,9 @@ Implemented:
 - Added `PICKUP_ITEM` action/debug metadata to Hidden Cave dropped item markers,
   so server-spawned item drops and coin piles share the same pickup affordance
   path.
+- Consolidated authored room debug entity serialization so all room QA receives
+  consistent action type, item id, coin type, quantity, prompt, and position
+  metadata.
 - Cleared hover state on pointer leave, click commit, room switch, and debug player placement so stale affordances do not leak between rooms.
 - Exposed hover helpers through `window.__neomudThreeDebug` for screenshot QA.
 
