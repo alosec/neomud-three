@@ -471,11 +471,17 @@ async function main() {
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
     const beforeInteractMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
     const beforeInteractEffects = await page.evaluate(() => window.__neomudThreeDebug.effects.interaction);
-    const chestClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), caveChest);
-    assert.equal(chestClick.type, "interactable");
-    assert.equal(chestClick.id, "cave_chest");
-    assert.equal(chestClick.autoUse, true);
+    await page.waitForFunction(
+      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
+      null,
+      { timeout: 2_000 }
+    );
+    await page.keyboard.press("KeyF");
     assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
+    const chestActionButton = page.locator('[data-interact-feature="cave_chest"]');
+    await chestActionButton.waitFor({ timeout: 2_000 });
+    assert.equal(await chestActionButton.isDisabled(), false);
+    await page.keyboard.press("Digit1");
     const chestActionState = await page.evaluate(() => ({
       pending: window.__neomudThreeDebug.server.pendingInteractionAction,
       result: window.__neomudThreeDebug.server.lastInteractionResult

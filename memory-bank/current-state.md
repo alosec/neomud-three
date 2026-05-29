@@ -88,6 +88,11 @@ Playable Three.js lab:
   direction-bound actions derived from the current room exits, such as
   `skill:KICK:WEST`; the client sends the Kotlin server's required
   `targetId:DIRECTION` payload instead of guessing a hidden default.
+  Non-hostile interaction panels now share the same primary hotkey pattern:
+  `Digit/Numpad 1` invokes the selected `Open` / `Pick up` / `Use` action
+  through the existing `useSelectedInteractable` command path when the
+  interaction panel is open, while offline mode still refuses to fake server
+  actions.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside

@@ -740,6 +740,9 @@ async function main() {
     assert.equal(chestSelection.healthBarVisible, false);
     assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), true);
     assert.equal(await page.locator('[data-interact-feature="cave_chest"]').textContent(), "Open unavailable");
+    await page.keyboard.press("Digit1");
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction), null);
+    assert.match(await page.locator("#panel-content").textContent(), /Server action requires a live Kotlin server session|preserved|vial|gloves|untouched/i);
     assert.match(await page.locator("#panel-content").textContent(), /preserved|vial|gloves|untouched/i);
     await page.evaluate(() => window.__neomudThreeDebug.setRoom("forest:deep"));
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.currentRoomId), "forest:deep");

@@ -919,6 +919,7 @@ function handleKeyDown(event) {
   }
 
   if (handleCombatHotkey(event)) return;
+  if (handlePrimaryInteractionHotkey(event)) return;
 
   if ((event.code === "KeyF" || event.code === "Enter") && nearbyInteractable && !activePanel) {
     event.preventDefault();
@@ -941,6 +942,15 @@ function handleCombatHotkey(event) {
   if (!action?.enabled) return false;
   event.preventDefault();
   useCombatCommand(action.command);
+  return true;
+}
+
+function handlePrimaryInteractionHotkey(event) {
+  if (!event.code.match(/^(?:Digit|Numpad)1$/)) return false;
+  if (activePanel !== "interaction" || !selectedInteractable || isHostileEntity(selectedInteractable)) return false;
+  if (!selectedInteractable.actionType || selectedInteractable.actionConsumed || pendingInteractionAction?.id === selectedInteractable.id) return false;
+  event.preventDefault();
+  useSelectedInteractable(selectedInteractable.id);
   return true;
 }
 

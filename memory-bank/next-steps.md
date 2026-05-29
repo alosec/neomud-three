@@ -97,6 +97,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
    - Feature prompts now preserve semantic verbs too: treasure/drop features such as the Hidden Cave chest read as `Open` rather than generic `Pick up`.
    - Server-dropped Hidden Cave item loot now carries `PICKUP_ITEM` action/debug metadata, giving item drops and coin piles the same `Pick up` affordance path. Selected non-hostile interactables now also get a small in-world action badge attached to the selected-target ring, with QA coverage for `Open` chest and live `Pick up` loot semantics. Room changes close stale interaction panels and clear selected badge/target debug state so affordances do not leak across scenes. Server-backed clicks on actionable non-hostiles now auto-use through the authoritative command path, so chest open and loot pickup can be driven directly from the world instead of requiring a second DOM button click. These commands now track pendingInteractionAction to suppress repeat sends until interact_result/pickup_result clears the state. Server interact results now emit world-space Opened/Used/No effect feedback at the selected object through a dedicated interaction-effect queue/counter, and combat dispatch uses the same prompt-derived hostile classifier as targeting.
+   - Non-hostile interaction panels now support `Digit/Numpad 1` as the primary
+     selected action hotkey for `Open` / `Pick up` / `Use`, reusing the same
+     `useSelectedInteractable` server-authoritative command path and preserving
+     hostile combat hotkeys.
    - General server/tutorial/presence messages now have a focused HUD event
      toast instead of disappearing into the log only. Offline QA injects
      `system_message` and `tutorial` messages and verifies the visible title and

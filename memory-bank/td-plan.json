@@ -1,11 +1,40 @@
 {
-  "updated": "2026-05-29T20:32:00.000Z",
+  "updated": "2026-05-29T20:45:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-b5aa",
+      "project": "NeoMud",
+      "title": "Add primary world-action hotkey",
+      "description": "Make the Diablo-like interaction loop more consistent by letting the number 1 hotkey activate the selected non-hostile interaction panel action, matching the hostile action row without bypassing server authority.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "interaction",
+        "hotkeys",
+        "playability",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Digit/Numpad 1 now triggers the selected non-hostile interaction action when the interaction panel is open. It preserves hostile combat hotkeys, ignores consumed/pending actions, and still routes through useSelectedInteractable/server commands. Server-backed QA opens the Hidden Cave chest panel with F and activates the real server action with Digit1; offline QA verifies Digit1 does not create a fake pending server action.",
+          "created": "2026-05-29T20:45:00Z"
+        }
+      ],
+      "created": "2026-05-29T20:45:00Z",
+      "updated": "2026-05-29T20:45:00Z"
+    },
     {
       "id": "neo-f7b2",
       "project": "NeoMud",
