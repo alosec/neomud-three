@@ -1,11 +1,72 @@
 {
-  "updated": "2026-05-29T00:36:09.747Z",
+  "updated": "2026-05-29T14:38:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-8fb4",
+      "project": "NeoMud",
+      "title": "Fix gate sign clipping and review sign affordance system",
+      "description": "Fix the North Gate sign/label clipping into the gate structure as the gameplay camera swings. Treat this as a bounded sign-affordance pass: identify which sign or text board intersects geometry, adjust placement/depth/orientation or replace it with a more stable world affordance, and verify with Town Square fixed screenshots plus a player-camera gate view. Do not redesign all navigation in this task; preserve current exit readability.",
+      "type": "task",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "bug",
+        "qa",
+        "signs"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Implemented initial fix: exit affordance text boards are now physical oriented planes instead of camera-facing sprites, and the North Gate board was moved forward from the gate face to prevent view-swing clipping.",
+          "created": "2026-05-29T14:38:00Z"
+        }
+      ],
+      "created": "2026-05-29T14:31:27Z",
+      "updated": "2026-05-29T14:31:27Z"
+    },
+    {
+      "id": "neo-3361",
+      "project": "NeoMud",
+      "title": "Refactor NeoMud Three toward bird eye click to move play",
+      "description": "Explore and implement a click-first play mode for NeoMud Three: Diablo 3-inspired elevated camera, click-to-move, clickable world landmarks/exits/interactables, readable loot/NPC affordances, room-to-room action-RPG flow, and reduced reliance on camera-facing sign labels that can clip into geometry. Keep server-authoritative movement: clicking a destination should route through the same move/interaction command path as physical triggers and UI controls. StarCraft II and Dota are camera clarity references; Diablo is the closest mechanics target for a single controllable character.",
+      "type": "task",
+      "priority": 1,
+      "status": "todo",
+      "status_type": "unstarted",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "input",
+        "camera",
+        "refactor"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User clarified target feel: StarCraft II / Dota-like camera and interaction, not first-person or third-person chase. Refined target: Diablo-like is probably the better fit for NeoMud Three than RTS/MOBA. Single-character click-to-move, elevated readable camera, click NPCs/items/exits, room graph remains server-authoritative.",
+          "created": "2026-05-29T14:31:43Z"
+        },
+        {
+          "id": 1,
+          "body": "Product direction clarified: ship a game obviously heavily inspired by Diablo 3 mechanics. Prioritize elevated/isometric camera, click-to-move, click attacks/interactions/exits, readable loot/NPC affordances, room-to-room flow, and action-RPG pacing. Preserve NeoMud server authority and MUD room graph under the presentation layer.",
+          "created": "2026-05-29T14:38:00Z"
+        }
+      ],
+      "created": "2026-05-29T14:31:20Z",
+      "updated": "2026-05-29T14:31:43Z"
+    },
     {
       "id": "neo-1fb2",
       "project": "NeoMud",

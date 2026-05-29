@@ -406,10 +406,28 @@ export function addTextBoard(root, text, spec) {
     height = 0.78,
     subtitle = "",
     palette = "gold",
-    renderOrder = 8
+    renderOrder = 8,
+    billboard = true
   } = spec;
 
   const map = textBoardTexture(text, { subtitle, palette });
+  if (!billboard) {
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(width, height),
+      new THREE.MeshBasicMaterial({
+        map,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      })
+    );
+    mesh.position.set(x, y, z);
+    mesh.rotation.y = rotationY;
+    mesh.renderOrder = renderOrder;
+    root.add(mesh);
+    return mesh;
+  }
+
   const sprite = new THREE.Sprite(
     new THREE.SpriteMaterial({
       map,

@@ -60,6 +60,10 @@ Minimum bar before pushing:
 Pass discipline:
 
 - One pass changes one target and records one hypothesis.
+- One critique should not cause an unbounded swing. For any pass that changes
+  scale, camera, density, material contrast, movement speed, or object
+  prominence, record the intended delta and the condition that would mean the
+  pass overcorrected.
 - Screenshot anchors are evidence, not decoration.
 - Render stats must stay within the room/lab budget or the budget change must be
   explicit and justified.

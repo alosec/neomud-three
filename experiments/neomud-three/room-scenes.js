@@ -7598,7 +7598,8 @@ function addTownSpecExitAffordances(root, spec) {
       height,
       subtitle: affordance.subtitle,
       palette: affordance.palette,
-      rotationY: exitBoardRotation(exit.direction)
+      rotationY: exitBoardRotation(exit.direction),
+      billboard: false
     });
 
     const [tx, , tz] = affordance.threshold.center;

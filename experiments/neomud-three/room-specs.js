@@ -611,7 +611,7 @@ export const TOWN_SQUARE_SPEC = {
         label: "Gate",
         subtitle: "North Road",
         palette: "green",
-        board: { center: [0, 5.15, -19.85], size: [5.6, 1.05] },
+        board: { center: [0, 5.15, -18.95], size: [5.6, 1.05] },
         threshold: { center: [0, 0.05, -20.4], size: [6.8, 1.35], color: 0xcfe9b9 }
       }
     },

@@ -24,6 +24,13 @@ High leverage next work:
    - Acceptance should be screenshot based: avatar should have at least two clear avatar-widths in main corridors, room landmarks should not feel pressed against the camera, and each room should have more breathing room around the primary focal object.
    - Town Square now has the first scale pass through a 1.18x horizontal spec scale. Tavern now has a source-level Blender footprint/spacing/camera pass. Temple now has a first source-level aisle breathing-room pass. Next scale work should decide whether to raise the Temple vault and/or globally pull camera rigs back per room.
 
+0b. Shift the play model toward Diablo 3-inspired controls and flow.
+   - User clarified that the desired game feel is not primarily third-person chase movement. The better target is a Diablo-like elevated camera with click-to-move, click-to-interact, click exits/NPCs/items, and readable action-RPG room flow.
+   - StarCraft II and Dota are useful references for bird-eye camera clarity, but Diablo is the closer mechanics reference because NeoMud Three has one controllable character moving through authored rooms.
+   - Preserve the MUD/server authority boundary: click actions should route through the same command path as keyboard movement, physical triggers, DOM interactions, and server-backed room/item/NPC messages.
+   - First implementation should be a small slice: elevated camera mode in Town Square, raycast ground click target, visible destination marker, click-to-walk toward the point, and click an exit affordance to issue the normal move command.
+   - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
+
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
    - Camera-follow rig math is now inside `render-engine.js`.

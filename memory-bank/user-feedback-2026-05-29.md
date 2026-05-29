@@ -82,6 +82,11 @@ to build Scenic Review capability before more broad visual production.
 - Workflow concern: the production process has too many local fixes, reversals,
   and improvised passes instead of a stable sequence for asset conception,
   standalone QA, integration QA, and room-level acceptance.
+- A recurring process failure is overcorrection: one valid critique can turn
+  into an excessive swing in the opposite direction, especially around player
+  scale, room scale, camera distance, visual density, or landmark/backdrop
+  prominence. Future passes need bounded deltas and explicit "too far" criteria
+  before editing those variables.
 - Outcome concern: visible scenes can read as an accumulation of disconnected
   fixes rather than coherent authored environments.
 - A better next workflow needs to reduce jumbled decision-making and make each
@@ -148,9 +153,10 @@ to build Scenic Review capability before more broad visual production.
 
 1. Define the smallest meaningful scope.
 2. State what "good" means for that scope before editing.
-3. Build or revise only that thing.
-4. QA it standalone for representational sanity.
-5. QA it in context for world fit.
-6. QA it in play for movement, camera, affordances, and flow.
-7. Reject, revise, or integrate.
-8. Move to the next bounded scope only after the previous one has evidence.
+3. State the intended delta and what would count as overcorrection.
+4. Build or revise only that thing.
+5. QA it standalone for representational sanity.
+6. QA it in context for world fit.
+7. QA it in play for movement, camera, affordances, and flow.
+8. Reject, revise, or integrate.
+9. Move to the next bounded scope only after the previous one has evidence.

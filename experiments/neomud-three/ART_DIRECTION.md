@@ -48,3 +48,5 @@ Each MUD room should feel like a compact stage: clear identity, clear exits, rea
 - Screenshots should include the player/avatar or scale marker where scale matters.
 - Render stats must report calls, triangles, textures, and geometries.
 - Visual review notes must state whether the result is blockout, acceptable prototype, or production candidate.
+- Do not overcorrect from one piece of feedback. Before changing scale, camera, density, material contrast, or landmark prominence, state the current problem, the intended bounded delta, and what evidence would prove the change went too far.
+- Prefer reversible, measured adjustments over large swings. A pass should preserve what is already working unless the review explicitly names it as broken.

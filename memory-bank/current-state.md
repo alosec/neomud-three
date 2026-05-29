@@ -198,6 +198,11 @@ Local app/server status:
 
 Known rough edges:
 
+- The workflow itself now has an explicit anti-overcorrection guard, because
+  recent avatar scale/camera/detail passes showed a tendency to swing too far
+  from one piece of feedback. Future visual passes that touch scale, camera,
+  density, contrast, movement speed, or prominence should record the intended
+  delta and the "too far" condition before implementation.
 - Global spatial scale is now a primary acceptance issue. User QA says Magic Shop is still the strongest room because it feels cohesive, but every playable room, including Magic Shop, Town Square, Cathedral/Temple, and Tavern, reads too small/cramped. Next visual work should prioritize footprint, walkable corridor width, camera distance, object spacing, and landmark scale before adding more props or texture detail.
 - The renderer is still prototype architecture, with room-specific scene builders instead of a general room/component system. The authority boundary and first spec/trigger contract are real, but the rendering system itself still needs a proper registry/component pass.
 - Collision is clamp/trigger based, not mesh or navmesh based.
