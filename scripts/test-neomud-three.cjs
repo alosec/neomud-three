@@ -49,6 +49,7 @@ async function main() {
     assert.equal(avatar.model, "Xbot.glb");
     assert.equal(avatar.animationSource, "Xbot.glb-reference-loaded");
     assert.equal(avatar.visualTreatment, "clean-xbot-neutral-v2");
+    assert.ok(avatar.modelScale >= 1.25, `expected readable player scale, got ${JSON.stringify(avatar)}`);
     assert.equal(avatar.overlay, false);
     assert.equal(avatar.proxy, false);
 

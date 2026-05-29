@@ -127,6 +127,7 @@ async function main() {
         assert.ok(snapshot.props.length >= 10, `expected reusable prop set, got ${snapshot.props.length}`);
         assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
         assert.equal(snapshot.avatar.visualTreatment, "clean-xbot-neutral-v2");
+        assert.ok(snapshot.avatar.modelScale >= 1.25, `expected readable prop-zoo avatar scale: ${JSON.stringify(snapshot.avatar)}`);
         assert.equal(snapshot.avatar.overlay, false);
         assert.equal(snapshot.avatar.proxy, false);
       }
@@ -136,6 +137,7 @@ async function main() {
         for (const station of snapshot.stations) {
           assert.equal(station.avatar.loaded, true, `expected ${station.id} avatar reference to load: ${JSON.stringify(station)}`);
           assert.equal(station.avatar.visualTreatment, "clean-xbot-neutral-v2");
+          assert.ok(station.avatar.modelScale >= 1.25, `expected readable ${station.id} avatar scale: ${JSON.stringify(station.avatar)}`);
           assert.equal(station.avatar.overlay, false);
           assert.equal(station.avatar.proxy, false);
         }

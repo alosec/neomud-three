@@ -45,6 +45,7 @@ export function makePlayerAvatar() {
     loadFailed: state.loadFailed,
     activeAnimation: state.activeName,
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
+    modelScale: state.loaded ? PLAYER_MODEL_SCALE : state.fallbackRig.group.scale.x,
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
     visualTreatment: state.loaded ? "clean-xbot-neutral-v2" : "procedural-adventurer-v1",
     overlay: Boolean(state.overlay),
