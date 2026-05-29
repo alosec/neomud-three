@@ -1364,9 +1364,9 @@ export function buildDeepForestRoom({ root, worldRoot, npcs = [], roomItems = []
     spawn: { position: new THREE.Vector3(0, 0, 13.8), heading: 0 },
     status: "Deep Forest: authored primeval forest with spider threat, visible cave route, hidden-exit atmosphere, and server-authoritative movement.",
     environment: {
-      background: 0x18291d,
-      fog: 0x18291d,
-      fogDensity: 0.026
+      background: 0x26382d,
+      fog: 0x1e3327,
+      fogDensity: 0.022
     },
     camera: {
       distance: 8.0,
@@ -4305,16 +4305,23 @@ function makeDeepForestMaterials() {
 function addDeepForestStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.deepSoil, DEEP_FOREST.width, DEEP_FOREST.depth);
   addInstancedSurfaceRects(root, materials, [
-    { material: "dampMoss", x: 0, z: 0, width: 14.5, depth: 33.5, y: 0.02 },
-    { material: "deepTrail", x: 0, z: 8.4, width: 5.4, depth: 28.0, y: 0.026 },
+    { material: "deepTrail", x: 0, z: 8.4, width: 4.45, depth: 28.0, y: 0.026 },
     { material: "packedDirt", x: -8.9, z: DEEP_FOREST.caveExitZ, width: 12.8, depth: 4.8, y: 0.022 }
   ], "deep-forest-surfaces");
+  addIrregularGroundPatches(root, materials, [
+    { material: "deepTrail", x: 0.2, z: 7.5, width: 6.1, depth: 19.0, y: 0.028, rotationZ: -0.04, seed: 30 },
+    { material: "dampMoss", x: -3.5, z: 1.8, width: 10.8, depth: 16.8, y: 0.021, rotationZ: -0.08, seed: 31 },
+    { material: "dampMoss", x: 3.9, z: -8.4, width: 9.2, depth: 14.6, y: 0.022, rotationZ: 0.12, seed: 32 },
+    { material: "forestShadow", x: -8.0, z: -5.2, width: 5.2, depth: 9.8, y: 0.024, rotationZ: -0.24, seed: 33 },
+    { material: "forestShadow", x: 8.0, z: -7.6, width: 5.0, depth: 8.4, y: 0.024, rotationZ: 0.22, seed: 34 },
+    { material: "forestMossLight", x: -8.9, z: DEEP_FOREST.caveExitZ, width: 8.2, depth: 3.2, y: 0.025, rotationZ: 0.08, seed: 35 }
+  ], "deep-forest-moss-patches");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_deep.webp`, 0, 9.4, -26.8, 39, 21, {
-    opacity: 0.34,
-    unlit: true,
-    castShadow: false,
-    receiveShadow: false
+  addStylizedForestBackdrop(root, materials, {
+    visualRole: "deep-forest-stylized-backdrop",
+    zOffset: -1.8,
+    xScale: 1.15,
+    zScale: 1.12
   });
 
   addDeepForestDepth(root, materials);
@@ -4430,9 +4437,9 @@ function addDeepForestMist(root, materials) {
   group.userData.visualRole = "deep-forest-mist";
   root.add(group);
   const mistPatches = [
-    { x: -6.2, y: 0.42, z: -5.8, width: 4.8, height: 0.6, depth: 0.12, rotationY: -0.18 },
-    { x: 4.6, y: 0.48, z: -8.6, width: 4.4, height: 0.62, depth: 0.12, rotationY: 0.24 },
-    { x: -1.2, y: 0.5, z: 3.2, width: 5.0, height: 0.58, depth: 0.12, rotationY: 0.08 }
+    { x: -6.2, y: 0.3, z: -5.8, width: 3.2, height: 0.28, depth: 0.08, rotationY: -0.18 },
+    { x: 4.6, y: 0.34, z: -8.6, width: 3.0, height: 0.3, depth: 0.08, rotationY: 0.24 },
+    { x: -1.2, y: 0.32, z: 3.2, width: 3.4, height: 0.28, depth: 0.08, rotationY: 0.08 }
   ];
   for (const patch of mistPatches) {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(patch.width, patch.height, patch.depth), materials.blueMist.clone());
