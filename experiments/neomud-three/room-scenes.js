@@ -3355,13 +3355,20 @@ function addForestEdgeStage(root, materials, worldRoot) {
   root.add(shaftLight);
 }
 
-function addStylizedForestBackdrop(root, materials) {
+function addStylizedForestBackdrop(root, materials, options = {}) {
+  const role = options.visualRole ?? "stylized-forest-backdrop";
+  const zOffset = options.zOffset ?? 0;
+  const xScale = options.xScale ?? 1;
+  const zScale = options.zScale ?? 1;
+  const pathShiftX = options.pathShiftX ?? 0;
   const trunks = [];
   const darkCanopy = [];
   const lightCanopy = [];
   const shrubBands = [];
   const pathBands = [];
   const ridgeBands = [];
+  const transformX = (x) => x * xScale;
+  const transformZ = (z) => z * zScale + zOffset;
 
   for (const [x, z, scale, lean] of [
     [-17.2, -20.8, 1.25, -0.1], [-13.4, -23.2, 1.5, 0.08], [-9.6, -24.2, 1.1, -0.06],
@@ -3369,9 +3376,9 @@ function addStylizedForestBackdrop(root, materials) {
     [13.5, -23.0, 1.48, -0.04], [17.2, -20.6, 1.22, 0.1],
     [-18.4, -10.8, 1.05, 0.05], [18.2, -10.6, 1.02, -0.04]
   ]) {
-    trunks.push({ x, y: 3.0 * scale, z, width: 0.5 * scale, height: 6.0 * scale, depth: 0.5 * scale, rotationZ: lean });
-    darkCanopy.push({ x, y: 7.1 * scale, z: z + 0.15, scale: [2.4 * scale, 0.85 * scale, 1.65 * scale], rotationY: x * 0.03 });
-    lightCanopy.push({ x: x + 0.55, y: 7.75 * scale, z: z - 0.25, scale: [1.45 * scale, 0.55 * scale, 1.05 * scale], rotationY: -x * 0.025 });
+    trunks.push({ x: transformX(x), y: 3.0 * scale, z: transformZ(z), width: 0.5 * scale, height: 6.0 * scale, depth: 0.5 * scale, rotationZ: lean });
+    darkCanopy.push({ x: transformX(x), y: 7.1 * scale, z: transformZ(z + 0.15), scale: [2.4 * scale, 0.85 * scale, 1.65 * scale], rotationY: x * 0.03 });
+    lightCanopy.push({ x: transformX(x + 0.55), y: 7.75 * scale, z: transformZ(z - 0.25), scale: [1.45 * scale, 0.55 * scale, 1.05 * scale], rotationY: -x * 0.025 });
   }
 
   for (const [x, z, width, height, depth] of [
@@ -3379,14 +3386,14 @@ function addStylizedForestBackdrop(root, materials) {
     [-18.4, -4.8, 1.0, 1.65, 18.0], [18.4, -4.8, 1.0, 1.65, 18.0],
     [-9.0, -24.4, 7.4, 1.15, 0.9], [9.0, -24.4, 7.4, 1.15, 0.9]
   ]) {
-    shrubBands.push({ x, y: height / 2, z, width, height, depth });
+    shrubBands.push({ x: transformX(x), y: height / 2, z: transformZ(z), width: width * xScale, height, depth: depth * zScale });
   }
 
   for (const [x, z, width, depth] of [
     [0, -20.4, 5.0, 8.8],
     [0, -26.0, 3.2, 5.0]
   ]) {
-    pathBands.push({ material: "forestTrail", x, z, width, depth, y: 0.028 });
+    pathBands.push({ material: "forestTrail", x: transformX(x) + pathShiftX, z: transformZ(z), width, depth: depth * zScale, y: 0.028 });
   }
 
   for (const [x, z, width, height, depth] of [
@@ -3395,15 +3402,15 @@ function addStylizedForestBackdrop(root, materials) {
     [7.0, -30.2, 12.4, 2.2, 1.2],
     [20.0, -29.0, 12.0, 2.0, 1.2]
   ]) {
-    ridgeBands.push({ x, y: height / 2, z, width, height, depth });
+    ridgeBands.push({ x: transformX(x), y: height / 2, z: transformZ(z), width: width * xScale, height, depth: depth * zScale });
   }
 
-  addInstancedSurfaceRects(root, materials, pathBands, "forest-edge-stylized-backdrop-path");
-  addInstancedBoxes(root, materials.forestShadow ?? materials.foliageDark, ridgeBands, "forest-edge-stylized-backdrop-ridges", { castShadow: false, receiveShadow: true });
-  addInstancedBoxes(root, materials.trunk, trunks, "forest-edge-stylized-backdrop-trunks", { castShadow: false, receiveShadow: true });
-  addInstancedBoxes(root, materials.foliageDark, shrubBands, "forest-edge-stylized-backdrop-shrubs", { castShadow: false, receiveShadow: true });
-  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliageDark, darkCanopy, "forest-edge-stylized-backdrop-dark-canopy", { castShadow: false, receiveShadow: false });
-  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliage, lightCanopy, "forest-edge-stylized-backdrop-light-canopy", { castShadow: false, receiveShadow: false });
+  addInstancedSurfaceRects(root, materials, pathBands, `${role}-path`);
+  addInstancedBoxes(root, materials.forestShadow ?? materials.foliageDark, ridgeBands, `${role}-ridges`, { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.trunk, trunks, `${role}-trunks`, { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.foliageDark, shrubBands, `${role}-shrubs`, { castShadow: false, receiveShadow: true });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliageDark, darkCanopy, `${role}-dark-canopy`, { castShadow: false, receiveShadow: false });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.foliage, lightCanopy, `${role}-light-canopy`, { castShadow: false, receiveShadow: false });
 }
 
 function addForestEdgeSouthTownWall(root, materials) {
@@ -3711,17 +3718,24 @@ function addForestPathStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.forestGround ?? materials.foliageDark, FOREST_PATH.width, FOREST_PATH.depth);
   addInstancedSurfaceRects(root, materials, [
     { material: "forestTrail", x: 0, z: 3.5, width: 5.2, depth: 40.2, y: 0.022 },
-    { material: "forestTrail", x: 7.0, z: 3.6, width: 13.8, depth: 4.4, y: 0.024 },
-    { material: "forestMossLight", x: 0, z: 11.8, width: 9.8, depth: 5.9, y: 0.016 },
-    { material: "forestMossLight", x: 0, z: -13.6, width: 8.8, depth: 6.8, y: 0.018 },
-    { material: "forestMossLight", x: 10.2, z: 3.6, width: 7.0, depth: 5.2, y: 0.017 }
+    { material: "forestTrail", x: 7.0, z: 3.6, width: 13.8, depth: 4.4, y: 0.024 }
   ], "forest-path-surfaces");
+  addIrregularGroundPatches(root, materials, [
+    { material: "forestMossLight", x: 0, z: 11.8, width: 9.8, depth: 5.9, y: 0.019, rotationZ: 0.1, seed: 21 },
+    { material: "forestMossLight", x: 0, z: -13.6, width: 8.8, depth: 6.8, y: 0.021, rotationZ: -0.16, seed: 22 },
+    { material: "forestMossLight", x: 10.2, z: 3.6, width: 7.0, depth: 5.2, y: 0.02, rotationZ: 0.18, seed: 23 },
+    { material: "forestShadow", x: -6.1, z: -0.4, width: 4.4, depth: 7.2, y: 0.023, rotationZ: -0.22, seed: 24 },
+    { material: "forestShadow", x: 6.6, z: -2.6, width: 4.0, depth: 6.2, y: 0.023, rotationZ: 0.24, seed: 25 },
+    { material: "forestMossLight", x: 7.0, z: 6.7, width: 4.8, depth: 2.4, y: 0.026, rotationZ: 0.1, seed: 26 }
+  ], "forest-path-moss-patches");
   addForestGroundBreakup(root, materials, "path");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.5, -28.2, 40, 22, {
-    unlit: true,
-    castShadow: false,
-    receiveShadow: false
+  addStylizedForestBackdrop(root, materials, {
+    visualRole: "forest-path-stylized-backdrop",
+    zOffset: -1.4,
+    xScale: 1.08,
+    zScale: 1.08,
+    pathShiftX: 0
   });
   addForestPathDepth(root, materials);
   addForestPathTrees(root, materials);
@@ -3773,6 +3787,18 @@ function addForestPathDepth(root, materials) {
     ],
     "forest-path-side-undergrowth"
   );
+  addInstancedBoxes(
+    root,
+    materials.foliage,
+    [
+      { x: -13.6, y: 0.48, z: 9.6, width: 3.2, height: 0.96, depth: 8.8, rotationY: -0.08 },
+      { x: 13.6, y: 0.48, z: 8.2, width: 3.2, height: 0.96, depth: 8.2, rotationY: 0.08 },
+      { x: -13.8, y: 0.46, z: -8.0, width: 3.4, height: 0.92, depth: 8.8, rotationY: 0.12 },
+      { x: 13.8, y: 0.46, z: -9.2, width: 3.4, height: 0.92, depth: 8.6, rotationY: -0.12 }
+    ],
+    "forest-path-side-shrub-masses",
+    { castShadow: false }
+  );
   addTownContextTrees(root, materials, [
     { x: -14.2, z: -18.8, scale: 1.68, rotationY: 0.42 },
     { x: -9.4, z: -22.2, scale: 1.38, rotationY: -0.22 },
@@ -3788,7 +3814,9 @@ function addForestPathDepth(root, materials) {
       { x: -12.8, y: 7.4, z: -8.5, scale: [2.9, 1.0, 2.2], rotationY: 0.2 },
       { x: 12.8, y: 7.3, z: -8.9, scale: [2.8, 1.0, 2.2], rotationY: -0.24 },
       { x: -8.8, y: 7.8, z: -17.4, scale: [2.3, 0.9, 1.8], rotationY: -0.12 },
-      { x: 8.8, y: 7.9, z: -17.6, scale: [2.3, 0.9, 1.8], rotationY: 0.16 }
+      { x: 8.8, y: 7.9, z: -17.6, scale: [2.3, 0.9, 1.8], rotationY: 0.16 },
+      { x: -12.2, y: 6.9, z: 7.4, scale: [2.2, 0.78, 1.7], rotationY: -0.22 },
+      { x: 12.4, y: 6.85, z: 6.2, scale: [2.2, 0.78, 1.7], rotationY: 0.24 }
     ],
     "forest-path-high-canopy",
     { castShadow: false, receiveShadow: false }
