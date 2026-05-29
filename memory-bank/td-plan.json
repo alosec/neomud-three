@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T00:06:25.288Z",
+  "updated": "2026-05-29T00:12:37.952Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -3134,6 +3134,35 @@
       ],
       "created": "2026-05-29T00:02:04Z",
       "updated": "2026-05-29T00:05:13Z"
+    },
+    {
+      "id": "neo-1fb2.93",
+      "project": "NeoMud",
+      "title": "Promote GLB material remaps into package metadata",
+      "description": "",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done",
+      "labels": [
+        "architecture",
+        "blender",
+        "materials",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 128,
+          "body": "Material remap declarations now live on LEVEL_PACKAGES and the shared GLB room runtime applies them before room-specific configuration; room shots/offline/server QA passed.",
+          "created": "2026-05-29T00:11:43Z"
+        }
+      ],
+      "created": "2026-05-29T00:08:15Z",
+      "updated": "2026-05-29T00:11:43Z"
     }
   ]
 }

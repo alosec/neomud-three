@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { instantiateBlenderLevel } from "./level-loader.js";
+import { createApprovedMaterial } from "./render-assets.js";
 
 export function buildGlbRoomRuntime({
   root,
@@ -16,6 +17,7 @@ export function buildGlbRoomRuntime({
   update = () => {}
 }) {
   const { scene, level } = instantiateBlenderLevel(packageInfo.url, { hideAuthoringNodes: true });
+  applyMaterialRemaps(scene, packageInfo.materialRemaps ?? {});
   configureScene?.(scene, level);
   configureLights?.(scene, level);
   root.add(scene);
@@ -69,6 +71,48 @@ export function buildGlbRoomRuntime({
     },
     update
   };
+}
+
+function applyMaterialRemaps(scene, materialIdsByName) {
+  const entries = Object.entries(materialIdsByName);
+  if (entries.length === 0) {
+    scene.userData.neomudMaterialRemaps = [];
+    return;
+  }
+
+  const materialCache = new Map();
+  const applied = new Map();
+
+  function approvedMaterial(materialId) {
+    if (!materialCache.has(materialId)) {
+      const material = createApprovedMaterial(materialId);
+      material.name = materialId;
+      materialCache.set(materialId, material);
+    }
+    return materialCache.get(materialId);
+  }
+
+  function remap(material, objectName) {
+    if (!material) return material;
+    const materialName = material.name ?? "";
+    const materialId = materialIdsByName[materialName]
+      ?? entries.find(([sourceName]) => objectName.includes(sourceName))?.[1];
+    if (!materialId) return material;
+    applied.set(materialName || objectName, materialId);
+    return approvedMaterial(materialId);
+  }
+
+  scene.traverse((object) => {
+    if (!object.isMesh || !object.material) return;
+    object.material = Array.isArray(object.material)
+      ? object.material.map((material) => remap(material, object.name))
+      : remap(object.material, object.name);
+  });
+
+  scene.userData.neomudMaterialRemaps = [...applied.entries()].map(([source, materialId]) => ({
+    source,
+    materialId
+  }));
 }
 
 export function addRuntimeLightsFromBlenderLevel(scene, level, {

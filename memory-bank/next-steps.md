@@ -25,7 +25,7 @@ High leverage next work:
    - A consistent coordinate convention for exits and spawn headings.
    - Server room state should enter the renderer through one adapter, not leak into individual scene builders.
    - The first main-runtime GLB adapter now exists in `glb-room-runtime.js`; Temple and Tavern both use it. Keep future Blender-authored rooms on that path instead of adding per-room GLB parsing glue.
-   - Blender room material names can now be remapped at runtime to approved material IDs, and room debug landmarks expose those remaps. Keep extending that bridge instead of letting GLB exports introduce one-off flat material islands.
+   - Blender room material names can now be remapped from `LEVEL_PACKAGES` metadata to approved material IDs by the shared GLB runtime, and room debug landmarks expose those remaps. Keep extending that bridge instead of letting GLB exports introduce one-off flat material islands.
    - Run `node scripts/refresh-neomud-three-packages.mjs` after Blender exports; run `node scripts/refresh-neomud-three-packages.mjs --check` in verification to prove manifest file sizes and GLB counts are current.
    - Run `node scripts/validate-neomud-three-packages.mjs` after any package, source brief, manifest, or registry change so source/manifest/GLB drift is caught before browser QA.
    - Promote the movement gym loader and room adapter into a named `WorldLoader` / `LevelParser` interface before the third room package lands.
