@@ -258,7 +258,7 @@ const TEMPLE_COLLIDERS = [
 ];
 
 export function buildTempleRoom({ root, worldRoot, onExit }) {
-  return buildGlbRoomRuntime({
+  const runtime = buildGlbRoomRuntime({
     root,
     packageInfo: LEVEL_PACKAGES["town:temple"],
     fallbackSpawn: { position: new THREE.Vector3(0, 0, TEMPLE.entrySpawnZ), heading: Math.PI },
@@ -275,6 +275,8 @@ export function buildTempleRoom({ root, worldRoot, onExit }) {
     colliderRadius: 0.42,
     landmarkId: "town-temple-glb"
   });
+  addTempleRuntimeFinish(root, makeTempleMaterials());
+  return runtime;
 }
 
 function configureBlenderTempleLights(scene, level) {
@@ -6480,11 +6482,67 @@ function configureBlenderTempleScene(scene) {
         if (object.name.includes("_glass_") || object.name.includes("_light_band_") || object.name.includes("_floor_light_")) {
           material.transparent = true;
           material.depthWrite = false;
+          if (object.name.includes("_floor_light_")) {
+            material.opacity = Math.min(material.opacity ?? 1, 0.16);
+          }
         }
       }
     }
   });
 
+}
+
+function addTempleRuntimeFinish(root, materials) {
+  const floorBandMaterial = new THREE.MeshBasicMaterial({
+    color: 0xc7b993,
+    transparent: true,
+    opacity: 0.16,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const floorShadeMaterial = new THREE.MeshBasicMaterial({
+    color: 0x7b5e34,
+    transparent: true,
+    opacity: 0.12,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const baseTrim = [];
+  const wallPilasterCaps = [];
+  const sideFloorBands = [];
+  const aisleBreaks = [];
+  const centerRunnerShade = [];
+
+  for (const side of [-1, 1]) {
+    const wallX = side * 13.68;
+    baseTrim.push({ x: wallX, y: 0.18, z: -8, width: 0.18, height: 0.24, depth: 55.8 });
+    baseTrim.push({ x: wallX, y: 2.35, z: -8, width: 0.16, height: 0.16, depth: 53.2 });
+
+    for (const z of [-31.8, -24.2, -16.6, -9.0, -1.4, 6.2, 13.8]) {
+      wallPilasterCaps.push({ x: side * 13.42, y: 1.08, z, width: 0.24, height: 0.18, depth: 1.72 });
+      wallPilasterCaps.push({ x: side * 13.42, y: 5.35, z, width: 0.2, height: 0.16, depth: 1.48 });
+    }
+
+    sideFloorBands.push({ x: side * 7.35, y: 0.028, z: -8.0, width: 1.55, depth: 52.0 });
+    sideFloorBands.push({ x: side * 10.55, y: 0.029, z: -8.0, width: 0.36, depth: 52.0 });
+  }
+
+  for (const z of [-30.5, -23.0, -15.5, -8.0, -0.5, 7.0, 14.5]) {
+    aisleBreaks.push({ x: 0, y: 0.031, z, width: 4.2, depth: 0.16 });
+  }
+  centerRunnerShade.push({ x: 0, y: 0.034, z: -8.1, width: 2.35, depth: 44.5 });
+
+  addInstancedBoxes(root, materials.trim, baseTrim, "temple-runtime-wall-base-trim", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.windowReveal ?? materials.trim, wallPilasterCaps, "temple-runtime-pilaster-caps", { castShadow: false, receiveShadow: true });
+  addInstancedSurfaceRects(root, {
+    sideBand: floorBandMaterial,
+    aisleBreak: floorBandMaterial,
+    centerShade: floorShadeMaterial
+  }, [
+    ...sideFloorBands.map((band) => ({ ...band, material: "sideBand" })),
+    ...aisleBreaks.map((band) => ({ ...band, material: "aisleBreak" })),
+    ...centerRunnerShade.map((band) => ({ ...band, material: "centerShade" }))
+  ], "temple-runtime-floor-trim");
 }
 
 function configureBlenderTavernScene(scene, flameMeshes = []) {

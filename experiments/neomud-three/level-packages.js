@@ -15,7 +15,7 @@ export const LEVEL_PACKAGES = {
       MAT_temple_pew_warm_oak: "temple.pew.oak",
       MAT_temple_pew_dark_endgrain: "temple.pew.endgrain",
       MAT_temple_pew_worn_edge: "temple.pew.worn-edge",
-      MAT_temple_dawn_cloth: "temple.altar.cloth",
+      MAT_temple_dawn_cloth: "temple.dawn.runner",
       MAT_temple_stained_glass_dawn_v2: "temple.stained-glass.dawn-v2"
     }
   },

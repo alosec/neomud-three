@@ -309,12 +309,12 @@ function arcaneWallTexture() {
 
 function calmTempleMarbleTexture() {
   return proceduralTexture("temple-calm-marble-v2", [3.8, 6.4], (ctx, width, height, random) => {
-    ctx.fillStyle = "#d5cdb8";
+    ctx.fillStyle = "#c9c0aa";
     ctx.fillRect(0, 0, width, height);
-    valueNoise(ctx, width, height, "#d8d0be", 420, 0.018, random);
+    valueNoise(ctx, width, height, "#cfc6b3", 360, 0.014, random);
 
-    ctx.strokeStyle = "rgba(99, 86, 62, 0.075)";
-    ctx.lineWidth = 1.05;
+    ctx.strokeStyle = "rgba(92, 80, 60, 0.055)";
+    ctx.lineWidth = 0.9;
     const cell = 72;
     for (let x = 0; x <= width + cell; x += cell) {
       ctx.beginPath();
@@ -332,8 +332,8 @@ function calmTempleMarbleTexture() {
     for (let i = 0; i < 16; i++) {
       const y = random() * height;
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(124, 102, 72, ${0.018 + random() * 0.025})`;
-      ctx.lineWidth = 0.55 + random() * 0.75;
+      ctx.strokeStyle = `rgba(118, 98, 72, ${0.012 + random() * 0.018})`;
+      ctx.lineWidth = 0.45 + random() * 0.55;
       ctx.moveTo(-12, y);
       ctx.bezierCurveTo(width * 0.3, y + random() * 18 - 9, width * 0.65, y + random() * 20 - 10, width + 12, y + random() * 16 - 8);
       ctx.stroke();
@@ -376,7 +376,7 @@ const MATERIAL_DEFINITION_LIST = [
     roughness: 0.78,
     metalness: 0,
     approved: true,
-    create: () => standardMaterial({ map: calmTempleMarbleTexture(), color: 0xe9e0ca, roughness: 0.78, metalness: 0 })
+    create: () => standardMaterial({ map: calmTempleMarbleTexture(), color: 0xd1c7ad, roughness: 0.84, metalness: 0 })
   },
   {
     id: "temple.limestone.wall",
@@ -389,7 +389,7 @@ const MATERIAL_DEFINITION_LIST = [
     roughness: 0.9,
     metalness: 0,
     approved: true,
-    create: () => standardMaterial({ map: calmTempleLimestoneTexture(), color: 0xd7ccb3, roughness: 0.92 })
+    create: () => standardMaterial({ map: calmTempleLimestoneTexture(), color: 0xc4b899, roughness: 0.94 })
   },
   {
     id: "temple.stained-glass.alpha",
@@ -455,6 +455,7 @@ const MATERIAL_DEFINITION_LIST = [
     approved: true,
     create: () => standardMaterial({ map: texture("templeAltarCloth"), roughness: 0.62 })
   },
+  colorMaterial("temple.dawn.runner", "dawnRunner", "temple", "cathedral-aisle-runner", 0xb79a62, { roughness: 0.82 }),
   colorMaterial("temple.trim.limestone", "trim", "temple", "stone-trim", 0xbeb39c, { roughness: 0.65 }),
   colorMaterial("temple.ceiling.warm-shadow", "ceilingWarmShadow", "temple", "cathedral-ceiling", 0x7c6a4e, { roughness: 0.92, emissive: 0x2b2115, emissiveIntensity: 0.18 }),
   colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x8a633a, { roughness: 0.84 }),
@@ -708,6 +709,7 @@ export function makeTempleMaterials() {
     altar: createApprovedMaterial("temple.altar.cloth"),
     trim: createApprovedMaterial("temple.trim.limestone"),
     ceilingWarmShadow: createApprovedMaterial("temple.ceiling.warm-shadow"),
+    dawnRunner: createApprovedMaterial("temple.dawn.runner"),
     pewOak: createApprovedMaterial("temple.pew.oak"),
     pewEndgrain: createApprovedMaterial("temple.pew.endgrain"),
     pewWornEdge: createApprovedMaterial("temple.pew.worn-edge"),
