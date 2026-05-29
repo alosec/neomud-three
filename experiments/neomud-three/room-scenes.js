@@ -910,10 +910,10 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
       fogDensity: 0.008
     },
     camera: {
-      distance: 6.4,
-      height: 4.65,
-      sideOffset: -0.85,
-      lookAhead: 3.65,
+      distance: 5.4,
+      height: 7.15,
+      sideOffset: -0.55,
+      lookAhead: 5.4,
       targetHeight: 1.05
     },
     syncEntities,
@@ -2897,8 +2897,12 @@ function addNorthGateWalls(root, materials) {
   }
 
   stone.push({ x: 0, y: 6.15, z: -9.35, width: 9.4, height: 2.35, depth: 3.0 });
-  darkStone.push({ x: 0, y: 2.45, z: -6.18, width: 5.8, height: 4.9, depth: 0.26 });
-  timber.push({ x: 0, y: 2.45, z: -5.96, width: 5.2, height: 3.9, depth: 0.22 });
+  darkStone.push({ x: -2.72, y: 2.45, z: -6.18, width: 0.36, height: 4.9, depth: 0.26 });
+  darkStone.push({ x: 2.72, y: 2.45, z: -6.18, width: 0.36, height: 4.9, depth: 0.26 });
+  darkStone.push({ x: 0, y: 4.78, z: -6.18, width: 5.8, height: 0.46, depth: 0.26 });
+  darkStone.push({ x: 0, y: 0.22, z: -6.18, width: 5.8, height: 0.32, depth: 0.26 });
+  timber.push({ x: -2.52, y: 2.45, z: -5.96, width: 0.18, height: 3.9, depth: 0.22 });
+  timber.push({ x: 2.52, y: 2.45, z: -5.96, width: 0.18, height: 3.9, depth: 0.22 });
   for (const x of [-2.1, -1.4, -0.7, 0, 0.7, 1.4, 2.1]) {
     timber.push({ x, y: 2.36, z: -5.7, width: 0.11, height: 3.72, depth: 0.12 });
   }
@@ -3115,7 +3119,17 @@ function addForestEdgeStage(root, materials, worldRoot) {
     { material: "packedDirt", x: 0, z: -12.2, width: 8.4, depth: 9.2, y: 0.018 }
   ], "forest-edge-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4);
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4, { castShadow: false });
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, -15.8, 7.4, -4.2, 26, 16.2, {
+    rotationY: Math.PI / 2,
+    opacity: 0.72,
+    castShadow: false
+  });
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 15.8, 7.4, -4.2, 26, 16.2, {
+    rotationY: -Math.PI / 2,
+    opacity: 0.72,
+    castShadow: false
+  });
   addForestEdgeDepthLayers(root, materials);
   addForestEdgeSouthTownWall(root, materials);
   addForestEdgeTrees(root, materials);
@@ -5188,8 +5202,10 @@ function addBackdrop(root, path, x, y, z, width, height, options = {}) {
   );
   mesh.position.set(x, y, z);
   mesh.rotation.y = options.rotationY ?? 0;
-  mesh.castShadow = true;
+  mesh.castShadow = options.castShadow ?? true;
+  mesh.receiveShadow = options.receiveShadow ?? true;
   root.add(mesh);
+  return mesh;
 }
 
 function makeGenericMaterials(room) {

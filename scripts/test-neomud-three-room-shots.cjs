@@ -21,7 +21,7 @@ const ANCHORS = [
   { id: "forge-entry", roomId: "town:forge", filename: "room-shot-forge-entry.png", x: -8.45, z: 0, heading: Math.PI / 2 },
   { id: "forge-furnace", roomId: "town:forge", filename: "room-shot-forge-furnace.png", x: -1.8, z: 0.2, heading: Math.PI / 2 },
   { id: "north-gate-entry", roomId: "town:gate", filename: "room-shot-north-gate-entry.png", x: 0, z: 12.8, heading: 0 },
-  { id: "north-gate-forest", roomId: "town:gate", filename: "room-shot-north-gate-forest.png", x: 0, z: -10.8, heading: 0 },
+  { id: "north-gate-forest", roomId: "town:gate", filename: "room-shot-north-gate-forest.png", x: 0, z: -3.8, heading: 0 },
   { id: "forest-edge-entry", roomId: "forest:edge", filename: "room-shot-forest-edge-entry.png", x: 0, z: 13.1, heading: 0 },
   { id: "forest-edge-path", roomId: "forest:edge", filename: "room-shot-forest-edge-path.png", x: 0, z: -9.8, heading: 0 },
   { id: "forest-path-entry", roomId: "forest:path", filename: "room-shot-forest-path-entry.png", x: 0, z: 13.6, heading: 0 },
