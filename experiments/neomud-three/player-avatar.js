@@ -35,6 +35,7 @@ export function makePlayerAvatar() {
     activeAction: null,
     activeName: "Loading",
     model: null,
+    overlay: null,
     renderMode: "procedural"
   };
 
@@ -44,8 +45,8 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "clean-xbot-neutral-v1" : "procedural-adventurer-v1",
-    overlay: false,
+    visualTreatment: state.loaded ? "xbot-fantasy-adventurer-v2" : "procedural-adventurer-v1",
+    overlay: Boolean(state.overlay),
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
   });
@@ -88,6 +89,13 @@ async function loadSkinnedHero(state, materials) {
       child.frustumCulled = false;
     });
 
+    const overlay = makeSkinnedAdventurerOverlay(materials);
+    overlay.name = "Xbot fantasy adventurer treatment";
+    overlay.scale.setScalar(0.82);
+    overlay.rotation.y = Math.PI;
+    state.overlay = overlay;
+    state.visualRoot.add(overlay);
+
     state.model = model;
     state.visualRoot.add(model);
     state.mixer = new THREE.AnimationMixer(model);
@@ -117,59 +125,30 @@ function makeSkinnedAdventurerOverlay(materials) {
 
   const cape = new THREE.Group();
   cape.name = "Adventurer cloak";
-  cape.position.set(0, 1.45, 0.34);
+  cape.position.set(0, 1.38, 0.22);
   group.add(cape);
   const leftCape = makeCloakPanel(materials.cloak, -1);
   const rightCape = makeCloakPanel(materials.cloak, 1);
-  leftCape.scale.set(0.74, 0.92, 1);
-  rightCape.scale.set(0.74, 0.92, 1);
+  leftCape.scale.set(0.48, 0.74, 0.78);
+  rightCape.scale.set(0.48, 0.74, 0.78);
   cape.add(leftCape, rightCape);
 
   const tabard = makeTabardPanel(materials.tunic);
-  tabard.position.set(0, 1.24, -0.32);
-  tabard.scale.set(0.86, 0.86, 1);
+  tabard.position.set(0, 1.22, -0.25);
+  tabard.scale.set(0.54, 0.72, 0.72);
   group.add(tabard);
 
   addOverlayBoxBatch(group, materials.gold, [
-    { x: 0, y: 1.03, z: 0.3, width: 0.18, height: 0.16, depth: 0.055 },
-    { x: -0.46, y: 1.04, z: 0.085, width: 0.12, height: 0.05, depth: 0.03 }
+    { x: 0, y: 1.16, z: -0.31, width: 0.12, height: 0.12, depth: 0.04 },
+    { x: 0, y: 1.02, z: -0.02, width: 0.42, height: 0.07, depth: 0.28 }
   ], "adventurer-gold-trim");
   addOverlayBoxBatch(group, materials.gem, [
-    { x: 0, y: 1.28, z: 0.39, width: 0.12, height: 0.16, depth: 0.04 }
+    { x: 0, y: 1.32, z: -0.31, width: 0.08, height: 0.1, depth: 0.035 }
   ], "adventurer-gem-trim");
   addOverlayBoxBatch(group, materials.darkLeather, [
-    { x: 0, y: 1.02, z: -0.03, width: 0.82, height: 0.14, depth: 0.48, rotationX: -0.03 },
-    { x: 0.5, y: 1.22, z: -0.18, width: 0.052, height: 1.55, depth: 0.052, rotationZ: -0.16 }
+    { x: 0, y: 1.02, z: -0.02, width: 0.58, height: 0.1, depth: 0.34, rotationX: -0.02 },
+    { x: -0.34, y: 0.86, z: 0.05, width: 0.18, height: 0.26, depth: 0.08, rotationZ: 0.08 }
   ], "adventurer-leather-gear");
-  addOverlayBoxBatch(group, materials.steel, [
-    { x: -0.48, y: 1.48, z: -0.03, width: 0.3, height: 0.14, depth: 0.26 },
-    { x: 0.48, y: 1.48, z: -0.03, width: 0.3, height: 0.14, depth: 0.26 }
-  ], "adventurer-shoulders");
-
-
-  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.62), materials.cloak);
-  hood.name = "Adventurer hood";
-  hood.position.set(0, 1.95, -0.01);
-  hood.rotation.x = -0.12;
-  hood.scale.set(1.08, 0.78, 1.02);
-  hood.castShadow = true;
-  group.add(hood);
-  addOverlayBoxBatch(group, materials.cloak, [
-    { x: 0, y: 1.6, z: 0.02, width: 0.98, height: 0.16, depth: 0.42 },
-    { x: 0, y: 1.47, z: 0.22, width: 0.84, height: 0.12, depth: 0.24, rotationX: -0.08 }
-  ], "adventurer-shoulder-cowl");
-
-  const satchel = new THREE.Group();
-  satchel.name = "Adventurer satchel";
-  satchel.position.set(-0.46, 0.96, 0.16);
-  satchel.rotation.z = 0.18;
-  group.add(satchel);
-  addBox(satchel, materials.leather, 0, 0, 0, 0.28, 0.34, 0.12);
-
-  const orb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 18, 12), materials.gem);
-  orb.position.set(0.5, 2.02, -0.18);
-  orb.castShadow = true;
-  group.add(orb);
 
   return group;
 }
@@ -246,8 +225,8 @@ function makeTabardPanel(material) {
 
 function styleSkinnedModel(model) {
   const palette = {
-    body: new THREE.Color(0x405463),
-    joints: new THREE.Color(0x1a1714)
+    body: new THREE.Color(0x6f7f79),
+    joints: new THREE.Color(0x211914)
   };
 
   model.traverse((child) => {
@@ -255,9 +234,9 @@ function styleSkinnedModel(model) {
     const materials = Array.isArray(child.material) ? child.material : [child.material];
     for (const material of materials) {
       material.color?.copy(material.name?.includes("Joints") ? palette.joints : palette.body);
-      material.roughness = material.name?.includes("Joints") ? 0.86 : 0.74;
+      material.roughness = material.name?.includes("Joints") ? 0.88 : 0.82;
       material.metalness = 0.02;
-      material.envMapIntensity = 0.32;
+      material.envMapIntensity = 0.18;
       material.needsUpdate = true;
     }
   });
