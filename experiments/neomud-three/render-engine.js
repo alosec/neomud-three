@@ -420,6 +420,7 @@ function updateCameraFadeMaterials(fadedObjects, fadeTarget) {
   for (const [uuid, record] of fadedObjects) {
     if (fadeTarget && uuid === fadeTarget.uuid) continue;
     record.object.material = record.originalMaterial;
+    delete record.object.userData.cameraFadeBlocker;
     disposeMaterial(record.fadeMaterial);
     fadedObjects.delete(uuid);
   }
@@ -433,12 +434,14 @@ function updateCameraFadeMaterials(fadedObjects, fadeTarget) {
     originalMaterial,
     fadeMaterial
   });
+  fadeTarget.userData.cameraFadeBlocker = true;
   fadeTarget.material = fadeMaterial;
 }
 
 function restoreCameraFadeMaterials(fadedObjects) {
   for (const record of fadedObjects.values()) {
     record.object.material = record.originalMaterial;
+    delete record.object.userData.cameraFadeBlocker;
     disposeMaterial(record.fadeMaterial);
   }
   fadedObjects.clear();
@@ -469,6 +472,7 @@ function disposeMaterial(material) {
 function isCameraBlockingObject(object) {
   if (!object?.visible || !object.isMesh) return false;
   if (object.userData?.cameraIgnore || object.parent?.userData?.cameraIgnore) return false;
+  if (object.userData?.cameraFadeBlocker) return true;
   const materials = Array.isArray(object.material) ? object.material : [object.material];
   if (materials.some((material) => material?.transparent && (material.opacity ?? 1) < 0.62)) return false;
   const name = `${object.name ?? ""} ${object.parent?.name ?? ""}`.toLowerCase();

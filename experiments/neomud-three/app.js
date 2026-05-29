@@ -111,7 +111,8 @@ const controls = {
   jumpVelocity: 5.2,
   gravity: 14.5,
   maxAirControl: 0.55,
-  clickArriveDistance: 0.38
+  clickArriveDistance: 0.38,
+  clickWaypointLookahead: 1.45
 };
 
 const cameraControls = {
@@ -1800,6 +1801,7 @@ function updatePlayer(dt) {
   let forwardInput = keyboardForwardInput;
   let desiredClickDirection = null;
   if (movement.clickTarget && !hasKeyboardMove) {
+    advanceClickWaypointIfVisible();
     const toTarget = movement.clickTarget.clone().sub(player.position);
     toTarget.y = 0;
     const distance = toTarget.length();
@@ -1918,6 +1920,16 @@ function updatePlayer(dt) {
 
   const exit = movement.grounded ? roomRuntime?.exitAt?.(player.position) : null;
   if (exit && performance.now() > exitCooldownUntil) enterExitTarget(exit);
+}
+
+function advanceClickWaypointIfVisible() {
+  if (!movement.clickTarget || movement.clickPathIndex >= movement.clickPath.length - 1) return;
+  const distance = player.position.distanceTo(movement.clickTarget);
+  if (distance > controls.clickWaypointLookahead) return;
+  const nextTarget = movement.clickPath[movement.clickPathIndex + 1];
+  if (!nextTarget || firstBlockingClickCollider(player.position, nextTarget)) return;
+  movement.clickPathIndex += 1;
+  movement.clickTarget = nextTarget;
 }
 
 function updateCamera(dt, snap = false) {

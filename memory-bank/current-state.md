@@ -83,7 +83,9 @@ Playable Three.js lab:
   The router now builds a small visibility graph from inflated room-collider
   corners before falling back to the old one-blocker side route, so future
   multi-collider rooms get a more systematic click path without introducing a
-  full navmesh yet.
+  full navmesh yet. Waypoint following now looks ahead to the next visible
+  waypoint near corners, reducing hard stop-and-turn behavior while preserving
+  collider checks.
   Iso camera obstruction handling now has a first bounded slice: when the ray
   from the elevated camera to the avatar is blocked, the camera samples nearby
   orbit offsets and uses the first clear angle instead of leaving the avatar
@@ -92,7 +94,9 @@ Playable Three.js lab:
   QA captures this as `town-shot-isometric-camera-avoidance.png`. Tight-room
   blockers now also get a transient low-opacity material clone when no sampled
   Iso orbit angle clears the avatar ray; Town Square QA verifies this fallback
-  in the Tavern as `town-shot-tavern-iso-fade.png`.
+  in the Tavern as `town-shot-tavern-iso-fade.png`. Faded blockers are marked
+  as active camera blockers until restored so obstruction state does not flicker
+  frame-to-frame.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

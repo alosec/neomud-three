@@ -65,14 +65,17 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      the blocker. Town Square QA verifies clicking across the fountain produces
      a multi-waypoint path and arrives on the far side. The router now attempts
      a small room-collider visibility graph first, then falls back to the old
-     one-blocker route if no graph path is available.
+     one-blocker route if no graph path is available. Waypoint following now
+     advances early to a visible next waypoint near corners, reducing hard
+     stop-and-turn motion without cutting through colliders.
    - First Iso camera obstruction-avoidance slice exists: if the avatar-camera
      ray is blocked, the renderer samples nearby orbit angles and rotates to the
      first clear view when possible. Town Square screenshot QA verifies one
      obstructed plaza placement and records `town-shot-isometric-camera-avoidance.png`.
      When no sampled angle clears the ray, the current foreground blocker gets
      a transient low-opacity material clone; QA verifies that fallback in the
-     Tavern as `town-shot-tavern-iso-fade.png`.
+     Tavern as `town-shot-tavern-iso-fade.png`. Faded blockers remain eligible
+     as camera blockers until restored, avoiding frame-to-frame fade flicker.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.

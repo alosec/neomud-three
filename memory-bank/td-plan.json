@@ -190,10 +190,15 @@
           "id": 2,
           "body": "Upgraded the router from one-blocker side waypoints to a small visibility graph over inflated room-collider corners, with the old one-blocker route retained as fallback. Existing Town Square fountain QA still verifies route creation and arrival.",
           "created": "2026-05-29T21:08:00Z"
+        },
+        {
+          "id": 3,
+          "body": "Added visible-waypoint lookahead while following click paths so the avatar can round corners more naturally instead of stopping at every intermediate node. The lookahead only advances when the next waypoint is directly visible under collider checks.",
+          "created": "2026-05-29T21:24:00Z"
         }
       ],
       "created": "2026-05-29T19:32:00Z",
-      "updated": "2026-05-29T21:08:00Z"
+      "updated": "2026-05-29T21:24:00Z"
     },
     {
       "id": "neo-2a6f",
@@ -229,10 +234,15 @@
           "id": 2,
           "body": "Added fallback occluder fading for tight Iso cases where no sampled orbit clears the avatar ray. The renderer clones/restores only the current blocking object's material, debug state reports faded=true, and Town Square QA verifies the Tavern fallback screenshot.",
           "created": "2026-05-29T20:48:00Z"
+        },
+        {
+          "id": 3,
+          "body": "Fixed fade-state flicker by marking the active faded object as a camera blocker until its original material is restored. This keeps debug obstruction/faded state stable across frames.",
+          "created": "2026-05-29T21:24:00Z"
         }
       ],
       "created": "2026-05-29T20:07:00Z",
-      "updated": "2026-05-29T20:48:00Z"
+      "updated": "2026-05-29T21:24:00Z"
     },
     {
       "id": "neo-61d4",
