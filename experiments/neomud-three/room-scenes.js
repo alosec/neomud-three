@@ -4730,11 +4730,6 @@ function addHiddenCaveStage(root, materials, worldRoot) {
     { material: "water", x: -0.2, z: 6.35, width: 7.2, depth: 1.1, y: 0.032, rotationZ: -0.06 }
   ], "hidden-cave-floor-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_cave.webp`, -12.08, 4.35, 0, 11.5, 6.6, {
-    rotationY: Math.PI / 2,
-    opacity: 0.24
-  });
-
   addInstancedBoxes(root, materials.caveWall, [
     { x: -0.5, y: 0.75, z: -8.48, width: 22.2, height: 1.5, depth: 0.58 },
     { x: -1.2, y: 0.72, z: 8.48, width: 20.5, height: 1.44, depth: 0.62 },
@@ -4743,6 +4738,7 @@ function addHiddenCaveStage(root, materials, worldRoot) {
     { x: 11.28, y: 1.05, z: 4.9, width: 0.72, height: 2.1, depth: 7.0 }
   ], "hidden-cave-walls");
 
+  addHiddenCaveTunnelMouth(root, materials);
   addHiddenCaveShellDetails(root, materials);
 
   addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.wetStone, [
@@ -4781,6 +4777,43 @@ function addHiddenCaveStage(root, materials, worldRoot) {
   root.add(dripLight);
 
   return { moss, mist };
+}
+
+function addHiddenCaveTunnelMouth(root, materials) {
+  const group = new THREE.Group();
+  group.position.set(-11.16, 0, 0);
+  group.userData.visualRole = "authored-cave-tunnel-mouth";
+  root.add(group);
+
+  addBox(group, materials.portalDark, -0.06, 1.92, 0, 0.28, 3.84, 4.7, { castShadow: false, receiveShadow: false });
+  addBox(group, materials.caveWall, 0.08, 3.98, 0, 1.05, 0.82, 5.7);
+  addBox(group, materials.wetStone, 0.0, 2.08, -2.85, 1.18, 3.6, 0.86, { rotationZ: -0.08 });
+  addBox(group, materials.wetStone, 0.0, 1.92, 2.85, 1.08, 3.32, 0.86, { rotationZ: 0.1 });
+  addBox(group, materials.caveWall, 0.34, 0.55, -2.2, 1.35, 1.1, 1.1, { rotationY: 0.12 });
+  addBox(group, materials.caveWall, 0.3, 0.5, 2.15, 1.28, 1.0, 1.04, { rotationY: -0.18 });
+
+  addInstancedGeometry(group, new THREE.DodecahedronGeometry(1, 0), materials.wetStone, [
+    { x: 0.18, y: 3.4, z: -1.82, scale: [0.78, 0.55, 0.72], rotationY: 0.2 },
+    { x: 0.08, y: 3.72, z: 0.05, scale: [0.92, 0.52, 1.06], rotationY: -0.12 },
+    { x: 0.16, y: 3.35, z: 1.86, scale: [0.72, 0.48, 0.7], rotationY: 0.32 },
+    { x: 0.46, y: 1.0, z: -3.22, scale: [0.58, 0.5, 0.44], rotationY: -0.3 },
+    { x: 0.44, y: 0.92, z: 3.1, scale: [0.52, 0.44, 0.42], rotationY: 0.24 }
+  ], "hidden-cave-tunnel-rock-breakup");
+
+  addInstancedBoxes(group, materials.chestMoss, [
+    { x: 0.45, y: 1.3, z: -2.55, width: 0.1, height: 1.05, depth: 0.18, rotationY: 0.08 },
+    { x: 0.42, y: 1.16, z: 2.35, width: 0.1, height: 0.82, depth: 0.18, rotationY: -0.08 },
+    { x: 0.54, y: 3.38, z: -0.82, width: 0.12, height: 0.72, depth: 0.2, rotationY: 0.12 },
+    { x: 0.54, y: 3.24, z: 0.95, width: 0.12, height: 0.62, depth: 0.2, rotationY: -0.18 }
+  ], "hidden-cave-tunnel-moss", { castShadow: false });
+
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(4.1, 2.7), materials.blueMist.clone());
+  glow.position.set(0.11, 2.0, 0);
+  glow.rotation.y = Math.PI / 2;
+  glow.renderOrder = 4;
+  glow.castShadow = false;
+  glow.receiveShadow = false;
+  group.add(glow);
 }
 
 function addHiddenCaveShellDetails(root, materials) {
