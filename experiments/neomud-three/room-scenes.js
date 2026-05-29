@@ -2348,8 +2348,8 @@ function addMagicShopEntities(root, materials, worldRoot, world, npcs, roomItems
 
 function makeForgeMaterials() {
   return {
-    forgeFloor: new THREE.MeshStandardMaterial({ color: 0x3b3029, roughness: 0.86, metalness: 0.02 }),
-    forgeWall: new THREE.MeshStandardMaterial({ color: 0x3a2922, roughness: 0.88, metalness: 0 }),
+    forgeFloor: new THREE.MeshStandardMaterial({ color: 0x4a382a, roughness: 0.88, metalness: 0.02 }),
+    forgeWall: new THREE.MeshStandardMaterial({ color: 0x493020, roughness: 0.9, metalness: 0 }),
     sootBrick: new THREE.MeshStandardMaterial({ color: 0x241916, roughness: 0.9, metalness: 0.02 }),
     ironDark: new THREE.MeshStandardMaterial({ color: 0x34383a, roughness: 0.48, metalness: 0.72 }),
     hotMetal: new THREE.MeshStandardMaterial({ color: 0xffb35c, emissive: 0xff5b1f, emissiveIntensity: 1.1, roughness: 0.38, metalness: 0.45 }),
@@ -2364,10 +2364,6 @@ function makeForgeMaterials() {
 
 function addGrimjawForgeStage(root, materials, worldRoot) {
   addGroundPlane(root, materials.forgeFloor, FORGE.width, FORGE.depth);
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/town_forge.webp`, FORGE.halfX + 0.2, 4.85, 0, 13.4, 7.55, {
-    rotationY: -Math.PI / 2,
-    opacity: 0.28
-  });
 
   addForgeArchitecture(root, materials);
   const flames = addForgeFurnace(root, materials);
@@ -2375,16 +2371,20 @@ function addGrimjawForgeStage(root, materials, worldRoot) {
   const sparks = addForgeSparks(root, materials);
   addForgeExitAffordances(root);
 
-  const ambientFill = new THREE.HemisphereLight(0xffc792, 0x20110b, 0.68);
+  const ambientFill = new THREE.HemisphereLight(0xffd0a2, 0x24130c, 0.9);
   root.add(ambientFill);
 
   const furnaceLight = new THREE.PointLight(0xff6a28, 4.1, 14);
   furnaceLight.position.set(7.85, 2.55, 0);
   root.add(furnaceLight);
 
-  const benchLight = new THREE.PointLight(0xffbd74, 1.35, 7.5);
+  const benchLight = new THREE.PointLight(0xffbd74, 1.85, 8.5);
   benchLight.position.set(-2.8, 2.45, -4.6);
   root.add(benchLight);
+
+  const warmWallLight = new THREE.PointLight(0xff9a4d, 1.15, 11);
+  warmWallLight.position.set(1.2, 3.1, 4.4);
+  root.add(warmWallLight);
 
   const coolVialLight = new THREE.PointLight(0x7adfff, 0.95, 5.8);
   coolVialLight.position.set(5.0, 2.3, -5.65);
@@ -2417,6 +2417,29 @@ function addForgeArchitecture(root, materials) {
   addInstancedBoxes(root, materials.forgeWall, walls, "forge-walls");
   addInstancedBoxes(root, materials.darkTimber, trim, "forge-wall-trim");
   addInstancedBoxes(root, materials.darkTimber, overhead, "forge-overhead-beams");
+  addForgeWallRelief(root, materials);
+}
+
+function addForgeWallRelief(root, materials) {
+  const brickBands = [];
+  const warmPanels = [];
+  const soot = [];
+  for (const z of [-8.36, 8.36]) {
+    for (const y of [1.05, 1.75, 2.45, 3.15, 3.85]) {
+      brickBands.push({ x: -1.2, y, z, width: 18.6, height: 0.08, depth: 0.08 });
+    }
+    for (const x of [-8.6, -5.2, -1.8, 1.6, 5.0, 8.3]) {
+      brickBands.push({ x, y: 2.5, z, width: 0.08, height: 2.8, depth: 0.08 });
+    }
+    warmPanels.push({ x: -6.6, y: 2.45, z: z * 0.995, width: 2.1, height: 1.42, depth: 0.08 });
+    warmPanels.push({ x: 0.4, y: 2.62, z: z * 0.995, width: 2.35, height: 1.55, depth: 0.08 });
+    warmPanels.push({ x: 6.8, y: 2.38, z: z * 0.995, width: 2.0, height: 1.3, depth: 0.08 });
+  }
+  soot.push({ x: 8.4, y: 2.75, z: -0.02, width: 0.1, height: 3.2, depth: 5.9 });
+  soot.push({ x: 7.35, y: 2.15, z: 0, width: 0.08, height: 2.2, depth: 4.6 });
+  addInstancedBoxes(root, materials.darkTimber, brickBands, "forge-wall-brick-relief", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.pelt, warmPanels, "forge-wall-warm-panels", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.sootBrick, soot, "forge-furnace-soot-shadow", { castShadow: false, receiveShadow: true });
 }
 
 function addForgeFurnace(root, materials) {
@@ -2426,6 +2449,10 @@ function addForgeFurnace(root, materials) {
 
   addBox(group, materials.sootBrick, 8.7, 1.25, 0, 2.35, 2.5, 4.75);
   addBox(group, materials.sootBrick, 8.2, 2.85, 0, 1.25, 1.2, 3.55);
+  addBox(group, materials.darkTimber, 7.36, 2.52, 0, 0.16, 2.45, 3.25, { castShadow: false });
+  addBox(group, materials.darkTimber, 7.28, 1.84, -1.38, 0.18, 0.18, 0.92, { castShadow: false });
+  addBox(group, materials.darkTimber, 7.28, 1.84, 1.38, 0.18, 0.18, 0.92, { castShadow: false });
+  addBox(group, materials.trimLight, 7.18, 0.44, 0, 0.12, 0.18, 3.25, { castShadow: false });
   addBox(group, materials.emberGlow, 7.46, 1.16, 0, 0.08, 1.18, 2.55, { castShadow: false });
   addBox(group, materials.hotMetal, 7.28, 0.67, -0.86, 0.4, 0.18, 0.7, { castShadow: false });
   addBox(group, materials.hotMetal, 7.23, 0.67, 0.12, 0.36, 0.18, 0.72, { castShadow: false });
@@ -2457,6 +2484,13 @@ function addForgeFurnace(root, materials) {
   chimney.position.set(8.78, 4.45, 0);
   chimney.castShadow = true;
   group.add(chimney);
+
+  addInstancedBoxes(group, materials.sootBrick, [
+    { x: 8.98, y: 0.46, z: -2.18, width: 0.85, height: 0.34, depth: 0.46, rotationY: 0.1 },
+    { x: 8.96, y: 0.43, z: 2.08, width: 0.92, height: 0.32, depth: 0.48, rotationY: -0.12 },
+    { x: 8.95, y: 3.48, z: -1.75, width: 0.72, height: 0.26, depth: 0.42, rotationY: -0.06 },
+    { x: 8.95, y: 3.56, z: 1.82, width: 0.78, height: 0.24, depth: 0.4, rotationY: 0.08 }
+  ], "forge-furnace-block-breakup", { castShadow: false, receiveShadow: true });
 
   return flames;
 }
