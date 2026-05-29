@@ -194,6 +194,82 @@ function plazaPaverTexture() {
   });
 }
 
+function woodGrainTexture(id, base, line, knot) {
+  return proceduralTexture(id, [3.6, 3.6], (ctx, width, height, random) => {
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, width, height);
+    for (let y = 0; y < height; y += 18) {
+      ctx.fillStyle = `rgba(${line[0]}, ${line[1]}, ${line[2]}, ${0.04 + random() * 0.035})`;
+      ctx.fillRect(0, y + random() * 5, width, 1 + random() * 2);
+    }
+    ctx.strokeStyle = `rgba(${line[0]}, ${line[1]}, ${line[2]}, 0.1)`;
+    ctx.lineWidth = 0.8;
+    for (let i = 0; i < 18; i++) {
+      const y = random() * height;
+      ctx.beginPath();
+      ctx.moveTo(-12, y);
+      ctx.bezierCurveTo(width * 0.28, y + random() * 16 - 8, width * 0.72, y + random() * 18 - 9, width + 12, y + random() * 12 - 6);
+      ctx.stroke();
+    }
+    for (let i = 0; i < 8; i++) {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${knot[0]}, ${knot[1]}, ${knot[2]}, ${0.05 + random() * 0.05})`;
+      ctx.ellipse(random() * width, random() * height, 8 + random() * 16, 3 + random() * 6, random() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+}
+
+function plasterWashTexture(id, base, stain) {
+  return proceduralTexture(id, [2.2, 2.2], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, base, 520, 0.04, random);
+    for (let i = 0; i < 24; i++) {
+      const x = random() * width;
+      const y = random() * height;
+      const radius = 10 + random() * 34;
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      gradient.addColorStop(0, `rgba(${stain[0]}, ${stain[1]}, ${stain[2]}, ${0.025 + random() * 0.045})`);
+      gradient.addColorStop(1, `rgba(${stain[0]}, ${stain[1]}, ${stain[2]}, 0)`);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(Math.max(0, x - radius), Math.max(0, y - radius), radius * 2, radius * 2);
+    }
+    ctx.strokeStyle = `rgba(${stain[0]}, ${stain[1]}, ${stain[2]}, 0.045)`;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 10; i++) {
+      const y = random() * height;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.bezierCurveTo(width * 0.35, y + random() * 20 - 10, width * 0.7, y + random() * 20 - 10, width, y + random() * 16 - 8);
+      ctx.stroke();
+    }
+  });
+}
+
+function arcaneFloorTexture() {
+  return proceduralTexture("magic-shop-arcane-floor", [3.2, 3.2], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#2f253b", 560, 0.045, random);
+    ctx.strokeStyle = "rgba(166, 132, 210, 0.08)";
+    ctx.lineWidth = 1.2;
+    const cell = 64;
+    for (let x = 0; x <= width; x += cell) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + random() * 8 - 4, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= height; y += cell) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y + random() * 8 - 4);
+      ctx.stroke();
+    }
+  });
+}
+
+function arcaneWallTexture() {
+  return plasterWashTexture("magic-shop-arcane-wall", "#574463", [52, 35, 68]);
+}
+
 function calmTempleMarbleTexture() {
   return proceduralTexture("temple-calm-marble-v1", [4.4, 7.2], (ctx, width, height, random) => {
     ctx.fillStyle = "#cfc8b4";
@@ -425,13 +501,13 @@ const MATERIAL_DEFINITION_LIST = [
       polygonOffsetUnits: -1
     })
   },
-  colorMaterial("town.timber", "timber", "town", "timber", 0x57351f, { roughness: 0.78 }),
-  colorMaterial("town.timber.dark", "darkTimber", "town", "timber-trim", 0x322013, { roughness: 0.82 }),
-  colorMaterial("town.trim.light", "trimLight", "town", "trim", 0xc8bb94, { roughness: 0.7 }),
+  proceduralMaterial("town.timber", "timber", "town", "timber", () => woodGrainTexture("town-timber-warm-grain", "#57351f", [64, 36, 18], [28, 14, 7]), { color: 0x9a7042, roughness: 0.82 }),
+  proceduralMaterial("town.timber.dark", "darkTimber", "town", "timber-trim", () => woodGrainTexture("town-timber-dark-grain", "#2d1b10", [78, 42, 20], [16, 8, 4]), { color: 0x6d4125, roughness: 0.86 }),
+  proceduralMaterial("town.trim.light", "trimLight", "town", "trim", () => woodGrainTexture("town-trim-worn-grain", "#b39b65", [112, 84, 42], [66, 44, 22]), { color: 0xd4c088, roughness: 0.72 }),
   colorMaterial("town.window.dark", "windowDark", "town", "window", 0x17212a, { roughness: 0.48, emissive: 0x0b151d, emissiveIntensity: 0.28 }),
-  colorMaterial("town.plaster", "plaster", "town", "plaster", 0xb9b19d, { roughness: 0.86 }),
-  colorMaterial("town.plaster.warm", "plasterWarm", "town", "plaster", 0xc6b89c, { roughness: 0.86 }),
-  colorMaterial("town.plaster.quiet", "plasterQuiet", "town", "background-plaster", 0x9fa996, { roughness: 0.92 }),
+  proceduralMaterial("town.plaster", "plaster", "town", "plaster", () => plasterWashTexture("town-plaster-cool-wash", "#b6b09e", [92, 82, 62]), { color: 0xd4cebc, roughness: 0.88 }),
+  proceduralMaterial("town.plaster.warm", "plasterWarm", "town", "plaster", () => plasterWashTexture("town-plaster-warm-wash", "#c1ae91", [111, 82, 52]), { color: 0xe0c9a9, roughness: 0.88 }),
+  proceduralMaterial("town.plaster.quiet", "plasterQuiet", "town", "background-plaster", () => plasterWashTexture("town-plaster-quiet-wash", "#9fa996", [72, 82, 62]), { color: 0xbcc6b2, roughness: 0.93 }),
   {
     id: "town.facade.plaster-timber",
     legacyKey: "plasterFacade",
@@ -497,6 +573,8 @@ const MATERIAL_DEFINITION_LIST = [
       });
     }
   },
+  proceduralMaterial("magic.arcane.floor", "arcaneFloor", "magic", "shop-floor", arcaneFloorTexture, { color: 0x4a3858, roughness: 0.82, metalness: 0.02 }),
+  proceduralMaterial("magic.arcane.wall", "arcaneWall", "magic", "shop-wall", arcaneWallTexture, { color: 0x7a5d87, roughness: 0.86 }),
   {
     id: "town.temple.glass.glow",
     legacyKey: "templeGlassGlow",

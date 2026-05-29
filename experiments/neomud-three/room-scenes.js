@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { LEVEL_PACKAGES } from "./level-packages.js";
 import { addRuntimeLightsFromBlenderLevel, buildGlbRoomRuntime } from "./glb-room-runtime.js";
-import { makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
+import { createApprovedMaterial, makeTempleMaterials, makeTownMaterials, texture } from "./render-assets.js";
 import { scaledTownSquareSpec } from "./room-specs.js";
 import { exitForPosition, triggerDebugInfo } from "./room-triggers.js";
 import { addTownKitProp } from "./components/town-kit.js";
@@ -1798,8 +1798,8 @@ function addMarketEntities(root, materials, worldRoot, world, npcs, roomItems, i
 
 function makeMagicShopMaterials() {
   return {
-    arcaneFloor: new THREE.MeshStandardMaterial({ color: 0x2b2238, roughness: 0.78, metalness: 0.02 }),
-    arcaneWall: new THREE.MeshStandardMaterial({ color: 0x4f4266, roughness: 0.82, metalness: 0 }),
+    arcaneFloor: createApprovedMaterial("magic.arcane.floor"),
+    arcaneWall: createApprovedMaterial("magic.arcane.wall"),
     velvet: new THREE.MeshStandardMaterial({ color: 0x5d1f44, roughness: 0.74, metalness: 0.02 }),
     glassCase: new THREE.MeshStandardMaterial({ color: 0xb9efff, transparent: true, opacity: 0.38, roughness: 0.18, metalness: 0.05 }),
     crystalBlue: new THREE.MeshBasicMaterial({ color: 0x8be8ff, transparent: true, opacity: 0.78 }),
