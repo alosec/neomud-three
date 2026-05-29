@@ -383,15 +383,12 @@ function handleServerMessage(message) {
         message: message.message ?? `${message.userName ?? "Player"} uses ${message.skillName ?? "skill"}.`
       };
       appendLog(lastCombatResult.message);
-      showCombatHitFeedback({
-        ...message,
-        attackerName: message.userName,
-        defenderName: message.targetName,
-        damage: message.damage,
-        defenderHp: message.targetHp,
-        defenderMaxHp: message.targetMaxHp,
-        isPlayerDefender: false
-      }, message.targetId);
+      showCombatAbilityFeedback({
+        defenderId: message.targetId,
+        label: message.skillName ?? "Skill",
+        amount: Math.max(0, Number(message.damage) || 0),
+        kind: "skill"
+      });
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     }
@@ -432,14 +429,12 @@ function handleServerMessage(message) {
       };
       appendLog(lastCombatResult.message);
       if (!message.isPlayerTarget) {
-        showCombatHitFeedback({
-          attackerName: message.casterName,
-          defenderName: message.targetName,
-          damage: amount,
-          defenderHp: message.targetNewHp,
-          defenderMaxHp: message.targetMaxHp,
-          isPlayerDefender: false
-        }, targetId);
+        showCombatAbilityFeedback({
+          defenderId: targetId,
+          label: message.spellName ?? "Spell",
+          amount,
+          kind: "spell"
+        });
       }
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
@@ -710,6 +705,15 @@ function showCombatHitFeedback(message, defenderId = "") {
       : "hit";
   renderEngine.showCombatEffect({
     position: combatFeedbackPosition(defenderId, message.isPlayerDefender),
+    text,
+    kind
+  });
+}
+
+function showCombatAbilityFeedback({ defenderId = "", label = "Ability", amount = 0, kind = "skill" } = {}) {
+  const text = amount > 0 ? `${label} -${amount}` : label;
+  renderEngine.showCombatEffect({
+    position: combatFeedbackPosition(defenderId, false),
     text,
     kind
   });

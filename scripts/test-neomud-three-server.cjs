@@ -350,6 +350,7 @@ async function main() {
         null,
         { timeout: 5_000 }
       );
+      const combatEffectsBeforeSkill = await page.evaluate(() => window.__neomudThreeDebug.effects.combat);
       await page.keyboard.press("Digit2");
       const pendingSkill = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
       assert.equal(pendingSkill?.targetId, "npc:forest_spider");
@@ -364,6 +365,10 @@ async function main() {
         },
         null,
         { timeout: 8_000 }
+      );
+      assert.ok(
+        await page.evaluate((before) => window.__neomudThreeDebug.effects.combat > before, combatEffectsBeforeSkill),
+        "expected Bash skill effect to create world-space combat feedback"
       );
       assert.match(await page.locator("#mp-value").textContent(), /^\d+\/\d+$/);
       const skillActionsAfter = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);

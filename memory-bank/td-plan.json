@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T06:28:00.000Z",
+  "updated": "2026-05-30T06:47:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-e92a",
+      "project": "NeoMud",
+      "title": "Name skill and spell feedback in world space",
+      "description": "Make skill/spell combat results readable as distinct ability events in the 3D scene instead of generic damage-only floating text.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "feedback",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "skill_effect and spell_effect now route through named ability feedback, rendering labels such as BASH -n or Smite -n with distinct skill/spell colors. Offline QA injects Smite and verifies effect count plus target HP; server-backed QA verifies live Bash creates world-space combat feedback.",
+          "created": "2026-05-30T06:47:00Z"
+        }
+      ],
+      "created": "2026-05-30T06:47:00Z",
+      "updated": "2026-05-30T06:47:00Z"
+    },
     {
       "id": "neo-d5b1",
       "project": "NeoMud",

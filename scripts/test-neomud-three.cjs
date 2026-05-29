@@ -590,6 +590,25 @@ async function main() {
     assert.equal(noManaCombatActions[1]?.spellId, "SMITE");
     assert.equal(noManaCombatActions[1]?.resourceReady, false);
     assert.equal(noManaCombatActions[1]?.resourceWarning, "Need 5 MP");
+    const combatEffectsBeforeSpell = await page.evaluate(() => window.__neomudThreeDebug.effects.combat);
+    await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
+      type: "spell_effect",
+      casterName: "Guest Adventurer",
+      targetName: "Giant Forest Spider",
+      spellName: "Smite",
+      effectAmount: 9,
+      targetNewHp: 23,
+      targetMaxHp: 32,
+      targetId: "npc:forest_spider"
+    }));
+    await page.waitForFunction(
+      (before) => window.__neomudThreeDebug.effects.combat > before,
+      combatEffectsBeforeSpell,
+      { timeout: 2_000 }
+    );
+    const spellResult = await page.evaluate(() => window.__neomudThreeDebug.server.lastCombatResult);
+    assert.match(spellResult.message, /casts Smite/i);
+    assert.deepEqual(await page.evaluate(() => window.__neomudThreeDebug.server.targetHealth["npc:forest_spider"]), { current: 23, max: 32 });
     await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
       type: "combat_hit",
       attackerName: "Guest Adventurer",

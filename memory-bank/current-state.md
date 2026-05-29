@@ -82,7 +82,9 @@ Playable Three.js lab:
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside
   HP, and offline QA verifies the MP bar/value updates when a spell result
-  drives current MP to zero.
+  drives current MP to zero. Skill/spell effects now emit named world-space
+  feedback instead of generic damage-only text, so live Bash and injected Smite
+  are readable as distinct ability events.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.

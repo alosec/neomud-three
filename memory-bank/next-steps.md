@@ -125,8 +125,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      attack/skill/spell path. Ability identity now remains stable when MP is
      too low, and debug/UI metadata exposes resource readiness plus the exact
      MP warning. The player HUD now includes a compact MP bar/value beside HP,
-     and QA verifies MP changes after spell-cast server messages. Cooldown
-     display, richer cast visuals, and multi-slot skill selection remain open.
+     and QA verifies MP changes after spell-cast server messages. Skill/spell
+     effects now produce named world-space feedback such as `BASH -n` and
+     `Smite -n` instead of generic damage-only text. Cooldown display,
+     multi-slot skill selection, and richer per-school cast visuals remain open.
      Item/loot hover parity exists for the Hidden Cave server-loot path, but
      should be audited across future authored rooms as they gain live drops.
    - Click-to-move now has first-pass visibility-graph waypoint routing over
