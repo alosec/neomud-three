@@ -381,6 +381,7 @@ function handleServerMessage(message) {
         featureName: message.featureName ?? selectedInteractable?.name ?? "Interaction",
         message: message.message ?? ""
       };
+      showInteractionFeedback(message);
       appendLog(`${lastInteractionResult.featureName}: ${lastInteractionResult.message}`);
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
@@ -584,6 +585,23 @@ function showPickupFeedback(message) {
   pickupFeedbackTimeout = window.setTimeout(() => {
     pickupFeedback.classList.add("hidden");
   }, 4200);
+}
+
+function showInteractionFeedback(message) {
+  const success = Boolean(message.success);
+  const action = actionVerbForEntity(selectedInteractable ?? {});
+  const text = success
+    ? String(action).toLowerCase() === "open"
+      ? "Opened"
+      : "Used"
+    : "No effect";
+  renderEngine.showCombatEffect({
+    position: selectedInteractable?.position
+      ? selectedInteractable.position.clone?.() ?? new THREE.Vector3(selectedInteractable.position.x ?? 0, 0, selectedInteractable.position.z ?? 0)
+      : player.position.clone(),
+    text,
+    kind: success ? "defeat" : "miss"
+  });
 }
 
 function showCombatHitFeedback(message, defenderId = "") {
@@ -2144,7 +2162,7 @@ function interactWithNearby(entity = nearbyInteractable, options = {}) {
     position: entity.position.clone?.() ?? new THREE.Vector3(entity.position.x ?? 0, 0, entity.position.z ?? 0),
     label: `${actionVerbForEntity(entity)} ${entity.name}`
   });
-  if (!entity.hostile || lastCombatResult?.targetName !== entity.name) {
+  if (!isHostileEntity(entity) || lastCombatResult?.targetName !== entity.name) {
     lastCombatResult = null;
   }
   selectedInteractable = { ...entity };
@@ -2203,7 +2221,7 @@ function sendSelectedInteractableCommand(entity) {
 
 function useCombatCommand(command) {
   const target = selectedInteractable;
-  if (!target?.hostile) return;
+  if (!target || !isHostileEntity(target)) return;
 
   if (!serverCanDriveMovement()) {
     lastCombatResult = {

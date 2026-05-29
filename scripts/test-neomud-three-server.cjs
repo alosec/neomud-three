@@ -368,6 +368,7 @@ async function main() {
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
     const beforeInteractMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
+    const beforeInteractEffects = await page.evaluate(() => window.__neomudThreeDebug.effects.combat);
     const chestClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), caveChest);
     assert.equal(chestClick.type, "interactable");
     assert.equal(chestClick.id, "cave_chest");
@@ -377,6 +378,11 @@ async function main() {
       (before) => window.__neomudThreeDebug.server.messageCount > before && window.__neomudThreeDebug.server.lastInteractionResult,
       beforeInteractMessages,
       { timeout: 5_000 }
+    );
+    await page.waitForFunction(
+      (before) => window.__neomudThreeDebug.effects.combat > before,
+      beforeInteractEffects,
+      { timeout: 2_000 }
     );
     const chestResult = await page.evaluate(() => window.__neomudThreeDebug.server.lastInteractionResult);
     assert.match(chestResult.message, /preserved|vial|gloves|untouched|doesn't seem to do anything more/i);
