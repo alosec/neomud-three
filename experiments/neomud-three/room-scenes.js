@@ -474,6 +474,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   });
   root.add(entityLayer);
   addTavernRuntimeInteriorFinish(root, materials);
+  addTavernRuntimeFurnitureFinish(root, materials);
 
   const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
     disposeObjectTree(entityLayer);
@@ -587,6 +588,60 @@ function addTavernRuntimeInteriorFinish(root, materials) {
   addInstancedBoxes(root, materials.awningBlue, blue, "tavern-runtime-wall-blue");
   addInstancedBoxes(root, materials.sign, gold, "tavern-runtime-wall-gold", { castShadow: false });
   addInstancedBoxes(root, materials.windowDark, glass, "tavern-runtime-wall-glass", { castShadow: false, receiveShadow: false });
+}
+
+function addTavernRuntimeFurnitureFinish(root, materials) {
+  const darkTimber = [];
+  const timber = [];
+  const trim = [];
+  const cloth = [];
+  const plates = [];
+  const mugs = [];
+  const candles = [];
+  const flames = [];
+
+  for (const table of TAVERN_TABLES) {
+    const anchor = { x: table.x, z: table.z, rotationY: table.rotation };
+
+    darkTimber.push(orientedBox(anchor, 0, 0.79, 0, 1.62, 0.1, 1.08));
+    timber.push(orientedBox(anchor, 0, 0.85, 0, 1.46, 0.08, 0.92));
+    cloth.push(orientedBox(anchor, 0, 0.91, 0, 0.24, 0.035, 0.8));
+
+    for (const localZ of [-0.92, 0.92]) {
+      darkTimber.push(orientedBox(anchor, 0, 0.42, localZ, 1.7, 0.22, 0.22));
+      timber.push(orientedBox(anchor, -0.64, 0.77, localZ, 0.12, 0.72, 0.16));
+      timber.push(orientedBox(anchor, 0.64, 0.77, localZ, 0.12, 0.72, 0.16));
+      timber.push(orientedBox(anchor, 0, 1.08, localZ, 1.46, 0.16, 0.14));
+      trim.push(orientedBox(anchor, 0, 1.19, localZ, 1.18, 0.05, 0.08));
+    }
+
+    for (const [localX, localZ] of [[-0.42, -0.23], [0.42, 0.22]]) {
+      const point = offsetPoint(anchor, localX, localZ);
+      plates.push({ x: point.x, y: 0.965, z: point.z, scale: [0.18, 1, 0.18], rotationY: table.rotation });
+    }
+    for (const [localX, localZ] of [[-0.52, 0.28], [0.52, -0.28]]) {
+      const point = offsetPoint(anchor, localX, localZ);
+      mugs.push({ x: point.x, y: 1.04, z: point.z, scale: [0.07, 0.15, 0.07], rotationY: table.rotation });
+    }
+    const candle = offsetPoint(anchor, 0, 0);
+    candles.push({ x: candle.x, y: 1.08, z: candle.z, scale: [0.035, 0.18, 0.035] });
+    flames.push({ x: candle.x, y: 1.28, z: candle.z, scale: [0.045, 0.11, 0.045] });
+  }
+
+  addInstancedBoxes(root, materials.darkTimber, darkTimber, "tavern-runtime-furniture-dark");
+  addInstancedBoxes(root, materials.timber, timber, "tavern-runtime-furniture-timber");
+  addInstancedBoxes(root, materials.trimLight, trim, "tavern-runtime-furniture-trim", { castShadow: false, receiveShadow: true });
+  addInstancedBoxes(root, materials.awningRed, cloth, "tavern-runtime-table-cloth", { castShadow: false, receiveShadow: true });
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 0.035, 16), materials.trimLight, plates, "tavern-runtime-table-plates", {
+    castShadow: false,
+    receiveShadow: true
+  });
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 12), materials.sign, mugs, "tavern-runtime-table-mugs");
+  addInstancedGeometry(root, new THREE.CylinderGeometry(1, 1, 1, 10), materials.trimLight, candles, "tavern-runtime-table-candles");
+  addInstancedGeometry(root, new THREE.ConeGeometry(1, 1.25, 8), materials.sign, flames, "tavern-runtime-table-flames", {
+    castShadow: false,
+    receiveShadow: false
+  });
 }
 
 export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
