@@ -467,10 +467,10 @@
       "description": "Fix the North Gate sign/label clipping into the gate structure as the gameplay camera swings. Treat this as a bounded sign-affordance pass: identify which sign or text board intersects geometry, adjust placement/depth/orientation or replace it with a more stable world affordance, and verify with Town Square fixed screenshots plus a player-camera gate view. Do not redesign all navigation in this task; preserve current exit readability.",
       "type": "task",
       "priority": 0,
-      "status": "in-progress",
-      "status_type": "started",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-1fb2",
-      "close_reason": "",
+      "close_reason": "done: converted remaining North Gate route labels to fixed mesh boards and added screenshot QA assertions that they are not billboard sprites",
       "labels": [
         "neomud-three",
         "bug",
@@ -483,10 +483,15 @@
           "id": 0,
           "body": "Implemented initial fix: exit affordance text boards are now physical oriented planes instead of camera-facing sprites, and the North Gate board was moved forward from the gate face to prevent view-swing clipping.",
           "created": "2026-05-29T14:38:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Closed the remaining North Gate sign gap: text boards now expose debug metadata, the Forest Road and Town Square labels inside town:gate render as fixed mesh planes instead of camera-facing sprites, and room-shot QA asserts both labels are non-billboard mesh boards before capturing the North Gate entry screenshot.",
+          "created": "2026-05-30T05:34:00Z"
         }
       ],
       "created": "2026-05-29T14:31:27Z",
-      "updated": "2026-05-29T14:31:27Z"
+      "updated": "2026-05-30T05:34:00Z"
     },
     {
       "id": "neo-3361",

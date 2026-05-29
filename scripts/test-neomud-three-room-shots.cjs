@@ -77,6 +77,16 @@ async function main() {
       }, anchor);
       await settleFrames(page);
 
+      if (anchor.id === "north-gate-entry") {
+        const gateBoards = await page.evaluate(() => window.__neomudThreeDebug.room.textBoards);
+        for (const label of ["Forest Road", "Town Square"]) {
+          const board = gateBoards.find((candidate) => candidate.text === label);
+          assert.ok(board, `expected North Gate physical text board ${label}, got ${JSON.stringify(gateBoards)}`);
+          assert.equal(board.type, "mesh", `expected ${label} to render as fixed mesh board, got ${JSON.stringify(board)}`);
+          assert.equal(board.billboard, false, `expected ${label} to avoid camera-facing billboard behavior, got ${JSON.stringify(board)}`);
+        }
+      }
+
       const target = path.join(qaDir, anchor.filename);
       await page.screenshot({ path: target, animations: "disabled" });
       screenshots.push({ id: anchor.id, roomId: anchor.roomId, path: target });

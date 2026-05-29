@@ -3324,6 +3324,7 @@ function installDebugApi() {
         landmarks: roomRuntime?.debugLandmarks?.() ?? [],
         entities: roomRuntime?.debugEntities?.() ?? [],
         colliders: roomRuntime?.debugColliders?.() ?? [],
+        textBoards: renderEngine.textBoards,
         nearbyInteractable: nearbyInteractable
           ? {
               id: nearbyInteractable.id,

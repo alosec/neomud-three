@@ -113,7 +113,12 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      first-line detail.
    - Authored room debug entity payloads now use a shared serializer so QA sees action type/item id/coin type/quantity consistently across rooms.
    - Hostile targets now get first-pass combat affordance treatment: red selected-target marker colors plus a compact hostile target frame/health bar in the interaction panel. Hostile panels wire `Basic Attack` to the live Kotlin protocol by sending `select_target` plus `attack_toggle`; clicking a hostile target while connected to the Kotlin server now also selects/approaches it and starts that same server attack loop automatically, while offline mode still avoids fake combat. Combat commands now track pendingCombatCommand and only reflect attackMode/selectedTargetId after server attack_mode_update confirmation. Digit/Numpad 1-4 now activate the hostile action row through the same combatActionOptions definitions used by rendered buttons, and debug selection state exposes combatActions metadata for QA/future UI work. The action row is now multi-slot and catalog-driven: offensive spells are listed before supported combat skills, so PALADIN/offline exposes both `cast:SMITE` and `skill:BASH`, while WARRIOR/server-backed exposes executable `skill:BASH` plus direction-bound `KICK` actions derived from the current room exits. Directional `KICK` uses commands like `skill:KICK:WEST` and sends the server's required `targetId:DIRECTION` payload instead of guessing a hidden default. Once engaged, the panel exposes `Stop Attack` through `attack_toggle(false)`. Server `combat_hit`, `skill_effect`, `spell_cast_result`, `spell_effect`, and `npc_died` messages now update combat result state, target HP, player MP/HP where relevant, the selected in-world HP bar, and world-space feedback. Combat authority still belongs on the server/game model.
-   - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
+   - Do not solve navigation clarity by adding more floating labels. The sign
+     clipping issue is evidence that navigation affordances should become
+     stable world objects and clickable surfaces, not camera-facing sprites
+     mounted inside geometry. Town Square exit boards and the North Gate room
+     route labels now use fixed mesh boards, with QA coverage for the North
+     Gate labels.
 
    Acceptance for the first slice:
    - A player can enter Town Square, click a reachable ground point, and watch

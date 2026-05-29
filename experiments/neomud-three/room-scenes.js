@@ -3277,7 +3277,9 @@ function addNorthGateDressing(root, materials) {
     height: 0.46,
     subtitle: "North",
     palette: "green",
-    renderOrder: 9
+    renderOrder: 9,
+    rotationY: 0,
+    billboard: false
   });
   addTextBoard(root, "Town Square", {
     x: -6.8,
@@ -3287,7 +3289,9 @@ function addNorthGateDressing(root, materials) {
     height: 0.48,
     subtitle: "South",
     palette: "gold",
-    renderOrder: 9
+    renderOrder: 9,
+    rotationY: Math.PI,
+    billboard: false
   });
 }
 

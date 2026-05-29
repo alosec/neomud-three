@@ -424,6 +424,7 @@ export function addTextBoard(root, text, spec) {
     mesh.position.set(x, y, z);
     mesh.rotation.y = rotationY;
     mesh.renderOrder = renderOrder;
+    mesh.userData.textBoard = { text, subtitle, palette, billboard: false };
     root.add(mesh);
     return mesh;
   }
@@ -439,6 +440,7 @@ export function addTextBoard(root, text, spec) {
   sprite.scale.set(width, height, 1);
   sprite.renderOrder = renderOrder;
   sprite.userData.rotationY = rotationY;
+  sprite.userData.textBoard = { text, subtitle, palette, billboard: true };
   root.add(sprite);
   return sprite;
 }

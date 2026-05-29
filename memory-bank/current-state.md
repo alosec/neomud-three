@@ -250,6 +250,7 @@ North Gate status:
 - The scene is a compact fortified gate stage with side walls, watchtowers, batched gate geometry, portcullis, arrow slits, guard booth, supply crates, banners, low-poly trees, forest threshold, and an existing forest-edge backdrop.
 - Town Guard is rendered from NeoMud NPC/world/server data as an interactable standee at the guard post.
 - The room has a tighter camera rig so the gate corridor does not clip behind the portcullis when looking toward the forest.
+- The route labels inside the room now use fixed mesh text boards instead of camera-facing sprites, and authored-room screenshot QA asserts the Forest Road and Town Square labels remain non-billboard boards before capturing the North Gate entry view.
 - Visual quality is still first-pass, especially the flat forest backdrop and simple tower massing, but it is now a playable server-authoritative room instead of a generic shell.
 
 Market Street status:

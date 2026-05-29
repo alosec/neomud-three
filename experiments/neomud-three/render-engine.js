@@ -90,6 +90,25 @@ export function createRenderEngine(canvas) {
     get roomDebug() {
       return roomDebug;
     },
+    get textBoards() {
+      const boards = [];
+      worldRoot.traverse((object) => {
+        const board = object.userData?.textBoard;
+        if (!board) return;
+        boards.push({
+          text: board.text ?? "",
+          subtitle: board.subtitle ?? "",
+          palette: board.palette ?? "",
+          billboard: Boolean(board.billboard),
+          x: object.position.x,
+          y: object.position.y,
+          z: object.position.z,
+          rotationY: object.rotation?.y ?? 0,
+          type: object.isSprite ? "sprite" : object.isMesh ? "mesh" : object.type
+        });
+      });
+      return boards;
+    },
     get cameraObstruction() {
       return cameraObstruction;
     },
