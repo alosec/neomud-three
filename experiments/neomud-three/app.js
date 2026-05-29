@@ -1129,12 +1129,14 @@ function handleGroundClick(point) {
   if (clickTarget.type === "interactable") {
     clearHoverTarget();
     setSelectionTarget(clickTarget);
-    startPendingInteraction(clickTarget.entity);
+    const autoEngage = isHostileEntity(clickTarget.entity) && serverCanDriveMovement();
+    startPendingInteraction(clickTarget.entity, { autoEngage });
     return {
       type: "interactable",
       id: clickTarget.entity.id,
       kind: clickTarget.entity.kind,
-      pending: true
+      pending: true,
+      autoEngage
     };
   }
 
@@ -1318,20 +1320,21 @@ function updateSelectionHealthBar(entity = selectedInteractable) {
   return bar.userData;
 }
 
-function startPendingInteraction(entity) {
+function startPendingInteraction(entity, options = {}) {
   if (!entity?.position) return;
   const distance = horizontalDistance(player.position, entity.position);
   if (distance <= controls.clickInteractDistance) {
     clearClickMoveTarget();
     movement.pendingInteractable = null;
     nearbyInteractable = entity;
-    interactWithNearby(entity);
+    interactWithNearby(entity, options);
     return;
   }
 
   movement.pendingInteractable = {
     id: entity.id,
     kind: entity.kind,
+    autoEngage: Boolean(options.autoEngage),
     entity: { ...entity },
     position: entity.position.clone?.() ?? new THREE.Vector3(entity.position.x ?? 0, 0, entity.position.z ?? 0)
   };
@@ -1349,7 +1352,7 @@ function updatePendingInteraction() {
   movement.pendingInteractable = null;
   clearClickMoveTarget();
   nearbyInteractable = entity;
-  interactWithNearby(entity);
+  interactWithNearby(entity, { autoEngage: Boolean(pending.autoEngage) });
 }
 
 function approachPointForInteractable(entity) {
@@ -2023,7 +2026,7 @@ function updateInteractionPrompt() {
   interactionPrompt.classList.remove("hidden");
 }
 
-function interactWithNearby(entity = nearbyInteractable) {
+function interactWithNearby(entity = nearbyInteractable, options = {}) {
   if (!entity) return;
   setSelectionTarget({
     type: "interactable",
@@ -2038,6 +2041,9 @@ function interactWithNearby(entity = nearbyInteractable) {
   lastInteractionResult = null;
   appendLog(`${selectedInteractable.prompt}.`);
   openPanel("interaction");
+  if (options.autoEngage && isHostileEntity(selectedInteractable) && serverCanDriveMovement()) {
+    useCombatCommand("attack");
+  }
   updateInteractionPrompt();
 }
 
@@ -2493,6 +2499,7 @@ function installDebugApi() {
           ? {
               id: movement.pendingInteractable.id,
               kind: movement.pendingInteractable.kind,
+              autoEngage: Boolean(movement.pendingInteractable.autoEngage),
               x: movement.pendingInteractable.position.x,
               z: movement.pendingInteractable.position.z
             }
