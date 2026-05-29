@@ -22,7 +22,7 @@ High leverage next work:
    - Current user QA: all playable rooms read too small/cramped, including Magic Shop, Town Square, Cathedral/Temple, and Tavern.
    - Treat this as footprint/camera/corridor/spacing work, not prop-detail work.
    - Acceptance should be screenshot based: avatar should have at least two clear avatar-widths in main corridors, room landmarks should not feel pressed against the camera, and each room should have more breathing room around the primary focal object.
-   - Town Square now has the first scale pass through a 1.18x horizontal spec scale. Tavern now has a source-level Blender footprint/spacing/camera pass. Next scale work should move to Temple/Cathedral through `scripts/create-neomud-three-town-temple.py`, not runtime mesh hacks.
+   - Town Square now has the first scale pass through a 1.18x horizontal spec scale. Tavern now has a source-level Blender footprint/spacing/camera pass. Temple now has a first source-level aisle breathing-room pass. Next scale work should decide whether to raise the Temple vault and/or globally pull camera rigs back per room.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.

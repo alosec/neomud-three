@@ -337,7 +337,7 @@ def sloped_panel_x3(name, x, bottom_y, z, width, height, thickness, top_offset_z
 
 
 def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
-    width = 5.05
+    width = 4.65
     seat_depth = 0.98
     side_profile = [
         (-0.56, 0.0),
@@ -687,8 +687,8 @@ def build_level():
     )
 
     # Pews and runner.
-    cube3("VIS_dawn_runner", 0, 0.018, -8.6, 3.1, 0.04, 43.0, cloth, semantic="center_runner")
-    for side_x, side_name in [(-4.25, "west"), (4.25, "east")]:
+    cube3("VIS_dawn_runner", 0, 0.018, -8.6, 2.45, 0.04, 43.0, cloth, semantic="center_runner")
+    for side_x, side_name in [(-5.1, "west"), (5.1, "east")]:
         for index, z in enumerate([-27.5, -22.5, -17.5, -12.5, -7.5, -2.5, 2.5, 7.5], start=1):
             add_cathedral_pew(f"{side_name}_{index:02d}", side_x, z, wood_dark, wood, wood_highlight)
 
