@@ -481,6 +481,8 @@ async function main() {
     const chestActionButton = page.locator('[data-interact-feature="cave_chest"]');
     await chestActionButton.waitFor({ timeout: 2_000 });
     assert.equal(await chestActionButton.isDisabled(), false);
+    assert.equal(await chestActionButton.locator("kbd").textContent(), "1");
+    assert.match(await chestActionButton.textContent(), /1\s*Open/);
     await page.keyboard.press("Digit1");
     const chestActionState = await page.evaluate(() => ({
       pending: window.__neomudThreeDebug.server.pendingInteractionAction,

@@ -100,7 +100,8 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Non-hostile interaction panels now support `Digit/Numpad 1` as the primary
      selected action hotkey for `Open` / `Pick up` / `Use`, reusing the same
      `useSelectedInteractable` server-authoritative command path and preserving
-     hostile combat hotkeys.
+     hostile combat hotkeys. The panel button visibly shows the `1` keycap so
+     the accelerator is discoverable in the same place as the action.
    - General server/tutorial/presence messages now have a focused HUD event
      toast instead of disappearing into the log only. Offline QA injects
      `system_message` and `tutorial` messages and verifies the visible title and

@@ -881,11 +881,32 @@ p {
 }
 
 .panel-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   min-height: 32px;
   border: 1px solid rgba(204, 168, 85, 0.42);
   color: #f3e5ba;
   background: rgba(60, 39, 19, 0.9);
   cursor: pointer;
+}
+
+.panel-actions button:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+
+.panel-actions kbd {
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 1px solid rgba(244, 206, 120, 0.42);
+  color: #fff4c7;
+  background: rgba(20, 13, 7, 0.86);
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .log-line {

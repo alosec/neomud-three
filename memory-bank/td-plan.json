@@ -1,11 +1,40 @@
 {
-  "updated": "2026-05-29T20:45:00.000Z",
+  "updated": "2026-05-29T20:58:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-d9fd",
+      "project": "NeoMud",
+      "title": "Show primary world-action hotkey in panels",
+      "description": "Make the new primary non-hostile interaction hotkey discoverable by rendering a compact 1 keycap inside the Open/Pick up/Use action button and verifying it in offline and live QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "ui",
+        "hotkeys",
+        "interaction",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "The primary non-hostile interaction button now renders a compact 1 keycap next to its action label, including disabled offline states like Open unavailable. Shared panel-action CSS styles the keycap without affecting combat hotkeys. Offline and server-backed QA assert the keycap and action text on the Hidden Cave chest button.",
+          "created": "2026-05-29T20:58:00Z"
+        }
+      ],
+      "created": "2026-05-29T20:58:00Z",
+      "updated": "2026-05-29T20:58:00Z"
+    },
     {
       "id": "neo-b5aa",
       "project": "NeoMud",

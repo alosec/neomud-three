@@ -2365,6 +2365,10 @@ function interactionPanel() {
     : pendingAction
       ? "Working..."
       : serverActionLabel(entity);
+  const buttonLabel = canUseServerAction || entity.actionConsumed || pendingAction ? actionLabel : `${actionLabel} unavailable`;
+  const primaryActionButton = hasServerAction
+    ? `<button class="primary-world-action" type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}><kbd>1</kbd><span>${escapeHtml(buttonLabel)}</span></button>`
+    : "";
   const actionResult = lastInteractionResult
     ? `
       <div class="list-card">
@@ -2386,9 +2390,7 @@ function interactionPanel() {
       ${actionResult}
     </div>
     <div class="panel-actions">
-      ${hasServerAction
-        ? `<button type="button" data-interact-feature="${escapeHtml(entity.id)}"${canUseServerAction ? "" : " disabled"}>${canUseServerAction || entity.actionConsumed || pendingAction ? escapeHtml(actionLabel) : escapeHtml(`${actionLabel} unavailable`)}</button>`
-        : ""}
+      ${primaryActionButton}
       <button type="button" data-panel-target="log">Open log</button>
       <button type="button" data-panel-target="map">Map</button>
     </div>

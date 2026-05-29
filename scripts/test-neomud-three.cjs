@@ -739,7 +739,8 @@ async function main() {
     assert.equal(chestSelection.actionBadgeType, "TREASURE_DROP");
     assert.equal(chestSelection.healthBarVisible, false);
     assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), true);
-    assert.equal(await page.locator('[data-interact-feature="cave_chest"]').textContent(), "Open unavailable");
+    assert.equal(await page.locator('[data-interact-feature="cave_chest"] kbd').textContent(), "1");
+    assert.match(await page.locator('[data-interact-feature="cave_chest"]').textContent(), /1\s*Open unavailable/);
     await page.keyboard.press("Digit1");
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.pendingInteractionAction), null);
     assert.match(await page.locator("#panel-content").textContent(), /Server action requires a live Kotlin server session|preserved|vial|gloves|untouched/i);

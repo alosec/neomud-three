@@ -92,7 +92,9 @@ Playable Three.js lab:
   `Digit/Numpad 1` invokes the selected `Open` / `Pick up` / `Use` action
   through the existing `useSelectedInteractable` command path when the
   interaction panel is open, while offline mode still refuses to fake server
-  actions.
+  actions. The corresponding panel action button now renders a compact `1`
+  keycap beside the action label, including disabled offline states such as
+  `Open unavailable`.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside
