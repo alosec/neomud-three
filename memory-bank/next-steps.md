@@ -34,7 +34,13 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - User clarified that the desired game feel is not primarily third-person chase movement. The better target is a Diablo-like elevated camera with click-to-move, click-to-interact, click exits/NPCs/items, and readable action-RPG room flow.
    - StarCraft II and Dota are useful references for bird-eye camera clarity, but Diablo is the closer mechanics reference because NeoMud Three has one controllable character moving through authored rooms.
    - Preserve the MUD/server authority boundary: click actions should route through the same command path as keyboard movement, physical triggers, DOM interactions, and server-backed room/item/NPC messages.
-   - First visual-mode slice exists: the HUD now supports `Platform` and `Iso` camera modes. Platform preserves the behind-character/pointer-lock camera; Iso provides the first elevated action-RPG camera and keeps the cursor visible.
+   - Visual mode is now an explicit product option, not a temporary branch:
+     `Platform` is the behind-character/pointer-lock platformer POV, and `Iso`
+     is the top-down/bird's-eye action-RPG POV. Preserve both modes in camera,
+     input, screenshot QA, and debug state unless a future task explicitly
+     removes one with evidence. `Iso` is the strategic default direction for
+     Diablo-like gameplay; `Platform` remains valuable for traversal and
+     representational review from behind the avatar.
    - First click slice exists: Iso mode raycasts canvas clicks to the ground plane, checks nearby interactables and exit trigger volumes, clamps movement targets through the current room runtime, shows a destination marker, and steers the avatar toward the clicked point. Keyboard movement cancels the click target.
    - Click-and-hold movement now exists for open ground in Iso mode: holding the primary pointer continuously updates the destination marker until release, which better matches Diablo-like movement.
    - Iso mode now has bounded mouse-wheel zoom for player comfort and QA review, without changing room art or server authority.

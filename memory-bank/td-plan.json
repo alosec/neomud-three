@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T17:55:00.000Z",
+  "updated": "2026-05-29T18:10:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -141,6 +141,34 @@
       ],
       "created": "2026-05-29T14:31:20Z",
       "updated": "2026-05-29T17:55:00Z"
+    },
+    {
+      "id": "neo-61d4",
+      "project": "NeoMud",
+      "title": "Preserve Platform and Iso as explicit visual mode options",
+      "description": "Codify and maintain two supported visual modes for NeoMud Three: Platform as the behind-character/pointer-lock platformer POV, and Iso as the top-down bird eye/action-RPG POV. Future input, camera, QA screenshots, and debug state should cover both modes. Iso remains the strategic direction for Diablo-like click-first play, but Platform should stay available for traversal review unless intentionally removed with evidence.",
+      "type": "task",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-1fb2",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "camera",
+        "input",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User clarified visual mode requirement: keep both a platformer-style behind-character POV and a top-down/bird eye POV as explicit options. This should be treated as product surface, not a temporary experiment.",
+          "created": "2026-05-29T18:10:00Z"
+        }
+      ],
+      "created": "2026-05-29T18:10:00Z",
+      "updated": "2026-05-29T18:10:00Z"
     },
     {
       "id": "neo-1fb2",

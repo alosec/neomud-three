@@ -20,9 +20,13 @@ Playable Three.js lab:
 - By default, the lab connects to the Kotlin/JVM NeoMud server at `ws://127.0.0.1:8080/game`, logs in as an ephemeral guest, and treats `room_info` / `move_ok` as the authoritative room state.
 - `?offline=1` disables the server path and uses the static room graph fallback.
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
-- The main client now has two visual modes: `Platform`, the existing
-  behind-character/pointer-lock camera, and `Iso`, the first elevated
-  action-RPG camera option for the Diablo-like control direction. Iso mode now
+- The main client intentionally supports two visual modes, not one discarded
+  prototype camera: `Platform`, the behind-character/pointer-lock platformer
+  POV, and `Iso`, the elevated bird's-eye/action-RPG POV. The product direction
+  is `Iso` for Diablo-like click-first play, while `Platform` remains a useful
+  visual/debug/playability option for behind-the-character traversal review.
+  Future camera work should preserve both modes unless a task explicitly removes
+  one with QA evidence. Iso mode now
   has the first click-to-move slice: canvas clicks raycast to the ground plane,
   show a destination marker, and steer the avatar toward the target while
   preserving keyboard movement as fallback. The ground-click path also checks
