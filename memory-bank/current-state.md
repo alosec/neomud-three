@@ -33,7 +33,9 @@ Playable Three.js lab:
   a small world marker and a concise DOM prompt, clicked interactables get a
   persistent selected-target ring while the interaction panel is open, and
   screenshot QA now verifies Old Wren hover/selection plus North Gate hover
-  before click routing.
+  before click routing. Hover/proximity action language now respects entity
+  semantics: normal NPCs read as `Talk to`, loot reads as `Pick up`, generic
+  objects read as `Inspect`, and hostile forest entities read as `Engage`.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.

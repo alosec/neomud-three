@@ -8,6 +8,8 @@ Implemented:
 - Added a lightweight world hover marker and `Click ...` DOM prompt for NPCs/items/exits.
 - Added a persistent selected-target ring for clicked interactables while the interaction panel is open.
 - Added isometric cursor state for hoverable NPC/item/exit targets.
+- Tightened target action language so prompts use entity semantics: `Talk to`,
+  `Engage`, `Inspect`, or `Pick up` instead of treating every NPC as talkable.
 - Cleared hover state on pointer leave, click commit, room switch, and debug player placement so stale affordances do not leak between rooms.
 - Exposed hover helpers through `window.__neomudThreeDebug` for screenshot QA.
 
@@ -25,6 +27,7 @@ Evidence:
 - `qa/latest/town-shot-isometric-selection-target.png` shows the selected Old Wren target ring while the interaction panel is open.
 - Town Square screenshot QA verifies Old Wren hover before click-interact and North Gate hover before click-exit routing.
 - The Town Square QA budget remains under gate at `232/240` draw calls with the selection marker visible.
+- Offline smoke QA verifies hostile Forest Rat and Shadow Wolf hover/proximity prompts read as `Engage`.
 
 Remaining gap:
 

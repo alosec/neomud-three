@@ -761,7 +761,7 @@ function classifyGroundPoint(point) {
       type: "interactable",
       entity,
       position: entity.position.clone?.() ?? target,
-      label: `${actionLabelForEntity(entity)} ${entity.name}`
+      label: `${actionVerbForEntity(entity)} ${entity.name}`
     };
   }
 
@@ -785,9 +785,13 @@ function classifyGroundPoint(point) {
   };
 }
 
-function actionLabelForEntity(entity) {
-  if (entity.kind === "npc") return "Talk to";
+function actionVerbForEntity(entity) {
   if (entity.actionType === "PICKUP_ITEM" || entity.actionType === "PICKUP_COINS") return "Pick up";
+  const promptVerb = String(entity.prompt ?? "").split(":")[0]?.trim().toLowerCase();
+  if (promptVerb === "engage") return "Engage";
+  if (promptVerb === "talk") return "Talk to";
+  if (promptVerb === "inspect") return "Inspect";
+  if (entity.kind === "npc") return "Talk to";
   return "Inspect";
 }
 
@@ -1315,11 +1319,7 @@ function updateInteractionPrompt() {
     return;
   }
 
-  const action = nearbyInteractable.kind === "npc"
-    ? "Talk"
-    : nearbyInteractable.actionType === "PICKUP_ITEM" || nearbyInteractable.actionType === "PICKUP_COINS"
-      ? "Pick up"
-      : "Inspect";
+  const action = actionVerbForEntity(nearbyInteractable);
   interactionPrompt.textContent = `F ${action} ${nearbyInteractable.name}`;
   interactionPrompt.classList.remove("hidden");
 }

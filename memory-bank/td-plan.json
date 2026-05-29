@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T16:05:00.000Z",
+  "updated": "2026-05-29T16:18:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -87,10 +87,15 @@
           "id": 6,
           "body": "Selection affordance slice added: clicking an interactable in Iso mode now leaves a selected-target world ring while the interaction panel is open, and body cursor state changes on hoverable NPC/item/exit targets. Town Square screenshot QA now captures isometric-selection-target and budget remains within the 240-call gate.",
           "created": "2026-05-29T16:05:00Z"
+        },
+        {
+          "id": 7,
+          "body": "Target prompt semantics tightened: hover/proximity labels now use entity prompt/action data so normal NPCs read Talk to, hostiles read Engage, objects read Inspect, and loot reads Pick up. Offline smoke QA now asserts Forest Rat and Shadow Wolf hover/proximity labels read as Engage.",
+          "created": "2026-05-29T16:18:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T16:05:00Z"
+      "updated": "2026-05-29T16:18:00Z"
     },
     {
       "id": "neo-1fb2",

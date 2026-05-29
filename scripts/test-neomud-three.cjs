@@ -452,13 +452,16 @@ async function main() {
     assertRenderBudget(assert, "forest:edge", budgetReports.at(-1).stats);
 
     const forestRat = forestEntities.find((entity) => entity.id === "npc:forest_rat");
+    const forestRatHover = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.hoverGround({ x, z }), forestRat);
+    assert.equal(forestRatHover.label, "Engage Forest Rat");
+    await page.evaluate(() => window.__neomudThreeDebug.clearHover());
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), forestRat);
     await page.waitForFunction(
       () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:forest_rat",
       null,
       { timeout: 2_000 }
     );
-    assert.match(await page.locator("#interaction-prompt").textContent(), /Forest Rat/);
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Engage Forest Rat/);
     await page.keyboard.press("f");
     assert.equal(await page.locator("#panel-title").textContent(), "Forest Rat");
     await page.keyboard.press("Escape");
@@ -495,13 +498,16 @@ async function main() {
     assertRenderBudget(assert, "forest:path", budgetReports.at(-1).stats);
 
     const shadowWolf = forestPathEntities.find((entity) => entity.id === "npc:shadow_wolf");
+    const shadowWolfHover = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.hoverGround({ x, z }), shadowWolf);
+    assert.equal(shadowWolfHover.label, "Engage Shadow Wolf");
+    await page.evaluate(() => window.__neomudThreeDebug.clearHover());
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), shadowWolf);
     await page.waitForFunction(
       () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "npc:shadow_wolf",
       null,
       { timeout: 2_000 }
     );
-    assert.match(await page.locator("#interaction-prompt").textContent(), /Shadow Wolf/);
+    assert.match(await page.locator("#interaction-prompt").textContent(), /Engage Shadow Wolf/);
     await page.keyboard.press("f");
     assert.equal(await page.locator("#panel-title").textContent(), "Shadow Wolf");
     await page.keyboard.press("Escape");
