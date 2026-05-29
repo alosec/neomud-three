@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T00:22:00.000Z",
+  "updated": "2026-05-30T00:40:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -235,10 +235,15 @@
           "id": 4,
           "body": "Follow-up hardening: clickMove debug now exposes the full waypoint path and a pathClear boolean, and Town Square QA asserts every fountain detour segment clears colliders plus contains an explicit detour waypoint before arrival.",
           "created": "2026-05-30T00:22:00Z"
+        },
+        {
+          "id": 5,
+          "body": "Click route following now auto-runs in Iso mode and includes a small stuck/repath guard: if the avatar stops making progress because collision clamping pins it, the client recomputes a route from the current position to the final click target. Town Square QA checks the fountain detour is collision-clear, uses Run animation, and makes prompt progress before final arrival.",
+          "created": "2026-05-30T00:40:00Z"
         }
       ],
       "created": "2026-05-29T19:32:00Z",
-      "updated": "2026-05-30T00:22:00Z"
+      "updated": "2026-05-30T00:40:00Z"
     },
     {
       "id": "neo-2a6f",

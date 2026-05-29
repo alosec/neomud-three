@@ -115,8 +115,10 @@ const controls = {
   jumpVelocity: 5.2,
   gravity: 14.5,
   maxAirControl: 0.55,
+  clickAutoRun: true,
   clickArriveDistance: 0.38,
   clickWaypointLookahead: 1.45,
+  clickStuckRepathDelay: 0.55,
   clickInteractDistance: 2.12
 };
 
@@ -140,6 +142,7 @@ const movement = {
   clickTarget: null,
   clickPath: [],
   clickPathIndex: 0,
+  clickStuckTime: 0,
   clickTargetMarker: null,
   hoverTarget: null,
   hoverMarker: null,
@@ -896,6 +899,7 @@ function setClickMoveTarget(point) {
   roomRuntime?.clamp?.(target);
   movement.clickPath = routeClickPath(player.position, target);
   movement.clickPathIndex = 0;
+  movement.clickStuckTime = 0;
   movement.clickTarget = movement.clickPath[0] ?? target;
   movement.pendingInteractable = pendingInteractable;
   ensureClickTargetMarker().position.copy(target).setY(0.055);
@@ -1416,6 +1420,7 @@ function clearClickMoveTarget() {
   movement.clickTarget = null;
   movement.clickPath = [];
   movement.clickPathIndex = 0;
+  movement.clickStuckTime = 0;
   movement.pendingInteractable = null;
   clearHoldMove();
   if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
@@ -2275,11 +2280,13 @@ function updatePlayer(dt) {
   if (desired.lengthSq() > 1) desired.normalize();
 
   const hasMoveIntent = desired.lengthSq() > 0;
-  const targetSpeed = running && (cameraMode === "isometric" ? hasMoveIntent : forwardInput > 0) ? controls.runSpeed : controls.walkSpeed;
+  const clickMoveRunning = Boolean(desiredClickDirection && controls.clickAutoRun);
+  const targetSpeed = (clickMoveRunning || (running && (cameraMode === "isometric" ? hasMoveIntent : forwardInput > 0))) ? controls.runSpeed : controls.walkSpeed;
   const airControl = movement.grounded ? 1 : controls.maxAirControl;
   const blend = (1 - Math.pow(hasMoveIntent ? controls.acceleration : controls.braking, dt)) * airControl;
   movement.velocity.lerp(desired.multiplyScalar(targetSpeed), blend);
 
+  const previousPosition = player.position.clone();
   const nextPosition = player.position.clone().addScaledVector(movement.velocity, dt);
   const previousGroundY = Math.max(0, player.position.y);
   if (movement.jumpQueued && movement.grounded) {
@@ -2298,6 +2305,7 @@ function updatePlayer(dt) {
   movement.velocity.x = nextPosition.x === player.position.x ? 0 : movement.velocity.x;
   movement.velocity.z = nextPosition.z === player.position.z ? 0 : movement.velocity.z;
   player.position.copy(nextPosition);
+  updateClickMoveProgress(dt, previousPosition, desiredClickDirection);
 
   const horizontalSpeed = movement.velocity.length();
   movement.walkClock += horizontalSpeed * dt * 4.4;
@@ -2321,7 +2329,7 @@ function updatePlayer(dt) {
   }
   updateSelectionHealthBar();
   updateTargetObjectHighlight();
-  movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
+  movement.running = (clickMoveRunning || running) && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
   if (isoOrbitInput) {
@@ -2353,7 +2361,32 @@ function advanceClickWaypointIfVisible() {
   const nextTarget = movement.clickPath[movement.clickPathIndex + 1];
   if (!nextTarget || firstBlockingClickCollider(player.position, nextTarget)) return;
   movement.clickPathIndex += 1;
+  movement.clickStuckTime = 0;
   movement.clickTarget = nextTarget;
+}
+
+function updateClickMoveProgress(dt, previousPosition, desiredClickDirection) {
+  if (!movement.clickTarget || !desiredClickDirection) {
+    movement.clickStuckTime = 0;
+    return;
+  }
+  const moved = Math.hypot(player.position.x - previousPosition.x, player.position.z - previousPosition.z);
+  movement.clickStuckTime = moved < 0.015 ? movement.clickStuckTime + dt : 0;
+  if (movement.clickStuckTime < controls.clickStuckRepathDelay) return;
+  const finalTarget = movement.clickPath.at(-1)?.clone();
+  if (!finalTarget) {
+    movement.clickStuckTime = 0;
+    return;
+  }
+  const reroutedPath = routeClickPath(player.position, finalTarget);
+  if (!reroutedPath.length) {
+    movement.clickStuckTime = 0;
+    return;
+  }
+  movement.clickPath = reroutedPath;
+  movement.clickPathIndex = 0;
+  movement.clickTarget = movement.clickPath[0] ?? null;
+  movement.clickStuckTime = 0;
 }
 
 function updateCamera(dt, snap = false) {
@@ -2452,6 +2485,8 @@ function installDebugApi() {
         pathIndex: movement.clickPathIndex,
         pathClear: clickPathSegmentsClear(),
         path: movement.clickPath.map((point) => ({ x: point.x, y: point.y, z: point.z })),
+        stuckTime: movement.clickStuckTime,
+        autoRun: controls.clickAutoRun,
         markerVisible: Boolean(movement.clickTargetMarker?.visible),
         holdActive: movement.holdMoveActive,
         pendingInteraction: movement.pendingInteractable

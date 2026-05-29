@@ -196,7 +196,25 @@ async function main() {
       routedMove.path.some((point) => Math.abs(point.x) > 2.1 || Math.abs(point.z) > 2.1),
       `expected route to contain an explicit detour waypoint outside the fountain footprint: ${JSON.stringify(routedMove.path)}`
     );
-    await page.waitForTimeout(6500);
+    await page.waitForTimeout(1200);
+    const routeProgress = await page.evaluate(() => {
+      const player = window.__neomudThreeDebug.player;
+      const clickMove = window.__neomudThreeDebug.clickMove;
+      const finalTarget = clickMove.finalTarget;
+      return {
+        player,
+        clickMove,
+        avatar: window.__neomudThreeDebug.avatar,
+        distanceToFinal: Math.hypot(player.x - finalTarget.x, player.z - finalTarget.z)
+      };
+    });
+    assert.equal(routeProgress.clickMove.autoRun, true);
+    assert.equal(routeProgress.avatar.activeAnimation, "Run");
+    assert.ok(
+      routeProgress.distanceToFinal < 13.5 && routeProgress.clickMove.active,
+      `expected click route to make prompt running progress before final arrival, got ${JSON.stringify(routeProgress)}`
+    );
+    await page.waitForTimeout(5300);
     const routedAfter = await page.evaluate(() => ({
       player: window.__neomudThreeDebug.player,
       clickMove: window.__neomudThreeDebug.clickMove
@@ -244,15 +262,17 @@ async function main() {
 
     const beforeClick = await page.evaluate(() => window.__neomudThreeDebug.player);
     await page.mouse.click(760, 525);
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(250);
     const afterClick = await page.evaluate(() => ({
       player: window.__neomudThreeDebug.player,
       clickMove: window.__neomudThreeDebug.clickMove
     }));
     assert.ok(afterClick.clickMove.markerVisible, `expected visible click destination marker: ${JSON.stringify(afterClick)}`);
+    await page.waitForTimeout(450);
+    const afterClickMovement = await page.evaluate(() => window.__neomudThreeDebug.player);
     assert.ok(
-      Math.hypot(afterClick.player.x - beforeClick.x, afterClick.player.z - beforeClick.z) > 0.6,
-      `expected real pointer click to move avatar in Iso mode: ${JSON.stringify({ beforeClick, afterClick })}`
+      Math.hypot(afterClickMovement.x - beforeClick.x, afterClickMovement.z - beforeClick.z) > 0.6,
+      `expected real pointer click to move avatar in Iso mode: ${JSON.stringify({ beforeClick, afterClick, afterClickMovement })}`
     );
     const clickTarget = path.join(qaDir, "town-shot-isometric-click-target.png");
     await page.screenshot({ path: clickTarget, animations: "disabled" });
