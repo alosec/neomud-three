@@ -1489,6 +1489,7 @@ function addMarketStage(root, materials, worldRoot) {
   });
 
   addMarketShopfronts(root, materials);
+  addMarketRoofline(root, materials);
   addMarketStalls(root, materials);
   addMarketThresholds(root, materials);
   addMarketOverheadDressing(root, materials);
@@ -1525,22 +1526,27 @@ function addMarketShopfronts(root, materials) {
     ["awningRed", []]
   ]);
   const windows = [];
+  const upperWindows = [];
 
   for (const side of [-1, 1]) {
     const z = side * 8.25;
     const frontZ = side * 7.38;
-    plaster.push({ x: -12.2, y: 2.15, z, width: 7.6, height: 4.3, depth: 1.18 });
-    plaster.push({ x: -3.6, y: 2.42, z, width: 7.4, height: 4.84, depth: 1.18 });
-    plaster.push({ x: 5.0, y: 2.22, z, width: 7.8, height: 4.44, depth: 1.18 });
+    plaster.push({ x: -12.2, y: 2.46, z, width: 7.6, height: 4.92, depth: 1.18 });
+    plaster.push({ x: -3.6, y: 2.84, z, width: 7.4, height: 5.68, depth: 1.18 });
+    plaster.push({ x: 5.0, y: 2.58, z, width: 7.8, height: 5.16, depth: 1.18 });
 
     for (const x of [-15.8, -8.7, -7.1, -0.2, 1.4, 8.7]) {
-      timber.push({ x, y: 2.28, z: frontZ, width: 0.16, height: 4.55, depth: 0.16 });
+      timber.push({ x, y: 2.62, z: frontZ, width: 0.16, height: 5.24, depth: 0.16 });
     }
-    for (const x of [-12.2, -3.6, 5.0]) {
+    for (const [index, x] of [-12.2, -3.6, 5.0].entries()) {
+      const topY = index === 1 ? 5.72 : index === 0 ? 4.98 : 5.18;
       timber.push({ x, y: 0.18, z: frontZ, width: 7.95, height: 0.24, depth: 0.2 });
-      timber.push({ x, y: 4.42, z: frontZ, width: 7.95, height: 0.2, depth: 0.18 });
+      timber.push({ x, y: topY, z: frontZ, width: 7.95, height: 0.22, depth: 0.2 });
+      timber.push({ x, y: 3.82, z: frontZ, width: 7.45, height: 0.14, depth: 0.16 });
       windows.push({ x: x - 1.55, y: 2.72, z: frontZ - side * 0.06, width: 0.76, height: 0.86, depth: 0.08 });
       windows.push({ x: x + 1.55, y: 2.72, z: frontZ - side * 0.06, width: 0.76, height: 0.86, depth: 0.08 });
+      upperWindows.push({ x: x - 1.2, y: 4.54, z: frontZ - side * 0.065, width: 0.58, height: 0.74, depth: 0.08 });
+      upperWindows.push({ x: x + 1.2, y: 4.54, z: frontZ - side * 0.065, width: 0.58, height: 0.74, depth: 0.08 });
     }
 
     awnings.get(side < 0 ? "awningBlue" : "awningGold").push({ x: -11.8, y: 1.62, z: side * 6.84, width: 5.6, height: 0.18, depth: 1.15 });
@@ -1555,9 +1561,47 @@ function addMarketShopfronts(root, materials) {
   addInstancedBoxes(root, materials.trimLight, trim, "market-shopfront-trim");
   addInstancedBoxes(root, materials.darkStone, dark, "market-shopfront-curbs", { castShadow: false });
   addInstancedBoxes(root, materials.windowDark, windows, "market-shopfront-windows", { castShadow: false, receiveShadow: false });
+  addInstancedBoxes(root, materials.windowDark, upperWindows, "market-shopfront-upper-windows", { castShadow: false, receiveShadow: false });
   for (const [materialKey, boxes] of awnings) {
     addInstancedBoxes(root, material(materials, materialKey), boxes, `market-shopfront-awning-${materialKey}`);
   }
+}
+
+function addMarketRoofline(root, materials) {
+  const roofsByMaterial = new Map([
+    ["roofRed", []],
+    ["roof", []],
+    ["roofQuiet", []]
+  ]);
+  const trim = [];
+  const stone = [];
+  const dark = [];
+
+  for (const side of [-1, 1]) {
+    const z = side * 8.78;
+    roofsByMaterial.get("roofRed").push({ x: -12.2, y: 5.42, z, width: 8.6, height: 0.7, depth: 2.1, rotationZ: side * 0.02 });
+    roofsByMaterial.get("roof").push({ x: -3.6, y: 6.1, z, width: 8.4, height: 0.82, depth: 2.2, rotationZ: -side * 0.018 });
+    roofsByMaterial.get("roofQuiet").push({ x: 5.0, y: 5.62, z, width: 8.8, height: 0.72, depth: 2.1, rotationZ: side * 0.016 });
+    for (const x of [-16.5, -7.9, 0.6, 9.1]) {
+      trim.push({ x, y: 5.18, z: side * 7.25, width: 0.18, height: 0.52, depth: 0.2 });
+    }
+    trim.push({ x: -12.2, y: 5.02, z: side * 7.2, width: 7.8, height: 0.18, depth: 0.2 });
+    trim.push({ x: -3.6, y: 5.72, z: side * 7.2, width: 7.6, height: 0.18, depth: 0.2 });
+    trim.push({ x: 5.0, y: 5.22, z: side * 7.2, width: 8.0, height: 0.18, depth: 0.2 });
+  }
+
+  stone.push({ x: 16.05, y: 2.7, z: -4.65, width: 0.72, height: 5.4, depth: 0.72 });
+  stone.push({ x: 16.05, y: 2.7, z: 4.65, width: 0.72, height: 5.4, depth: 0.72 });
+  stone.push({ x: 16.12, y: 5.58, z: 0, width: 0.82, height: 0.68, depth: 9.7 });
+  dark.push({ x: 15.78, y: 1.62, z: 0, width: 0.22, height: 3.24, depth: 2.9 });
+  trim.push({ x: 15.72, y: 5.95, z: 0, width: 0.24, height: 0.2, depth: 10.1 });
+
+  for (const [materialKey, roofs] of roofsByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), roofs, `market-roofline-${materialKey}`);
+  }
+  addInstancedBoxes(root, materials.trimLight, trim, "market-roofline-trim");
+  addInstancedBoxes(root, materials.stone, stone, "market-east-terminus-stone");
+  addInstancedBoxes(root, materials.portalDark, dark, "market-east-terminus-shadow", { castShadow: false, receiveShadow: false });
 }
 
 function addMarketStalls(root, materials) {
