@@ -7547,7 +7547,15 @@ function townCollidersFromSpec(spec) {
     colliders.push({ id: `notice-board-${index + 1}`, center: [board.x, board.z], size: [2.2, 0.65] });
   }
   for (const [index, cart] of (spec.props?.marketCarts ?? []).entries()) {
-    colliders.push({ id: `market-cart-${index + 1}`, center: [cart.x, cart.z], size: [2.65, 1.7] });
+    colliders.push({ id: `market-cart-${index + 1}`, center: [cart.x, cart.z], size: [3.15, 2.05] });
+  }
+  const market = (spec.landmarks ?? []).find((landmark) => landmark.kind === "market-hall");
+  for (const [index, stall] of (market?.stalls ?? []).entries()) {
+    colliders.push({
+      id: `market-stall-${index + 1}`,
+      center: [stall.x, stall.z],
+      size: [stall.width ?? 3.0, (stall.depth ?? 1.5) + 0.55]
+    });
   }
   for (const [index, stack] of (spec.props?.firewoodStacks ?? []).entries()) {
     colliders.push({ id: `firewood-stack-${index + 1}`, center: [stack.x, stack.z], size: [1.75, 0.85] });

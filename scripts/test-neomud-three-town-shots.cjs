@@ -449,6 +449,15 @@ async function main() {
       tavernTrigger.trigger.center[0] > -18.5,
       `expected Tavern trigger to sit at the visible doorway side instead of inside the building: ${JSON.stringify(tavernTrigger)}`
     );
+    const marketColliders = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.colliders.filter((collider) =>
+        collider.id.startsWith("market-cart-") || collider.id.startsWith("market-stall-")
+      )
+    );
+    assert.ok(
+      marketColliders.length >= 4,
+      `expected Market frontage carts and stalls to expose collision coverage: ${JSON.stringify(marketColliders)}`
+    );
     const gateTrigger = await page.evaluate(() =>
       window.__neomudThreeDebug.room.triggers.find((trigger) => trigger.id === "exit-north-gate")
     );
