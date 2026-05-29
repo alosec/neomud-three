@@ -269,7 +269,18 @@ export function addNpcStandee(root, materials, spec) {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
   group.rotation.y = rotationY;
-  group.userData = { kind: "npc", id, name, role };
+  group.userData = {
+    kind: "npc",
+    id,
+    name,
+    role,
+    interactableAffordance: {
+      entityId: id,
+      label: name,
+      position: new THREE.Vector3(x, 0, z),
+      maxDistance: 1.8
+    }
+  };
   root.add(group);
 
   const pad = new THREE.Mesh(
@@ -343,7 +354,18 @@ export function addItemMarker(root, materials, spec) {
 
   const group = new THREE.Group();
   group.position.set(x, 0, z);
-  group.userData = { kind: "item", id, name, quantity };
+  group.userData = {
+    kind: "item",
+    id,
+    name,
+    quantity,
+    interactableAffordance: {
+      entityId: id,
+      label: name,
+      position: new THREE.Vector3(x, 0, z),
+      maxDistance: 1.45
+    }
+  };
   root.add(group);
 
   addBox(group, materials.darkTimber ?? materials.timber, 0, 0.18, 0, 0.82, 0.36, 0.58);

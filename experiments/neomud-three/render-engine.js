@@ -119,7 +119,7 @@ export function createRenderEngine(canvas) {
     raycastWorldTargets(raycaster) {
       const targets = [];
       worldRoot.traverse((object) => {
-        if (!object.visible || !object.isMesh) return;
+        if (!object.visible || (!object.isMesh && !object.isSprite)) return;
         if (worldTargetAffordanceForObject(object)) targets.push(object);
       });
       return targets.length ? raycaster.intersectObjects(targets, false) : [];

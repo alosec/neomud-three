@@ -4070,6 +4070,287 @@
       ],
       "created": "2026-05-29T00:16:23Z",
       "updated": "2026-05-29T00:35:43Z"
+    },
+    {
+      "id": "neo-1fb2.94",
+      "project": "NeoMud",
+      "title": "Recompose Town Square into a larger explorable civic district",
+      "description": "Run a focused Town Square scale/composition pass so it stops reading as a literal square outdoor room and starts reading as an explorable civic district/adventure hub. Expand and reshape the usable footprint with offset paths, asymmetric edges, pockets of exploration, varied approach corridors, layered backdrop/edge treatment, and distinct landmark districts instead of one flat box-shaped plaza. Diversify landmarks through silhouettes, planting, ground zones, civic props, elevation/threshold changes, and visual hierarchy rather than generic clutter. Improve ground fidelity with more convincing path/grass material treatment plus restrained small grass tufts/clumps at edges and seams, keeping paths readable and avoiding high-noise carpet detail. Preserve all four primary exits, click-to-move routing, physical board clicks, render budgets, and fixed screenshot QA.",
+      "type": "task",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "town-square",
+        "scale",
+        "visual-qa",
+        "composition"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User requested: make the Town Square bigger and more visually diverse. Treat this as a bounded scale/composition task with screenshot evidence, not a prop-spam pass.",
+          "created": "2026-05-30T07:18:00Z"
+        },
+        {
+          "id": 1,
+          "body": "User clarified the problem is not only size: Town Square feels like a boring square outdoor room. The target should be a less-square, more explorable adventure hub with asymmetric shape, path flow, edge composition, and distinct districts.",
+          "created": "2026-05-30T07:27:00Z"
+        },
+        {
+          "id": 2,
+          "body": "User requested better visual fidelity for paths and grass: more textured grass feel and small restrained tufts/clumps emerging from grass/path edges. Keep it legible and not visually noisy.",
+          "created": "2026-05-30T07:29:00Z"
+        },
+        {
+          "id": 3,
+          "body": "User noted the outside context beyond the little town-square box reads jumbled. The recomposition should make the space more interesting and traversable, with clear explorable edges and hierarchy rather than cluttered backdrop massing.",
+          "created": "2026-05-30T07:41:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:18:00Z",
+      "updated": "2026-05-30T07:41:00Z"
+    },
+    {
+      "id": "neo-1fb2.95",
+      "project": "NeoMud",
+      "title": "Fix floating artifact in front of Town Square temple",
+      "description": "Identify and remove or correctly attach the weird floating visual artifact in front of the Town Square south Temple/cathedral landmark. Inspect the south-temple-threshold/forecourt geometry, signs, windows, boards, candles, plinths, and any billboard/text-board elements from multiple Scenic Review angles. The fix should preserve the Temple exit affordance, physical trigger, clickability, and screenshot QA while eliminating the floating/visually detached object.",
+      "type": "bug",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "town-square",
+        "temple",
+        "visual-bug",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User reported a weird floating thing in front of the Town Square temple. Needs visual inspection and a surgical asset/layout fix, separate from the broader Town Square scale/diversity pass.",
+          "created": "2026-05-30T07:20:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:20:00Z",
+      "updated": "2026-05-30T07:20:00Z"
+    },
+    {
+      "id": "neo-1fb2.96",
+      "project": "NeoMud",
+      "title": "Redesign disconnected Town Square string lights",
+      "description": "Fix or redesign the Town Square rope/string/Edison bulb lights so they no longer read as floating bulbs detached from lamps or support structures. Inspect the current lamp/string-light geometry from Iso, Platform, and Scenic Review angles; either add convincing supports/catenary attachment points or replace the concept with a cleaner civic lighting treatment. Preserve route readability, physical exits, click targets, and render budget.",
+      "type": "bug",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "town-square",
+        "lighting",
+        "visual-bug",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User reported the rope/string/Edison bulb lights look disconnected from the lamp supports and float in space. The current idea may need a fundamental redesign rather than minor nudging.",
+          "created": "2026-05-30T07:22:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:22:00Z",
+      "updated": "2026-05-30T07:22:00Z"
+    },
+    {
+      "id": "neo-1fb2.97",
+      "project": "NeoMud",
+      "title": "Give the Town Square market a stronger forward-facing identity",
+      "description": "Make the Town Square market read as a distinct, front-facing civic landmark rather than background clutter. Improve its entrance/frontage, silhouette, signage, awnings, stall composition, and approach framing so the player understands where the market is from Iso and Platform views. Resolve the carts/loose props in front of the market so the player cannot visibly clip through them; either add accurate collision volumes, reposition them outside traversal lanes, or replace them with cleaner nonblocking frontage elements. Keep the east exit target, physical click/trigger behavior, route readability, and render budget intact.",
+      "type": "task",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "town-square",
+        "market",
+        "landmark",
+        "visual-qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User requested giving the market more of a forward-facing identity. Treat as a landmark/readability pass, not extra filler props.",
+          "created": "2026-05-30T07:24:00Z"
+        },
+        {
+          "id": 1,
+          "body": "User reported carts/loose props in front of the market can be clipped through. The market identity pass must include collision or layout cleanup for those frontage props.",
+          "created": "2026-05-30T07:25:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:24:00Z",
+      "updated": "2026-05-30T07:25:00Z"
+    },
+    {
+      "id": "neo-3361.1",
+      "project": "NeoMud",
+      "title": "Audit server-backed playability loop for NeoMud Three",
+      "description": "Audit and improve whether NeoMud Three is actually playable as a server-authoritative game client rather than only a visual walkthrough. Map each player-facing interaction to the Kotlin server protocol: login/session, room_info sync, move/exit commands, NPC selection/talk/combat, item pickup, feature interaction, inventory/equipment, combat state, death/health/mana feedback, and room graph discovery. Identify gaps where the Three client is visual-only, static/offline-only, or relying on local assumptions. Produce concrete fixes/tests so a player can follow a coherent loop: enter room, understand available actions, click/move/interact, see server-confirmed results, and continue without state drift.",
+      "type": "task",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-3361",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "server-authoritative",
+        "playability",
+        "protocol",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User raised a broader concern: beyond visual polish, we need to think through whether the game is actually playable based on how the Three client interacts with the Kotlin server.",
+          "created": "2026-05-30T07:31:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:31:00Z",
+      "updated": "2026-05-30T07:31:00Z"
+    },
+    {
+      "id": "neo-3361.2",
+      "project": "NeoMud",
+      "title": "Design NeoMud Three combat as a server-authoritative ARPG layer",
+      "description": "Design and then implement a coherent combat loop for NeoMud Three that fits an isometric action-RPG client over the NeoMud server. Define target selection, auto-attack, ability slots/hotkeys, cooldown/resource display, hostile telegraph/readability, damage feedback, player HP/MP state, death/flee/stop-attack behavior, server message handling, and how turn/tick-based MUD combat should feel in a click-first 3D client. Inventory/class/catalog data should drive available abilities; the client must not fake authoritative combat outcomes. Deliver a written combat design note, protocol/state mapping, UI affordance plan, and browser/server QA proving a simple hostile encounter is understandable and playable.",
+      "type": "task",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-3361.1",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "server-authoritative",
+        "game-design",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User noted combat has not really been designed. Existing basic attack/skill wiring is not enough; we need an intentional combat design for the isometric client over the MUD server.",
+          "created": "2026-05-30T07:33:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:33:00Z",
+      "updated": "2026-05-30T07:33:00Z"
+    },
+    {
+      "id": "neo-1fb2.98",
+      "project": "NeoMud",
+      "title": "Fix North Gate exit so the gate visibly opens",
+      "description": "Fix the North Gate/Gate exit interaction so leaving through the gate has a readable visual response. Currently the gate does not really open when the player exits, making the transition feel broken. Add or repair an explicit gate-open animation/state, doorway clearance, or transition affordance tied to the existing server-authoritative exit flow. Preserve room graph movement, physical trigger/click behavior, and screenshot/server QA.",
+      "type": "bug",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "north-gate",
+        "animation",
+        "visual-bug",
+        "playability"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User reported that when leaving through the gate, the gate does not really open. Needs visible transition/animation feedback rather than only an invisible room switch.",
+          "created": "2026-05-30T07:35:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:35:00Z",
+      "updated": "2026-05-30T07:35:00Z"
+    },
+    {
+      "id": "neo-1fb2.99",
+      "project": "NeoMud",
+      "title": "Fix rotating and clipping Town Square market sign",
+      "description": "Fix the Town Square market sign so it behaves like the corrected gate sign: stable fixed world geometry, no camera-facing rotation, no clipping through the market building, and still directly readable/clickable as the east market exit affordance. Update Town Square screenshot QA to cover the market sign from relevant Iso/Platform/scenic angles.",
+      "type": "bug",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "town-square",
+        "market",
+        "signage",
+        "visual-bug"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User reported the gate sign works and no longer rotates, but the market sign still rotates and clips through its building. Apply the same stable-world-sign rule to the market affordance.",
+          "created": "2026-05-30T07:37:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:37:00Z",
+      "updated": "2026-05-30T07:37:00Z"
+    },
+    {
+      "id": "neo-1fb2.100",
+      "project": "NeoMud",
+      "title": "Fix Town Square Tavern entrance hitbox placement",
+      "description": "Fix the Town Square Tavern entrance trigger/click target so the player can enter through the visible doorway without clipping through the building. The current hitbox appears to sit inside the Tavern structure. Align the trigger volume, click affordance, collision volumes, and visual doorway/threshold so click-to-move and physical walking both route to the Tavern naturally. Preserve west exit server movement and Town Square screenshot/server QA.",
+      "type": "bug",
+      "priority": 0,
+      "status": "todo",
+      "status_type": "open",
+      "parent": "neo-1fb2.8",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "town-square",
+        "tavern",
+        "collision",
+        "playability"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User reported the Tavern hitbox/entrance trigger is inside the building, forcing the player to clip through geometry to enter. Need trigger/collider/doorway alignment.",
+          "created": "2026-05-30T07:39:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:39:00Z",
+      "updated": "2026-05-30T07:39:00Z"
     }
   ]
 }
