@@ -4365,10 +4365,10 @@ function addSunlitClearingTreeRing(root, materials) {
     new THREE.DodecahedronGeometry(1, 0),
     materials.foliage,
     [
-      { x: -9.6, y: 6.95, z: -12.4, scale: [2.05, 0.7, 1.55], rotationY: 0.24 },
-      { x: 9.4, y: 6.9, z: -12.2, scale: [2.0, 0.7, 1.55], rotationY: -0.24 },
-      { x: -13.4, y: 6.2, z: 4.2, scale: [1.75, 0.65, 1.35], rotationY: -0.18 },
-      { x: 13.4, y: 6.15, z: 3.8, scale: [1.75, 0.65, 1.35], rotationY: 0.2 }
+      { x: -10.8, y: 7.65, z: -13.8, scale: [1.65, 0.46, 1.18], rotationY: 0.24 },
+      { x: 10.6, y: 7.6, z: -13.6, scale: [1.62, 0.46, 1.18], rotationY: -0.24 },
+      { x: -14.6, y: 6.85, z: 5.3, scale: [1.28, 0.44, 0.98], rotationY: -0.18 },
+      { x: 14.7, y: 6.82, z: 5.0, scale: [1.28, 0.44, 0.98], rotationY: 0.2 }
     ],
     "sunlit-clearing-high-canopy",
     { castShadow: false, receiveShadow: false }
@@ -4403,6 +4403,7 @@ function addSunlitClearingDressing(root, materials) {
   addTownKitProp(root, materials, "log.fallen", { x: 0.8, z: -5.0, rotationY: 0.18, scale: 1.22 });
   addTownKitProp(root, materials, "log.fallen", { x: -5.2, z: 4.3, rotationY: -0.4, scale: 0.96 });
   addTownKitProp(root, materials, "stone.moss", { x: -10.6, z: 0.6, rotationY: 0.18, scale: 1.0 });
+  addSunlitClearingFocalRing(root, materials);
 
   const grass = [];
   for (const [x, z] of [
@@ -4445,6 +4446,50 @@ function addSunlitClearingDressing(root, materials) {
   addInstancedGeometry(root, new THREE.SphereGeometry(1, 10, 8), materials.trimLight, mushrooms, "sunlit-clearing-log-mushrooms", {
     castShadow: false
   });
+}
+
+function addSunlitClearingFocalRing(root, materials) {
+  const stones = [];
+  const petalsGold = [];
+  const petalsPink = [];
+  const petalsBlue = [];
+  for (let i = 0; i < 18; i++) {
+    const angle = (i / 18) * Math.PI * 2;
+    const radius = 2.55 + (i % 3) * 0.08;
+    const x = Math.cos(angle) * radius + 1.2;
+    const z = Math.sin(angle) * radius - 0.9;
+    stones.push({
+      x,
+      y: 0.12,
+      z,
+      width: 0.52,
+      height: 0.18,
+      depth: 0.28,
+      rotationY: -angle + Math.PI / 2
+    });
+    const petalTarget = i % 3 === 0 ? petalsGold : i % 3 === 1 ? petalsPink : petalsBlue;
+    petalTarget.push({
+      x: Math.cos(angle) * (radius + 0.52) + 1.2,
+      y: 0.34,
+      z: Math.sin(angle) * (radius + 0.52) - 0.9,
+      scale: [0.09, 0.09, 0.09],
+      rotationY: angle
+    });
+  }
+  addInstancedBoxes(root, materials.stone, stones, "sunlit-clearing-focal-stone-ring", { castShadow: false, receiveShadow: true });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.flowerGold, petalsGold, "sunlit-clearing-focal-gold", {
+    castShadow: false,
+    receiveShadow: false
+  });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.flowerPink, petalsPink, "sunlit-clearing-focal-pink", {
+    castShadow: false,
+    receiveShadow: false
+  });
+  addInstancedGeometry(root, new THREE.DodecahedronGeometry(1, 0), materials.flowerBlue, petalsBlue, "sunlit-clearing-focal-blue", {
+    castShadow: false,
+    receiveShadow: false
+  });
+  addBox(root, materials.sign, 1.2, 0.18, -0.9, 0.52, 0.36, 0.52, { castShadow: false });
 }
 
 function addSunlitClearingButterflies(root, materials) {
