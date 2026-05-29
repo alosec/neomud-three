@@ -40,9 +40,9 @@ export function makePlayerAvatar() {
     loaded: state.loaded,
     loadFailed: state.loadFailed,
     activeAnimation: state.activeName,
-    model: "procedural-fantasy-adventurer",
+    model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v8" : "procedural-adventurer-v1",
+    visualTreatment: state.loaded ? "xbot-skinned-visible-v1" : "procedural-adventurer-v1",
     overlay: false,
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
@@ -74,9 +74,9 @@ async function loadSkinnedHero(state, materials) {
     const gltf = await new GLTFLoader().loadAsync(PLAYER_MODEL_URL);
     const model = gltf.scene;
     model.name = "Xbot skinned player rig";
-    model.scale.setScalar(1.48);
+    model.scale.setScalar(0.94);
     model.rotation.y = Math.PI;
-    model.visible = false;
+    model.visible = true;
 
     styleSkinnedModel(model);
     model.traverse((child) => {
@@ -87,6 +87,7 @@ async function loadSkinnedHero(state, materials) {
     });
 
     state.model = model;
+    state.visualRoot.add(model);
     state.mixer = new THREE.AnimationMixer(model);
     state.actions = Object.fromEntries(
       gltf.animations.map((clip) => {
@@ -97,7 +98,8 @@ async function loadSkinnedHero(state, materials) {
     );
 
     state.loaded = true;
-    state.renderMode = "procedural-proxy";
+    state.fallbackRig.group.visible = false;
+    state.renderMode = "skinned";
     playSkinnedAction(state, "idle", 0);
   } catch (error) {
     state.loadFailed = true;

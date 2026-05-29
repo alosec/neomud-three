@@ -4,12 +4,11 @@
 
 https://threejs.org/examples/models/gltf/Xbot.glb
 
-It is kept as a hidden technical/reference asset because it provides a
+It is currently rendered as the visible player because it provides a
 Mixamo-style skinned humanoid with `idle`, `walk`, and `run` animation clips.
-The visible player is currently a compact instanced low-poly fantasy adventurer
-proxy rendered in `player-avatar.js`; this avoids spending most room triangle
-budget on the example mesh. The proxy should still be replaced with a proper
-authored NeoMud character model.
+This is a placeholder baseline, not final NeoMud character art. The next
+character step should be a properly sourced or authored fantasy adventurer GLB
+with compatible clips and documented license metadata.
 
 `Soldier.glb` was briefly used from the official Three.js example assets:
 

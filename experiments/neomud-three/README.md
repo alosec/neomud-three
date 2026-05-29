@@ -20,7 +20,7 @@ It currently:
 - Shows a compact player HUD with HP and movement mode.
 - Adds simple authored collision volumes for the Temple altar/dais, Town Square fountain/dressing, North Gate watchtowers/walls/guard post, Forest Edge trees/log/stones, Forest Path roots/trees/stones, and Tavern tables/bar/fireplace.
 - Uses transparent generated stained glass inside a physical window component.
-- Loads the vendored Three.js/Xbot GLTF as a hidden animation/reference asset, but renders a compact instanced low-poly fantasy adventurer as the visible player. This reclaims substantial triangle budget for the rooms; it is still not the final authored character model.
+- Renders the vendored Three.js/Xbot GLTF as the visible skinned player again so the walk/run clips drive the on-screen character directly. It is still a placeholder asset, but it is a better baseline than the procedural proxy.
 - Starts a Blender-authored GLB pipeline under `assets/source/` and `assets/build/`; new substantial geometry should move through source image/brief, Blender source, exported GLB, and validation before runtime integration.
 - Provides `level-debug.js`, a reusable parsed-GLB debug renderer used by Movement Gym, so collision, triggers, spawn points, pickups, enemy markers, paths, camera zones, and light markers can be reviewed without trusting hidden authoring meshes.
 - Provides `glb-room-runtime.js`, a reusable adapter that turns parsed Blender GLB room packages into the normal playable-room runtime contract: spawn, clamp, physical exits, debug colliders, debug triggers, and package landmark metadata.

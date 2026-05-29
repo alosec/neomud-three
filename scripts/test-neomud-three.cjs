@@ -46,10 +46,10 @@ async function main() {
     );
     const avatar = await page.evaluate(() => window.__neomudThreeDebug.avatar);
     assert.equal(avatar.loaded, true, `expected avatar to initialize: ${JSON.stringify(avatar)}`);
-    assert.equal(avatar.model, "procedural-fantasy-adventurer");
+    assert.equal(avatar.model, "Xbot.glb");
     assert.equal(avatar.animationSource, "Xbot.glb-reference-loaded");
-    assert.equal(avatar.visualTreatment, "procedural-adventurer-proxy-v8");
-    assert.equal(avatar.proxy, true);
+    assert.equal(avatar.visualTreatment, "xbot-skinned-visible-v1");
+    assert.equal(avatar.proxy, false);
 
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
     assert.match(await page.locator("#world-count").textContent(), /\d+ rooms/);

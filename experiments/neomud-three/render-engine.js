@@ -106,15 +106,20 @@ export function createRenderEngine(canvas) {
     updateCamera({ heading = 0, roomCamera = {}, dt = 1 / 60, snap = false } = {}) {
       const forward = new THREE.Vector3(Math.sin(heading), 0, -Math.cos(heading));
       const right = new THREE.Vector3(Math.cos(heading), 0, Math.sin(heading));
+      const distance = roomCamera.distance ?? 9.8;
+      const height = roomCamera.height ?? 6.1;
+      const sideOffset = roomCamera.sideOffset ?? -1.15;
+      const lookAhead = roomCamera.lookAhead ?? 4.2;
+      const targetHeight = roomCamera.targetHeight ?? 1.25;
       const desired = player.position
         .clone()
-        .addScaledVector(forward, -(roomCamera.distance ?? 8.6))
-        .addScaledVector(right, roomCamera.sideOffset ?? -0.35)
-        .add(new THREE.Vector3(0, roomCamera.height ?? 5.35, 0));
+        .addScaledVector(forward, -distance)
+        .addScaledVector(right, sideOffset)
+        .add(new THREE.Vector3(0, height, 0));
       const lookTarget = player.position
         .clone()
-        .addScaledVector(forward, roomCamera.lookAhead ?? 3.0)
-        .add(new THREE.Vector3(0, roomCamera.targetHeight ?? 1.45, 0));
+        .addScaledVector(forward, lookAhead)
+        .add(new THREE.Vector3(0, targetHeight, 0));
 
       if (snap) {
         camera.position.copy(desired);

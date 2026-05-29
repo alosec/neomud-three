@@ -126,16 +126,16 @@ async function main() {
       if (lab.id === "prop-zoo") {
         assert.ok(snapshot.props.length >= 10, `expected reusable prop set, got ${snapshot.props.length}`);
         assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
-        assert.equal(snapshot.avatar.visualTreatment, "procedural-adventurer-proxy-v8");
-        assert.equal(snapshot.avatar.proxy, true);
+        assert.equal(snapshot.avatar.visualTreatment, "xbot-skinned-visible-v1");
+        assert.equal(snapshot.avatar.proxy, false);
       }
       if (lab.id === "avatar-lab") {
         assert.equal(snapshot.stations.length, 4, `expected four avatar QA stations: ${JSON.stringify(snapshot.stations)}`);
         assert.deepEqual(snapshot.stations.map((station) => station.id), ["idle-back", "walk-side", "run-front", "jump-three-quarter"]);
         for (const station of snapshot.stations) {
           assert.equal(station.avatar.loaded, true, `expected ${station.id} avatar reference to load: ${JSON.stringify(station)}`);
-          assert.equal(station.avatar.visualTreatment, "procedural-adventurer-proxy-v8");
-          assert.equal(station.avatar.proxy, true);
+          assert.equal(station.avatar.visualTreatment, "xbot-skinned-visible-v1");
+          assert.equal(station.avatar.proxy, false);
         }
       }
       if (lab.id === "movement-gym") {

@@ -154,10 +154,10 @@ function valueNoise(ctx, width, height, base, flecks, alpha, random) {
 
 function packedDirtTexture() {
   return proceduralTexture("town-packed-dirt", [10, 10], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#6f745e", 1400, 0.09, random);
-    ctx.strokeStyle = "rgba(58, 66, 50, 0.08)";
+    valueNoise(ctx, width, height, "#7d826b", 760, 0.045, random);
+    ctx.strokeStyle = "rgba(66, 72, 57, 0.045)";
     ctx.lineWidth = 1.2;
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 10; i++) {
       ctx.beginPath();
       const y = random() * height;
       ctx.moveTo(0, y);
@@ -169,9 +169,9 @@ function packedDirtTexture() {
 
 function roadTexture() {
   return proceduralTexture("town-road-gravel", [7, 7], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#878476", 1500, 0.1, random);
-    ctx.fillStyle = "rgba(58, 56, 50, 0.08)";
-    for (let i = 0; i < 220; i++) {
+    valueNoise(ctx, width, height, "#969283", 900, 0.055, random);
+    ctx.fillStyle = "rgba(58, 56, 50, 0.045)";
+    for (let i = 0; i < 130; i++) {
       ctx.beginPath();
       ctx.ellipse(random() * width, random() * height, 1 + random() * 3, 0.8 + random() * 2.4, random() * Math.PI, 0, Math.PI * 2);
       ctx.fill();
@@ -181,9 +181,9 @@ function roadTexture() {
 
 function plazaPaverTexture() {
   return proceduralTexture("town-plaza-pavers", [2.8, 2.8], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#9fa29a", 750, 0.08, random);
-    ctx.strokeStyle = "rgba(54, 56, 52, 0.12)";
-    ctx.lineWidth = 1.4;
+    valueNoise(ctx, width, height, "#a9aaa1", 440, 0.045, random);
+    ctx.strokeStyle = "rgba(54, 56, 52, 0.08)";
+    ctx.lineWidth = 1.15;
     const cell = 56;
     for (let y = -cell; y < height + cell; y += cell) {
       for (let x = -cell; x < width + cell; x += cell) {
@@ -411,7 +411,7 @@ const MATERIAL_DEFINITION_LIST = [
   colorMaterial("town.window.dark", "windowDark", "town", "window", 0x17212a, { roughness: 0.48, emissive: 0x0b151d, emissiveIntensity: 0.28 }),
   colorMaterial("town.plaster", "plaster", "town", "plaster", 0xb9b19d, { roughness: 0.86 }),
   colorMaterial("town.plaster.warm", "plasterWarm", "town", "plaster", 0xc6b89c, { roughness: 0.86 }),
-  colorMaterial("town.plaster.quiet", "plasterQuiet", "town", "background-plaster", 0xaeb09b, { roughness: 0.9 }),
+  colorMaterial("town.plaster.quiet", "plasterQuiet", "town", "background-plaster", 0x9fa996, { roughness: 0.92 }),
   {
     id: "town.facade.plaster-timber",
     legacyKey: "plasterFacade",
@@ -440,7 +440,7 @@ const MATERIAL_DEFINITION_LIST = [
   },
   colorMaterial("town.roof.teal", "roof", "town", "roof", 0x345e67, { roughness: 0.82 }),
   colorMaterial("town.roof.red", "roofRed", "town", "roof", 0x783e35, { roughness: 0.84 }),
-  colorMaterial("town.roof.quiet", "roofQuiet", "town", "background-roof", 0x5d6f6c, { roughness: 0.88 }),
+  colorMaterial("town.roof.quiet", "roofQuiet", "town", "background-roof", 0x5e746d, { roughness: 0.9 }),
   colorMaterial("town.awning.red", "awningRed", "town", "awning", 0xa24532, { roughness: 0.76 }),
   colorMaterial("town.awning.blue", "awningBlue", "town", "awning", 0x385d7a, { roughness: 0.76 }),
   colorMaterial("town.awning.gold", "awningGold", "town", "awning", 0xb68537, { roughness: 0.78 }),

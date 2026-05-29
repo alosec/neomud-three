@@ -186,7 +186,23 @@ export const TOWN_SQUARE_SPEC = {
         { x: -9.4, z: -6.9, scale: 1.52, rotationY: 0.36 },
         { x: 9.4, z: -6.9, scale: 1.56, rotationY: -0.42 },
         { x: -9.6, z: 7.2, scale: 1.46, rotationY: -0.28 },
-        { x: 9.6, z: 7.2, scale: 1.5, rotationY: 0.32 }
+        { x: 9.6, z: 7.2, scale: 1.5, rotationY: 0.32 },
+        { x: -22.0, z: -31.4, scale: 1.9, rotationY: 0.12 },
+        { x: -14.0, z: -33.5, scale: 1.58, rotationY: -0.56 },
+        { x: 14.2, z: -33.0, scale: 1.66, rotationY: 0.68 },
+        { x: 22.4, z: -31.6, scale: 1.84, rotationY: -0.24 },
+        { x: -24.4, z: 31.8, scale: 1.68, rotationY: 0.48 },
+        { x: -17.2, z: 34.2, scale: 1.42, rotationY: -0.18 },
+        { x: 17.3, z: 34.0, scale: 1.5, rotationY: 0.34 },
+        { x: 24.2, z: 31.6, scale: 1.74, rotationY: -0.62 },
+        { x: -32.8, z: -16.0, scale: 1.62, rotationY: 0.72 },
+        { x: -34.5, z: -8.2, scale: 1.44, rotationY: -0.34 },
+        { x: -34.0, z: 8.8, scale: 1.5, rotationY: 0.2 },
+        { x: -32.6, z: 16.2, scale: 1.7, rotationY: -0.5 },
+        { x: 32.8, z: -16.4, scale: 1.58, rotationY: -0.68 },
+        { x: 34.4, z: -8.5, scale: 1.38, rotationY: 0.22 },
+        { x: 34.0, z: 8.6, scale: 1.46, rotationY: -0.12 },
+        { x: 32.6, z: 16.0, scale: 1.66, rotationY: 0.54 }
       ]
     }
   ],

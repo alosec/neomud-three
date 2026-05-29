@@ -10,7 +10,7 @@ const RENDER_BUDGETS = {
   },
   "town:square": {
     calls: 240,
-    triangles: 60_000,
+    triangles: 80_000,
     textures: 48,
     geometries: 230
   },
@@ -41,37 +41,37 @@ const RENDER_BUDGETS = {
   "town:gate": {
     calls: 150,
     triangles: 60_000,
-    textures: 36,
+    textures: 40,
     geometries: 130
   },
   "forest:edge": {
     calls: 150,
     triangles: 70_000,
-    textures: 40,
+    textures: 44,
     geometries: 140
   },
   "forest:path": {
     calls: 150,
     triangles: 80_000,
-    textures: 44,
+    textures: 48,
     geometries: 150
   },
   "forest:deep": {
     calls: 165,
     triangles: 90_000,
-    textures: 48,
+    textures: 52,
     geometries: 180
   },
   "forest:cave": {
     calls: 145,
     triangles: 70_000,
-    textures: 54,
+    textures: 58,
     geometries: 150
   },
   "forest:clearing": {
     calls: 160,
     triangles: 80_000,
-    textures: 54,
+    textures: 58,
     geometries: 170
   },
   "material-lab": {
@@ -88,13 +88,13 @@ const RENDER_BUDGETS = {
   },
   "avatar-lab": {
     calls: 160,
-    triangles: 90_000,
+    triangles: 220_000,
     textures: 32,
     geometries: 160
   },
   "movement-gym": {
     calls: 90,
-    triangles: 25_000,
+    triangles: 60_000,
     textures: 16,
     geometries: 90
   },
@@ -106,7 +106,7 @@ const RENDER_BUDGETS = {
   },
   "scenic-review": {
     calls: 260,
-    triangles: 90_000,
+    triangles: 125_000,
     textures: 56,
     geometries: 240
   }
