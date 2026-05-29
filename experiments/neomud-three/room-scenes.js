@@ -352,6 +352,7 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
   const landmarkDebug = [];
   const townColliders = townCollidersFromSpec(spec);
 
+  addTownPerimeterDepthBase(root, materials);
   addGroundPlane(root, material(materials, spec.surfaces.ground.material), spec.surfaces.ground.width, spec.surfaces.ground.depth);
   addTownSpecSurfaces(root, materials, spec);
   const fountain = addTownSpecFountain(root, materials, spec.features.fountain);
@@ -6009,6 +6010,49 @@ function addTownSpecSurfaces(root, materials, spec) {
   for (const curb of spec.surfaces.curbs) {
     addBox(root, materials.darkStone, curb.x, curb.height / 2, curb.z, curb.width, curb.height, curb.depth);
   }
+}
+
+function addTownPerimeterDepthBase(root, materials) {
+  const base = addGroundPlane(root, materials.forestMossLight, 124, 124, { y: -0.032 });
+  base.name = "town-square-continuous-perimeter-terrain";
+  base.userData = { visualRole: "continuous-perimeter-terrain" };
+
+  addInstancedSurfaceRects(root, materials, [
+    { material: "forestMossLight", x: 0, z: -43, width: 78, depth: 24, y: -0.018 },
+    { material: "forestMossLight", x: 0, z: 43, width: 78, depth: 24, y: -0.018 },
+    { material: "forestMossLight", x: -43, z: 0, width: 24, depth: 78, y: -0.018 },
+    { material: "forestMossLight", x: 43, z: 0, width: 24, depth: 78, y: -0.018 },
+    { material: "packedDirt", x: 0, z: -35.5, width: 10.5, depth: 25, y: -0.01 },
+    { material: "packedDirt", x: 0, z: 35.5, width: 11.5, depth: 25, y: -0.01 },
+    { material: "packedDirt", x: -35.5, z: 0, width: 25, depth: 10.5, y: -0.01 },
+    { material: "packedDirt", x: 35.5, z: 0, width: 25, depth: 10.5, y: -0.01 }
+  ], "town-continuous-perimeter-surfaces");
+
+  addInstancedBoxes(root, materials.foliageDark, [
+    { x: -42, y: 0.42, z: -42, width: 18, height: 0.84, depth: 9.5, rotationY: 0.18 },
+    { x: 42, y: 0.42, z: -42, width: 18, height: 0.84, depth: 9.5, rotationY: -0.16 },
+    { x: -42, y: 0.42, z: 42, width: 18, height: 0.84, depth: 9.5, rotationY: -0.2 },
+    { x: 42, y: 0.42, z: 42, width: 18, height: 0.84, depth: 9.5, rotationY: 0.14 },
+    { x: -50, y: 0.5, z: 0, width: 6.2, height: 1.0, depth: 58, rotationY: 0.02 },
+    { x: 50, y: 0.5, z: 0, width: 6.2, height: 1.0, depth: 58, rotationY: -0.02 },
+    { x: 0, y: 0.48, z: -50, width: 58, height: 0.96, depth: 6.2, rotationY: 0.03 },
+    { x: 0, y: 0.48, z: 50, width: 58, height: 0.96, depth: 6.2, rotationY: -0.03 }
+  ], "town-square-perimeter-dark-green-bands", { castShadow: false, receiveShadow: true });
+
+  addInstancedBoxes(root, materials.roofQuiet, [
+    { x: -20, y: 5.9, z: -42.5, width: 12.5, height: 0.72, depth: 3.2, rotationY: -0.1 },
+    { x: 0, y: 6.25, z: -43.5, width: 15.0, height: 0.78, depth: 3.3, rotationY: 0.05 },
+    { x: 20, y: 5.85, z: -42.5, width: 12.5, height: 0.72, depth: 3.2, rotationY: 0.12 },
+    { x: -22, y: 5.45, z: 43.2, width: 13.5, height: 0.68, depth: 3.1, rotationY: 0.08 },
+    { x: 2, y: 5.82, z: 44.2, width: 16.2, height: 0.72, depth: 3.2, rotationY: -0.04 },
+    { x: 24, y: 5.5, z: 43.0, width: 12.8, height: 0.68, depth: 3.1, rotationY: -0.12 },
+    { x: -43.5, y: 5.55, z: -21, width: 3.2, height: 0.7, depth: 12.5, rotationY: 0.08 },
+    { x: -44.0, y: 5.9, z: 1, width: 3.2, height: 0.76, depth: 15.2, rotationY: -0.05 },
+    { x: -43.2, y: 5.45, z: 22, width: 3.1, height: 0.68, depth: 13.0, rotationY: 0.12 },
+    { x: 43.5, y: 5.55, z: -21, width: 3.2, height: 0.7, depth: 12.5, rotationY: -0.08 },
+    { x: 44.0, y: 5.9, z: 1, width: 3.2, height: 0.76, depth: 15.2, rotationY: 0.05 },
+    { x: 43.2, y: 5.45, z: 22, width: 3.1, height: 0.68, depth: 13.0, rotationY: -0.12 }
+  ], "town-square-distant-roof-silhouette-band", { castShadow: false, receiveShadow: true });
 }
 
 function addTownContactShadows(root, materials, shadows = []) {
