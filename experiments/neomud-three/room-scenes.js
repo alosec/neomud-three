@@ -37,24 +37,24 @@ const TEMPLE = {
 };
 
 const TAVERN = {
-  width: 22.0,
-  depth: 17.0,
-  halfX: 11.0,
-  halfZ: 8.5,
-  spawnX: 7.15,
-  exitX: 10.2,
-  exitHalfZ: 2.35,
-  barX: -8.35,
-  barZ: -3.1,
-  fireplaceX: -10.35,
-  fireplaceZ: 4.8
+  width: 28.0,
+  depth: 22.0,
+  halfX: 14.0,
+  halfZ: 11.0,
+  spawnX: 9.6,
+  exitX: 13.55,
+  exitHalfZ: 2.9,
+  barX: -11.05,
+  barZ: -3.9,
+  fireplaceX: -13.05,
+  fireplaceZ: 6.65
 };
 
 const TAVERN_TABLES = [
-  { id: "table-northwest", x: -2.65, z: -5.45, rotation: 0.18, collider: { width: 2.35, depth: 1.78 } },
-  { id: "table-northeast", x: 3.35, z: -5.0, rotation: -0.24, collider: { width: 2.35, depth: 1.78 } },
-  { id: "table-southwest", x: -1.55, z: 4.85, rotation: 0.42, collider: { width: 2.35, depth: 1.78 } },
-  { id: "table-southeast", x: 4.75, z: 3.82, rotation: -0.12, collider: { width: 2.35, depth: 1.78 } }
+  { id: "table-northwest", x: -4.65, z: -7.1, rotation: 0.18, collider: { width: 2.35, depth: 1.78 } },
+  { id: "table-northeast", x: 4.2, z: -6.72, rotation: -0.24, collider: { width: 2.35, depth: 1.78 } },
+  { id: "table-southwest", x: -3.35, z: 6.35, rotation: 0.42, collider: { width: 2.35, depth: 1.78 } },
+  { id: "table-southeast", x: 5.95, z: 5.05, rotation: -0.12, collider: { width: 2.35, depth: 1.78 } }
 ];
 
 const MARKET = {
@@ -474,10 +474,10 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   return {
     ...glbRuntime,
     camera: {
-      distance: 6.35,
-      height: 3.28,
+      distance: 7.75,
+      height: 3.45,
       sideOffset: -0.18,
-      lookAhead: 2.75,
+      lookAhead: 3.25,
       targetHeight: 1.12
     },
     syncEntities,

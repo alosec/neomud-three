@@ -10,8 +10,8 @@
   "runtimeGlb": "town_tavern.glb",
   "files": {
     "sourceImageBytes": 51606,
-    "sourceBlendBytes": 140643,
-    "runtimeGlbBytes": 237908
+    "sourceBlendBytes": 140662,
+    "runtimeGlbBytes": 240476
   },
   "validator": {
     "script": "scripts/validate-neomud-three-gltf.mjs",

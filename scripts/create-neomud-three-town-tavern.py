@@ -17,20 +17,20 @@ BUILD_DIR = ROOT / "experiments/neomud-three/assets/build/levels"
 SOURCE_BLEND = SOURCE_DIR / "town_tavern.blend"
 BUILD_GLB = BUILD_DIR / "town_tavern.glb"
 
-WIDTH = 22.0
-DEPTH = 17.0
+WIDTH = 28.0
+DEPTH = 22.0
 HALF_X = WIDTH / 2
 HALF_Z = DEPTH / 2
-BAR_X = -8.35
-BAR_Z = -3.1
-FIREPLACE_X = -10.35
-FIREPLACE_Z = 4.8
+BAR_X = -11.05
+BAR_Z = -3.9
+FIREPLACE_X = -13.05
+FIREPLACE_Z = 6.65
 
 TABLES = [
-    ("northwest", -2.65, -5.45, 0.18, 2.35, 1.78),
-    ("northeast", 3.35, -5.0, -0.24, 2.35, 1.78),
-    ("southwest", -1.55, 4.85, 0.42, 2.35, 1.78),
-    ("southeast", 4.75, 3.82, -0.12, 2.35, 1.78),
+    ("northwest", -4.65, -7.1, 0.18, 2.35, 1.78),
+    ("northeast", 4.2, -6.72, -0.24, 2.35, 1.78),
+    ("southwest", -3.35, 6.35, 0.42, 2.35, 1.78),
+    ("southeast", 5.95, 5.05, -0.12, 2.35, 1.78),
 ]
 
 
@@ -206,38 +206,38 @@ def build_level():
 
     # Cutaway shell and floor planks.
     cube3("VIS_floor_base", 0, -0.04, 0, WIDTH, 0.08, DEPTH, floor_mat, semantic="tavern_floor")
-    for index, x in enumerate([-8.8, -6.6, -4.4, -2.2, 0, 2.2, 4.4, 6.6, 8.8], start=1):
+    for index, x in enumerate([-11.2, -8.4, -5.6, -2.8, 0, 2.8, 5.6, 8.4, 11.2], start=1):
         cube3(f"VIS_floor_plank_line_{index:02d}", x, 0.035, 0, 0.08, 0.05, DEPTH - 0.35, wood, semantic="floor_plank")
 
     cube3("VIS_west_bar_wall", -HALF_X + 0.18, 2.35, 0, 0.42, 4.7, DEPTH, plaster_warm, semantic="west_bar_wall")
     cube3("VIS_north_wall", 0, 2.35, -HALF_Z + 0.18, WIDTH, 4.7, 0.42, plaster, semantic="north_wall")
     cube3("VIS_south_wall", 0, 2.35, HALF_Z - 0.18, WIDTH, 4.7, 0.42, plaster, semantic="south_wall")
-    cube3("VIS_east_door_pier_north", HALF_X - 0.35, 2.25, -5.4, 0.5, 4.5, 5.4, wood_dark, semantic="east_door_pier")
-    cube3("VIS_east_door_pier_south", HALF_X - 0.35, 2.25, 5.4, 0.5, 4.5, 5.4, wood_dark, semantic="east_door_pier")
-    cube3("VIS_east_door_header", HALF_X - 0.38, 4.18, 0, 0.52, 0.45, 4.9, wood_dark, semantic="east_door_header")
-    cube3("VIS_east_threshold_glow", HALF_X - 1.2, 0.04, 0, 1.8, 0.04, 4.9, gold, semantic="east_exit_glow")
+    cube3("VIS_east_door_pier_north", HALF_X - 0.35, 2.25, -6.85, 0.5, 4.5, 6.6, wood_dark, semantic="east_door_pier")
+    cube3("VIS_east_door_pier_south", HALF_X - 0.35, 2.25, 6.85, 0.5, 4.5, 6.6, wood_dark, semantic="east_door_pier")
+    cube3("VIS_east_door_header", HALF_X - 0.38, 4.18, 0, 0.52, 0.45, 5.6, wood_dark, semantic="east_door_header")
+    cube3("VIS_east_threshold_glow", HALF_X - 1.2, 0.04, 0, 1.8, 0.04, 5.8, gold, semantic="east_exit_glow")
 
-    for index, z in enumerate([-7.15, -4.6, -2.05, 0.5, 3.05, 5.6, 7.25], start=1):
+    for index, z in enumerate([-9.5, -6.35, -3.2, 0, 3.2, 6.35, 9.5], start=1):
         cube3(f"VIS_ceiling_plank_{index:02d}", 0, 4.32, z, WIDTH - 0.9, 0.09, 0.38, wood, semantic="ceiling_plank")
-    for index, x in enumerate([-8.7, -4.35, 0, 4.35, 8.7], start=1):
+    for index, x in enumerate([-11.2, -5.6, 0, 5.6, 11.2], start=1):
         cube3(f"VIS_ceiling_rafter_{index:02d}", x, 4.05, 0, 0.26, 0.3, DEPTH - 0.65, wood_dark, semantic="ceiling_rafter")
 
     # Bar, shelves, bottles, and service staging.
-    cube3("VIS_bar_base", BAR_X, 0.72, BAR_Z, 1.05, 1.44, 7.45, wood_dark, semantic="bar_counter")
-    cube3("VIS_bar_top", BAR_X + 0.58, 1.52, BAR_Z, 0.72, 0.24, 7.8, wood, semantic="bar_counter")
-    cube3("VIS_bar_trim", BAR_X + 0.97, 1.68, BAR_Z, 0.18, 0.18, 7.85, trim, semantic="bar_counter")
-    cube3("VIS_backbar_post", -HALF_X + 0.29, 2.35, BAR_Z, 0.26, 2.1, 7.8, wood_dark, semantic="backbar")
+    cube3("VIS_bar_base", BAR_X, 0.72, BAR_Z, 1.05, 1.44, 8.7, wood_dark, semantic="bar_counter")
+    cube3("VIS_bar_top", BAR_X + 0.58, 1.52, BAR_Z, 0.72, 0.24, 9.05, wood, semantic="bar_counter")
+    cube3("VIS_bar_trim", BAR_X + 0.97, 1.68, BAR_Z, 0.18, 0.18, 9.1, trim, semantic="bar_counter")
+    cube3("VIS_backbar_post", -HALF_X + 0.29, 2.35, BAR_Z, 0.26, 2.1, 9.1, wood_dark, semantic="backbar")
     for index, y in enumerate([2.18, 2.82, 3.42], start=1):
-        cube3(f"VIS_backbar_shelf_{index}", -HALF_X + 0.72, y, BAR_Z - 2.35, 0.2, 0.16, 5.8 - index * 0.55, wood_dark, semantic="backbar_shelf")
+        cube3(f"VIS_backbar_shelf_{index}", -HALF_X + 0.72, y, BAR_Z - 2.55, 0.2, 0.16, 6.8 - index * 0.55, wood_dark, semantic="backbar_shelf")
     bottle_index = 1
-    for y, count, z_start in [(2.44, 8, -6.2), (3.08, 7, -5.8), (3.66, 6, -5.35)]:
+    for y, count, z_start in [(2.44, 9, -7.45), (3.08, 8, -7.0), (3.66, 7, -6.55)]:
         for offset in range(count):
             z = z_start + offset * 0.62
             mat = gold if offset % 3 == 0 else blue if offset % 3 == 1 else cloth_red
             cube3(f"VIS_backbar_bottle_{bottle_index:02d}", -HALF_X + 0.98, y, z, 0.13, 0.42, 0.13, mat, semantic="bottle")
             bottle_index += 1
     cube3("VIS_barkeep_service_mat", BAR_X + 1.62, 0.055, BAR_Z - 0.08, 1.9, 0.04, 1.6, gold, semantic="barkeep_service_spot")
-    for index, z in enumerate([-5.8, -4.4, -3.0, -1.6, -0.2], start=1):
+    for index, z in enumerate([-6.95, -5.4, -3.85, -2.3, -0.75], start=1):
         cylinder3(f"VIS_bar_mug_{index:02d}", BAR_X + 1.05, 1.92, z, 0.13, 0.24, 12, gold, semantic="bar_mug")
 
     # Fireplace and fire.
@@ -252,32 +252,32 @@ def build_level():
     for table in TABLES:
         add_table(*table, wood_dark, wood, cloth_red, trim, gold)
     for index, (x, z) in enumerate([
-        (-3.55, -5.45), (-1.75, -6.42), (2.0, -5.85), (4.65, -5.38),
-        (-2.62, 4.05), (-0.35, 5.7), (3.42, 2.72), (5.9, 4.25),
-        (BAR_X + 1.6, -5.6), (BAR_X + 1.6, -4.0), (BAR_X + 1.6, -2.4), (BAR_X + 1.6, -0.8)
+        (-5.6, -7.2), (-3.1, -8.1), (2.7, -7.55), (5.85, -7.05),
+        (-4.55, 5.35), (-1.8, 7.25), (4.45, 3.95), (7.15, 5.55),
+        (BAR_X + 1.6, -6.85), (BAR_X + 1.6, -5.2), (BAR_X + 1.6, -3.55), (BAR_X + 1.6, -1.9)
     ], start=1):
         cylinder3(f"VIS_stool_{index:02d}", x, 0.72, z, 0.31, 0.14, 14, wood_dark, semantic="stool")
         cube3(f"VIS_stool_{index:02d}_stem", x, 0.36, z, 0.14, 0.58, 0.14, wood, semantic="stool_leg")
 
-    for index, (x, z, mat) in enumerate([(-5.1, -8.19, cloth_red), (0.2, -8.19, blue), (5.4, -8.19, gold), (-5.4, 8.19, gold), (0, 8.19, cloth_red), (5.1, 8.19, blue)], start=1):
+    for index, (x, z, mat) in enumerate([(-6.8, -10.68, cloth_red), (0.2, -10.68, blue), (6.8, -10.68, gold), (-6.8, 10.68, gold), (0, 10.68, cloth_red), (6.8, 10.68, blue)], start=1):
         cube3(f"VIS_wall_panel_frame_{index:02d}", x, 2.56, z, 1.18, 1.42, 0.09, wood_dark, semantic="wall_panel")
         cube3(f"VIS_wall_panel_color_{index:02d}", x, 2.56, z + (0.06 if z < 0 else -0.06), 0.82, 0.96, 0.045, mat, semantic="wall_panel_color")
 
-    cube3("VIS_locked_cellar_trapdoor", 2.9, 0.08, 0.95, 2.55, 0.11, 1.45, wood_dark, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
-    cube3("VIS_trapdoor_crossbar", 2.9, 0.19, 0.95, 2.15, 0.08, 0.14, trim, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
-    cube3("VIS_trapdoor_iron_ring", 2.25, 0.26, 0.92, 0.22, 0.08, 0.22, stone, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
+    cube3("VIS_locked_cellar_trapdoor", 3.35, 0.08, 1.15, 2.55, 0.11, 1.45, wood_dark, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
+    cube3("VIS_trapdoor_crossbar", 3.35, 0.19, 1.15, 2.15, 0.08, 0.14, trim, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
+    cube3("VIS_trapdoor_iron_ring", 2.7, 0.26, 1.12, 0.22, 0.08, 0.22, stone, rotation_y=-0.18, semantic="locked_cellar_trapdoor")
 
     # Runtime collision and gameplay metadata.
     cube3("COL_world_floor", 0, 0.02, 0, WIDTH, 0.12, DEPTH, None, kind="collision", collider="box", collider_id="world-floor")
-    cube3("COL_bar", BAR_X - 0.1, 0.75, BAR_Z, 1.78, 1.5, 7.8, None, kind="collision", collider="box", collider_id="bar")
+    cube3("COL_bar", BAR_X - 0.1, 0.75, BAR_Z, 1.78, 1.5, 9.05, None, kind="collision", collider="box", collider_id="bar")
     cube3("COL_fireplace", FIREPLACE_X + 0.18, 0.95, FIREPLACE_Z, 1.45, 1.9, 2.9, None, kind="collision", collider="box", collider_id="fireplace")
-    cube3("TRG_exit_east_square", HALF_X - 0.45, 1.4, 0, 1.25, 2.8, 4.7, trigger, kind="trigger", trigger_type="exit", direction="EAST", target_room="town:square", prompt="Return to Town Square")
-    marker3("SPAWN_player", 7.15, 0.9, 0, "spawn", spawn_id="player", heading_degrees=-90)
-    marker3("CAMERA_tavern_cutaway", 3.5, 3.15, 0, "camera_zone", camera_id="tavern_cutaway", distance=6.35, height=3.28, look_ahead=2.75)
+    cube3("TRG_exit_east_square", HALF_X - 0.45, 1.4, 0, 1.25, 2.8, 5.8, trigger, kind="trigger", trigger_type="exit", direction="EAST", target_room="town:square", prompt="Return to Town Square")
+    marker3("SPAWN_player", 9.6, 0.9, 0, "spawn", spawn_id="player", heading_degrees=-90)
+    marker3("CAMERA_tavern_cutaway", 5.4, 3.3, 0, "camera_zone", camera_id="tavern_cutaway", distance=7.75, height=3.45, look_ahead=3.25)
     marker3("LIGHTS_tavern_ambient_fill", 0, 3.1, 0, "light", display_type="SINGLE_ARROW", light_id="ambient_fill", light_type="hemisphere", intensity=0.78, sky_color="#ffd8a8", ground_color="#26160f")
-    marker3("LIGHTS_room_warm", -1.0, 4.0, -0.8, "light", display_type="SINGLE_ARROW", light_id="room_warm", light_type="point", intensity=4.8, distance=16.5, color="#ffa85a")
+    marker3("LIGHTS_room_warm", -1.0, 4.0, -0.8, "light", display_type="SINGLE_ARROW", light_id="room_warm", light_type="point", intensity=5.2, distance=21.0, color="#ffa85a")
     marker3("LIGHTS_fireplace_warm", FIREPLACE_X + 1.35, 2.0, FIREPLACE_Z, "light", display_type="SINGLE_ARROW", light_id="fireplace_warm", light_type="point", intensity=6.2, distance=10.5, color="#ff7d2f")
-    marker3("LIGHTS_door_cool_fill", HALF_X - 0.7, 2.8, 0, "light", display_type="SINGLE_ARROW", light_id="door_cool_fill", light_type="point", intensity=1.45, distance=8.4, color="#d9e5ff")
+    marker3("LIGHTS_door_cool_fill", HALF_X - 0.7, 2.8, 0, "light", display_type="SINGLE_ARROW", light_id="door_cool_fill", light_type="point", intensity=1.45, distance=10.6, color="#d9e5ff")
 
     batch_visible_meshes_by_material()
 
@@ -295,7 +295,7 @@ def build_level():
     room_light.data.color = (1.0, 0.66, 0.36)
     tag(room_light, "light", light_id="preview_room_warm", light_type="point", intensity=2.2)
 
-    bpy.ops.object.camera_add(location=to_blender_location(9.2, 4.9, 4.0), rotation=(math.radians(62), 0, math.radians(-62)))
+    bpy.ops.object.camera_add(location=to_blender_location(12.0, 5.2, 5.5), rotation=(math.radians(62), 0, math.radians(-62)))
     camera = bpy.context.object
     camera.name = "CAMERA_preview_tavern"
     tag(camera, "camera_zone", camera_id="preview_tavern")

@@ -691,12 +691,12 @@ async function main() {
     budgetReports.push(await collectBudgetStatus(page, "town:tavern"));
     assertRenderBudget(assert, "town:tavern", budgetReports.at(-1).stats);
 
-    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -2.65, z: -7.55, heading: Math.PI }));
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -4.65, z: -9.25, heading: Math.PI }));
     await page.keyboard.down("w");
     await page.waitForTimeout(700);
     await page.keyboard.up("w");
     const afterTablePush = await page.evaluate(() => window.__neomudThreeDebug.player);
-    assert.ok(afterTablePush.z < -6.45, `expected Tavern table collision to block movement, got ${JSON.stringify(afterTablePush)}`);
+    assert.ok(afterTablePush.z < -8.1, `expected Tavern table collision to block movement, got ${JSON.stringify(afterTablePush)}`);
 
     const barkeep = tavernEntities.find((entity) => entity.id === "npc:barkeep");
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.1, z, heading: -Math.PI / 2 }), barkeep);
