@@ -35,6 +35,16 @@ const LABS = [
     })
   },
   {
+    id: "avatar-lab",
+    path: "avatar-lab.html",
+    screenshot: "avatar-lab.png",
+    ready: () => window.__neomudAvatarLabDebug?.ready && window.__neomudAvatarLabDebug?.render?.triangles > 0,
+    snapshot: () => ({
+      render: window.__neomudAvatarLabDebug.render,
+      stations: window.__neomudAvatarLabDebug.stations
+    })
+  },
+  {
     id: "movement-gym",
     path: "movement-gym.html",
     screenshot: "movement-gym.png",
@@ -106,8 +116,17 @@ async function main() {
       if (lab.id === "prop-zoo") {
         assert.ok(snapshot.props.length >= 10, `expected reusable prop set, got ${snapshot.props.length}`);
         assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
-        assert.equal(snapshot.avatar.visualTreatment, "procedural-adventurer-proxy-v6");
+        assert.equal(snapshot.avatar.visualTreatment, "procedural-adventurer-proxy-v7");
         assert.equal(snapshot.avatar.proxy, true);
+      }
+      if (lab.id === "avatar-lab") {
+        assert.equal(snapshot.stations.length, 4, `expected four avatar QA stations: ${JSON.stringify(snapshot.stations)}`);
+        assert.deepEqual(snapshot.stations.map((station) => station.id), ["idle-front", "walk-side", "run-back", "jump-three-quarter"]);
+        for (const station of snapshot.stations) {
+          assert.equal(station.avatar.loaded, true, `expected ${station.id} avatar reference to load: ${JSON.stringify(station)}`);
+          assert.equal(station.avatar.visualTreatment, "procedural-adventurer-proxy-v7");
+          assert.equal(station.avatar.proxy, true);
+        }
       }
       if (lab.id === "movement-gym") {
         assert.equal(snapshot.error, null);

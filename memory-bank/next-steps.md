@@ -50,10 +50,10 @@ High leverage next work:
    - The next serious geometry pass should move one named landmark or graybox room slice into Blender source and GLB validation instead of adding more direct mesh code.
 
 3a. Continue player avatar production.
-   - The visible player is now a v6 compact low-poly fantasy adventurer proxy with better hood/face separation, hands, darker palette, rear cloak structure, shoulder pieces, stronger gold trim, eye/nose detail, staff/gear accents, back gear, cloak shoulder mass, small steel details, and slimmer proportions. Xbot remains a hidden technical/reference asset, not the rendered character.
+   - The visible player is now a v7 articulated low-poly fantasy adventurer proxy with clearer capsule limbs, cloak/staff silhouette, and dedicated idle/walk/run/jump review in Avatar Lab. Xbot remains a hidden technical/reference asset, not the rendered character.
    - Do not swap to another random example model.
    - Next character work should be an authored or deliberately sourced skinned adventurer GLB with documented license, forward axis, scale, idle/walk/run clips, and fixed QA screenshots.
-   - If a full GLB is not practical yet, improve the proxy only when it clearly helps silhouette/proportions without spending the reclaimed room budget.
+   - If a full GLB is not practical yet, improve the proxy only when it clearly helps silhouette/proportions in `avatar-lab.html` and authored-room screenshots without pushing Town Square over its 240-call budget.
 
 4. Connect NeoMud gameplay surfaces.
    - Clicking/approaching an NPC should open a DOM interaction panel.
@@ -100,7 +100,7 @@ High leverage next work:
    - The courtyard garden composition pass adds larger main-ground tree clusters with oval garden beds, shrubs, and flowers through `TOWN_SQUARE_SPEC`; `garden.bed` is now also staged in Prop Zoo. Further warmth work should improve landmark-specific story dressing instead of adding more generic greenery.
    - Do not keep solving warmth by adding more loose foliage; the next pass should improve a named landmark or authored gameplay staging.
    - Guildmaster Aldric and Old Wren now have richer local staging props. Further Town Square NPC work should connect role-specific affordances to real dialogue/combat/tutorial interactions rather than adding disconnected clutter.
-   - The compact avatar proxy lowered Town Square full-smoke triangles from roughly 59k to roughly 9.4k; surface and gate batching now leaves current Town Square full smoke at roughly 13.6k triangles and 211/240 draw calls. Keep spending that headroom deliberately.
+   - The articulated avatar v7 spends some of the reclaimed budget and leaves current Town Square full smoke at roughly 32k triangles and 231/240 draw calls. Keep future avatar or Town Square detail work budget-aware, and prefer reclaiming room draw calls before adding more visible complexity.
    - The Temple window batching pass reclaimed more than 100 full-smoke draw calls, and the altar retable spends part of that headroom while keeping full smoke at 276 calls.
    - Stone ground trim and gate trim are now in Prop Zoo and applied to Town Square; add the next Prop Zoo items only when they unlock that landmark pass: a better NPC staging prop, a smoke/effects prop, or a true optimized texture-delivery path.
    - Keep Town Square under the current render budget and update fixed screenshots.

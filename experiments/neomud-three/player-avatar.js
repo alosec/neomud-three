@@ -12,7 +12,7 @@ export function makePlayerAvatar() {
   visualRoot.name = "Player visual root";
   root.add(visualRoot);
 
-  const rig = makeCompactAdventurerRig(materials);
+  const rig = makeAdventurerRig(materials);
   visualRoot.add(rig.group);
 
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.82, 48), materials.shadow);
@@ -42,7 +42,7 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v6" : "procedural-adventurer-v1",
+    visualTreatment: state.loaded ? "procedural-adventurer-proxy-v7" : "procedural-adventurer-v1",
     overlay: false,
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError

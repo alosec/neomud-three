@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T00:12:37.952Z",
+  "updated": "2026-05-29T00:36:09.747Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -3163,6 +3163,33 @@
       ],
       "created": "2026-05-29T00:08:15Z",
       "updated": "2026-05-29T00:11:43Z"
+    },
+    {
+      "id": "neo-1fb2.14.4",
+      "project": "NeoMud",
+      "title": "Evaluate articulated adventurer avatar v7",
+      "description": "",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2.14",
+      "close_reason": "done",
+      "labels": [
+        "avatar",
+        "neomud-three",
+        "visual-qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 129,
+          "body": "Shipped articulated procedural avatar proxy v7 plus Avatar Lab fixed-pose QA. Lab, room-shot, offline smoke, and server-backed QA pass; Market budget adjusted to 160 calls for the more expensive visible avatar.",
+          "created": "2026-05-29T00:35:43Z"
+        }
+      ],
+      "created": "2026-05-29T00:16:23Z",
+      "updated": "2026-05-29T00:35:43Z"
     }
   ]
 }

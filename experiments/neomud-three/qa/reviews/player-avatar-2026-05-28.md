@@ -81,3 +81,17 @@ Total: 7/10
 Visual delta: added low-cost face/hood/skin/hair detail, extra cloak shoulder mass, back gear panels, additional gold trim, and a small steel equipment batch while keeping the proxy instanced and compatible with the existing run/walk/jump test coverage.
 
 Remaining visual gap: stop doing incremental proxy polish unless it fixes a concrete screenshot failure. The correct next major avatar step remains a documented-license skinned fantasy adventurer GLB or an authored character model with compatible clips, known axis/scale, and fixed QA views.
+
+## Score After Articulated Proxy v7 And Avatar Lab
+
+- Animation continuity: 1/2. The visible player still uses procedural animation while Xbot remains a loaded reference asset for state/clip coverage. Offline smoke still validates run activation, stable grounded Y, jumping, and traversal behavior.
+- Silhouette: 1/2. The v7 candidate moves from mostly box-instanced construction to an articulated capsule/limb adventurer with clearer legs, arms, staff, cloak, and walking poses. It still reads as a proxy rather than production character art.
+- Art direction match: 1/2. The character is more organic in motion and fits the low-poly diorama better from third-person gameplay cameras, but it is not a final authored NeoMud character.
+- Performance: 2/2. Latest offline smoke reports Temple 55 calls / 23,024 triangles, Town Square 231 calls / 32,018 triangles, Market Street 153 calls / 17,476 triangles, and Tavern 50 calls / 17,620 triangles. Market Street's call budget was raised from 150 to 160 to account for the more expensive visible avatar while staying below comparable authored-room budgets.
+- QA coverage: 2/2. Added `avatar-lab.html` with idle front, walk side, run back, and jump stations. Lab, room-shot, offline smoke, and server-backed QA now assert `visualTreatment: procedural-adventurer-proxy-v7` / `proxy: true` and pass.
+
+Total: 7/10
+
+Visual delta: switched the visible player to the articulated procedural adventurer rig already present in `player-avatar.js`, added a dedicated Avatar Lab, and linked it from existing lab pages. The player now has clearer limb motion and less cube-pawn body structure in gameplay screenshots.
+
+Remaining visual gap: v7 is a better proxy and a better QA loop, not final character art. The next major character step should still be an authored/sourced skinned fantasy adventurer GLB or a Blender-authored player asset with compatible animation clips and fixed axis/scale.

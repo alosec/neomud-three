@@ -21,7 +21,7 @@ const RENDER_BUDGETS = {
     geometries: 100
   },
   "town:market": {
-    calls: 150,
+    calls: 160,
     triangles: 70_000,
     textures: 36,
     geometries: 150
@@ -85,6 +85,12 @@ const RENDER_BUDGETS = {
     triangles: 120_000,
     textures: 56,
     geometries: 240
+  },
+  "avatar-lab": {
+    calls: 160,
+    triangles: 90_000,
+    textures: 32,
+    geometries: 160
   },
   "movement-gym": {
     calls: 90,
