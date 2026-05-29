@@ -366,6 +366,82 @@ function handleServerMessage(message) {
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     }
+    case "skill_effect": {
+      clearPendingCombatCommand();
+      if (message.targetId) {
+        targetHealthById.set(message.targetId, {
+          current: Math.max(0, Number(message.targetHp) || 0),
+          max: Math.max(1, Number(message.targetMaxHp) || 1)
+        });
+        if (movement.selectionTarget?.id === message.targetId) updateSelectionHealthBar(selectedInteractable);
+      }
+      lastCombatResult = {
+        success: true,
+        targetName: message.targetName ?? selectedInteractable?.name ?? "Target",
+        message: message.message ?? `${message.userName ?? "Player"} uses ${message.skillName ?? "skill"}.`
+      };
+      appendLog(lastCombatResult.message);
+      showCombatHitFeedback({
+        ...message,
+        attackerName: message.userName,
+        defenderName: message.targetName,
+        damage: message.damage,
+        defenderHp: message.targetHp,
+        defenderMaxHp: message.targetMaxHp,
+        isPlayerDefender: false
+      }, message.targetId);
+      if (activePanel === "interaction") renderPanel(activePanel);
+      break;
+    }
+    case "spell_cast_result":
+      if (pendingCombatCommand?.command?.startsWith("cast:")) clearPendingCombatCommand();
+      playerProfile.mp = Math.max(0, Number(message.newMp) || 0);
+      if (message.newHp != null) {
+        playerProfile.hp = Math.max(0, Number(message.newHp) || 0);
+      }
+      lastCombatResult = {
+        success: Boolean(message.success),
+        targetName: selectedInteractable?.name ?? "Target",
+        message: `${message.spellName ?? "Spell"}: ${message.message ?? ""}`.trim()
+      };
+      appendLog(lastCombatResult.message);
+      updatePlayerHud();
+      if (activePanel === "interaction") renderPanel(activePanel);
+      break;
+    case "spell_effect": {
+      clearPendingCombatCommand();
+      const targetId = message.targetId || (!message.isPlayerTarget ? serverState.selectedTargetId : "");
+      if (message.isPlayerTarget) {
+        playerProfile.hp = Math.max(0, Number(message.targetNewHp) || 0);
+        playerProfile.maxHp = Math.max(1, Number(message.targetMaxHp) || playerProfile.maxHp);
+        updatePlayerHud();
+      } else if (targetId) {
+        targetHealthById.set(targetId, {
+          current: Math.max(0, Number(message.targetNewHp) || 0),
+          max: Math.max(1, Number(message.targetMaxHp) || 1)
+        });
+        if (movement.selectionTarget?.id === targetId) updateSelectionHealthBar(selectedInteractable);
+      }
+      const amount = Number(message.effectAmount) || 0;
+      lastCombatResult = {
+        success: true,
+        targetName: message.targetName ?? selectedInteractable?.name ?? "Target",
+        message: `${message.casterName ?? "Caster"} casts ${message.spellName ?? "spell"} on ${message.targetName ?? "target"}${amount ? ` for ${amount}` : ""}.`
+      };
+      appendLog(lastCombatResult.message);
+      if (!message.isPlayerTarget) {
+        showCombatHitFeedback({
+          attackerName: message.casterName,
+          defenderName: message.targetName,
+          damage: amount,
+          defenderHp: message.targetNewHp,
+          defenderMaxHp: message.targetMaxHp,
+          isPlayerDefender: false
+        }, targetId);
+      }
+      if (activePanel === "interaction") renderPanel(activePanel);
+      break;
+    }
     case "npc_died":
       if (serverState.selectedTargetId === message.npcId) {
         serverState.selectedTargetId = null;
@@ -2259,15 +2335,34 @@ function hostileActionFrame(entity) {
 }
 
 function combatActionOptions(entity) {
-  const classDef = world.catalogs.classesById.get(playerProfile.classId);
-  const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
-  const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
+  const spell = combatSpellForProfile();
+  const skill = spell ? null : combatSkillForProfile();
+  const ability = spell
+    ? {
+        kind: "spell",
+        id: spell.id,
+        name: spell.name,
+        command: `cast:${spell.id}`,
+        detail: `${spell.manaCost} MP`,
+        manaCost: spell.manaCost ?? 0
+      }
+    : skill
+      ? {
+          kind: "skill",
+          id: skill.id,
+          name: skill.name,
+          command: `skill:${skill.id}`,
+          detail: skill.manaCost ? `${skill.manaCost} MP` : "Skill",
+          manaCost: skill.manaCost ?? 0
+        }
+      : null;
   const combatReady = Boolean(serverCanDriveMovement());
   const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
   const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
   return [
     {
       hotkey: "1",
+      kind: "attack",
       label: pendingCombat?.command === "attack" || pendingCombat?.command === "stop_attack"
         ? "Working..."
         : engaged ? "Stop Attack" : "Basic Attack",
@@ -2277,12 +2372,36 @@ function combatActionOptions(entity) {
     },
     {
       hotkey: "2",
-      label: pendingCombat?.command?.startsWith("cast:") ? "Working..." : spell?.name ?? "Class Skill",
-      detail: pendingCombat?.command?.startsWith("cast:") ? "Awaiting server" : spell ? `${spell.manaCost} MP` : "Ability",
-      command: spell ? `cast:${spell.id}` : "skill",
-      enabled: combatReady && Boolean(spell) && !pendingCombat
+      kind: ability?.kind ?? "ability",
+      abilityId: ability?.id ?? "",
+      spellId: ability?.kind === "spell" ? ability.id : "",
+      skillId: ability?.kind === "skill" ? ability.id : "",
+      manaCost: ability?.manaCost ?? 0,
+      label: pendingCombat?.command === ability?.command ? "Working..." : ability?.name ?? "Class Skill",
+      detail: pendingCombat?.command === ability?.command ? "Awaiting server" : ability?.detail ?? "No combat ability",
+      command: ability?.command ?? "ability",
+      enabled: combatReady && Boolean(ability) && !pendingCombat
     }
   ];
+}
+
+function combatSpellForProfile() {
+  const classDef = world.catalogs.classesById.get(playerProfile.classId);
+  const schools = new Set(Object.keys(classDef?.magicSchools ?? {}));
+  if (!schools.size) return null;
+  return world.catalogs.spells.find((candidate) => (
+    schools.has(candidate.school)
+    && (candidate.levelRequired ?? 1) <= playerProfile.level
+    && (candidate.manaCost ?? 0) <= playerProfile.mp
+  )) ?? null;
+}
+
+function combatSkillForProfile() {
+  const classDef = world.catalogs.classesById.get(playerProfile.classId);
+  const skillIds = classDef?.skills ?? [];
+  return skillIds
+    .map((skillId) => world.catalogs.skillsById.get(skillId))
+    .find((skill) => skill && !skill.isPassive && skill.category === "combat") ?? null;
 }
 
 function serverActionLabel(entity) {
@@ -2478,6 +2597,7 @@ function useCombatCommand(command) {
     targetId: target.id,
     targetName: target.name,
     command,
+    label: combatActionOptions(target).find((action) => action.command === command)?.label ?? command,
     startedAt: performance.now()
   };
   if (activePanel === "interaction") renderPanel(activePanel);
@@ -2509,6 +2629,7 @@ function useCombatCommand(command) {
     }
   } else if (command?.startsWith("cast:")) {
     const spellId = command.slice("cast:".length);
+    const spell = world.catalogs.spellsById.get(spellId);
     const selected = serverState.client.sendSelectTarget(target.id);
     const cast = serverState.client.sendCastSpell(spellId, target.id);
     sent = selected && cast;
@@ -2517,13 +2638,14 @@ function useCombatCommand(command) {
       lastCombatResult = {
         success: true,
         targetName: target.name,
-        message: `Casting ${spellId} at ${target.name}.`
+        message: `Casting ${spell?.name ?? spellId} at ${target.name}.`
       };
-      appendLog(`Casting ${spellId} at ${target.name} through the Kotlin server...`);
+      appendLog(`Casting ${spell?.name ?? spellId} at ${target.name} through the Kotlin server...`);
       updateStatusText(`Casting at ${target.name}...`);
     }
   } else if (command?.startsWith("skill:")) {
     const skillId = command.slice("skill:".length);
+    const skillDef = world.catalogs.skillsById.get(skillId);
     const selected = serverState.client.sendSelectTarget(target.id);
     const skill = serverState.client.sendUseSkill(skillId, target.id);
     sent = selected && skill;
@@ -2532,9 +2654,9 @@ function useCombatCommand(command) {
       lastCombatResult = {
         success: true,
         targetName: target.name,
-        message: `Using ${skillId} on ${target.name}.`
+        message: `Using ${skillDef?.name ?? skillId} on ${target.name}.`
       };
-      appendLog(`Using ${skillId} on ${target.name} through the Kotlin server...`);
+      appendLog(`Using ${skillDef?.name ?? skillId} on ${target.name} through the Kotlin server...`);
       updateStatusText(`Using skill on ${target.name}...`);
     }
   }
@@ -2949,6 +3071,11 @@ function installDebugApi() {
               label: action.label,
               detail: action.detail,
               command: action.command,
+              kind: action.kind,
+              abilityId: action.abilityId ?? "",
+              spellId: action.spellId ?? "",
+              skillId: action.skillId ?? "",
+              manaCost: action.manaCost ?? 0,
               enabled: Boolean(action.enabled)
             }))
           : [],
@@ -3015,7 +3142,8 @@ function installDebugApi() {
           ? {
               targetId: pendingCombatCommand.targetId,
               targetName: pendingCombatCommand.targetName,
-              command: pendingCombatCommand.command
+              command: pendingCombatCommand.command,
+              label: pendingCombatCommand.label
             }
           : null,
         messageCount: serverState.messageCount,

@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T05:16:00.000Z",
+  "updated": "2026-05-30T05:44:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-a42d",
+      "project": "NeoMud",
+      "title": "Harden catalog-driven hostile ability actions",
+      "description": "Make the hostile action row's second slot real instead of placeholder-like: choose a usable spell for magical classes or an active combat skill for martial classes, expose stable debug metadata, send the existing server-authoritative command, and reconcile skill/spell server messages into combat result, HP/MP, and world feedback state.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "server-authoritative",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Combat action option 2 is now catalog-driven: PALADIN/offline exposes cast:SMITE and WARRIOR/server-backed exposes skill:BASH. The client handles skill_effect, spell_cast_result, and spell_effect by clearing pending commands, updating target HP/player HP/MP where relevant, rendering selected-target HP changes, and emitting world-space feedback. Offline smoke and live server-backed QA pass.",
+          "created": "2026-05-30T05:44:00Z"
+        }
+      ],
+      "created": "2026-05-30T05:44:00Z",
+      "updated": "2026-05-30T05:44:00Z"
+    },
     {
       "id": "neo-9c72",
       "project": "NeoMud",

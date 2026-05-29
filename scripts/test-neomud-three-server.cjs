@@ -307,6 +307,11 @@ async function main() {
       assert.equal(initialCombatActions[0]?.hotkey, "1");
       assert.equal(initialCombatActions[0]?.command, "attack");
       assert.equal(initialCombatActions[0]?.enabled, true);
+      assert.equal(initialCombatActions[1]?.hotkey, "2");
+      assert.equal(initialCombatActions[1]?.kind, "skill");
+      assert.equal(initialCombatActions[1]?.skillId, "BASH");
+      assert.equal(initialCombatActions[1]?.command, "skill:BASH");
+      assert.equal(initialCombatActions[1]?.enabled, true);
       await page.keyboard.press("Digit1");
       const hotkeyAttack = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
       assert.equal(hotkeyAttack?.targetId, "npc:forest_spider");
@@ -342,6 +347,24 @@ async function main() {
         null,
         { timeout: 5_000 }
       );
+      await page.keyboard.press("Digit2");
+      const pendingSkill = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
+      assert.equal(pendingSkill?.targetId, "npc:forest_spider");
+      assert.equal(pendingSkill?.command, "skill:BASH");
+      assert.equal(pendingSkill?.label, "Bash");
+      await page.waitForFunction(
+        () => {
+          const server = window.__neomudThreeDebug.server;
+          return server.pendingCombatCommand === null
+            && /bash/i.test(server.lastCombatResult?.message ?? "")
+            && server.targetHealth["npc:forest_spider"]?.current >= 0;
+        },
+        null,
+        { timeout: 8_000 }
+      );
+      const skillActionsAfter = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
+      assert.equal(skillActionsAfter[1]?.command, "skill:BASH");
+      assert.equal(skillActionsAfter[1]?.enabled, true);
       await page.keyboard.press("Escape");
       await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x + 1.0, z, heading: -Math.PI / 2 }), forestSpider);
       const clickResult = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), forestSpider);

@@ -73,7 +73,11 @@ Playable Three.js lab:
   selected hostile ring also carries a small in-world HP bar that mirrors the
   same live HP state. The action row updates optimistically after successful
   WebSocket sends, then reconciles to server `attack_mode_update` / combat
-  messages.
+  messages. The second hostile action is now catalog-driven: PALADIN/offline
+  exposes `cast:SMITE`, WARRIOR/server-backed exposes `skill:BASH`, and
+  `skill_effect`, `spell_cast_result`, and `spell_effect` messages update the
+  combat result frame, target HP, player MP/HP where applicable, selected-target
+  HP bar, and world-space feedback without creating a local combat simulation.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.

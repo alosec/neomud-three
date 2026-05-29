@@ -570,6 +570,11 @@ async function main() {
     assert.equal(offlineCombatActions[0]?.hotkey, "1");
     assert.equal(offlineCombatActions[0]?.command, "attack");
     assert.equal(offlineCombatActions[0]?.enabled, false);
+    assert.equal(offlineCombatActions[1]?.hotkey, "2");
+    assert.equal(offlineCombatActions[1]?.kind, "spell");
+    assert.equal(offlineCombatActions[1]?.spellId, "SMITE");
+    assert.equal(offlineCombatActions[1]?.command, "cast:SMITE");
+    assert.equal(offlineCombatActions[1]?.enabled, false);
     await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
       type: "combat_hit",
       attackerName: "Guest Adventurer",
