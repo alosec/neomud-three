@@ -45,7 +45,7 @@ export function makePlayerAvatar() {
     activeAnimation: state.activeName,
     model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
     animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
-    visualTreatment: state.loaded ? "xbot-fantasy-adventurer-v2" : "procedural-adventurer-v1",
+    visualTreatment: state.loaded ? "clean-xbot-neutral-v2" : "procedural-adventurer-v1",
     overlay: Boolean(state.overlay),
     proxy: state.renderMode === "procedural-proxy",
     error: state.loadError
@@ -77,7 +77,7 @@ async function loadSkinnedHero(state, materials) {
     const gltf = await new GLTFLoader().loadAsync(PLAYER_MODEL_URL);
     const model = gltf.scene;
     model.name = "Xbot skinned player rig";
-    model.scale.setScalar(0.82);
+    model.scale.setScalar(0.96);
     model.rotation.y = Math.PI;
     model.visible = true;
 
@@ -88,13 +88,6 @@ async function loadSkinnedHero(state, materials) {
       child.receiveShadow = true;
       child.frustumCulled = false;
     });
-
-    const overlay = makeSkinnedAdventurerOverlay(materials);
-    overlay.name = "Xbot fantasy adventurer treatment";
-    overlay.scale.setScalar(0.82);
-    overlay.rotation.y = Math.PI;
-    state.overlay = overlay;
-    state.visualRoot.add(overlay);
 
     state.model = model;
     state.visualRoot.add(model);

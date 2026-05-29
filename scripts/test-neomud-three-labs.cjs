@@ -126,8 +126,8 @@ async function main() {
       if (lab.id === "prop-zoo") {
         assert.ok(snapshot.props.length >= 10, `expected reusable prop set, got ${snapshot.props.length}`);
         assert.equal(snapshot.avatar.loaded, true, `expected player scale avatar to load: ${JSON.stringify(snapshot.avatar)}`);
-        assert.equal(snapshot.avatar.visualTreatment, "xbot-fantasy-adventurer-v2");
-        assert.equal(snapshot.avatar.overlay, true);
+        assert.equal(snapshot.avatar.visualTreatment, "clean-xbot-neutral-v2");
+        assert.equal(snapshot.avatar.overlay, false);
         assert.equal(snapshot.avatar.proxy, false);
       }
       if (lab.id === "avatar-lab") {
@@ -135,8 +135,8 @@ async function main() {
         assert.deepEqual(snapshot.stations.map((station) => station.id), ["idle-back", "walk-side", "run-front", "jump-three-quarter"]);
         for (const station of snapshot.stations) {
           assert.equal(station.avatar.loaded, true, `expected ${station.id} avatar reference to load: ${JSON.stringify(station)}`);
-          assert.equal(station.avatar.visualTreatment, "xbot-fantasy-adventurer-v2");
-          assert.equal(station.avatar.overlay, true);
+          assert.equal(station.avatar.visualTreatment, "clean-xbot-neutral-v2");
+          assert.equal(station.avatar.overlay, false);
           assert.equal(station.avatar.proxy, false);
         }
       }
