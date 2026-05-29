@@ -219,6 +219,43 @@ export const TOWN_SQUARE_SPEC = {
         { x: 34.0, z: 8.6, scale: 1.46, rotationY: -0.12 },
         { x: 32.6, z: 16.0, scale: 1.66, rotationY: 0.54 }
       ]
+    },
+    {
+      id: "outer-ridge-tree-bands",
+      ring: "far",
+      kind: "distant-ridges",
+      ridges: [
+        { x: -39, z: -43, width: 4.7, height: 1.0, depth: 1.8, scale: 1.0, rotationY: 0.2 },
+        { x: -31, z: -45, width: 6.4, height: 1.15, depth: 2.2, scale: 1.0, rotationY: -0.18 },
+        { x: -22, z: -44, width: 5.6, height: 1.05, depth: 2.1, scale: 0.92, rotationY: 0.38 },
+        { x: -12, z: -46, width: 7.1, height: 1.22, depth: 2.35, scale: 1.0, rotationY: -0.26 },
+        { x: 0, z: -44.5, width: 6.2, height: 1.1, depth: 2.2, scale: 0.98, rotationY: 0.14 },
+        { x: 11, z: -46, width: 7.4, height: 1.18, depth: 2.4, scale: 1.02, rotationY: 0.34 },
+        { x: 23, z: -44.2, width: 5.6, height: 1.02, depth: 2.05, scale: 0.95, rotationY: -0.4 },
+        { x: 34, z: -45, width: 6.5, height: 1.16, depth: 2.25, scale: 1.0, rotationY: 0.18 },
+        { x: -40, z: 43, width: 5.0, height: 1.0, depth: 1.9, scale: 0.98, rotationY: -0.2 },
+        { x: -29, z: 45, width: 7.0, height: 1.14, depth: 2.3, scale: 1.0, rotationY: 0.24 },
+        { x: -17, z: 44, width: 5.8, height: 1.02, depth: 2.05, scale: 0.94, rotationY: -0.34 },
+        { x: -5, z: 46, width: 7.4, height: 1.2, depth: 2.42, scale: 1.0, rotationY: 0.16 },
+        { x: 7, z: 44.5, width: 6.0, height: 1.08, depth: 2.1, scale: 0.96, rotationY: -0.24 },
+        { x: 19, z: 45.5, width: 7.2, height: 1.18, depth: 2.35, scale: 1.0, rotationY: 0.38 },
+        { x: 31, z: 43.8, width: 5.9, height: 1.04, depth: 2.05, scale: 0.96, rotationY: -0.16 },
+        { x: 42, z: 45, width: 6.4, height: 1.12, depth: 2.2, scale: 1.0, rotationY: 0.28 },
+        { x: -45, z: -35, width: 5.2, height: 1.04, depth: 2.0, scale: 0.98, rotationY: Math.PI / 2 - 0.2 },
+        { x: -46, z: -24, width: 7.2, height: 1.18, depth: 2.35, scale: 1.0, rotationY: Math.PI / 2 + 0.22 },
+        { x: -44.5, z: -12, width: 6.0, height: 1.08, depth: 2.1, scale: 0.96, rotationY: Math.PI / 2 - 0.36 },
+        { x: -46, z: 0, width: 7.5, height: 1.2, depth: 2.45, scale: 1.02, rotationY: Math.PI / 2 + 0.18 },
+        { x: -44.5, z: 13, width: 6.2, height: 1.08, depth: 2.15, scale: 0.98, rotationY: Math.PI / 2 - 0.24 },
+        { x: -46, z: 26, width: 7.1, height: 1.16, depth: 2.34, scale: 1.0, rotationY: Math.PI / 2 + 0.34 },
+        { x: -44, z: 38, width: 5.6, height: 1.0, depth: 2.0, scale: 0.94, rotationY: Math.PI / 2 - 0.16 },
+        { x: 45, z: -36, width: 5.4, height: 1.04, depth: 2.0, scale: 0.98, rotationY: -Math.PI / 2 + 0.18 },
+        { x: 46, z: -25, width: 7.4, height: 1.18, depth: 2.35, scale: 1.0, rotationY: -Math.PI / 2 - 0.24 },
+        { x: 44.5, z: -13, width: 6.1, height: 1.08, depth: 2.12, scale: 0.96, rotationY: -Math.PI / 2 + 0.38 },
+        { x: 46, z: 0, width: 7.6, height: 1.2, depth: 2.45, scale: 1.02, rotationY: -Math.PI / 2 - 0.18 },
+        { x: 44.5, z: 13, width: 6.3, height: 1.08, depth: 2.15, scale: 0.98, rotationY: -Math.PI / 2 + 0.24 },
+        { x: 46, z: 26, width: 7.0, height: 1.16, depth: 2.34, scale: 1.0, rotationY: -Math.PI / 2 - 0.34 },
+        { x: 44, z: 38, width: 5.8, height: 1.0, depth: 2.0, scale: 0.94, rotationY: -Math.PI / 2 + 0.16 }
+      ]
     }
   ],
   landmarks: [

@@ -336,9 +336,7 @@ def sloped_panel_x3(name, x, bottom_y, z, width, height, thickness, top_offset_z
     return mesh3(name, vertices, faces, mat, kind=kind, **props)
 
 
-def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
-    width = 4.65
-    seat_depth = 0.98
+def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight, width=4.65, back_height=0.92, seat_depth=0.98):
     side_profile = [
         (-0.56, 0.0),
         (0.52, 0.0),
@@ -357,15 +355,16 @@ def add_cathedral_pew(pew_id, x, z, wood_dark, wood_mid, wood_highlight):
         0.58,
         z - 0.47,
         width,
-        0.92,
+        back_height,
         0.18,
         -0.16,
         wood_mid,
         semantic="cathedral_pew_backrest",
     )
-    cube3(f"VIS_pew_{pew_id}_top_soft_cap", x, 1.45, z - 0.66, width + 0.08, 0.13, 0.14, wood_highlight, semantic="cathedral_pew_worn_edge")
+    cube3(f"VIS_pew_{pew_id}_top_soft_cap", x, 0.53 + back_height, z - 0.66, width + 0.08, 0.13, 0.14, wood_highlight, semantic="cathedral_pew_worn_edge")
     cube3(f"VIS_pew_{pew_id}_kneeler_shadow", x, 0.26, z + 0.68, width - 0.58, 0.09, 0.1, wood_dark, semantic="cathedral_pew_kneeler")
-    for foot_x, foot_label in [(-2.18, "west"), (2.18, "east")]:
+    foot_span = max(0.55, width / 2 - 0.28)
+    for foot_x, foot_label in [(-foot_span, "west"), (foot_span, "east")]:
         for foot_z, depth_label in [(z + 0.4, "front"), (z - 0.43, "back")]:
             cube3(
                 f"VIS_pew_{pew_id}_{foot_label}_{depth_label}_foot",
@@ -688,9 +687,27 @@ def build_level():
 
     # Pews and runner.
     cube3("VIS_dawn_runner", 0, 0.018, -8.6, 2.45, 0.04, 43.0, cloth, semantic="center_runner")
-    for side_x, side_name in [(-5.1, "west"), (5.1, "east")]:
-        for index, z in enumerate([-27.5, -22.5, -17.5, -12.5, -7.5, -2.5, 2.5, 7.5], start=1):
-            add_cathedral_pew(f"{side_name}_{index:02d}", side_x, z, wood_dark, wood, wood_highlight)
+    pew_rows = [
+        {"z": -27.5, "width": 4.95, "back_height": 1.0, "x": 5.28},
+        {"z": -22.0, "width": 4.85, "back_height": 0.98, "x": 5.18},
+        {"z": -16.4, "width": 4.65, "back_height": 0.95, "x": 5.06},
+        {"z": -10.7, "width": 4.35, "back_height": 0.9, "x": 4.92},
+        {"z": -4.8, "width": 4.0, "back_height": 0.84, "x": 4.72},
+        {"z": 1.4, "width": 3.58, "back_height": 0.78, "x": 4.45},
+    ]
+    for side, side_name in [(-1, "west"), (1, "east")]:
+        for index, row in enumerate(pew_rows, start=1):
+            stagger = 0.32 if index % 2 == 0 else -0.18
+            add_cathedral_pew(
+                f"{side_name}_{index:02d}",
+                side * row["x"],
+                row["z"] + stagger,
+                wood_dark,
+                wood,
+                wood_highlight,
+                width=row["width"],
+                back_height=row["back_height"],
+            )
 
     # Collision and gameplay markers.
     cube3("COL_world_floor", 0, 0.02, -8, 27.2, 0.12, 60.0, collision, kind="collision", collider="box", collider_id="world-floor")

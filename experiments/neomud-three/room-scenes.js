@@ -5476,7 +5476,59 @@ function addTownSpecChunkRings(root, materials, spec) {
     if (chunk.kind === "tree-line") {
       addTownContextTrees(root, materials, chunk.trees);
     }
+    if (chunk.kind === "distant-ridges") {
+      addTownDistantRidges(root, materials, chunk);
+    }
   }
+}
+
+function addTownDistantRidges(root, materials, chunk) {
+  const ridges = chunk.ridges ?? [];
+  if (!ridges.length) return null;
+
+  const group = new THREE.Group();
+  group.userData = { visualRole: "distant-ridges", count: ridges.length };
+  root.add(group);
+
+  const hillGeometry = new THREE.DodecahedronGeometry(1, 0);
+  const treeGeometry = new THREE.DodecahedronGeometry(1, 0);
+  const hillMesh = new THREE.InstancedMesh(hillGeometry, materials.foliageDark, ridges.length);
+  const treeMesh = new THREE.InstancedMesh(treeGeometry, materials.foliage, ridges.length);
+  const shadowMesh = new THREE.InstancedMesh(hillGeometry, materials.darkStone, ridges.length);
+  const dummy = new THREE.Object3D();
+
+  ridges.forEach((ridge, index) => {
+    const scale = ridge.scale ?? 1;
+    const rotationY = ridge.rotationY ?? 0;
+    dummy.rotation.set(0, rotationY, 0);
+
+    dummy.position.set(ridge.x, ridge.y ?? 1.45 * scale, ridge.z);
+    dummy.scale.set((ridge.width ?? 5.5) * scale, (ridge.height ?? 1.15) * scale, (ridge.depth ?? 2.2) * scale);
+    dummy.updateMatrix();
+    hillMesh.setMatrixAt(index, dummy.matrix);
+
+    dummy.position.set(
+      ridge.x + 0.36 * Math.cos(rotationY) * scale,
+      (ridge.y ?? 1.45 * scale) + 0.72 * scale,
+      ridge.z + 0.36 * Math.sin(rotationY) * scale
+    );
+    dummy.scale.set((ridge.width ?? 5.5) * 0.52 * scale, (ridge.height ?? 1.15) * 0.72 * scale, (ridge.depth ?? 2.2) * 0.72 * scale);
+    dummy.updateMatrix();
+    treeMesh.setMatrixAt(index, dummy.matrix);
+
+    dummy.position.set(ridge.x, 0.2, ridge.z);
+    dummy.scale.set((ridge.width ?? 5.5) * 0.74 * scale, 0.08, (ridge.depth ?? 2.2) * 0.8 * scale);
+    dummy.updateMatrix();
+    shadowMesh.setMatrixAt(index, dummy.matrix);
+  });
+
+  for (const mesh of [hillMesh, treeMesh, shadowMesh]) {
+    mesh.castShadow = false;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+
+  return group;
 }
 
 function addTownContextTrees(root, materials, trees = []) {
