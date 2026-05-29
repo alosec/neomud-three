@@ -309,6 +309,9 @@ async function main() {
       assert.equal(clickResult.type, "interactable");
       assert.equal(clickResult.id, "npc:forest_spider");
       assert.equal(clickResult.autoEngage, true);
+      const pendingAttack = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
+      assert.equal(pendingAttack?.targetId, "npc:forest_spider");
+      assert.equal(pendingAttack?.command, "attack");
       await page.waitForFunction(
         () => {
           const server = window.__neomudThreeDebug.server;
@@ -318,6 +321,7 @@ async function main() {
         null,
         { timeout: 5_000 }
       );
+      assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand), null);
       await page.waitForFunction(
         () => document.querySelector('[data-combat-command="stop_attack"]')?.textContent?.match(/Stop Attack/i),
         null,
@@ -325,6 +329,9 @@ async function main() {
       );
       assert.match(await page.locator(".combat-actions").textContent(), /Attacking/i);
       await page.locator('[data-combat-command="stop_attack"]').click();
+      const pendingStop = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);
+      assert.equal(pendingStop?.targetId, "npc:forest_spider");
+      assert.equal(pendingStop?.command, "stop_attack");
       await page.waitForFunction(
         () => {
           const server = window.__neomudThreeDebug.server;
@@ -334,6 +341,7 @@ async function main() {
         null,
         { timeout: 5_000 }
       );
+      assert.equal(await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand), null);
       await page.keyboard.press("Escape");
     }
     await saveScreenshot(page, "server-deep-forest.png");

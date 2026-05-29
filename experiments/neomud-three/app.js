@@ -56,6 +56,7 @@ let selectedInteractable = null;
 let lastInteractionResult = null;
 let lastCombatResult = null;
 let pendingInteractionAction = null;
+let pendingCombatCommand = null;
 const targetHealthById = new Map();
 let pickupFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
@@ -316,7 +317,11 @@ function handleServerMessage(message) {
       appendLog(message.message);
       break;
     case "attack_mode_update":
+      clearPendingCombatCommand();
       serverState.attackMode = Boolean(message.enabled);
+      serverState.selectedTargetId = serverState.attackMode
+        ? (message.targetId ?? message.npcId ?? serverState.selectedTargetId ?? selectedInteractable?.id ?? null)
+        : null;
       lastCombatResult = {
         success: true,
         targetName: selectedInteractable?.name ?? "Target",
@@ -326,6 +331,7 @@ function handleServerMessage(message) {
       if (activePanel === "interaction") renderPanel(activePanel);
       break;
     case "combat_hit": {
+      clearPendingCombatCommand();
       const defenderId = message.defenderId || (!message.isPlayerDefender ? serverState.selectedTargetId : "");
       if (!message.isPlayerDefender && defenderId) {
         targetHealthById.set(defenderId, {
@@ -362,6 +368,7 @@ function handleServerMessage(message) {
         serverState.selectedTargetId = null;
         serverState.attackMode = false;
       }
+      clearPendingCombatCommand();
       targetHealthById.set(message.npcId, {
         current: 0,
         max: targetHealthById.get(message.npcId)?.max ?? 1
@@ -687,6 +694,7 @@ function setRoom(roomId, options = {}) {
   lastCombatResult = null;
   lastInteractionResult = null;
   clearPendingInteractionAction();
+  clearPendingCombatCommand();
   activePanel = null;
   panel.classList.add("hidden");
   updatePanelButtons();
@@ -1328,6 +1336,7 @@ function clearSelectionTarget({ clearInteractable = false } = {}) {
     selectedInteractable = null;
     lastInteractionResult = null;
     clearPendingInteractionAction();
+    clearPendingCombatCommand();
   }
   if (!movement.selectionTarget && !movement.selectionMarker?.visible) {
     updateSelectionHealthBar(null);
@@ -2014,18 +2023,21 @@ function hostileActionFrame(entity) {
   const spell = world.catalogs.spells.find((candidate) => schools.has(candidate.school) && candidate.levelRequired <= 2);
   const combatReady = Boolean(serverCanDriveMovement());
   const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
+  const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
   const actions = [
     {
-      label: engaged ? "Stop Attack" : "Basic Attack",
-      detail: engaged ? "Disengage" : "Weapon strike",
+      label: pendingCombat?.command === "attack" || pendingCombat?.command === "stop_attack"
+        ? "Working..."
+        : engaged ? "Stop Attack" : "Basic Attack",
+      detail: pendingCombat ? "Awaiting server" : engaged ? "Disengage" : "Weapon strike",
       command: engaged ? "stop_attack" : "attack",
-      enabled: combatReady
+      enabled: combatReady && !pendingCombat
     },
     {
-      label: spell?.name ?? "Class Skill",
-      detail: spell ? `${spell.manaCost} MP` : "Ability",
+      label: pendingCombat?.command?.startsWith("cast:") ? "Working..." : spell?.name ?? "Class Skill",
+      detail: pendingCombat?.command?.startsWith("cast:") ? "Awaiting server" : spell ? `${spell.manaCost} MP` : "Ability",
       command: spell ? `cast:${spell.id}` : "skill",
-      enabled: combatReady && Boolean(spell)
+      enabled: combatReady && Boolean(spell) && !pendingCombat
     }
   ];
   const authorityText = serverCanDriveMovement()
@@ -2243,6 +2255,7 @@ function sendSelectedInteractableCommand(entity) {
 function useCombatCommand(command) {
   const target = selectedInteractable;
   if (!target || !isHostileEntity(target)) return;
+  if (pendingCombatCommand?.targetId === target.id) return;
 
   if (!serverCanDriveMovement()) {
     lastCombatResult = {
@@ -2255,14 +2268,20 @@ function useCombatCommand(command) {
     return;
   }
 
+  pendingCombatCommand = {
+    targetId: target.id,
+    targetName: target.name,
+    command,
+    startedAt: performance.now()
+  };
+  if (activePanel === "interaction") renderPanel(activePanel);
+
   let sent = false;
   if (command === "attack") {
     const selected = serverState.client.sendSelectTarget(target.id);
     const enabled = serverState.client.sendAttackToggle(true);
     sent = selected && enabled;
     if (sent) {
-      serverState.selectedTargetId = target.id;
-      serverState.attackMode = true;
       lastCombatResult = {
         success: true,
         targetName: target.name,
@@ -2274,8 +2293,6 @@ function useCombatCommand(command) {
   } else if (command === "stop_attack") {
     sent = serverState.client.sendAttackToggle(false);
     if (sent) {
-      serverState.attackMode = false;
-      serverState.selectedTargetId = null;
       lastCombatResult = {
         success: true,
         targetName: target.name,
@@ -2317,6 +2334,7 @@ function useCombatCommand(command) {
   }
 
   if (!sent) {
+    clearPendingCombatCommand();
     lastCombatResult = {
       success: false,
       targetName: target.name,
@@ -2325,6 +2343,10 @@ function useCombatCommand(command) {
     appendLog(`${target.name}: ${lastCombatResult.message}`);
   }
   if (activePanel === "interaction") renderPanel(activePanel);
+}
+
+function clearPendingCombatCommand() {
+  pendingCombatCommand = null;
 }
 
 function shortDirection(direction) {
@@ -2740,6 +2762,13 @@ function installDebugApi() {
             }
           : null,
         lastCombatResult,
+        pendingCombatCommand: pendingCombatCommand
+          ? {
+              targetId: pendingCombatCommand.targetId,
+              targetName: pendingCombatCommand.targetName,
+              command: pendingCombatCommand.command
+            }
+          : null,
         messageCount: serverState.messageCount,
         npcs: serverState.npcs.map((npc) => ({
           id: npc.id ?? npc.npcId ?? "",
