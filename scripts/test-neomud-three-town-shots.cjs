@@ -177,6 +177,8 @@ async function main() {
     );
     const resolvedTarget = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
     assert.ok(resolvedTarget.markerVisible, `expected resolved target marker to stay visible: ${JSON.stringify(resolvedTarget)}`);
+    assert.ok(resolvedTarget.pathMarkerVisible, `expected route preview to stay visible for clamped target: ${JSON.stringify(resolvedTarget)}`);
+    assert.ok(resolvedTarget.pathMarkerNodeCount >= 1, `expected route preview node for clamped target: ${JSON.stringify(resolvedTarget)}`);
     const blockedTarget = path.join(qaDir, "town-shot-isometric-blocked-target.png");
     await page.screenshot({ path: blockedTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-blocked-target", path: blockedTarget });
@@ -192,6 +194,8 @@ async function main() {
       `expected click beyond fountain to route around collider with waypoints, got ${JSON.stringify({ beyondPropMove, routedMove })}`
     );
     assert.equal(routedMove.pathClear, true, `expected every routed segment to clear room colliders: ${JSON.stringify(routedMove)}`);
+    assert.equal(routedMove.pathMarkerVisible, true, `expected visible route preview for fountain detour: ${JSON.stringify(routedMove)}`);
+    assert.ok(routedMove.pathMarkerNodeCount >= 3, `expected waypoint preview nodes for fountain detour: ${JSON.stringify(routedMove)}`);
     assert.ok(
       routedMove.path.some((point) => Math.abs(point.x) > 2.1 || Math.abs(point.z) > 2.1),
       `expected route to contain an explicit detour waypoint outside the fountain footprint: ${JSON.stringify(routedMove.path)}`
@@ -223,6 +227,7 @@ async function main() {
       routedAfter.player.z < -5.2 && Math.abs(routedAfter.player.x) < 1.0 && !routedAfter.clickMove.active,
       `expected avatar to route around fountain and reach far side target, got ${JSON.stringify(routedAfter)}`
     );
+    assert.equal(routedAfter.clickMove.pathMarkerVisible, false, `expected route preview to clear after arrival: ${JSON.stringify(routedAfter)}`);
 
     await page.evaluate(() => {
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
@@ -268,6 +273,7 @@ async function main() {
       clickMove: window.__neomudThreeDebug.clickMove
     }));
     assert.ok(afterClick.clickMove.markerVisible, `expected visible click destination marker: ${JSON.stringify(afterClick)}`);
+    assert.ok(afterClick.clickMove.pathMarkerVisible, `expected visible click route preview: ${JSON.stringify(afterClick)}`);
     await page.waitForTimeout(450);
     const afterClickMovement = await page.evaluate(() => window.__neomudThreeDebug.player);
     assert.ok(

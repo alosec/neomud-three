@@ -146,6 +146,7 @@ const movement = {
   clickPathIndex: 0,
   clickStuckTime: 0,
   clickTargetMarker: null,
+  clickPathMarker: null,
   hoverTarget: null,
   hoverMarker: null,
   selectionTarget: null,
@@ -957,6 +958,7 @@ function setClickMoveTarget(point) {
   movement.pendingInteractable = pendingInteractable;
   ensureClickTargetMarker().position.copy(target).setY(0.055);
   ensureClickTargetMarker().visible = true;
+  updateClickPathMarker();
   return {
     x: target.x,
     y: target.y,
@@ -1533,6 +1535,7 @@ function clearClickMoveTarget() {
   movement.pendingInteractable = null;
   clearHoldMove();
   if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
+  if (movement.clickPathMarker) movement.clickPathMarker.visible = false;
 }
 
 function finishClickMovePath() {
@@ -1564,6 +1567,78 @@ function ensureClickTargetMarker() {
   renderEngine.scene.add(group);
   movement.clickTargetMarker = group;
   return group;
+}
+
+function ensureClickPathMarker() {
+  if (movement.clickPathMarker) return movement.clickPathMarker;
+  const group = new THREE.Group();
+  group.name = "Click move route preview";
+  group.userData.cameraIgnore = true;
+
+  const line = new THREE.Line(
+    new THREE.BufferGeometry().setAttribute("position", new THREE.BufferAttribute(new Float32Array(9 * 3), 3)),
+    new THREE.LineBasicMaterial({
+      color: 0xf4ce78,
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false
+    })
+  );
+  line.name = "Click route line";
+  line.userData.routeLine = true;
+  group.add(line);
+
+  for (let index = 0; index < 8; index += 1) {
+    const node = new THREE.Mesh(
+      new THREE.CircleGeometry(0.13, 18),
+      new THREE.MeshBasicMaterial({
+        color: 0xfff1c2,
+        transparent: true,
+        opacity: 0.42,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      })
+    );
+    node.name = `Click route waypoint ${index + 1}`;
+    node.rotation.x = -Math.PI / 2;
+    node.position.y = 0.052;
+    node.userData.routeNode = true;
+    node.visible = false;
+    group.add(node);
+  }
+
+  group.visible = false;
+  renderEngine.scene.add(group);
+  movement.clickPathMarker = group;
+  return group;
+}
+
+function updateClickPathMarker() {
+  if (!movement.clickTarget || !movement.clickPath.length) {
+    if (movement.clickPathMarker) movement.clickPathMarker.visible = false;
+    return;
+  }
+  const group = ensureClickPathMarker();
+  const remaining = movement.clickPath.slice(movement.clickPathIndex);
+  const line = group.children.find((child) => child.userData.routeLine);
+  const positions = line.geometry.attributes.position;
+  const pointCount = Math.min(remaining.length + 1, positions.count);
+  positions.setXYZ(0, player.position.x, 0.06, player.position.z);
+  for (let index = 1; index < pointCount; index += 1) {
+    const point = remaining[index - 1];
+    positions.setXYZ(index, point.x, 0.06, point.z);
+  }
+  positions.needsUpdate = true;
+  line.geometry.setDrawRange(0, pointCount);
+  line.geometry.computeBoundingSphere();
+
+  const nodes = group.children.filter((child) => child.userData.routeNode);
+  nodes.forEach((node, index) => {
+    const point = remaining[index];
+    node.visible = Boolean(point);
+    if (point) node.position.set(point.x, 0.052, point.z);
+  });
+  group.visible = true;
 }
 
 function ensureHoverMarker() {
@@ -2519,6 +2594,7 @@ function updatePlayer(dt) {
     const pulse = 1 + Math.sin(performance.now() * 0.006) * 0.08;
     movement.clickTargetMarker.scale.setScalar(pulse);
   }
+  updateClickPathMarker();
   if (movement.hoverMarker?.visible) {
     movement.hoverMarker.rotation.y += dt * 1.2;
     const hoverPulse = 1 + Math.sin(performance.now() * 0.007) * 0.06;
@@ -2572,6 +2648,7 @@ function advanceClickWaypointIfVisible() {
   movement.clickPathIndex += 1;
   movement.clickStuckTime = 0;
   movement.clickTarget = nextTarget;
+  updateClickPathMarker();
 }
 
 function updateClickMoveProgress(dt, previousPosition, desiredClickDirection) {
@@ -2596,6 +2673,7 @@ function updateClickMoveProgress(dt, previousPosition, desiredClickDirection) {
   movement.clickPathIndex = 0;
   movement.clickTarget = movement.clickPath[0] ?? null;
   movement.clickStuckTime = 0;
+  updateClickPathMarker();
 }
 
 function updateCamera(dt, snap = false) {
@@ -2697,6 +2775,10 @@ function installDebugApi() {
         stuckTime: movement.clickStuckTime,
         autoRun: controls.clickAutoRun,
         markerVisible: Boolean(movement.clickTargetMarker?.visible),
+        pathMarkerVisible: Boolean(movement.clickPathMarker?.visible),
+        pathMarkerNodeCount: movement.clickPathMarker
+          ? movement.clickPathMarker.children.filter((child) => child.userData.routeNode && child.visible).length
+          : 0,
         holdActive: movement.holdMoveActive,
         pendingInteraction: movement.pendingInteractable
           ? {

@@ -70,6 +70,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      stop-and-turn motion without cutting through colliders. Click routes now
      auto-run in Iso mode and include a small stuck/repath guard that recomputes
      from the current avatar position if collider clamping prevents progress.
+     The route now also renders a subtle ground-line/waypoint preview, with QA
+     coverage for clamped targets, direct clicks, fountain detours, and cleanup
+     after arrival.
    - First Iso camera obstruction-avoidance slice exists: if the avatar-camera
      ray is blocked, the renderer samples nearby orbit angles and rotates to the
      first clear view when possible. Town Square screenshot QA verifies one

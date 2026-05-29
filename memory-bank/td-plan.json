@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T03:24:00.000Z",
+  "updated": "2026-05-30T03:40:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -295,10 +295,15 @@
           "id": 6,
           "body": "Revalidated the quality-of-life obstacle routing request: Town Square Chrome Canary QA now passes the exact fountain case where the avatar clicks from south of the fountain to the far side, creates a collision-clear multi-waypoint route, auto-runs, makes progress, and arrives without clipping through the obstacle.",
           "created": "2026-05-30T03:24:00Z"
+        },
+        {
+          "id": 7,
+          "body": "Added a lightweight visible route preview for click movement: a faint ground line plus waypoint dots follows the remaining path, making obstacle detours read as intentional player feedback. Debug exposes pathMarkerVisible/pathMarkerNodeCount, and Town Square QA asserts the preview appears for clamped, direct, and fountain-detour clicks and clears after arrival.",
+          "created": "2026-05-30T03:40:00Z"
         }
       ],
       "created": "2026-05-29T19:32:00Z",
-      "updated": "2026-05-30T03:24:00Z"
+      "updated": "2026-05-30T03:40:00Z"
     },
     {
       "id": "neo-2a6f",
