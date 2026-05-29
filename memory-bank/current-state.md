@@ -42,9 +42,11 @@ Playable Three.js lab:
   exit clicks route through the existing move command path. Iso mode also has
   first-pass hover targeting for clickable NPCs/items/exits: hovered targets get
   a small world marker and a concise DOM prompt, clicked interactables get a
-  persistent selected-target ring while the interaction panel is open, and
-  screenshot QA now verifies Old Wren hover/selection plus North Gate hover
-  before click routing. Hover/proximity action language now respects entity
+  persistent selected-target ring while the interaction panel is open, and the
+  target's actual scene group now receives a subtle hover/selection scale pulse
+  so the selected object itself responds in-world. Screenshot QA verifies Old
+  Wren hover/selection object highlighting plus North Gate hover before click
+  routing. Hover/proximity action language now respects entity
   semantics: normal NPCs read as `Talk to`, loot reads as `Pick up`, generic
   objects read as `Inspect`, and hostile forest entities read as `Engage`.
   Iso movement now also supports click-and-hold dragging: holding the primary

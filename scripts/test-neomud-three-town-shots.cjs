@@ -220,6 +220,7 @@ async function main() {
     });
     const hoverState = await page.evaluate(() => window.__neomudThreeDebug.hover);
     assert.equal(hoverState.markerVisible, true);
+    assert.equal(hoverState.objectHighlighted, true);
     assert.equal(hoverState.promptVisible, true);
     assert.match(hoverState.prompt, /Click Talk to Old Wren/);
     const hoverTarget = path.join(qaDir, "town-shot-isometric-hover-target.png");
@@ -256,6 +257,7 @@ async function main() {
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
     const selectedNpc = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(selectedNpc.markerVisible, true);
+    assert.equal(selectedNpc.objectHighlighted, true);
     assert.equal(selectedNpc.target.id, "npc:old_wren");
     const selectionTarget = path.join(qaDir, "town-shot-isometric-selection-target.png");
     await page.screenshot({ path: selectionTarget, animations: "disabled" });

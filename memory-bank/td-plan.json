@@ -99,6 +99,11 @@
           "created": "2026-05-29T16:26:00Z"
         },
         {
+          "id": 20,
+          "body": "Object-level target response added: hover and selected interactables now pulse the actual scene group when a user targets them in Iso mode, with selection overriding hover. Town Square QA asserts Old Wren object highlighting for hover and selection.",
+          "created": "2026-05-29T21:45:00Z"
+        },
+        {
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"
@@ -155,7 +160,7 @@
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T19:48:00Z"
+      "updated": "2026-05-29T21:45:00Z"
     },
     {
       "id": "neo-9c72",

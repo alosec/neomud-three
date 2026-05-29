@@ -140,6 +140,7 @@ const movement = {
   hoverMarker: null,
   selectionTarget: null,
   selectionMarker: null,
+  targetObjectHighlight: null,
   holdMoveActive: false,
   holdMovePointerId: null
 };
@@ -1111,6 +1112,7 @@ function setHoverTargetFromPoint(point) {
   const marker = ensureHoverMarker();
   marker.position.copy(target.position).setY(0.07);
   marker.visible = true;
+  applyTargetObjectHighlight(movement.hoverTarget, "hover");
   document.body.dataset.isoTarget = target.type;
   updateInteractionPrompt();
   return movement.hoverTarget;
@@ -1123,6 +1125,7 @@ function clearHoverTarget() {
   }
   movement.hoverTarget = null;
   if (movement.hoverMarker) movement.hoverMarker.visible = false;
+  applyTargetObjectHighlight(movement.selectionTarget, movement.selectionTarget ? "selected" : null);
   delete document.body.dataset.isoTarget;
   updateInteractionPrompt();
 }
@@ -1148,6 +1151,7 @@ function setSelectionTarget(target) {
   marker.userData.cardinalMaterial?.color.setHex(hostile ? 0xff9b72 : 0xfff1c2);
   marker.position.copy(target.position).setY(0.09);
   marker.visible = true;
+  applyTargetObjectHighlight(movement.selectionTarget, "selected");
   updateInteractionPrompt();
   return movement.selectionTarget;
 }
@@ -1156,7 +1160,56 @@ function clearSelectionTarget() {
   if (!movement.selectionTarget && !movement.selectionMarker?.visible) return;
   movement.selectionTarget = null;
   if (movement.selectionMarker) movement.selectionMarker.visible = false;
+  applyTargetObjectHighlight(movement.hoverTarget, movement.hoverTarget ? "hover" : null);
   updateInteractionPrompt();
+}
+
+function applyTargetObjectHighlight(target, mode = null) {
+  const current = movement.targetObjectHighlight;
+  const nextObject = target?.id ? findTargetSceneObject(target) : null;
+  if (current?.object && current.object !== nextObject) restoreTargetObjectHighlight(current.object);
+  if (!nextObject || !mode) {
+    movement.targetObjectHighlight = null;
+    return;
+  }
+
+  if (!nextObject.userData.isoTargetBaseScale) {
+    nextObject.userData.isoTargetBaseScale = nextObject.scale.clone();
+  }
+  movement.targetObjectHighlight = {
+    object: nextObject,
+    mode,
+    startedAt: performance.now()
+  };
+}
+
+function restoreTargetObjectHighlight(object) {
+  if (!object?.userData?.isoTargetBaseScale) return;
+  object.scale.copy(object.userData.isoTargetBaseScale);
+}
+
+function updateTargetObjectHighlight() {
+  const highlight = movement.targetObjectHighlight;
+  if (!highlight?.object?.parent) {
+    movement.targetObjectHighlight = null;
+    return;
+  }
+  const base = highlight.object.userData.isoTargetBaseScale ?? highlight.object.scale;
+  const age = (performance.now() - highlight.startedAt) * 0.006;
+  const selected = highlight.mode === "selected";
+  const pulse = selected ? 1.07 + Math.sin(age) * 0.025 : 1.035 + Math.sin(age) * 0.014;
+  highlight.object.scale.set(base.x * pulse, base.y * (selected ? 1.02 : 1.01), base.z * pulse);
+}
+
+function findTargetSceneObject(target) {
+  let found = null;
+  renderEngine.scene.traverse((object) => {
+    if (found || !object.userData) return;
+    if (object.userData.id !== target.id) return;
+    if (target.kind && object.userData.kind && object.userData.kind !== target.kind) return;
+    found = object;
+  });
+  return found;
 }
 
 function clearClickMoveTarget() {
@@ -1897,6 +1950,7 @@ function updatePlayer(dt) {
     const selectedPulse = 1 + Math.sin(performance.now() * 0.004) * 0.035;
     movement.selectionMarker.scale.setScalar(selectedPulse);
   }
+  updateTargetObjectHighlight();
   movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
@@ -2035,6 +2089,7 @@ function installDebugApi() {
         active: Boolean(movement.hoverTarget),
         target: movement.hoverTarget,
         markerVisible: Boolean(movement.hoverMarker?.visible),
+        objectHighlighted: movement.targetObjectHighlight?.mode === "hover",
         prompt: interactionPrompt?.textContent ?? "",
         promptVisible: Boolean(interactionPrompt && !interactionPrompt.classList.contains("hidden"))
       };
@@ -2043,7 +2098,8 @@ function installDebugApi() {
       return {
         active: Boolean(movement.selectionTarget),
         target: movement.selectionTarget,
-        markerVisible: Boolean(movement.selectionMarker?.visible)
+        markerVisible: Boolean(movement.selectionMarker?.visible),
+        objectHighlighted: movement.targetObjectHighlight?.mode === "selected"
       };
     },
     get effects() {

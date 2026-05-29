@@ -76,8 +76,8 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      a transient low-opacity material clone; QA verifies that fallback in the
      Tavern as `town-shot-tavern-iso-fade.png`. Faded blockers remain eligible
      as camera blockers until restored, avoiding frame-to-frame fade flicker.
-   - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
-   - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
+   - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should deepen object-level affordance language beyond the current marker/pulse layer.
+   - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, keep a selected-target ring on a clicked interactable while its panel is open, and pulse the actual target scene group on hover/selection. Town Square screenshot QA verifies Old Wren hover/selection object highlighting and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
    - Feature prompts now preserve semantic verbs too: treasure/drop features such as the Hidden Cave chest read as `Open` rather than generic `Pick up`.
    - Server-dropped Hidden Cave item loot now carries `PICKUP_ITEM` action/debug metadata, giving item drops and coin piles the same `Pick up` affordance path.
@@ -102,11 +102,11 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - Offline smoke and Town Square screenshot QA pass.
 
    Remaining first-slice gap:
-   - Selection feedback needs stronger object-level affordance language:
-     target outlines/material response, target persistence rules after panel
-     close and real attack/ability commands. Item/loot hover parity exists for
-     the Hidden Cave server-loot path, but should be audited across future
-     authored rooms as they gain live drops.
+   - Selection feedback now has first-pass object response through target-group
+     pulsing, but still needs stronger outlines/material response, target
+     persistence rules after panel close, and real attack/ability commands.
+     Item/loot hover parity exists for the Hidden Cave server-loot path, but
+     should be audited across future authored rooms as they gain live drops.
    - Click-to-move now has first-pass visibility-graph waypoint routing over
      rectangular room colliders, but it is not a full navmesh. Dynamic blockers,
      irregular collision, narrow doors, and optimal paths still need a real
