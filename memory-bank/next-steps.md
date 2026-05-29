@@ -63,7 +63,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - First obstacle-routing slice exists: if a direct Iso click path crosses a
      rectangular room collider, the client creates simple side waypoints around
      the blocker. Town Square QA verifies clicking across the fountain produces
-     a multi-waypoint path and arrives on the far side.
+     a multi-waypoint path and arrives on the far side. The router now attempts
+     a small room-collider visibility graph first, then falls back to the old
+     one-blocker route if no graph path is available.
    - First Iso camera obstruction-avoidance slice exists: if the avatar-camera
      ray is blocked, the renderer samples nearby orbit angles and rotates to the
      first clear view when possible. Town Square screenshot QA verifies one
@@ -102,9 +104,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      close and real attack/ability commands. Item/loot hover parity exists for
      the Hidden Cave server-loot path, but should be audited across future
      authored rooms as they gain live drops.
-   - Click-to-move now has first-pass waypoint routing around one rectangular
-     blocker, but it is not a full navmesh. Multi-obstacle rooms, dynamic
-     blockers, and optimal paths still need a real pathing layer later.
+   - Click-to-move now has first-pass visibility-graph waypoint routing over
+     rectangular room colliders, but it is not a full navmesh. Dynamic blockers,
+     irregular collision, narrow doors, and optimal paths still need a real
+     pathing layer later.
    - Iso camera obstruction avoidance is also first-pass. It handles simple
      foreground occluders by orbit sampling and fades one unavoidable blocker
      when no sampled angle works. Later work still needs per-room camera volumes

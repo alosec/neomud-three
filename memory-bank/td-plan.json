@@ -185,10 +185,15 @@
           "id": 1,
           "body": "Implemented first bounded waypoint router: if a direct Iso click path crosses one rectangular room collider, the client picks side waypoints around the inflated collider and continues to the final click target. Town Square QA verifies clicking from south of the fountain to the far side creates a multi-waypoint path and arrives.",
           "created": "2026-05-29T19:48:00Z"
+        },
+        {
+          "id": 2,
+          "body": "Upgraded the router from one-blocker side waypoints to a small visibility graph over inflated room-collider corners, with the old one-blocker route retained as fallback. Existing Town Square fountain QA still verifies route creation and arrival.",
+          "created": "2026-05-29T21:08:00Z"
         }
       ],
       "created": "2026-05-29T19:32:00Z",
-      "updated": "2026-05-29T19:48:00Z"
+      "updated": "2026-05-29T21:08:00Z"
     },
     {
       "id": "neo-2a6f",

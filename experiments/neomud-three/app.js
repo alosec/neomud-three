@@ -798,14 +798,15 @@ function setClickMoveTarget(point) {
 
 function routeClickPath(origin, target) {
   const directTarget = target.clone();
+  if (!firstBlockingClickCollider(origin, directTarget)) return [directTarget];
+
+  const routedPath = routeClickPathThroughVisibilityGraph(origin, directTarget);
+  if (routedPath.length) return routedPath;
+
   const collider = firstBlockingClickCollider(origin, directTarget);
-  if (!collider) return [directTarget];
-
-  const waypoints = waypointsAroundCollider(origin, directTarget, collider);
-  if (!waypoints.length) return [directTarget];
+  const waypoints = collider ? waypointsAroundCollider(origin, directTarget, collider) : [];
   for (const waypoint of waypoints) roomRuntime?.clamp?.(waypoint);
-
-  return [...waypoints, directTarget];
+  return waypoints.length ? [...waypoints, directTarget] : [directTarget];
 }
 
 function firstBlockingClickCollider(origin, target) {
@@ -855,6 +856,110 @@ function waypointsAroundCollider(origin, target, collider) {
   if (best) return best;
 
   return [];
+}
+
+function routeClickPathThroughVisibilityGraph(origin, target) {
+  const colliders = (roomRuntime?.debugColliders?.() ?? [])
+    .map((collider) => inflatedColliderBounds(collider, 0.95))
+    .filter(Boolean);
+  if (!colliders.length) return [];
+
+  const nodes = [origin.clone(), target.clone()];
+  for (const bounds of colliders) {
+    for (const point of colliderCornerNodes(bounds)) {
+      roomRuntime?.clamp?.(point);
+      nodes.push(point);
+    }
+  }
+
+  const graph = nodes.map(() => []);
+  for (let from = 0; from < nodes.length; from += 1) {
+    for (let to = from + 1; to < nodes.length; to += 1) {
+      if (segmentHitsAnyCollider(nodes[from], nodes[to], colliders, 0.02)) continue;
+      const distance = nodes[from].distanceTo(nodes[to]);
+      graph[from].push({ to, distance });
+      graph[to].push({ to: from, distance });
+    }
+  }
+
+  const indices = shortestPathIndices(graph, 0, 1);
+  if (!indices.length || indices.length < 2) return [];
+  return indices.slice(1).map((index) => nodes[index].clone());
+}
+
+function inflatedColliderBounds(collider, extraRadius = 0) {
+  if (!collider?.center || !collider?.size) return null;
+  const [cx, cz] = collider.center;
+  const [width, depth] = collider.size;
+  const radius = Number(collider.radius ?? 0.42) + extraRadius;
+  return {
+    id: collider.id ?? "",
+    minX: cx - width / 2 - radius,
+    maxX: cx + width / 2 + radius,
+    minZ: cz - depth / 2 - radius,
+    maxZ: cz + depth / 2 + radius
+  };
+}
+
+function colliderCornerNodes(bounds) {
+  return [
+    new THREE.Vector3(bounds.minX, 0, bounds.minZ),
+    new THREE.Vector3(bounds.minX, 0, bounds.maxZ),
+    new THREE.Vector3(bounds.maxX, 0, bounds.minZ),
+    new THREE.Vector3(bounds.maxX, 0, bounds.maxZ)
+  ];
+}
+
+function segmentHitsAnyCollider(origin, target, colliders, extraRadius = 0) {
+  return colliders.some((collider) => segmentHitBounds(origin, target, collider, extraRadius));
+}
+
+function segmentHitBounds(origin, target, bounds, extraRadius = 0) {
+  const dx = target.x - origin.x;
+  const dz = target.z - origin.z;
+  let tMin = 0;
+  let tMax = 1;
+  const xRange = segmentAxisRange(origin.x, dx, bounds.minX - extraRadius, bounds.maxX + extraRadius);
+  if (!xRange) return null;
+  tMin = Math.max(tMin, xRange.min);
+  tMax = Math.min(tMax, xRange.max);
+  const zRange = segmentAxisRange(origin.z, dz, bounds.minZ - extraRadius, bounds.maxZ + extraRadius);
+  if (!zRange) return null;
+  tMin = Math.max(tMin, zRange.min);
+  tMax = Math.min(tMax, zRange.max);
+  return tMin <= tMax && tMax > 0.025 && tMin < 0.975;
+}
+
+function shortestPathIndices(graph, start, goal) {
+  const distances = graph.map(() => Infinity);
+  const previous = graph.map(() => -1);
+  const visited = new Set();
+  distances[start] = 0;
+
+  while (visited.size < graph.length) {
+    let current = -1;
+    let currentDistance = Infinity;
+    for (let index = 0; index < graph.length; index += 1) {
+      if (!visited.has(index) && distances[index] < currentDistance) {
+        current = index;
+        currentDistance = distances[index];
+      }
+    }
+    if (current === -1 || current === goal) break;
+    visited.add(current);
+    for (const edge of graph[current]) {
+      const distance = currentDistance + edge.distance;
+      if (distance < distances[edge.to]) {
+        distances[edge.to] = distance;
+        previous[edge.to] = current;
+      }
+    }
+  }
+
+  if (!Number.isFinite(distances[goal])) return [];
+  const path = [];
+  for (let index = goal; index !== -1; index = previous[index]) path.push(index);
+  return path.reverse();
 }
 
 function segmentHitInflatedCollider(origin, target, collider, extraRadius = 0) {

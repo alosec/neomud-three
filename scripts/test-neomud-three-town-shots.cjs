@@ -326,6 +326,8 @@ async function main() {
     await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:tavern", null, { timeout: 5_000 });
     await page.evaluate(() => {
       window.__neomudThreeDebug.placePlayer({ x: 8, z: 10, heading: 0 });
+      window.__neomudThreeDebug.setIsoZoom(1.08);
+      window.__neomudThreeDebug.setIsoOrbitAngle(0);
     });
     await settleFrames(page);
     const tavernObstruction = await page.evaluate(() => window.__neomudThreeDebug.camera.obstruction);

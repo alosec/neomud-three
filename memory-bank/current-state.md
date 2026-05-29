@@ -80,6 +80,10 @@ Playable Three.js lab:
   room colliders when a direct click path is blocked. Town Square QA clicks from
   the south side of the fountain to the far side, verifies a multi-waypoint path
   is created, and waits for the avatar to route around the fountain and arrive.
+  The router now builds a small visibility graph from inflated room-collider
+  corners before falling back to the old one-blocker side route, so future
+  multi-collider rooms get a more systematic click path without introducing a
+  full navmesh yet.
   Iso camera obstruction handling now has a first bounded slice: when the ray
   from the elevated camera to the avatar is blocked, the camera samples nearby
   orbit offsets and uses the first clear angle instead of leaving the avatar
