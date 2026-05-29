@@ -861,7 +861,7 @@ async function main() {
     );
     await page.keyboard.up("w");
 
-    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -20.2, z: 0, heading: -Math.PI / 2 }));
+    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: -16.4, z: 0, heading: -Math.PI / 2 }));
     await page.keyboard.down("w");
     await page.waitForFunction(
       () => window.__neomudThreeDebug.currentRoomId === "town:tavern",

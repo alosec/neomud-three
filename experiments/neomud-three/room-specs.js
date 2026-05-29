@@ -247,69 +247,13 @@ export const TOWN_SQUARE_SPEC = {
       id: "outer-ridge-tree-bands",
       ring: "far",
       kind: "distant-ridges",
-      ridges: [
-        { x: -39, z: -43, width: 4.7, height: 1.0, depth: 1.8, scale: 1.0, rotationY: 0.2 },
-        { x: -31, z: -45, width: 6.4, height: 1.15, depth: 2.2, scale: 1.0, rotationY: -0.18 },
-        { x: -22, z: -44, width: 5.6, height: 1.05, depth: 2.1, scale: 0.92, rotationY: 0.38 },
-        { x: -12, z: -46, width: 7.1, height: 1.22, depth: 2.35, scale: 1.0, rotationY: -0.26 },
-        { x: 0, z: -44.5, width: 6.2, height: 1.1, depth: 2.2, scale: 0.98, rotationY: 0.14 },
-        { x: 11, z: -46, width: 7.4, height: 1.18, depth: 2.4, scale: 1.02, rotationY: 0.34 },
-        { x: 23, z: -44.2, width: 5.6, height: 1.02, depth: 2.05, scale: 0.95, rotationY: -0.4 },
-        { x: 34, z: -45, width: 6.5, height: 1.16, depth: 2.25, scale: 1.0, rotationY: 0.18 },
-        { x: -40, z: 43, width: 5.0, height: 1.0, depth: 1.9, scale: 0.98, rotationY: -0.2 },
-        { x: -29, z: 45, width: 7.0, height: 1.14, depth: 2.3, scale: 1.0, rotationY: 0.24 },
-        { x: -17, z: 44, width: 5.8, height: 1.02, depth: 2.05, scale: 0.94, rotationY: -0.34 },
-        { x: -5, z: 46, width: 7.4, height: 1.2, depth: 2.42, scale: 1.0, rotationY: 0.16 },
-        { x: 7, z: 44.5, width: 6.0, height: 1.08, depth: 2.1, scale: 0.96, rotationY: -0.24 },
-        { x: 19, z: 45.5, width: 7.2, height: 1.18, depth: 2.35, scale: 1.0, rotationY: 0.38 },
-        { x: 31, z: 43.8, width: 5.9, height: 1.04, depth: 2.05, scale: 0.96, rotationY: -0.16 },
-        { x: 42, z: 45, width: 6.4, height: 1.12, depth: 2.2, scale: 1.0, rotationY: 0.28 },
-        { x: -45, z: -35, width: 5.2, height: 1.04, depth: 2.0, scale: 0.98, rotationY: Math.PI / 2 - 0.2 },
-        { x: -46, z: -24, width: 7.2, height: 1.18, depth: 2.35, scale: 1.0, rotationY: Math.PI / 2 + 0.22 },
-        { x: -44.5, z: -12, width: 6.0, height: 1.08, depth: 2.1, scale: 0.96, rotationY: Math.PI / 2 - 0.36 },
-        { x: -46, z: 0, width: 7.5, height: 1.2, depth: 2.45, scale: 1.02, rotationY: Math.PI / 2 + 0.18 },
-        { x: -44.5, z: 13, width: 6.2, height: 1.08, depth: 2.15, scale: 0.98, rotationY: Math.PI / 2 - 0.24 },
-        { x: -46, z: 26, width: 7.1, height: 1.16, depth: 2.34, scale: 1.0, rotationY: Math.PI / 2 + 0.34 },
-        { x: -44, z: 38, width: 5.6, height: 1.0, depth: 2.0, scale: 0.94, rotationY: Math.PI / 2 - 0.16 },
-        { x: 45, z: -36, width: 5.4, height: 1.04, depth: 2.0, scale: 0.98, rotationY: -Math.PI / 2 + 0.18 },
-        { x: 46, z: -25, width: 7.4, height: 1.18, depth: 2.35, scale: 1.0, rotationY: -Math.PI / 2 - 0.24 },
-        { x: 44.5, z: -13, width: 6.1, height: 1.08, depth: 2.12, scale: 0.96, rotationY: -Math.PI / 2 + 0.38 },
-        { x: 46, z: 0, width: 7.6, height: 1.2, depth: 2.45, scale: 1.02, rotationY: -Math.PI / 2 - 0.18 },
-        { x: 44.5, z: 13, width: 6.3, height: 1.08, depth: 2.15, scale: 0.98, rotationY: -Math.PI / 2 + 0.24 },
-        { x: 46, z: 26, width: 7.0, height: 1.16, depth: 2.34, scale: 1.0, rotationY: -Math.PI / 2 - 0.34 },
-        { x: 44, z: 38, width: 5.8, height: 1.0, depth: 2.0, scale: 0.94, rotationY: -Math.PI / 2 + 0.16 }
-      ]
+      ridges: []
     },
     {
       id: "far-horizon-terraces",
       ring: "far",
       kind: "context-masses",
-      masses: [
-        { material: "forestMossLight", x: -34, y: 1.05, z: -52, width: 28, height: 2.1, depth: 3.0 },
-        { material: "forestMossLight", x: 0, y: 1.28, z: -53, width: 34, height: 2.55, depth: 3.2 },
-        { material: "forestMossLight", x: 34, y: 1.0, z: -52, width: 28, height: 2.0, depth: 3.0 },
-        { material: "foliageDark", x: -32, y: 2.45, z: -54.2, width: 30, height: 2.0, depth: 2.4 },
-        { material: "foliageDark", x: 4, y: 2.75, z: -55.0, width: 38, height: 2.3, depth: 2.5 },
-        { material: "foliageDark", x: 38, y: 2.35, z: -54.2, width: 28, height: 1.9, depth: 2.4 },
-        { material: "forestMossLight", x: -34, y: 1.0, z: 52, width: 28, height: 2.0, depth: 3.0 },
-        { material: "forestMossLight", x: 0, y: 1.22, z: 53, width: 34, height: 2.45, depth: 3.2 },
-        { material: "forestMossLight", x: 34, y: 1.0, z: 52, width: 28, height: 2.0, depth: 3.0 },
-        { material: "foliageDark", x: -34, y: 2.3, z: 54.2, width: 30, height: 1.85, depth: 2.4 },
-        { material: "foliageDark", x: 2, y: 2.62, z: 55.0, width: 38, height: 2.15, depth: 2.5 },
-        { material: "foliageDark", x: 36, y: 2.32, z: 54.2, width: 30, height: 1.85, depth: 2.4 },
-        { material: "forestMossLight", x: -52, y: 1.18, z: -31, width: 3.0, height: 2.35, depth: 30 },
-        { material: "forestMossLight", x: -53, y: 1.28, z: 4, width: 3.2, height: 2.55, depth: 36 },
-        { material: "forestMossLight", x: -52, y: 1.1, z: 38, width: 3.0, height: 2.2, depth: 25 },
-        { material: "foliageDark", x: -54.4, y: 2.55, z: -30, width: 2.4, height: 2.0, depth: 32 },
-        { material: "foliageDark", x: -55.0, y: 2.72, z: 5, width: 2.5, height: 2.25, depth: 36 },
-        { material: "foliageDark", x: -54.2, y: 2.35, z: 38, width: 2.4, height: 1.9, depth: 26 },
-        { material: "forestMossLight", x: 52, y: 1.18, z: -31, width: 3.0, height: 2.35, depth: 30 },
-        { material: "forestMossLight", x: 53, y: 1.28, z: 4, width: 3.2, height: 2.55, depth: 36 },
-        { material: "forestMossLight", x: 52, y: 1.1, z: 38, width: 3.0, height: 2.2, depth: 25 },
-        { material: "foliageDark", x: 54.4, y: 2.55, z: -30, width: 2.4, height: 2.0, depth: 32 },
-        { material: "foliageDark", x: 55.0, y: 2.72, z: 5, width: 2.5, height: 2.25, depth: 36 },
-        { material: "foliageDark", x: 54.2, y: 2.35, z: 38, width: 2.4, height: 1.9, depth: 26 }
-      ]
+      masses: []
     }
   ],
   landmarks: [
@@ -345,7 +289,7 @@ export const TOWN_SQUARE_SPEC = {
         roofMaterial: "roof",
         plasterMaterial: "plasterWarm",
         facadeMaterial: "plasterFacade",
-        sign: true,
+        sign: false,
         awning: null,
         roofHeight: 2.15,
         dormers: 0
@@ -464,9 +408,10 @@ export const TOWN_SQUARE_SPEC = {
       { x: 5.35, z: 4.95 }
     ],
     stringLights: [
-      { from: [-4.9, 3.72, -4.7], to: [4.9, 3.72, -4.7], bulbs: 5, sag: 0.1 },
-      { from: [-5.35, 3.46, 4.95], to: [-4.9, 3.72, -4.7], bulbs: 4, sag: 0.08 },
-      { from: [5.35, 3.46, 4.95], to: [4.9, 3.72, -4.7], bulbs: 4, sag: 0.08 }
+      { from: [-4.9, 2.35, -4.7], to: [-4.15, 2.35, -4.25], bulbs: 1, sag: 0 },
+      { from: [4.9, 2.35, -4.7], to: [4.15, 2.35, -4.25], bulbs: 1, sag: 0 },
+      { from: [-5.35, 2.35, 4.95], to: [-4.6, 2.35, 4.5], bulbs: 1, sag: 0 },
+      { from: [5.35, 2.35, 4.95], to: [4.6, 2.35, 4.5], bulbs: 1, sag: 0 }
     ],
     benches: [
       { x: -6.7, z: 5.65, rotationY: -0.58 },
@@ -625,7 +570,7 @@ export const TOWN_SQUARE_SPEC = {
         label: "Market",
         subtitle: "Stalls & Traders",
         palette: "blue",
-        board: { center: [18.35, 4.85, 0], size: [4.8, 0.98] },
+        board: { center: [14.15, 3.45, -1.45], size: [4.8, 0.98] },
         threshold: { center: [20.35, 0.05, 0], size: [1.35, 6.4], color: 0xbfe8f0 }
       }
     },
@@ -648,13 +593,13 @@ export const TOWN_SQUARE_SPEC = {
       direction: "WEST",
       targetId: "town:tavern",
       prompt: "Enter the Tavern",
-      trigger: { type: "box", center: [-20.95, 1, 0], size: [1.9, 3, 6.6] },
+      trigger: { type: "box", center: [-15.6, 1, 0], size: [2.05, 3, 6.6] },
       affordance: {
         label: "Tavern",
         subtitle: "Common Room",
         palette: "red",
         board: { center: [-16.25, 3.45, 2.95], size: [4.2, 0.86] },
-        threshold: { center: [-20.35, 0.05, 0], size: [1.35, 6.6], color: 0xf1a36f }
+        threshold: { center: [-15.6, 0.05, 0], size: [1.35, 6.6], color: 0xf1a36f }
       }
     }
   ]

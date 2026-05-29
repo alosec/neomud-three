@@ -431,6 +431,24 @@ async function main() {
       window.__neomudThreeDebug.setCameraMode("isometric");
     });
     await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:square", null, { timeout: 5_000 });
+    const marketBoard = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.textBoards.find((board) => board.text === "Market" && board.exitTarget === "town:market")
+    );
+    assert.ok(marketBoard, "expected physical Market board to expose exit target metadata");
+    assert.equal(marketBoard.type, "mesh");
+    assert.equal(marketBoard.billboard, false);
+    assert.ok(
+      marketBoard.x < 17,
+      `expected Market board to sit forward of the building face instead of clipping into it: ${JSON.stringify(marketBoard)}`
+    );
+    const tavernTrigger = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.triggers.find((trigger) => trigger.id === "exit-west-tavern")
+    );
+    assert.ok(tavernTrigger, "expected Tavern trigger for entrance alignment");
+    assert.ok(
+      tavernTrigger.trigger.center[0] > -18.5,
+      `expected Tavern trigger to sit at the visible doorway side instead of inside the building: ${JSON.stringify(tavernTrigger)}`
+    );
     const gateTrigger = await page.evaluate(() =>
       window.__neomudThreeDebug.room.triggers.find((trigger) => trigger.id === "exit-north-gate")
     );

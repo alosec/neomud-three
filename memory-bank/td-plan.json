@@ -4078,8 +4078,8 @@
       "description": "Run a focused Town Square scale/composition pass so it stops reading as a literal square outdoor room and starts reading as an explorable civic district/adventure hub. Expand and reshape the usable footprint with offset paths, asymmetric edges, pockets of exploration, varied approach corridors, layered backdrop/edge treatment, and distinct landmark districts instead of one flat box-shaped plaza. Diversify landmarks through silhouettes, planting, ground zones, civic props, elevation/threshold changes, and visual hierarchy rather than generic clutter. Improve ground fidelity with more convincing path/grass material treatment plus restrained small grass tufts/clumps at edges and seams, keeping paths readable and avoiding high-noise carpet detail. Preserve all four primary exits, click-to-move routing, physical board clicks, render budgets, and fixed screenshot QA.",
       "type": "task",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "in-progress",
+      "status_type": "started",
       "parent": "neo-1fb2.8",
       "close_reason": "",
       "labels": [
@@ -4110,10 +4110,15 @@
           "id": 3,
           "body": "User noted the outside context beyond the little town-square box reads jumbled. The recomposition should make the space more interesting and traversable, with clear explorable edges and hierarchy rather than cluttered backdrop massing.",
           "created": "2026-05-30T07:41:00Z"
+        },
+        {
+          "id": 4,
+          "body": "First cleanup pass removed the noisiest far ridge/terrace bands from the Town Square spec so the outside edge reads less jumbled. This is only a simplification pass; the larger less-square/explorable district recomposition remains open.",
+          "created": "2026-05-30T07:55:00Z"
         }
       ],
       "created": "2026-05-30T07:18:00Z",
-      "updated": "2026-05-30T07:41:00Z"
+      "updated": "2026-05-30T07:55:00Z"
     },
     {
       "id": "neo-1fb2.95",
@@ -4151,10 +4156,10 @@
       "description": "Fix or redesign the Town Square rope/string/Edison bulb lights so they no longer read as floating bulbs detached from lamps or support structures. Inspect the current lamp/string-light geometry from Iso, Platform, and Scenic Review angles; either add convincing supports/catenary attachment points or replace the concept with a cleaner civic lighting treatment. Preserve route readability, physical exits, click targets, and render budget.",
       "type": "bug",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-1fb2.8",
-      "close_reason": "",
+      "close_reason": "done: redesigned disconnected overhead strands into short lamp-mounted bulb brackets and verified Town Square screenshot QA",
       "labels": [
         "neomud-three",
         "town-square",
@@ -4168,10 +4173,15 @@
           "id": 0,
           "body": "User reported the rope/string/Edison bulb lights look disconnected from the lamp supports and float in space. The current idea may need a fundamental redesign rather than minor nudging.",
           "created": "2026-05-30T07:22:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Replaced the long disconnected overhead string-light spans with short lamp-mounted bracket bulbs, preserving warm civic lighting without floating bulbs detached from supports. Town Square screenshot QA passes.",
+          "created": "2026-05-30T07:55:00Z"
         }
       ],
       "created": "2026-05-30T07:22:00Z",
-      "updated": "2026-05-30T07:22:00Z"
+      "updated": "2026-05-30T07:55:00Z"
     },
     {
       "id": "neo-1fb2.97",
@@ -4180,8 +4190,8 @@
       "description": "Make the Town Square market read as a distinct, front-facing civic landmark rather than background clutter. Improve its entrance/frontage, silhouette, signage, awnings, stall composition, and approach framing so the player understands where the market is from Iso and Platform views. Resolve the carts/loose props in front of the market so the player cannot visibly clip through them; either add accurate collision volumes, reposition them outside traversal lanes, or replace them with cleaner nonblocking frontage elements. Keep the east exit target, physical click/trigger behavior, route readability, and render budget intact.",
       "type": "task",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "in-progress",
+      "status_type": "started",
       "parent": "neo-1fb2.8",
       "close_reason": "",
       "labels": [
@@ -4202,10 +4212,15 @@
           "id": 1,
           "body": "User reported carts/loose props in front of the market can be clipped through. The market identity pass must include collision or layout cleanup for those frontage props.",
           "created": "2026-05-30T07:25:00Z"
+        },
+        {
+          "id": 2,
+          "body": "Partial: removed the Market building's camera-facing label and moved the fixed exit board forward. Remaining: stronger front-facing market identity and cart/frontage collision/layout cleanup.",
+          "created": "2026-05-30T07:55:00Z"
         }
       ],
       "created": "2026-05-30T07:24:00Z",
-      "updated": "2026-05-30T07:25:00Z"
+      "updated": "2026-05-30T07:55:00Z"
     },
     {
       "id": "neo-3361.1",
@@ -4301,10 +4316,10 @@
       "description": "Fix the Town Square market sign so it behaves like the corrected gate sign: stable fixed world geometry, no camera-facing rotation, no clipping through the market building, and still directly readable/clickable as the east market exit affordance. Update Town Square screenshot QA to cover the market sign from relevant Iso/Platform/scenic angles.",
       "type": "bug",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-1fb2.8",
-      "close_reason": "",
+      "close_reason": "done: removed rotating building label, moved fixed Market exit board forward, and added Town Square QA assertions",
       "labels": [
         "neomud-three",
         "town-square",
@@ -4318,10 +4333,15 @@
           "id": 0,
           "body": "User reported the gate sign works and no longer rotates, but the market sign still rotates and clips through its building. Apply the same stable-world-sign rule to the market affordance.",
           "created": "2026-05-30T07:37:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Removed the Market building's camera-facing label and relied on the fixed mesh exit board instead. Moved the Market exit board forward from the building face; Town Square QA asserts it is a non-billboard mesh with exit metadata and a forward world position.",
+          "created": "2026-05-30T07:55:00Z"
         }
       ],
       "created": "2026-05-30T07:37:00Z",
-      "updated": "2026-05-30T07:37:00Z"
+      "updated": "2026-05-30T07:55:00Z"
     },
     {
       "id": "neo-1fb2.100",
@@ -4330,10 +4350,10 @@
       "description": "Fix the Town Square Tavern entrance trigger/click target so the player can enter through the visible doorway without clipping through the building. The current hitbox appears to sit inside the Tavern structure. Align the trigger volume, click affordance, collision volumes, and visual doorway/threshold so click-to-move and physical walking both route to the Tavern naturally. Preserve west exit server movement and Town Square screenshot/server QA.",
       "type": "bug",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-1fb2.8",
-      "close_reason": "",
+      "close_reason": "done: moved Tavern trigger/threshold to the visible plaza-side doorway approach and updated smoke/Town Square QA",
       "labels": [
         "neomud-three",
         "town-square",
@@ -4347,10 +4367,15 @@
           "id": 0,
           "body": "User reported the Tavern hitbox/entrance trigger is inside the building, forcing the player to clip through geometry to enter. Need trigger/collider/doorway alignment.",
           "created": "2026-05-30T07:39:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Moved the Town Square Tavern trigger and threshold to the visible doorway side. Offline smoke now approaches Tavern from the plaza side, and Town Square QA asserts the trigger is no longer at the old inside-building coordinate.",
+          "created": "2026-05-30T07:55:00Z"
         }
       ],
       "created": "2026-05-30T07:39:00Z",
-      "updated": "2026-05-30T07:39:00Z"
+      "updated": "2026-05-30T07:55:00Z"
     }
   ]
 }
