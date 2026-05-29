@@ -6005,11 +6005,7 @@ function addTownSpecSignpost(root, materials, signpostSpec) {
 function addTownSpecChunkRings(root, materials, spec) {
   for (const chunk of spec.chunkRings) {
     if (chunk.kind === "backdrop") {
-      addComponentBackdrop(root, chunk.asset, chunk.x, chunk.y, chunk.z, chunk.width, chunk.height, {
-        opacity: chunk.opacity,
-        rotationY: chunk.rotationY ?? 0,
-        unlit: true
-      });
+      addTownPaintedHorizon(root, materials, chunk);
     }
     if (chunk.kind === "surface-rects") {
       addInstancedSurfaceRects(root, materials, chunk.surfaces, `${chunk.id}-surfaces`);
@@ -6068,6 +6064,51 @@ function addTownSpecChunkRings(root, materials, spec) {
       addTownDistantRidges(root, materials, chunk);
     }
   }
+}
+
+function addTownPaintedHorizon(root, materials, chunk) {
+  const group = new THREE.Group();
+  group.position.set(chunk.x, 0, chunk.z);
+  group.rotation.y = chunk.rotationY ?? 0;
+  group.userData = { visualRole: "painted-horizon", source: chunk.asset };
+  root.add(group);
+
+  const span = chunk.width ?? 120;
+  const segments = 10;
+  const start = -span / 2;
+  const darkFoliageBoxes = [];
+  const foliageBoxes = [];
+  const plasterBoxes = [];
+  const roofBoxes = [];
+
+  for (let i = 0; i < segments; i++) {
+    const t = i / (segments - 1);
+    const x = start + t * span;
+    const wave = Math.sin(t * Math.PI * 2.8 + 0.4);
+    const farHeight = 2.2 + 1.0 * Math.sin(t * Math.PI * 1.7) + 0.55 * wave;
+    const nearHeight = 1.35 + 0.65 * Math.cos(t * Math.PI * 2.3);
+    const width = span / segments + 3.5;
+
+    darkFoliageBoxes.push({ x, y: 1.2 + farHeight * 0.42, z: -2.4, width, height: farHeight, depth: 1.2 });
+    foliageBoxes.push({ x: x + 1.2, y: 0.72 + nearHeight * 0.36, z: -0.35, width: width * 0.72, height: nearHeight, depth: 1.05 });
+  }
+
+  for (let i = 0; i < 7; i++) {
+    const x = start + 8 + i * (span - 16) / 6;
+    const y = 3.1 + (i % 3) * 0.45;
+    const width = 8.0 + (i % 2) * 3.6;
+    plasterBoxes.push({ x, y, z: -1.45, width, height: 1.15, depth: 0.5 });
+    roofBoxes.push({ x, y: y + 0.78, z: -1.38, width: width * 0.88, height: 0.42, depth: 0.62 });
+  }
+
+  addInstancedBoxes(group, materials.foliageDark, darkFoliageBoxes, `${chunk.id}-far-foliage`, { castShadow: false });
+  addInstancedBoxes(group, materials.foliage, foliageBoxes, `${chunk.id}-near-foliage`, { castShadow: false });
+  addInstancedBoxes(group, materials.plasterQuiet, plasterBoxes, `${chunk.id}-quiet-buildings`, { castShadow: false });
+  addInstancedBoxes(group, materials.roofQuiet, roofBoxes, `${chunk.id}-quiet-roofs`, { castShadow: false });
+  addInstancedBoxes(group, materials.pathEdge, [{ x: 0, y: 0.08, z: 1.0, width: span, height: 0.12, depth: 1.6 }], `${chunk.id}-ground-edge`, {
+    castShadow: false
+  });
+  return group;
 }
 
 function addTownDistantRidges(root, materials, chunk) {

@@ -161,9 +161,9 @@ function valueNoise(ctx, width, height, base, flecks, alpha, random) {
 }
 
 function packedDirtTexture() {
-  return proceduralTexture("town-packed-dirt-v2", [10, 10], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#627044", 760, 0.032, random);
-    ctx.strokeStyle = "rgba(34, 48, 28, 0.045)";
+  return proceduralTexture("town-packed-dirt-v3", [10, 10], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#566744", 760, 0.028, random);
+    ctx.strokeStyle = "rgba(28, 42, 24, 0.04)";
     ctx.lineWidth = 1.2;
     for (let i = 0; i < 14; i++) {
       ctx.beginPath();
@@ -176,8 +176,8 @@ function packedDirtTexture() {
       const x = random() * width;
       const y = random() * height;
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, 8 + random() * 24);
-      gradient.addColorStop(0, `rgba(112, 135, 72, ${0.018 + random() * 0.025})`);
-      gradient.addColorStop(1, "rgba(112, 135, 72, 0)");
+      gradient.addColorStop(0, `rgba(88, 118, 66, ${0.016 + random() * 0.022})`);
+      gradient.addColorStop(1, "rgba(88, 118, 66, 0)");
       ctx.fillStyle = gradient;
       ctx.fillRect(x - 28, y - 28, 56, 56);
     }
@@ -185,9 +185,9 @@ function packedDirtTexture() {
 }
 
 function roadTexture() {
-  return proceduralTexture("town-road-gravel-v2", [7, 7], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#8d7b55", 760, 0.032, random);
-    ctx.strokeStyle = "rgba(82, 62, 38, 0.055)";
+  return proceduralTexture("town-road-gravel-v3", [7, 7], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#796949", 760, 0.026, random);
+    ctx.strokeStyle = "rgba(64, 50, 34, 0.046)";
     ctx.lineWidth = 1.25;
     for (let i = 0; i < 18; i++) {
       const x = random() * width;
@@ -196,7 +196,7 @@ function roadTexture() {
       ctx.bezierCurveTo(x + random() * 20 - 10, height * 0.3, x + random() * 24 - 12, height * 0.72, x + random() * 16 - 8, height + 8);
       ctx.stroke();
     }
-    ctx.fillStyle = "rgba(58, 45, 31, 0.045)";
+    ctx.fillStyle = "rgba(48, 39, 29, 0.035)";
     for (let i = 0; i < 130; i++) {
       ctx.beginPath();
       ctx.ellipse(random() * width, random() * height, 1 + random() * 3, 0.8 + random() * 2.4, random() * Math.PI, 0, Math.PI * 2);
@@ -206,9 +206,9 @@ function roadTexture() {
 }
 
 function plazaPaverTexture() {
-  return proceduralTexture("town-plaza-pavers-v2", [2.8, 2.8], (ctx, width, height, random) => {
-    valueNoise(ctx, width, height, "#b2a06f", 420, 0.032, random);
-    ctx.strokeStyle = "rgba(70, 58, 38, 0.105)";
+  return proceduralTexture("town-plaza-pavers-v3", [2.8, 2.8], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#9b8b61", 420, 0.026, random);
+    ctx.strokeStyle = "rgba(58, 50, 36, 0.092)";
     ctx.lineWidth = 1;
     const cell = 56;
     for (let y = -cell; y < height + cell; y += cell) {
@@ -217,7 +217,7 @@ function plazaPaverTexture() {
         ctx.strokeRect(x + jitter, y, cell + 8, cell - 2);
       }
     }
-    ctx.strokeStyle = "rgba(245, 220, 148, 0.045)";
+    ctx.strokeStyle = "rgba(220, 200, 132, 0.035)";
     for (let i = 0; i < 22; i++) {
       const y = random() * height;
       ctx.beginPath();
@@ -567,9 +567,9 @@ const MATERIAL_DEFINITION_LIST = [
     approved: true,
     create: () => standardMaterial({ map: texture("millhavenCobblestone", [3.7, 3.7]), color: 0x8f8a74, roughness: 0.94, metalness: 0 })
   },
-  proceduralMaterial("town.road.gravel", "road", "town", "road", roadTexture, { color: 0x9f8859, roughness: 0.96 }),
-  proceduralMaterial("town.plaza.pavers", "plazaStone", "town", "plaza", plazaPaverTexture, { color: 0xab9565, roughness: 0.9 }),
-  proceduralMaterial("town.ground.packed-dirt", "packedDirt", "town", "ground", packedDirtTexture, { color: 0x657449, roughness: 0.98 }),
+  proceduralMaterial("town.road.gravel", "road", "town", "road", roadTexture, { color: 0x806f4c, roughness: 0.96 }),
+  proceduralMaterial("town.plaza.pavers", "plazaStone", "town", "plaza", plazaPaverTexture, { color: 0x9a8a61, roughness: 0.9 }),
+  proceduralMaterial("town.ground.packed-dirt", "packedDirt", "town", "ground", packedDirtTexture, { color: 0x596b46, roughness: 0.98 }),
   colorMaterial("town.path.edge", "pathEdge", "town", "path-edge", 0x77704d, { roughness: 0.92 }),
   {
     id: "town.stone.limestone",
