@@ -286,9 +286,9 @@ const MATERIAL_DEFINITION_LIST = [
     create: () => standardMaterial({ map: texture("templeAltarCloth"), roughness: 0.62 })
   },
   colorMaterial("temple.trim.limestone", "trim", "temple", "stone-trim", 0xbeb39c, { roughness: 0.65 }),
-  colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x6c3f18, { roughness: 0.76 }),
-  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x321807, { roughness: 0.84 }),
-  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0xb77d34, { roughness: 0.68 }),
+  colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x654226, { roughness: 0.82 }),
+  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x3e2817, { roughness: 0.88 }),
+  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0x74502b, { roughness: 0.78 }),
   colorMaterial("temple.window.frame", "windowFrame", "temple", "window-frame", 0x58452f, { roughness: 0.52, metalness: 0.18 }),
   colorMaterial("temple.window.reveal", "windowReveal", "temple", "window-reveal", 0xa79b83, { roughness: 0.86 }),
   {

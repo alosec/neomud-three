@@ -96,14 +96,14 @@ It is accepted as a playable prototype, not final cathedral art.
 
 ## Current Pew Candidate
 
-`cathedral.pew` is now marked `redesign-required` by semantic QA. The current
-Blender candidate technically reads as seating, but Scenic Review/subagent QA
-finds that its dark rails, bright trim, chunky end caps, and repeated horizontal
-bars push it toward fence/crate/barricade reads. In the room, the pew rows also
-compete with the altar and stained glass instead of staying visually quiet. The
-next pew pass must simplify silhouette, reduce rail/trim contrast, enforce row
-layout constraints, and prove from asset-lab plus Scenic Review evidence that
-the result reads as calm church seating rather than an obstacle grid.
+`cathedral.pew` is marked `redesign-required` by semantic QA. The latest Blender
+candidate removes the worst rail/plank clutter and now uses broad seat/back/end
+panel planes with quieter worn-edge treatment and tighter center-aisle
+placement. It is improved, but still not accepted: the repeated dark backs
+remain visually heavy in the nave and compete with altar/glass hierarchy. The
+next pew pass should reduce material value contrast or wait until the Temple
+floor/wall material hierarchy is calmer, then re-score through asset lab plus
+Scenic Review.
 
 ## Current Texture Candidate
 

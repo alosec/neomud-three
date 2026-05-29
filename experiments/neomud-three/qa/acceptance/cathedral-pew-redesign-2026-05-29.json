@@ -28,13 +28,13 @@
   "scores": {
     "representationalSanity": {
       "score": 1,
-      "notes": "Technically reads as seating, but dark rails, bright trim, chunky end caps, and repeated bars push it toward barricade/fence/crate reads.",
-      "followUp": "Simplify the silhouette around a clear seat plane, back plane, and end panels with less rail language."
+      "notes": "The current pass reads more like broad seating than the previous rail-heavy candidate, but the long dark backs still feel too monolithic for calm cathedral pews.",
+      "followUp": "Lighten the backs/end panels or add subtle low-contrast bevel/seat separation without returning to rail/plank clutter."
     },
     "cohesion": {
       "score": 1,
-      "notes": "Pew detail density and contrast do not match the calmer low-poly sacred-furniture role.",
-      "followUp": "Keep geometry and material detail subordinate to the Temple's altar, glass, and nave composition."
+      "notes": "The simpler geometry fits the low-poly target better, but the pew material still does not harmonize with the bright marble floor and stained-glass focal language.",
+      "followUp": "Adjust material values after the Temple floor/wall material hierarchy is calmed."
     },
     "scale": {
       "score": 1,
@@ -43,11 +43,11 @@
     },
     "materialLanguage": {
       "score": 0,
-      "notes": "The orange/dark striping competes with the altar, glass, and already-loud floor/wall treatment."
+      "notes": "Rail striping is reduced, but the dark pew planes still compete against the over-bright floor/wall treatment instead of sitting quietly in the nave."
     },
     "visualHierarchy": {
       "score": 0,
-      "notes": "Repeated pew contrast competes with the intended sacred focal elements instead of framing them."
+      "notes": "The repeated dark backs still pull the eye away from the altar and stained glass in the player-view nave shot."
     },
     "flow": {
       "score": 1,
@@ -62,8 +62,8 @@
   },
   "acceptedAs": null,
   "blockedBy": [
-    "material contrast must be reduced below altar and stained-glass prominence",
-    "silhouette must stop reading as fence/barricade",
-    "row layout must read as seating rhythm rather than obstacle grid"
+    "pew material contrast must sit lower in hierarchy than altar and stained glass",
+    "Temple floor/wall material language is still loud enough to make dark pew rows feel harsher",
+    "row composition must feel more processional and less like repeated dark blocks"
   ]
 }

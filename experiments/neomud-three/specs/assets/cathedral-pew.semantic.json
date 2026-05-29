@@ -46,7 +46,7 @@
     ],
     "rowLayout": {
       "centerAisleWidthMeters": [2.4, 3.6],
-      "rowPitchMeters": [1.45, 1.9],
+      "rowPitchMeters": [3.8, 5.4],
       "sideClearanceMeters": [0.7, 1.4],
       "frontClearanceFromAltarMeters": [5.5, 8.5],
       "rules": [
