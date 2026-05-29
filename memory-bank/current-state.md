@@ -47,6 +47,9 @@ Playable Three.js lab:
   simulation. Hostile panels now also show disabled `Basic Attack` and class
   skill action slots with explicit server-authoritative command-path messaging,
   so the intended action-RPG loop is visible without faking combat locally.
+  Iso mode also supports right-click cancellation for player control: it clears
+  destination movement, hover, selection, and open panels without opening the
+  browser context menu.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.

@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T17:08:00.000Z",
+  "updated": "2026-05-29T17:18:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -117,10 +117,15 @@
           "id": 12,
           "body": "Hostile action row added: hostile interaction panels now show disabled Basic Attack and class-skill slots with explicit server-authoritative combat command messaging. Smoke QA asserts the action row, two disabled command slots, and screenshot evidence in offline-hostile-target-panel.png.",
           "created": "2026-05-29T17:08:00Z"
+        },
+        {
+          "id": 13,
+          "body": "Iso right-click cancel added: right-click on the canvas clears click movement, hover, selection, and panels without opening the browser context menu. Town Square screenshot QA verifies state clears after hold-move.",
+          "created": "2026-05-29T17:18:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T17:08:00Z"
+      "updated": "2026-05-29T17:18:00Z"
     },
     {
       "id": "neo-1fb2",

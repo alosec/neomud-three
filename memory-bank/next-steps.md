@@ -38,6 +38,7 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - First click slice exists: Iso mode raycasts canvas clicks to the ground plane, checks nearby interactables and exit trigger volumes, clamps movement targets through the current room runtime, shows a destination marker, and steers the avatar toward the clicked point. Keyboard movement cancels the click target.
    - Click-and-hold movement now exists for open ground in Iso mode: holding the primary pointer continuously updates the destination marker until release, which better matches Diablo-like movement.
    - Iso mode now has bounded mouse-wheel zoom for player comfort and QA review, without changing room art or server authority.
+   - Iso mode now has right-click cancel for player control: destination movement, hover, selection, and open panels clear without opening the browser context menu.
    - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should add hover/selection feedback and clearer object-level affordance language.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
@@ -56,6 +57,7 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - The elevated camera keeps all four primary landmark directions readable
      from the central plaza.
    - Mouse-wheel zoom changes Iso camera distance within bounded limits.
+   - Right-click clears targeting/movement state without navigating or opening browser UI.
    - Existing keyboard movement still works as fallback/debug.
    - Offline smoke and Town Square screenshot QA pass.
 

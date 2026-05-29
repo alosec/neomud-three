@@ -162,6 +162,17 @@ async function main() {
     const holdTarget = path.join(qaDir, "town-shot-isometric-hold-move.png");
     await page.screenshot({ path: holdTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-hold-move", path: holdTarget });
+    assert.equal(afterHold.markerVisible, true);
+    await page.mouse.click(740, 520, { button: "right" });
+    const afterCancel = await page.evaluate(() => ({
+      clickMove: window.__neomudThreeDebug.clickMove,
+      hover: window.__neomudThreeDebug.hover,
+      selection: window.__neomudThreeDebug.selection
+    }));
+    assert.equal(afterCancel.clickMove.active, false);
+    assert.equal(afterCancel.clickMove.markerVisible, false);
+    assert.equal(afterCancel.hover.active, false);
+    assert.equal(afterCancel.selection.active, false);
 
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
     const budget = budgetStatus("town:square", stats);

@@ -13,6 +13,8 @@ Implemented:
   movement while held updates the destination marker until release.
 - Added bounded mouse-wheel zoom for `Iso` mode so the player/reviewer can pull
   back or move closer without switching visual modes.
+- Added right-click cancel in `Iso` mode to clear destination movement, hover,
+  selection, and open panels without showing the browser context menu.
 - Tightened target action language so prompts use entity semantics: `Talk to`,
   `Engage`, `Inspect`, or `Pick up` instead of treating every NPC as talkable.
 - Added first-pass hostile target treatment: red selected-target marker colors
@@ -37,6 +39,8 @@ Evidence:
 - `qa/latest/town-shot-isometric-hold-move.png` shows the player moving after a real browser mouse drag.
 - Town Square screenshot QA verifies wheel-down zooms the Iso camera out and
   wheel-up zooms it back in.
+- Town Square screenshot QA verifies right-click clears movement, hover, and
+  selection state after hold-move.
 - Town Square screenshot QA asserts the selected-target ring clears after `Escape`.
 - Town Square screenshot QA verifies Old Wren hover before click-interact and North Gate hover before click-exit routing.
 - The Town Square QA budget remains under gate at `232/240` draw calls with target markers visible.

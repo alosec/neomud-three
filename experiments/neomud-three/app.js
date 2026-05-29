@@ -202,6 +202,7 @@ async function main() {
   canvas.addEventListener("pointerup", handleCanvasPointerUp);
   canvas.addEventListener("pointercancel", handleCanvasPointerCancel);
   canvas.addEventListener("wheel", handleCanvasWheel, { passive: false });
+  canvas.addEventListener("contextmenu", handleCanvasContextMenu);
   playButton.addEventListener("click", requestPlayMode);
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
   for (const button of cameraModeButtons) {
@@ -694,8 +695,14 @@ function handleCanvasPointerMove(event) {
 }
 
 function handleCanvasPointerDown(event) {
-  if (cameraMode !== "isometric" || activePanel || event.button !== 0) return;
+  if (cameraMode !== "isometric" || activePanel) return;
   if (isHudPointerTarget(event.target)) return;
+  if (event.button === 2) {
+    event.preventDefault();
+    cancelIsoTargeting();
+    return;
+  }
+  if (event.button !== 0) return;
   event.preventDefault();
   closePanel();
   setInputMode("play");
@@ -727,6 +734,19 @@ function handleCanvasWheel(event) {
   event.preventDefault();
   const direction = event.deltaY > 0 ? 1 : -1;
   setIsoZoom(cameraControls.isoZoom + direction * cameraControls.isoWheelStep);
+}
+
+function handleCanvasContextMenu(event) {
+  if (cameraMode !== "isometric" || isHudPointerTarget(event.target)) return;
+  event.preventDefault();
+}
+
+function cancelIsoTargeting() {
+  clearClickMoveTarget();
+  clearHoverTarget();
+  clearSelectionTarget();
+  closePanel();
+  setInputMode("play");
 }
 
 function setIsoZoom(value, { snap = false } = {}) {
@@ -1880,6 +1900,14 @@ function installDebugApi() {
     clearSelection() {
       clearSelectionTarget();
       return this.selection;
+    },
+    cancelIsoTargeting() {
+      cancelIsoTargeting();
+      return {
+        clickMove: this.clickMove,
+        hover: this.hover,
+        selection: this.selection
+      };
     },
     reconnectServer() {
       serverState.client?.close();
