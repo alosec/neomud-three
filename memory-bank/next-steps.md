@@ -15,6 +15,7 @@ High leverage next work:
    - Keep fixed screenshot anchors in `scripts/test-neomud-three-town-shots.cjs` current after Town Square visual changes.
    - Use `scenic-review.html` and `scripts/test-neomud-three-scenic-review.cjs` before broad visual edits so representational QA can inspect rooms from free-fly, top-down, scale, focal-landmark, and clean UI-hidden reviewer views.
    - Use `experiments/neomud-three/qa/representational-rubric.json` to score visual work before accepting it. Positive and negative reviews should cite specific screenshots and criteria, following the Magic Shop benchmark and Temple scenic review examples.
+   - Record acceptance verdicts under `experiments/neomud-three/qa/acceptance/` when promoting, rejecting, or redesigning a room/asset. A room can be "interesting" without being accepted; the JSON verdict is the gate.
    - For repeated, close-up, or representationally risky fixtures, create/update a semantic asset spec under `experiments/neomud-three/specs/assets/` before Blender/runtime changes. The spec must define required/forbidden reads, scale and placement constraints, material hierarchy, camera evidence, and acceptance criteria.
 
 1. Build a small renderer architecture instead of per-room hacks.
@@ -73,6 +74,7 @@ High leverage next work:
    - Use Scenic Review screenshots as a separate gate from player-follow screenshots. Player shots answer play readability; scenic shots answer representational sanity, abstraction consistency, scale, and room composition.
    - Run `node scripts/validate-neomud-three-representational-qa.cjs` after changing the rubric, benchmark reviews, or scenic review report structure.
    - Run `node scripts/validate-neomud-three-semantic-specs.cjs` after adding or changing semantic asset specs.
+   - Run `node scripts/validate-neomud-three-acceptance-reviews.cjs` after adding or changing acceptance verdicts.
 
 6. Revisit HTML-in-Canvas once the 3D space is stable.
    - Use real HTML panels as texture sources on in-world boards, doors, books, plaques, and dialogue surfaces.

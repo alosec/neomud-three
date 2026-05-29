@@ -1,0 +1,69 @@
+{
+  "id": "cathedral-pew-redesign-2026-05-29",
+  "target": {
+    "type": "asset",
+    "id": "cathedral.pew",
+    "stage": "integrated-fixture"
+  },
+  "rubricId": "neomud-three.representational-rubric.v1",
+  "reviewDate": "2026-05-29",
+  "verdict": "redesign-required",
+  "evidence": {
+    "playerView": [
+      "qa/latest/room-shot-temple-nave.png",
+      "qa/latest/room-shot-temple-altar.png"
+    ],
+    "scenicReview": [
+      "qa/latest/scenic-review-temple-nave.png",
+      "qa/latest/scenic-review-temple-pews.png"
+    ],
+    "assetLab": [
+      "qa/latest/cathedral-asset-lab.png"
+    ],
+    "metadata": [
+      "qa/latest/scenic-review-report.json",
+      "qa/latest/labs-report.json"
+    ]
+  },
+  "scores": {
+    "representationalSanity": {
+      "score": 1,
+      "notes": "Technically reads as seating, but dark rails, bright trim, chunky end caps, and repeated bars push it toward barricade/fence/crate reads.",
+      "followUp": "Simplify the silhouette around a clear seat plane, back plane, and end panels with less rail language."
+    },
+    "cohesion": {
+      "score": 1,
+      "notes": "Pew detail density and contrast do not match the calmer low-poly sacred-furniture role.",
+      "followUp": "Keep geometry and material detail subordinate to the Temple's altar, glass, and nave composition."
+    },
+    "scale": {
+      "score": 1,
+      "notes": "The rows feel low and grid-like in the room, weakening cathedral scale.",
+      "followUp": "Use semantic row pitch, aisle width, back height, and altar clearance constraints before export."
+    },
+    "materialLanguage": {
+      "score": 0,
+      "notes": "The orange/dark striping competes with the altar, glass, and already-loud floor/wall treatment."
+    },
+    "visualHierarchy": {
+      "score": 0,
+      "notes": "Repeated pew contrast competes with the intended sacred focal elements instead of framing them."
+    },
+    "flow": {
+      "score": 1,
+      "notes": "The center aisle exists, but the row field reads like obstacle-grid gameplay rather than processional seating.",
+      "followUp": "Validate integrated rows from Scenic Review and player-view Temple nave cameras."
+    },
+    "boundedness": {
+      "score": 1,
+      "notes": "The pews do not directly break room enclosure, but their repetition contributes to a game-board read.",
+      "followUp": "Review pew rows only after the nave composition keeps altar and aisle hierarchy intact."
+    }
+  },
+  "acceptedAs": null,
+  "blockedBy": [
+    "material contrast must be reduced below altar and stained-glass prominence",
+    "silhouette must stop reading as fence/barricade",
+    "row layout must read as seating rhythm rather than obstacle grid"
+  ]
+}

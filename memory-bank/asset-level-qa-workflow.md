@@ -32,6 +32,9 @@ One fixture moves through five states:
 4. Review note
    - The relevant QA review states whether the result is blockout, playable
      prototype, production candidate, or rejected.
+   - Promotions/rejections must also have a JSON verdict under
+     `experiments/neomud-three/qa/acceptance/` so the decision can be validated
+     by `scripts/validate-neomud-three-acceptance-reviews.cjs`.
 
 ## Cathedral Fixture Order
 

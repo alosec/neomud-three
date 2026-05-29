@@ -1,0 +1,60 @@
+{
+  "id": "magic-shop-prototype-2026-05-29",
+  "target": {
+    "type": "room",
+    "id": "town:magic_shop",
+    "stage": "playable-prototype"
+  },
+  "rubricId": "neomud-three.representational-rubric.v1",
+  "reviewDate": "2026-05-29",
+  "verdict": "prototype-pass",
+  "evidence": {
+    "playerView": [
+      "qa/latest/room-shot-magic-entry.png",
+      "qa/latest/room-shot-magic-counter.png"
+    ],
+    "scenicReview": [
+      "qa/latest/scenic-review-magic-entry.png",
+      "qa/latest/scenic-review-magic-layout.png"
+    ],
+    "metadata": [
+      "qa/latest/scenic-review-report.json",
+      "qa/latest/room-shots-report.json"
+    ]
+  },
+  "scores": {
+    "representationalSanity": {
+      "score": 2,
+      "notes": "Reads as a compact magic shop without labels: shelves, counter, display case, NPC, and floating magical objects support the premise."
+    },
+    "cohesion": {
+      "score": 2,
+      "notes": "Props share one simplified abstraction level and the room feels like one authored interior."
+    },
+    "scale": {
+      "score": 1,
+      "notes": "Room scale is workable, but the current avatar still dominates some views.",
+      "followUp": "Replace or rescale the avatar through Avatar Lab before using this as a production-quality reference."
+    },
+    "materialLanguage": {
+      "score": 1,
+      "notes": "Material family is coherent enough for prototype, but texture/lighting polish is still simple.",
+      "followUp": "Preserve current cohesion while improving wall/shelf material depth."
+    },
+    "visualHierarchy": {
+      "score": 2,
+      "notes": "Counter, shelves, NPC, floating objects, and exits create a readable interior composition."
+    },
+    "flow": {
+      "score": 1,
+      "notes": "Exits and collisions exist, but player-flow read still depends partly on labels and familiar layout.",
+      "followUp": "Add stronger in-world exit/interact affordances without cluttering the room."
+    },
+    "boundedness": {
+      "score": 2,
+      "notes": "Closed stage shape remains legible even without a true ceiling."
+    }
+  },
+  "acceptedAs": "positive-control-for-cohesive-playable-prototype",
+  "blockedBy": []
+}
