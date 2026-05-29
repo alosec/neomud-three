@@ -9,6 +9,7 @@ Improved the outdoor Town Square backdrop so the world beyond the walls no longe
 - Added an approved `town.sky.soft-cloud-band` material.
 - Added a single instanced soft cloud/depth layer around the Town Square perimeter.
 - Kept the implementation texture-free and limited to one additional draw call.
+- Removed the older distant roof silhouette band because the new sky depth carried the read with less visual clutter.
 
 ## Result
 
@@ -27,11 +28,11 @@ The fixed Town Square screenshot now has a stylized sky-depth layer above the wa
 
 Latest offline Town Square budget:
 
-- calls: 239 / 240
-- triangles: 77,956 / 80,000
+- calls: 238 / 240
+- triangles: 77,812 / 80,000
 - textures: 27 / 48
-- geometries: 197 / 230
+- geometries: 196 / 230
 
 ## Follow-up
 
-Town Square is now at the draw-call ceiling. The next Town Square visual pass should consolidate or remove existing clutter before adding any new visible systems.
+Town Square remains near the draw-call and triangle ceiling. The next Town Square visual pass should consolidate or remove existing clutter before adding any new visible systems.

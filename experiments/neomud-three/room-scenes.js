@@ -6039,21 +6039,6 @@ function addTownPerimeterDepthBase(root, materials) {
     { x: 0, y: 0.48, z: -50, width: 58, height: 0.96, depth: 6.2, rotationY: 0.03 },
     { x: 0, y: 0.48, z: 50, width: 58, height: 0.96, depth: 6.2, rotationY: -0.03 }
   ], "town-square-perimeter-dark-green-bands", { castShadow: false, receiveShadow: true });
-
-  addInstancedBoxes(root, materials.roofQuiet, [
-    { x: -20, y: 5.9, z: -42.5, width: 12.5, height: 0.72, depth: 3.2, rotationY: -0.1 },
-    { x: 0, y: 6.25, z: -43.5, width: 15.0, height: 0.78, depth: 3.3, rotationY: 0.05 },
-    { x: 20, y: 5.85, z: -42.5, width: 12.5, height: 0.72, depth: 3.2, rotationY: 0.12 },
-    { x: -22, y: 5.45, z: 43.2, width: 13.5, height: 0.68, depth: 3.1, rotationY: 0.08 },
-    { x: 2, y: 5.82, z: 44.2, width: 16.2, height: 0.72, depth: 3.2, rotationY: -0.04 },
-    { x: 24, y: 5.5, z: 43.0, width: 12.8, height: 0.68, depth: 3.1, rotationY: -0.12 },
-    { x: -43.5, y: 5.55, z: -21, width: 3.2, height: 0.7, depth: 12.5, rotationY: 0.08 },
-    { x: -44.0, y: 5.9, z: 1, width: 3.2, height: 0.76, depth: 15.2, rotationY: -0.05 },
-    { x: -43.2, y: 5.45, z: 22, width: 3.1, height: 0.68, depth: 13.0, rotationY: 0.12 },
-    { x: 43.5, y: 5.55, z: -21, width: 3.2, height: 0.7, depth: 12.5, rotationY: -0.08 },
-    { x: 44.0, y: 5.9, z: 1, width: 3.2, height: 0.76, depth: 15.2, rotationY: 0.05 },
-    { x: 43.2, y: 5.45, z: 22, width: 3.1, height: 0.68, depth: 13.0, rotationY: -0.12 }
-  ], "town-square-distant-roof-silhouette-band", { castShadow: false, receiveShadow: true });
 }
 
 function addTownSkyDepth(root, materials) {
