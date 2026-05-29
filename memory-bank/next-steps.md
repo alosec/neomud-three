@@ -15,6 +15,7 @@ High leverage next work:
    - Keep fixed screenshot anchors in `scripts/test-neomud-three-town-shots.cjs` current after Town Square visual changes.
    - Use `scenic-review.html` and `scripts/test-neomud-three-scenic-review.cjs` before broad visual edits so representational QA can inspect rooms from free-fly, top-down, scale, focal-landmark, and clean UI-hidden reviewer views.
    - Use `experiments/neomud-three/qa/representational-rubric.json` to score visual work before accepting it. Positive and negative reviews should cite specific screenshots and criteria, following the Magic Shop benchmark and Temple scenic review examples.
+   - For repeated, close-up, or representationally risky fixtures, create/update a semantic asset spec under `experiments/neomud-three/specs/assets/` before Blender/runtime changes. The spec must define required/forbidden reads, scale and placement constraints, material hierarchy, camera evidence, and acceptance criteria.
 
 1. Build a small renderer architecture instead of per-room hacks.
    - First renderer-shell extraction is done in `experiments/neomud-three/render-engine.js`.
@@ -38,7 +39,7 @@ High leverage next work:
    - Treat `experiments/neomud-three/assets/source/scenes/town_temple/level-brief.json` as the Temple production contract.
    - Keep `town_temple.blend` as the source of truth for cathedral geometry, collision, spawn, trigger, camera, and light markers.
    - Improve Gothic wall/window frames, altar proportions, pew scale, stained-glass placement, material IDs, and authored lighting inside Blender rather than adding more runtime mesh code.
-   - Use isolated asset QA for each fixture before room integration. `cathedral.pew`, `cathedral.wall_window_bay`, and `cathedral.altar_incense_fixture` are the first accepted playable-prototype candidates.
+   - Use isolated asset QA for each fixture before room integration. `cathedral.wall_window_bay` and `cathedral.altar_incense_fixture` are accepted playable-prototype candidates. `cathedral.pew` is now `redesign-required`; use `experiments/neomud-three/specs/assets/cathedral-pew.semantic.json` as the pew redesign contract.
    - Do not accept the current altar and incense as final art. Smoke has moved from hard cones to subtler low-poly puff columns, pews now have a stronger second candidate, Temple lighting now comes from authored `LIGHTS_` markers, and the main Temple GLB now remaps floor/wall/trim/pew wood/cloth/glass names through approved runtime material IDs. The next Temple fixture/material pass should improve altar material hierarchy, glass variant handling, or optimized texture delivery with screenshot evidence.
    - Add a generated package manifest beside `town_temple.glb` with parse counts, budgets, source image, source blend, validator profile, and package version.
    - Remove the old procedural Temple builder after the GLB adapter path has one more stable QA pass and a second room package proves the shared contract.
@@ -71,6 +72,7 @@ High leverage next work:
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
    - Use Scenic Review screenshots as a separate gate from player-follow screenshots. Player shots answer play readability; scenic shots answer representational sanity, abstraction consistency, scale, and room composition.
    - Run `node scripts/validate-neomud-three-representational-qa.cjs` after changing the rubric, benchmark reviews, or scenic review report structure.
+   - Run `node scripts/validate-neomud-three-semantic-specs.cjs` after adding or changing semantic asset specs.
 
 6. Revisit HTML-in-Canvas once the 3D space is stable.
    - Use real HTML panels as texture sources on in-world boards, doors, books, plaques, and dialogue surfaces.

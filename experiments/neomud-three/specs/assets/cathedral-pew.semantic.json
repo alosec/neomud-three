@@ -1,0 +1,173 @@
+{
+  "id": "cathedral.pew",
+  "version": 1,
+  "status": "redesign-required",
+  "assetType": "repeated-room-fixture",
+  "source": {
+    "currentRuntimeGlb": "../../assets/build/props/cathedral_pew.glb",
+    "currentSourceBlend": "../../assets/source/props/cathedral_pew/cathedral_pew.blend",
+    "currentManifest": "../../assets/build/props/cathedral_pew.manifest.json"
+  },
+  "semanticRole": {
+    "objectKind": "church-pew",
+    "roomRole": "seating that frames the Temple nave and reinforces sacred civic scale",
+    "gameplayRole": "collision-only atmospheric fixture; supports center-aisle flow without becoming an interaction target",
+    "worldLanguage": "Temple of the Dawn civic-sacred interior"
+  },
+  "abstraction": {
+    "level": "stylized-low-poly",
+    "target": "simple, readable, calm church furniture",
+    "allowed": [
+      "broad wooden seat and backrest silhouettes",
+      "subtle rail or end-panel indication",
+      "restrained warm wood material variation",
+      "low-poly proportions that read at player camera distance"
+    ],
+    "forbidden": [
+      "ornament added to compensate for weak silhouette",
+      "high-contrast stripes that make the pews busier than the altar",
+      "tiny repeated detail that reads as visual noise",
+      "toy-like end blocks or barricade-like massing"
+    ]
+  },
+  "scale": {
+    "class": "human-furniture",
+    "playerReferenceHeightMeters": 1.8,
+    "targetDimensionsMeters": {
+      "width": [3.8, 5.2],
+      "seatHeight": [0.42, 0.56],
+      "backHeight": [0.92, 1.28],
+      "depth": [0.82, 1.16]
+    },
+    "placementRules": [
+      "rows must leave a clear center aisle",
+      "pews should feel subordinate to the room massing and altar",
+      "repeat spacing should look like intentional seating rhythm, not a grid of obstacles"
+    ],
+    "rowLayout": {
+      "centerAisleWidthMeters": [2.4, 3.6],
+      "rowPitchMeters": [1.45, 1.9],
+      "sideClearanceMeters": [0.7, 1.4],
+      "frontClearanceFromAltarMeters": [5.5, 8.5],
+      "rules": [
+        "aisle must remain visibly processional from the player-spawn camera",
+        "row pitch must make seating rhythm legible without forming a tight obstacle grid",
+        "the altar sightline must remain open above and between the pew rows"
+      ]
+    },
+    "proportionRatios": {
+      "backHeightToSeatHeight": [1.8, 2.4],
+      "depthToBackHeight": [0.75, 1.1],
+      "endPanelThicknessToDepth": [0.08, 0.16],
+      "openRailCoverageMax": 0.25
+    }
+  },
+  "requiredRead": [
+    "pew",
+    "wooden church seating",
+    "nave-framing furniture",
+    "calm sacred interior fixture"
+  ],
+  "forbiddenRead": [
+    "crate",
+    "fence",
+    "barricade",
+    "toy bench",
+    "over-decorated prop"
+  ],
+  "materialContract": {
+    "family": "temple",
+    "slots": [
+      "woodBase",
+      "woodEndgrain",
+      "wornEdge"
+    ],
+    "hierarchy": {
+      "mustRemainSubordinateTo": [
+        "cathedral.altar_incense_fixture",
+        "cathedral.wall_window_bay",
+        "templeStainedGlassDawnV2"
+      ],
+      "darkCoverageMax": 0.28,
+      "brightTrimCoverageMax": 0.12,
+      "contrastGuidance": "Pew value contrast should be lower than altar cloth, stained glass, exit glow, NPCs, and interaction prompts."
+    },
+    "rules": [
+      "wood material must not overpower stained glass or altar",
+      "material variation should clarify form rather than create striping",
+      "future texture work should use an approved material or trim-sheet path before room integration"
+    ]
+  },
+  "qa": {
+    "rubricId": "neomud-three.representational-rubric.v1",
+    "requiredCriteria": [
+      "representationalSanity",
+      "cohesion",
+      "scale",
+      "materialLanguage",
+      "visualHierarchy",
+      "flow"
+    ],
+    "standaloneEvidence": [
+      "qa/latest/cathedral-asset-lab.png"
+    ],
+    "integratedEvidence": [
+      "qa/latest/scenic-review-temple-pews.png",
+      "qa/latest/room-shot-temple-nave.png"
+    ],
+    "cameraEvidence": [
+      {
+        "id": "asset.front",
+        "surface": "cathedral-asset-lab",
+        "purpose": "prove object reads as pew without room context"
+      },
+      {
+        "id": "asset.threeQuarter",
+        "surface": "cathedral-asset-lab",
+        "purpose": "prove silhouette is furniture, not barricade/fence"
+      },
+      {
+        "id": "temple.nave",
+        "surface": "room-shots",
+        "purpose": "prove pew rows frame the nave and stay subordinate to altar/glass"
+      },
+      {
+        "id": "temple.pews",
+        "surface": "scenic-review",
+        "purpose": "prove row repetition reads as seating rhythm from reviewer camera"
+      }
+    ],
+    "acceptance": {
+      "standalone": [
+        "reads as a pew from front, side, and three-quarter views",
+        "does not rely on ornate micro-detail to explain itself",
+        "player scale reference makes seat/back height plausible"
+      ],
+      "integrated": [
+        "frames the nave without competing with altar or stained glass",
+        "row rhythm supports the center aisle",
+        "wood/material contrast is quieter than focal sacred elements",
+        "does not read as fence, crate, barricade, or repeated obstacle grid from Temple nave screenshots"
+      ],
+      "play": [
+        "collider footprint prevents clipping without snagging the center aisle",
+        "does not block or confuse the intended Temple flow"
+      ]
+    }
+  },
+  "currentDiagnosis": [
+    "current candidate reads as a pew but looks like it is trying too hard",
+    "material and rail contrast make repeated rows visually busier than the room can support",
+    "the asset needs calmer silhouette/material decisions before another geometry-detail pass"
+  ],
+  "nextProductionPass": {
+    "scope": "redesign cathedral.pew only",
+    "doNotChange": [
+      "Temple room layout",
+      "stained glass",
+      "altar/incense fixture",
+      "server movement or collision systems"
+    ],
+    "preferredHypothesis": "Simpler pew geometry plus quieter wood hierarchy will improve representational sanity more than adding detail."
+  }
+}

@@ -8,8 +8,14 @@ Substantial room fixtures now need an isolated QA stop before integration.
 
 ## Contract
 
-One fixture moves through four states:
+One fixture moves through five states:
 
+0. Semantic asset spec
+   - Required for repeated, close-up, or representationally risky fixtures.
+   - Lives under `experiments/neomud-three/specs/assets/<id>.semantic.json`.
+   - Defines required/forbidden reads, scale, row/placement constraints,
+     material hierarchy, camera evidence, acceptance criteria, and the next
+     production hypothesis before Blender/runtime changes.
 1. Isolated asset source
    - Blender source under `experiments/neomud-three/assets/source/props/<id>/`.
    - Runtime GLB under `experiments/neomud-three/assets/build/props/`.
@@ -41,6 +47,7 @@ Do not run another broad "improve cathedral" pass. Work fixture by fixture:
 
 `cathedral.pew` now has:
 
+- Semantic spec: `experiments/neomud-three/specs/assets/cathedral-pew.semantic.json`
 - Source script: `scripts/create-neomud-three-cathedral-pew.py`
 - Source blend: `experiments/neomud-three/assets/source/props/cathedral_pew/cathedral_pew.blend`
 - Runtime GLB: `experiments/neomud-three/assets/build/props/cathedral_pew.glb`
@@ -86,12 +93,14 @@ It is accepted as a playable prototype, not final cathedral art.
 
 ## Current Pew Candidate
 
-`cathedral.pew` is now on a second playable-prototype candidate. The shared
-Blender builder adds visible seat planks, back rails/stiles, a kneeler rail,
-feet, and carved end-panel insets. The asset lab keeps one detailed isolated
-pew plus one row-fit pair so QA can see scale without blowing the lab render
-budget. The next pew-specific pass should improve shared wood material
-variation or trim-sheet treatment rather than adding more loose geometry.
+`cathedral.pew` is now marked `redesign-required` by semantic QA. The current
+Blender candidate technically reads as seating, but Scenic Review/subagent QA
+finds that its dark rails, bright trim, chunky end caps, and repeated horizontal
+bars push it toward fence/crate/barricade reads. In the room, the pew rows also
+compete with the altar and stained glass instead of staying visually quiet. The
+next pew pass must simplify silhouette, reduce rail/trim contrast, enforce row
+layout constraints, and prove from asset-lab plus Scenic Review evidence that
+the result reads as calm church seating rather than an obstacle grid.
 
 ## Current Texture Candidate
 
