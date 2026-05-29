@@ -49,6 +49,9 @@ export function createRenderEngine(canvas) {
   const cameraLookTarget = new THREE.Vector3();
   const cameraRayDirection = new THREE.Vector3();
   const cameraBlockers = [];
+  const isoProbeDesired = new THREE.Vector3();
+  const isoProbeLookTarget = new THREE.Vector3();
+  let isoCameraAvoidanceAngle = 0;
   const pickupEffects = [];
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
   let roomDebug = emptyRoomDebugSummary(false);
@@ -121,7 +124,7 @@ export function createRenderEngine(canvas) {
     },
     updateCamera({ heading = 0, roomCamera = {}, cameraMode = "platform", dt = 1 / 60, snap = false } = {}) {
       if (cameraMode === "isometric") {
-        updateIsometricCamera({
+        const isoResult = updateIsometricCamera({
           camera,
           cameraTarget,
           cameraDesired,
@@ -129,9 +132,17 @@ export function createRenderEngine(canvas) {
           player,
           roomCamera,
           dt,
-          snap
+          snap,
+          worldRoot,
+          raycaster: cameraRaycaster,
+          direction: cameraRayDirection,
+          blockers: cameraBlockers,
+          probeDesired: isoProbeDesired,
+          probeLookTarget: isoProbeLookTarget,
+          currentAvoidanceAngle: isoCameraAvoidanceAngle
         });
-        cameraObstruction = null;
+        isoCameraAvoidanceAngle = isoResult.avoidanceAngle;
+        cameraObstruction = isoResult.obstruction;
         return;
       }
 
@@ -222,13 +233,47 @@ export function createRenderEngine(canvas) {
   };
 }
 
-function updateIsometricCamera({ camera, cameraTarget, cameraDesired, cameraLookTarget, player, roomCamera = {}, dt = 1 / 60, snap = false }) {
+function updateIsometricCamera({
+  camera,
+  cameraTarget,
+  cameraDesired,
+  cameraLookTarget,
+  player,
+  roomCamera = {},
+  dt = 1 / 60,
+  snap = false,
+  worldRoot,
+  raycaster,
+  direction,
+  blockers,
+  probeDesired,
+  probeLookTarget,
+  currentAvoidanceAngle = 0
+}) {
   const zoom = roomCamera.isoZoom ?? 1;
   const distance = (roomCamera.isoDistance ?? 19.5) * zoom;
   const height = (roomCamera.isoHeight ?? 17.5) * zoom;
-  const angle = (roomCamera.isoAngle ?? Math.PI * 0.25) + (roomCamera.isoOrbitAngle ?? 0);
+  const baseAngle = (roomCamera.isoAngle ?? Math.PI * 0.25) + (roomCamera.isoOrbitAngle ?? 0);
   const targetHeight = roomCamera.isoTargetHeight ?? 0.8;
   const lookAheadZ = roomCamera.isoLookAheadZ ?? -1.2;
+  const desiredAvoidance = chooseIsometricAvoidanceAngle({
+    player,
+    baseAngle,
+    distance,
+    height,
+    targetHeight,
+    lookAheadZ,
+    worldRoot,
+    raycaster,
+    direction,
+    blockers,
+    probeDesired,
+    probeLookTarget
+  });
+  const avoidanceAngle = snap
+    ? desiredAvoidance.angle
+    : THREE.MathUtils.lerp(currentAvoidanceAngle, desiredAvoidance.angle, Math.min(1, dt * 2.6));
+  const angle = baseAngle + avoidanceAngle;
   const offsetX = Math.sin(angle) * distance;
   const offsetZ = Math.cos(angle) * distance;
 
@@ -247,6 +292,83 @@ function updateIsometricCamera({ camera, cameraTarget, cameraDesired, cameraLook
     cameraTarget.lerp(cameraLookTarget, Math.min(1, dt * 4.8));
   }
   camera.lookAt(cameraTarget);
+  return {
+    avoidanceAngle,
+    obstruction: desiredAvoidance.obstruction
+      ? {
+          ...desiredAvoidance.obstruction,
+          avoided: Math.abs(avoidanceAngle) > 0.02,
+          avoidanceAngle: Number(avoidanceAngle.toFixed(3))
+        }
+      : null
+  };
+}
+
+function chooseIsometricAvoidanceAngle({
+  player,
+  baseAngle,
+  distance,
+  height,
+  targetHeight,
+  lookAheadZ,
+  worldRoot,
+  raycaster,
+  direction,
+  blockers,
+  probeDesired,
+  probeLookTarget
+}) {
+  if (!worldRoot || !raycaster || !direction || !blockers || !probeDesired || !probeLookTarget) {
+    return { angle: 0, obstruction: null };
+  }
+
+  const offsets = [0, 0.36, -0.36, 0.72, -0.72, 1.08, -1.08];
+  let firstObstruction = null;
+  for (const offset of offsets) {
+    const obstruction = probeIsometricObstruction({
+      player,
+      angle: baseAngle + offset,
+      distance,
+      height,
+      targetHeight,
+      lookAheadZ,
+      worldRoot,
+      raycaster,
+      direction,
+      blockers,
+      probeDesired,
+      probeLookTarget
+    });
+    if (!firstObstruction && obstruction) firstObstruction = obstruction;
+    if (!obstruction) return { angle: offset, obstruction: firstObstruction };
+  }
+  return { angle: 0, obstruction: firstObstruction };
+}
+
+function probeIsometricObstruction({
+  player,
+  angle,
+  distance,
+  height,
+  targetHeight,
+  lookAheadZ,
+  worldRoot,
+  raycaster,
+  direction,
+  blockers,
+  probeDesired,
+  probeLookTarget
+}) {
+  probeDesired
+    .copy(player.position)
+    .add(new THREE.Vector3(Math.sin(angle) * distance, height, Math.cos(angle) * distance));
+  probeLookTarget
+    .copy(player.position)
+    .add(new THREE.Vector3(0, targetHeight, lookAheadZ));
+  return resolveCameraObstruction(probeLookTarget, probeDesired, worldRoot, raycaster, direction, blockers, {
+    minDistance: 2.15,
+    margin: 0.42
+  }).obstruction;
 }
 
 function resolveCameraObstruction(origin, desired, worldRoot, raycaster, direction, blockers, options = {}) {

@@ -191,6 +191,40 @@
       "updated": "2026-05-29T19:48:00Z"
     },
     {
+      "id": "neo-2a6f",
+      "project": "NeoMud",
+      "title": "Avoid isometric camera obstruction around foreground blockers",
+      "description": "Implement a practical first Iso camera obstruction-avoidance pass so the elevated camera does not leave the avatar hidden behind nearby buildings, props, or other foreground blockers. Initial acceptance: the renderer samples small orbit offsets when the camera-to-avatar ray is blocked, chooses a clear angle when available, exposes debug obstruction metadata, and Town Square screenshot QA proves one obstructed placement rotates to a usable view. This is a bounded camera comfort slice, not a full room camera-volume or transparent-occluder system.",
+      "type": "task",
+      "priority": 0,
+      "status": "in-progress",
+      "status_type": "started",
+      "parent": "neo-3361",
+      "close_reason": "",
+      "labels": [
+        "neomud-three",
+        "isometric",
+        "camera",
+        "qol",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "User reported the player view is frequently obstructed in Iso mode and requested camera handling that temporarily rotates/reframes rather than leaving the avatar hidden.",
+          "created": "2026-05-29T20:07:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Implemented first bounded orbit-sampling pass: when the Iso camera ray to the avatar is blocked, the renderer samples nearby orbit offsets and uses the first clear angle when possible. Debug camera state reports avoided/avoidanceAngle, and Town Square screenshot QA captures isometric-camera-avoidance.",
+          "created": "2026-05-29T20:20:00Z"
+        }
+      ],
+      "created": "2026-05-29T20:07:00Z",
+      "updated": "2026-05-29T20:20:00Z"
+    },
+    {
       "id": "neo-61d4",
       "project": "NeoMud",
       "title": "Preserve Platform and Iso as explicit visual mode options",

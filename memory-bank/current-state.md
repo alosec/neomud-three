@@ -80,6 +80,12 @@ Playable Three.js lab:
   room colliders when a direct click path is blocked. Town Square QA clicks from
   the south side of the fountain to the far side, verifies a multi-waypoint path
   is created, and waits for the avatar to route around the fountain and arrive.
+  Iso camera obstruction handling now has a first bounded slice: when the ray
+  from the elevated camera to the avatar is blocked, the camera samples nearby
+  orbit offsets and uses the first clear angle instead of leaving the avatar
+  hidden behind foreground geometry. Debug state reports
+  `camera.obstruction.avoided` and `avoidanceAngle`, and Town Square screenshot
+  QA captures this as `town-shot-isometric-camera-avoidance.png`.
   Feature action verbs are now more semantically accurate: the Hidden Cave
   chest reads as `Open` rather than `Pick up`, and disabled server actions keep
   their verb in the button label, e.g. `Open unavailable`.

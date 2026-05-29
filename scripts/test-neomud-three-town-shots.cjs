@@ -129,6 +129,25 @@ async function main() {
     screenshots.push({ id: "isometric-plaza", path: isoTarget });
 
     await page.evaluate(() => {
+      window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.placePlayer({ x: -6.195, z: -4.543, heading: 0 });
+    });
+    await settleFrames(page);
+    const avoidedCamera = await page.evaluate(() => window.__neomudThreeDebug.camera);
+    assert.equal(avoidedCamera.mode, "isometric");
+    assert.ok(
+      avoidedCamera.obstruction?.avoided,
+      `expected Iso camera to orbit around an obstructed Town Square player view, got ${JSON.stringify(avoidedCamera)}`
+    );
+    assert.ok(
+      Math.abs(avoidedCamera.obstruction.avoidanceAngle) > 0.1,
+      `expected non-trivial Iso avoidance angle, got ${JSON.stringify(avoidedCamera)}`
+    );
+    const avoidedTarget = path.join(qaDir, "town-shot-isometric-camera-avoidance.png");
+    await page.screenshot({ path: avoidedTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-camera-avoidance", path: avoidedTarget });
+
+    await page.evaluate(() => {
       window.__neomudThreeDebug.setCameraMode("platform");
       window.__neomudThreeDebug.placePlayer({ x: 0, z: 10.4, heading: 0 });
     });
