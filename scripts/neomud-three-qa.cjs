@@ -103,6 +103,12 @@ const RENDER_BUDGETS = {
     triangles: 45_000,
     textures: 30,
     geometries: 240
+  },
+  "scenic-review": {
+    calls: 260,
+    triangles: 90_000,
+    textures: 56,
+    geometries: 240
   }
 };
 

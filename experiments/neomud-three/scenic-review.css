@@ -1,0 +1,138 @@
+.scenic-panel {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 5;
+  width: min(380px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  padding: 14px 16px;
+  border: 1px solid rgba(240, 200, 120, 0.38);
+  color: #f2ead8;
+  background: rgba(18, 14, 8, 0.86);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.34);
+}
+
+.scenic-panel header,
+.button-row,
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.scenic-panel header {
+  margin-bottom: 12px;
+}
+
+.scenic-panel h1,
+.scenic-panel p {
+  margin: 0;
+}
+
+.scenic-panel h1 {
+  font-size: 20px;
+}
+
+.scenic-panel a,
+.scenic-panel button,
+.scenic-panel select {
+  color: #f4cf7e;
+}
+
+.scenic-panel a {
+  text-decoration: none;
+  border-bottom: 1px solid rgba(244, 207, 126, 0.45);
+}
+
+.scenic-panel label {
+  display: grid;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.scenic-panel select,
+.scenic-panel button {
+  min-height: 32px;
+  border: 1px solid rgba(240, 200, 120, 0.38);
+  background: rgba(35, 25, 14, 0.86);
+  font: inherit;
+}
+
+.scenic-panel select {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  color: #f2ead8;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.scenic-panel button {
+  cursor: pointer;
+}
+
+.scenic-panel button.active {
+  border-color: #f4cf7e;
+  color: #fff7d8;
+  background: rgba(79, 54, 24, 0.94);
+}
+
+.toggle-row {
+  justify-content: flex-start;
+  margin: 10px 0;
+}
+
+.toggle-row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.button-row button {
+  flex: 1;
+}
+
+#ui-toggle {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.eyebrow {
+  color: #b8a678;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+#review-readout {
+  min-height: 104px;
+  max-height: 190px;
+  margin: 12px 0 0;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid rgba(240, 200, 120, 0.22);
+  color: #e8d8b0;
+  background: rgba(0, 0, 0, 0.22);
+  font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: pre-wrap;
+}
+
+.scenic-panel .hint {
+  margin-top: 10px;
+  color: #d8cba9;
+  font-size: 12px;
+}
+
+body.scenic-ui-hidden .scenic-panel {
+  display: none;
+}

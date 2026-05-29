@@ -67,6 +67,16 @@ const LABS = [
       assets: window.__neomudCathedralAssetLabDebug.assets,
       error: window.__neomudCathedralAssetLabDebug.error
     })
+  },
+  {
+    id: "scenic-review",
+    path: "scenic-review.html",
+    screenshot: "scenic-review-magic-shop.png",
+    ready: () => window.__neomudScenicReviewDebug?.ready,
+    snapshot: () => ({
+      render: window.__neomudScenicReviewDebug.render,
+      review: window.__neomudScenicReviewDebug.review
+    })
   }
 ];
 
@@ -179,6 +189,15 @@ async function main() {
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_painted_glass_center")), "expected painted altar glass texture layer");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_incense_bowl")), "expected readable incense bowls");
         assert.ok(altarFixture.renderNodes.some((name) => name.includes("_smoke_wisp_")), "expected smoke wisp geometry");
+      }
+      if (lab.id === "scenic-review") {
+        assert.equal(snapshot.review.roomId, "town:magic_shop");
+        assert.equal(snapshot.review.bookmark, "entry");
+        assert.equal(snapshot.review.toggles.avatar, true);
+        assert.equal(snapshot.review.toggles.debug, false);
+        assert.ok(snapshot.review.triggers.length >= 1, `expected scenic room triggers: ${JSON.stringify(snapshot.review)}`);
+        assert.ok(snapshot.review.colliders.length >= 1, `expected scenic room colliders: ${JSON.stringify(snapshot.review)}`);
+        assert.ok(snapshot.review.camera.position.length === 3, `expected captured camera position: ${JSON.stringify(snapshot.review.camera)}`);
       }
 
       reports.push({ id: lab.id, url, screenshot: lab.screenshot, snapshot, budget });

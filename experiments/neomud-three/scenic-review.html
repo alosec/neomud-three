@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NeoMud Scenic Review</title>
+  <link rel="stylesheet" href="./lab.css">
+  <link rel="stylesheet" href="./scenic-review.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.164.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.164.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <section class="scenic-panel">
+    <header>
+      <div>
+        <p class="eyebrow">NeoMud Three</p>
+        <h1>Scenic Review</h1>
+      </div>
+      <a href="./index.html">Game</a>
+    </header>
+    <label>
+      Room
+      <select id="room-select"></select>
+    </label>
+    <div class="button-grid" id="bookmark-buttons"></div>
+    <div class="toggle-row">
+      <label><input id="avatar-toggle" type="checkbox" checked> Avatar</label>
+      <label><input id="debug-toggle" type="checkbox"> Debug</label>
+    </div>
+    <div class="button-row">
+      <button id="capture-button" type="button">Capture PNG</button>
+      <button id="copy-review-button" type="button">Copy Review JSON</button>
+    </div>
+    <button id="ui-toggle" type="button">Hide UI For Review</button>
+    <pre id="review-readout"></pre>
+    <p class="hint">Drag to look. WASD moves, Q/E lowers/raises, Shift boosts. H toggles this panel.</p>
+    <div class="lab-links">
+      <a href="./material-lab.html">Material Lab</a>
+      <a href="./prop-zoo.html">Prop Zoo</a>
+      <a href="./avatar-lab.html">Avatar Lab</a>
+      <a href="./cathedral-asset-lab.html">Cathedral Assets</a>
+      <a href="./movement-gym.html">Movement Gym</a>
+    </div>
+  </section>
+  <script type="module" src="./scenic-review.js"></script>
+</body>
+</html>
