@@ -23,3 +23,9 @@ https://threejs.org/examples/models/gltf/Soldier.glb
 It was used as a temporary animation probe because it includes `Idle`, `Walk`,
 and `Run` clips. It is not the active NeoMud player avatar because the soldier
 silhouette does not match the fantasy MUD art direction.
+## Player Runtime Model
+
+- `Xbot.glb` is the original animated reference model used to preserve the working Mixamo-style idle/walk/run/jump clips.
+- `Xbot-game.glb` is the current runtime model. It was generated from `Xbot.glb` in Blender with mesh decimation at ratio `0.58`, preserving the armature, skin, and animation clips while reducing model triangles from about `49,112` to about `28,483`.
+
+Do not replace either file with a random model without updating Avatar Lab screenshots, source/license notes, forward axis, scale, and animation compatibility.

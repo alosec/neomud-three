@@ -47,8 +47,8 @@ async function main() {
     );
     const avatar = await page.evaluate(() => window.__neomudThreeDebug.avatar);
     assert.equal(avatar.loaded, true, `expected avatar to initialize: ${JSON.stringify(avatar)}`);
-    assert.equal(avatar.model, "Xbot.glb");
-    assert.equal(avatar.animationSource, "Xbot.glb-reference-loaded");
+    assert.equal(avatar.model, "Xbot-game.glb");
+    assert.equal(avatar.animationSource, "Xbot-game.glb-runtime-optimized");
     assert.equal(avatar.visualTreatment, "xbot-stylized-teal-v3");
     assert.ok(avatar.modelScale >= MIN_READABLE_PLAYER_SCALE, `expected readable player scale, got ${JSON.stringify(avatar)}`);
     assert.equal(avatar.overlay, false);

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
+export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot-game.glb";
 export const PLAYER_MODEL_SCALE = 2.28;
 
 const sharedGeometries = new Map();
@@ -44,9 +44,9 @@ export function makePlayerAvatar() {
     loaded: state.loaded,
     loadFailed: state.loadFailed,
     activeAnimation: state.activeName,
-    model: state.loaded ? "Xbot.glb" : "procedural-fantasy-adventurer",
+    model: state.loaded ? "Xbot-game.glb" : "procedural-fantasy-adventurer",
     modelScale: state.loaded ? PLAYER_MODEL_SCALE : state.fallbackRig.group.scale.x,
-    animationSource: state.loaded ? "Xbot.glb-reference-loaded" : "procedural",
+    animationSource: state.loaded ? "Xbot-game.glb-runtime-optimized" : "procedural",
     visualTreatment: state.loaded ? "xbot-stylized-teal-v3" : "procedural-adventurer-v1",
     overlay: Boolean(state.overlay),
     proxy: state.renderMode === "procedural-proxy",
