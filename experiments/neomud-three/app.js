@@ -1195,6 +1195,11 @@ function installDebugApi() {
     get render() {
       return renderEngine.renderStats;
     },
+    get camera() {
+      return {
+        obstruction: renderEngine.cameraObstruction
+      };
+    },
     get effects() {
       return {
         pickup: renderEngine.pickupEffectCount

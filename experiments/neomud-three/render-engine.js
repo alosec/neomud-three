@@ -44,9 +44,15 @@ export function createRenderEngine(canvas) {
 
   const clock = new THREE.Clock();
   const cameraTarget = new THREE.Vector3(0, 1.4, 0);
+  const cameraRaycaster = new THREE.Raycaster();
+  const cameraDesired = new THREE.Vector3();
+  const cameraLookTarget = new THREE.Vector3();
+  const cameraRayDirection = new THREE.Vector3();
+  const cameraBlockers = [];
   const pickupEffects = [];
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
   let roomDebug = emptyRoomDebugSummary(false);
+  let cameraObstruction = null;
 
   return {
     renderer,
@@ -62,6 +68,9 @@ export function createRenderEngine(canvas) {
     },
     get roomDebug() {
       return roomDebug;
+    },
+    get cameraObstruction() {
+      return cameraObstruction;
     },
     replaceWorld(factory) {
       disposeObjectTree(worldRoot);
@@ -111,22 +120,27 @@ export function createRenderEngine(canvas) {
       const sideOffset = roomCamera.sideOffset ?? -1.15;
       const lookAhead = roomCamera.lookAhead ?? 4.2;
       const targetHeight = roomCamera.targetHeight ?? 1.25;
-      const desired = player.position
-        .clone()
+      cameraDesired
+        .copy(player.position)
         .addScaledVector(forward, -distance)
         .addScaledVector(right, sideOffset)
         .add(new THREE.Vector3(0, height, 0));
-      const lookTarget = player.position
-        .clone()
+      cameraLookTarget
+        .copy(player.position)
         .addScaledVector(forward, lookAhead)
         .add(new THREE.Vector3(0, targetHeight, 0));
+      const desired = resolveCameraObstruction(cameraLookTarget, cameraDesired, worldRoot, cameraRaycaster, cameraRayDirection, cameraBlockers, {
+        minDistance: roomCamera.minCameraDistance ?? 2.15,
+        margin: roomCamera.obstructionMargin ?? 0.42
+      });
+      cameraObstruction = desired.obstruction;
 
       if (snap) {
-        camera.position.copy(desired);
-        cameraTarget.copy(lookTarget);
+        camera.position.copy(desired.position);
+        cameraTarget.copy(cameraLookTarget);
       } else {
-        camera.position.lerp(desired, Math.min(1, dt * 4.2));
-        cameraTarget.lerp(lookTarget, Math.min(1, dt * 5.8));
+        camera.position.lerp(desired.position, Math.min(1, dt * 4.2));
+        cameraTarget.lerp(cameraLookTarget, Math.min(1, dt * 5.8));
       }
       camera.lookAt(cameraTarget);
     },
@@ -184,6 +198,49 @@ export function createRenderEngine(canvas) {
       renderer.setAnimationLoop(callback);
     }
   };
+}
+
+function resolveCameraObstruction(origin, desired, worldRoot, raycaster, direction, blockers, options = {}) {
+  const maxDistance = origin.distanceTo(desired);
+  if (maxDistance <= 0.001) return { position: desired, obstruction: null };
+
+  direction.copy(desired).sub(origin).normalize();
+  raycaster.set(origin, direction);
+  raycaster.far = maxDistance;
+  raycaster.near = 0.18;
+
+  blockers.length = 0;
+  worldRoot.traverse((object) => {
+    if (isCameraBlockingObject(object)) blockers.push(object);
+  });
+  if (!blockers.length) return { position: desired, obstruction: null };
+
+  const hit = raycaster
+    .intersectObjects(blockers, false)
+    .find((intersection) => isCameraBlockingObject(intersection.object));
+  if (!hit) return { position: desired, obstruction: null };
+
+  const minDistance = options.minDistance ?? 2.15;
+  const margin = options.margin ?? 0.42;
+  const adjustedDistance = Math.max(minDistance, hit.distance - margin);
+  return {
+    position: origin.clone().addScaledVector(direction, adjustedDistance),
+    obstruction: {
+      objectName: hit.object.name || hit.object.parent?.name || "unnamed",
+      distance: Number(hit.distance.toFixed(3)),
+      adjustedDistance: Number(adjustedDistance.toFixed(3))
+    }
+  };
+}
+
+function isCameraBlockingObject(object) {
+  if (!object?.visible || !object.isMesh) return false;
+  if (object.userData?.cameraIgnore || object.parent?.userData?.cameraIgnore) return false;
+  const materials = Array.isArray(object.material) ? object.material : [object.material];
+  if (materials.some((material) => material?.transparent && (material.opacity ?? 1) < 0.62)) return false;
+  const name = `${object.name ?? ""} ${object.parent?.name ?? ""}`.toLowerCase();
+  if (name.includes("ground") || name.includes("floor") || name.includes("cloud") || name.includes("sky")) return false;
+  return true;
 }
 
 function updatePickupEffects(pickupEffects, effectRoot) {
