@@ -358,3 +358,20 @@ Visual delta: added `gate.trim.stone` to Prop Zoo, batched the live gate battlem
 QA delta: `node --check` for changed files, Prop Zoo/Material Lab QA, offline smoke, Town Square screenshot anchors, authored-room screenshots, and server-backed traversal all pass. The first server-backed run hit the local server's localhost connection limit; restarting the Kotlin server restored the gate.
 
 Remaining visual gap: the gate is now more readable but still simple. Further north-side work should be larger architectural massing/material work, not small trim additions.
+
+## Score After Outdoor Material And Backdrop Pass
+
+- Navigation readability: 2/2. Gate, Market, Temple, Tavern, fountain, NPCs, and physical exits remain readable from the fixed anchors.
+- Scale believability: 1/2. The distant environment is less like blank sky, and buildings no longer double-render baked timber under geometry trim, but the outdoor architecture is still simplified low-poly.
+- Semantic match: 2/2. The square keeps its civic-town identity while replacing the weakest exterior texture reads.
+- Interaction clarity: 2/2. Movement, compass/HUD affordances, physical exits, and NPC prompts are unchanged.
+- Server sync: 2/2. Offline smoke and authored room-shot QA pass after the material/backdrop change; server protocol was not changed.
+- Performance: 2/2. Full smoke Town Square reports 225 calls / 75,479 triangles / 26 textures / 175 geometries; fixed Town Square anchors report 125 calls / 69,321 triangles / 28 textures / 194 geometries.
+
+Total: 11/12
+
+Visual delta: added approved `townHorizonPastoralV1` as the new four-sided outdoor horizon, reduced outdoor ground/road/plaza contrast, converted Town facade materials from baked timber images into quieter plaster bases, replaced Town stone with muted procedural block-stone, and switched the fountain apron off the exterior wall stone material.
+
+QA delta: `node --check` for changed files, diff hygiene, Material Lab/Prop Zoo QA, fixed Town Square screenshots, offline smoke, and authored-room screenshots all pass. Screenshot review shows a more coherent palette, though still not final-quality environment art.
+
+Remaining visual gap: the broad outdoor forms remain visibly authored from simple blocks. The next high-leverage pass should improve one landmark's silhouette/lighting at a time or move the Town Square source into Blender-authored geometry rather than adding more texture noise.

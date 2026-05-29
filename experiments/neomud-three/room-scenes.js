@@ -7256,7 +7256,7 @@ function addPerimeterCurbs(root, materials) {
 }
 
 function addFountainApron(root, materials) {
-  const apron = new THREE.Mesh(new THREE.CylinderGeometry(5.15, 5.6, 0.12, 8), materials.stone);
+  const apron = new THREE.Mesh(new THREE.CylinderGeometry(5.15, 5.6, 0.12, 8), materials.plazaStone ?? materials.stone);
   apron.position.y = 0.06;
   apron.rotation.y = Math.PI / 8;
   apron.receiveShadow = true;

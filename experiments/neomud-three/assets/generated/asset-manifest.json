@@ -68,6 +68,15 @@
       "prompt": "Simple spacious painterly RPG horizon: mostly bright blue sky, soft white clouds, rolling green hills, tiny distant treeline and faint road, no close buildings or characters.",
       "use": ["town-skyline", "temple-exterior-preview"],
       "preloadGroup": "starter"
+    },
+    {
+      "id": "townHorizonPastoralV1",
+      "file": "town-horizon-pastoral-v1.webp",
+      "kind": "horizon-backdrop",
+      "source": "built-in imagegen, converted from PNG to WebP with cwebp -q 82",
+      "prompt": "Wide panoramic game horizon backdrop for a low-poly fantasy town square: blue sky, soft distant rolling hills, faint tree lines, a few low village rooftops far away, very low visual noise, no foreground objects, no hard perspective, no text, no people, no dramatic lighting.",
+      "use": ["town-skyline", "outdoor-distance"],
+      "preloadGroup": "starter"
     }
   ]
 }

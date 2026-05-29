@@ -15,9 +15,9 @@ export const TOWN_SQUARE_SPEC = {
     "town:gate": { position: [0, 0, -12.2], heading: Math.PI }
   },
   environment: {
-    background: 0xc3d7df,
-    fog: 0xc3d7df,
-    fogDensity: 0.006
+    background: 0xbfd9e5,
+    fog: 0xc7dcd9,
+    fogDensity: 0.0048
   },
   surfaces: {
     ground: { material: "packedDirt", width: 46, depth: 46 },
@@ -63,52 +63,52 @@ export const TOWN_SQUARE_SPEC = {
       id: "far-hills-north",
       ring: "far",
       kind: "backdrop",
-      asset: "townHorizonDay",
+      asset: "townHorizonPastoralV1",
       x: 0,
-      y: 11.2,
-      z: -48,
-      width: 136,
-      height: 34,
-      opacity: 0.64
+      y: 13.2,
+      z: -61,
+      width: 168,
+      height: 44,
+      opacity: 0.96
     },
     {
       id: "far-hills-south",
       ring: "far",
       kind: "backdrop",
-      asset: "townHorizonDay",
+      asset: "townHorizonPastoralV1",
       x: 0,
-      y: 11.2,
-      z: 52,
+      y: 13.2,
+      z: 61,
       rotationY: Math.PI,
-      width: 136,
-      height: 34,
-      opacity: 0.58
+      width: 168,
+      height: 44,
+      opacity: 0.92
     },
     {
       id: "far-hills-east",
       ring: "far",
       kind: "backdrop",
-      asset: "townHorizonDay",
-      x: 52,
-      y: 11.2,
+      asset: "townHorizonPastoralV1",
+      x: 61,
+      y: 13.2,
       z: 0,
       rotationY: -Math.PI / 2,
-      width: 136,
-      height: 34,
-      opacity: 0.58
+      width: 168,
+      height: 44,
+      opacity: 0.92
     },
     {
       id: "far-hills-west",
       ring: "far",
       kind: "backdrop",
-      asset: "townHorizonDay",
-      x: -52,
-      y: 11.2,
+      asset: "townHorizonPastoralV1",
+      x: -61,
+      y: 13.2,
       z: 0,
       rotationY: Math.PI / 2,
-      width: 136,
-      height: 34,
-      opacity: 0.58
+      width: 168,
+      height: 44,
+      opacity: 0.92
     },
     {
       id: "outer-ground-and-roads",
