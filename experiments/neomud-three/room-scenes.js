@@ -471,6 +471,7 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
     landmarkId: "town-tavern-glb"
   });
   root.add(entityLayer);
+  addTavernRuntimeInteriorFinish(root, materials);
 
   const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
     disposeObjectTree(entityLayer);
@@ -539,6 +540,51 @@ function configureBlenderTavernLights(scene, level) {
     defaultColor: 0xffa85a,
     defaultDistance: 12
   });
+}
+
+function addTavernRuntimeInteriorFinish(root, materials) {
+  const darkTimber = [];
+  const timber = [];
+  const trim = [];
+  const red = [];
+  const blue = [];
+  const gold = [];
+  const glass = [];
+
+  for (const z of [-TAVERN.halfZ + 0.34, TAVERN.halfZ - 0.34]) {
+    const side = z < 0 ? 1 : -1;
+    for (const x of [-9.2, -4.6, 0, 4.6, 9.2]) {
+      darkTimber.push({ x, y: 2.18, z, width: 0.16, height: 3.3, depth: 0.18 });
+    }
+    darkTimber.push({ x: 0, y: 1.18, z, width: TAVERN.width - 1.4, height: 0.16, depth: 0.16 });
+    timber.push({ x: 0, y: 3.45, z, width: TAVERN.width - 1.8, height: 0.14, depth: 0.14 });
+    for (const [x, materialArray] of [[-6.2, red], [-1.8, gold], [2.4, blue], [6.8, red]]) {
+      darkTimber.push({ x, y: 2.55, z, width: 1.34, height: 1.38, depth: 0.1 });
+      materialArray.push({ x, y: 2.55, z: z + side * 0.065, width: 0.92, height: 0.92, depth: 0.045 });
+      trim.push({ x, y: 1.77, z: z + side * 0.08, width: 1.58, height: 0.11, depth: 0.1 });
+    }
+  }
+
+  for (const z of [-5.8, -3.8, -1.8, 0.2]) {
+    timber.push({ x: TAVERN.barX - 0.45, y: 2.45, z, width: 0.14, height: 0.14, depth: 1.35 });
+    trim.push({ x: TAVERN.barX - 0.32, y: 2.7, z, width: 0.08, height: 0.24, depth: 1.08 });
+    gold.push({ x: TAVERN.barX - 0.24, y: 2.48, z: z - 0.36, width: 0.08, height: 0.34, depth: 0.08 });
+    blue.push({ x: TAVERN.barX - 0.24, y: 2.48, z: z + 0.02, width: 0.08, height: 0.34, depth: 0.08 });
+    red.push({ x: TAVERN.barX - 0.24, y: 2.48, z: z + 0.38, width: 0.08, height: 0.34, depth: 0.08 });
+  }
+
+  darkTimber.push({ x: -7.0, y: 3.1, z: TAVERN.halfZ - 0.35, width: 3.6, height: 0.22, depth: 0.14 });
+  darkTimber.push({ x: 5.4, y: 3.1, z: -TAVERN.halfZ + 0.35, width: 3.2, height: 0.22, depth: 0.14 });
+  glass.push({ x: -7.0, y: 2.52, z: TAVERN.halfZ - 0.28, width: 1.34, height: 0.9, depth: 0.05 });
+  glass.push({ x: 5.4, y: 2.52, z: -TAVERN.halfZ + 0.28, width: 1.28, height: 0.84, depth: 0.05 });
+
+  addInstancedBoxes(root, materials.darkTimber, darkTimber, "tavern-runtime-wall-dark-timber");
+  addInstancedBoxes(root, materials.timber, timber, "tavern-runtime-wall-timber");
+  addInstancedBoxes(root, materials.trimLight, trim, "tavern-runtime-wall-trim", { castShadow: false });
+  addInstancedBoxes(root, materials.awningRed, red, "tavern-runtime-wall-red");
+  addInstancedBoxes(root, materials.awningBlue, blue, "tavern-runtime-wall-blue");
+  addInstancedBoxes(root, materials.sign, gold, "tavern-runtime-wall-gold", { castShadow: false });
+  addInstancedBoxes(root, materials.windowDark, glass, "tavern-runtime-wall-glass", { castShadow: false, receiveShadow: false });
 }
 
 export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], world }) {
