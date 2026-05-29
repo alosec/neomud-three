@@ -55,6 +55,7 @@ export function createRenderEngine(canvas) {
   let isoCameraAvoidanceAngle = 0;
   const pickupEffects = [];
   const combatEffects = [];
+  const interactionEffects = [];
   let renderStats = { calls: 0, triangles: 0, textures: 0, geometries: 0 };
   let roomDebug = emptyRoomDebugSummary(false);
   let cameraObstruction = null;
@@ -73,6 +74,9 @@ export function createRenderEngine(canvas) {
     },
     get combatEffectCount() {
       return combatEffects.length;
+    },
+    get interactionEffectCount() {
+      return interactionEffects.length;
     },
     get roomDebug() {
       return roomDebug;
@@ -240,9 +244,26 @@ export function createRenderEngine(canvas) {
       });
       return combatEffects.length;
     },
+    showInteractionEffect({ position = player.position, text = "", success = true } = {}) {
+      const basePosition = position.clone?.() ?? new THREE.Vector3(position.x ?? 0, position.y ?? 0, position.z ?? 0);
+      const sprite = createCombatTextSprite(text, success ? "interaction" : "miss");
+      sprite.position.copy(basePosition).add(new THREE.Vector3(0, 2.55, 0));
+      sprite.renderOrder = 29;
+      effectRoot.add(sprite);
+      interactionEffects.push({
+        sprite,
+        born: performance.now(),
+        duration: 1500,
+        startY: sprite.position.y,
+        baseScale: sprite.scale.clone(),
+        material: sprite.material
+      });
+      return interactionEffects.length;
+    },
     render() {
       updatePickupEffects(pickupEffects, effectRoot);
       updateCombatEffects(combatEffects, effectRoot);
+      updateCombatEffects(interactionEffects, effectRoot);
       renderer.render(scene, camera);
       renderStats = {
         calls: renderer.info.render.calls,
@@ -529,6 +550,8 @@ function createCombatTextSprite(text, kind = "hit") {
   const ctx = canvas.getContext("2d");
   const color = kind === "defeat"
     ? "#ffe18f"
+    : kind === "interaction"
+      ? "#b8ffd2"
     : kind === "miss"
       ? "#c8d7ff"
       : kind === "player"

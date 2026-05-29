@@ -368,7 +368,7 @@ async function main() {
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
     const beforeInteractMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
-    const beforeInteractEffects = await page.evaluate(() => window.__neomudThreeDebug.effects.combat);
+    const beforeInteractEffects = await page.evaluate(() => window.__neomudThreeDebug.effects.interaction);
     const chestClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), caveChest);
     assert.equal(chestClick.type, "interactable");
     assert.equal(chestClick.id, "cave_chest");
@@ -380,7 +380,7 @@ async function main() {
       { timeout: 5_000 }
     );
     await page.waitForFunction(
-      (before) => window.__neomudThreeDebug.effects.combat > before,
+      (before) => window.__neomudThreeDebug.effects.interaction > before,
       beforeInteractEffects,
       { timeout: 2_000 }
     );

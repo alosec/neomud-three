@@ -595,12 +595,12 @@ function showInteractionFeedback(message) {
       ? "Opened"
       : "Used"
     : "No effect";
-  renderEngine.showCombatEffect({
+  renderEngine.showInteractionEffect({
     position: selectedInteractable?.position
       ? selectedInteractable.position.clone?.() ?? new THREE.Vector3(selectedInteractable.position.x ?? 0, 0, selectedInteractable.position.z ?? 0)
       : player.position.clone(),
     text,
-    kind: success ? "defeat" : "miss"
+    success
   });
 }
 
@@ -2669,7 +2669,8 @@ function installDebugApi() {
     get effects() {
       return {
         pickup: renderEngine.pickupEffectCount,
-        combat: renderEngine.combatEffectCount
+        combat: renderEngine.combatEffectCount,
+        interaction: renderEngine.interactionEffectCount
       };
     },
     get debugOverlay() {
