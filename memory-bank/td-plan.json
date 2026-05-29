@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T07:06:00.000Z",
+  "updated": "2026-05-30T07:24:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-a7e3",
+      "project": "NeoMud",
+      "title": "Surface server events in the play HUD",
+      "description": "Add a focused HUD event toast for system, tutorial, player presence, and NPC movement messages so important server events remain visible during normal play instead of only being appended to the log panel.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "hud",
+        "server-events",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "The gameplay HUD now includes a separate event toast. system_message, tutorial, player_entered/player_left, and npc_entered/npc_left show concise title/detail feedback. Debug exposes eventFeedback and offline QA injects system/tutorial messages to verify visible output.",
+          "created": "2026-05-30T07:24:00Z"
+        }
+      ],
+      "created": "2026-05-30T07:24:00Z",
+      "updated": "2026-05-30T07:24:00Z"
+    },
     {
       "id": "neo-f67b",
       "project": "NeoMud",

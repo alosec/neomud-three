@@ -282,7 +282,8 @@ body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   box-shadow: 0 0 10px rgba(100, 150, 255, 0.34);
 }
 
-.pickup-feedback {
+.pickup-feedback,
+.event-feedback {
   margin-top: 8px;
   padding: 7px 8px;
   border: 1px solid rgba(244, 206, 120, 0.42);
@@ -293,29 +294,46 @@ body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
 }
 
-.pickup-feedback.hidden {
+.event-feedback {
+  border-color: rgba(126, 184, 255, 0.38);
+  color: #e8f1ff;
+  background:
+    linear-gradient(180deg, rgba(21, 38, 64, 0.82), rgba(8, 13, 22, 0.76)),
+    rgba(8, 13, 22, 0.72);
+}
+
+.pickup-feedback.hidden,
+.event-feedback.hidden {
   display: none;
 }
 
 .pickup-feedback strong,
-.pickup-feedback span {
+.pickup-feedback span,
+.event-feedback strong,
+.event-feedback span {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.pickup-feedback strong {
+.pickup-feedback strong,
+.event-feedback strong {
   font-size: 10px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.pickup-feedback span {
+.pickup-feedback span,
+.event-feedback span {
   margin-top: 2px;
   color: #f6db91;
   font-size: 12px;
   font-weight: 800;
+}
+
+.event-feedback span {
+  color: #b8d4ff;
 }
 
 .movement-chip {

@@ -33,6 +33,9 @@ const movementChip = document.querySelector("#movement-chip");
 const pickupFeedback = document.querySelector("#pickup-feedback");
 const pickupFeedbackTitle = document.querySelector("#pickup-feedback-title");
 const pickupFeedbackDetail = document.querySelector("#pickup-feedback-detail");
+const eventFeedback = document.querySelector("#event-feedback");
+const eventFeedbackTitle = document.querySelector("#event-feedback-title");
+const eventFeedbackDetail = document.querySelector("#event-feedback-detail");
 const cameraModeButtons = [...document.querySelectorAll("[data-camera-mode]")];
 
 const renderEngine = createRenderEngine(canvas);
@@ -61,6 +64,7 @@ let pendingInteractionAction = null;
 let pendingCombatCommand = null;
 const targetHealthById = new Map();
 let pickupFeedbackTimeout = 0;
+let eventFeedbackTimeout = 0;
 let roomDebugVisible = urlParams.get("debug") === "1" || urlParams.get("debug") === "true";
 let cameraMode = urlParams.get("camera") === "platform" ? "platform" : "isometric";
 
@@ -320,6 +324,7 @@ function handleServerMessage(message) {
       break;
     case "system_message":
       appendLog(message.message);
+      showEventFeedback("System", message.message);
       break;
     case "attack_mode_update":
       clearPendingCombatCommand();
@@ -488,20 +493,25 @@ function handleServerMessage(message) {
       break;
     case "tutorial":
       appendLog(`${message.title}: ${message.content.split("\n")[0]}`);
+      showEventFeedback(message.title ?? "Tutorial", message.content?.split("\n")[0] ?? "");
       break;
     case "player_entered":
       appendLog(`${message.playerName} entered the room.`);
+      showEventFeedback("Nearby player", `${message.playerName} entered.`);
       break;
     case "player_left":
       appendLog(`${message.playerName} left ${message.direction.toLowerCase()}.`);
+      showEventFeedback("Nearby player", `${message.playerName} left ${String(message.direction ?? "").toLowerCase()}.`);
       break;
     case "npc_entered":
       appendLog(`${message.npcName} entered.`);
+      showEventFeedback("NPC movement", `${message.npcName} entered.`);
       upsertServerNpc(message);
       refreshRendererEntities();
       break;
     case "npc_left":
       appendLog(`${message.npcName} left ${message.direction.toLowerCase()}.`);
+      showEventFeedback("NPC movement", `${message.npcName} left ${String(message.direction ?? "").toLowerCase()}.`);
       serverState.npcs = serverState.npcs.filter((npc) => (npc.id ?? npc.npcId) !== message.npcId);
       refreshRendererEntities();
       break;
@@ -671,6 +681,17 @@ function showPickupFeedback(message) {
   pickupFeedbackTimeout = window.setTimeout(() => {
     pickupFeedback.classList.add("hidden");
   }, 4200);
+}
+
+function showEventFeedback(title, detail) {
+  if (!eventFeedback || !eventFeedbackTitle || !eventFeedbackDetail) return;
+  eventFeedbackTitle.textContent = title ?? "Event";
+  eventFeedbackDetail.textContent = detail ?? "";
+  eventFeedback.classList.remove("hidden");
+  window.clearTimeout(eventFeedbackTimeout);
+  eventFeedbackTimeout = window.setTimeout(() => {
+    eventFeedback.classList.add("hidden");
+  }, 5200);
 }
 
 function showInteractionFeedback(message) {
@@ -3211,6 +3232,13 @@ function installDebugApi() {
         visible: Boolean(pickupFeedback && !pickupFeedback.classList.contains("hidden")),
         title: pickupFeedbackTitle?.textContent ?? "",
         detail: pickupFeedbackDetail?.textContent ?? ""
+      };
+    },
+    get eventFeedback() {
+      return {
+        visible: Boolean(eventFeedback && !eventFeedback.classList.contains("hidden")),
+        title: eventFeedbackTitle?.textContent ?? "",
+        detail: eventFeedbackDetail?.textContent ?? ""
       };
     },
     setRoom(roomId) {

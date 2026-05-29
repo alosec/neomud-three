@@ -62,6 +62,23 @@ async function main() {
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
     assert.match(await page.locator("#hp-value").textContent(), /^86\/86$/);
     assert.match(await page.locator("#mp-value").textContent(), /^18\/18$/);
+    await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
+      type: "system_message",
+      message: "QA event toast"
+    }));
+    const eventToast = await page.evaluate(() => window.__neomudThreeDebug.eventFeedback);
+    assert.equal(eventToast.visible, true);
+    assert.equal(eventToast.title, "System");
+    assert.equal(eventToast.detail, "QA event toast");
+    await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
+      type: "tutorial",
+      title: "QA Tutorial",
+      content: "First tutorial line.\nSecond line."
+    }));
+    const tutorialToast = await page.evaluate(() => window.__neomudThreeDebug.eventFeedback);
+    assert.equal(tutorialToast.visible, true);
+    assert.equal(tutorialToast.title, "QA Tutorial");
+    assert.equal(tutorialToast.detail, "First tutorial line.");
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.camera.mode), "isometric");
     assert.equal(await page.locator('[data-camera-mode="isometric"].active').count(), 1);
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform")), "platform");

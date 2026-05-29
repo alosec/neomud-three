@@ -163,6 +163,10 @@ Playable Three.js lab:
 - The Inventory panel now renders authoritative server inventory stacks, equipped slots, and coins instead of flattening inventory to item IDs. Server-backed QA verifies the inventory UI/state after a live rendered-loot pickup.
 - Server-confirmed pickup results now show a compact HUD pickup toast under the HP bar. Server-backed QA asserts the live toast when loot is available and always writes a deterministic Hidden Cave pickup-feedback screenshot for UI review.
 - Pickup results also trigger a lightweight transient 3D burst over the player avatar through the render engine. Server-backed QA asserts the active world effect through `window.__neomudThreeDebug.effects.pickup`.
+- System, tutorial, player presence, and NPC movement messages now surface
+  through a compact HUD event toast so important server events remain visible
+  during normal play instead of only appearing in the log panel. Offline QA
+  injects `system_message` and `tutorial` messages and verifies the event toast.
 
 Cathedral status:
 
