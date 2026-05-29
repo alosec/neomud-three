@@ -377,11 +377,11 @@ export function buildTownSquareRoom({ root, worldRoot, npcs = [], roomItems = []
     status: `${spec.name}: ${spec.intent}`,
     environment: spec.environment,
     camera: {
-      distance: 10.2,
-      height: 6.25,
-      sideOffset: -1.35,
-      lookAhead: 4.5,
-      targetHeight: 1.18
+      distance: 10.85,
+      height: 6.75,
+      sideOffset: -0.45,
+      lookAhead: 4.9,
+      targetHeight: 1.36
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -490,11 +490,11 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
   return {
     ...glbRuntime,
     camera: {
-      distance: 7.25,
-      height: 3.15,
-      sideOffset: -0.55,
-      lookAhead: 4.15,
-      targetHeight: 1.08
+      distance: 8.45,
+      height: 3.72,
+      sideOffset: -0.45,
+      lookAhead: 4.65,
+      targetHeight: 1.24
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -730,11 +730,11 @@ export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], wo
       fogDensity: 0.01
     },
     camera: {
-      distance: 8.5,
-      height: 4.85,
-      sideOffset: -1.15,
-      lookAhead: 4.15,
-      targetHeight: 1.08
+      distance: 10.0,
+      height: 5.45,
+      sideOffset: -0.95,
+      lookAhead: 4.8,
+      targetHeight: 1.24
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -846,12 +846,12 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
       fogDensity: 0.006
     },
     camera: {
-      distance: 5.45,
-      height: 4.35,
-      sideOffset: -2.65,
-      lookAhead: 5.4,
-      targetHeight: 1.08,
-      minCameraDistance: 2.45
+      distance: 6.75,
+      height: 4.85,
+      sideOffset: -2.25,
+      lookAhead: 5.85,
+      targetHeight: 1.22,
+      minCameraDistance: 2.9
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -967,11 +967,11 @@ export function buildForgeRoom({ root, worldRoot, npcs = [], roomItems = [], wor
       fogDensity: 0.024
     },
     camera: {
-      distance: 3.75,
-      height: 3.8,
+      distance: 5.25,
+      height: 4.28,
       sideOffset: 0.0,
-      lookAhead: 5.15,
-      targetHeight: 1.0
+      lookAhead: 5.55,
+      targetHeight: 1.16
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1075,11 +1075,11 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
       fogDensity: 0.008
     },
     camera: {
-      distance: 5.4,
-      height: 7.15,
-      sideOffset: -0.55,
-      lookAhead: 5.4,
-      targetHeight: 1.05
+      distance: 6.45,
+      height: 7.45,
+      sideOffset: -0.45,
+      lookAhead: 5.8,
+      targetHeight: 1.18
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1163,11 +1163,11 @@ export function buildForestEdgeRoom({ root, worldRoot, npcs = [], roomItems = []
       fogDensity: 0.011
     },
     camera: {
-      distance: 8.0,
-      height: 5.05,
-      sideOffset: -1.05,
-      lookAhead: 4.05,
-      targetHeight: 1.05
+      distance: 9.45,
+      height: 5.55,
+      sideOffset: -0.95,
+      lookAhead: 4.65,
+      targetHeight: 1.2
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1251,11 +1251,11 @@ export function buildForestPathRoom({ root, worldRoot, npcs = [], roomItems = []
       fogDensity: 0.018
     },
     camera: {
-      distance: 7.95,
-      height: 5.0,
-      sideOffset: -1.0,
-      lookAhead: 4.1,
-      targetHeight: 1.05
+      distance: 9.35,
+      height: 5.55,
+      sideOffset: -0.9,
+      lookAhead: 4.65,
+      targetHeight: 1.2
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1341,11 +1341,11 @@ export function buildSunlitClearingRoom({ root, worldRoot, npcs = [], roomItems 
       fogDensity: 0.0065
     },
     camera: {
-      distance: 8.45,
-      height: 5.2,
-      sideOffset: -1.05,
-      lookAhead: 4.15,
-      targetHeight: 1.05
+      distance: 9.85,
+      height: 5.72,
+      sideOffset: -0.9,
+      lookAhead: 4.75,
+      targetHeight: 1.2
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1431,11 +1431,11 @@ export function buildDeepForestRoom({ root, worldRoot, npcs = [], roomItems = []
       fogDensity: 0.022
     },
     camera: {
-      distance: 8.0,
-      height: 4.95,
-      sideOffset: -1.0,
-      lookAhead: 4.0,
-      targetHeight: 1.02
+      distance: 9.35,
+      height: 5.45,
+      sideOffset: -0.88,
+      lookAhead: 4.55,
+      targetHeight: 1.18
     },
     syncEntities,
     spawnFor(fromRoomId) {
@@ -1528,11 +1528,11 @@ export function buildHiddenCaveRoom({ root, worldRoot, roomItems = [], roomCoins
       fogDensity: 0.034
     },
     camera: {
-      distance: 7.2,
-      height: 4.95,
-      sideOffset: -1.7,
-      lookAhead: 2.8,
-      targetHeight: 0.95
+      distance: 8.4,
+      height: 5.32,
+      sideOffset: -1.35,
+      lookAhead: 3.25,
+      targetHeight: 1.12
     },
     syncEntities,
     spawnFor(fromRoomId) {
