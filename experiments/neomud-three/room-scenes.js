@@ -507,6 +507,10 @@ export function buildTavernRoom({ root, worldRoot, npcs = [], roomItems = [], wo
         name: entity.name,
         role: entity.role ?? "",
         prompt: entity.prompt,
+        actionType: entity.actionType ?? "",
+        itemId: entity.itemId ?? "",
+        coinType: entity.coinType ?? "",
+        quantity: entity.quantity ?? 1,
         x: entity.position.x,
         z: entity.position.z
       }));
@@ -787,6 +791,10 @@ export function buildMarketRoom({ root, worldRoot, npcs = [], roomItems = [], wo
         name: entity.name,
         role: entity.role ?? "",
         prompt: entity.prompt,
+        actionType: entity.actionType ?? "",
+        itemId: entity.itemId ?? "",
+        coinType: entity.coinType ?? "",
+        quantity: entity.quantity ?? 1,
         x: entity.position.x,
         z: entity.position.z
       }));
@@ -904,6 +912,10 @@ export function buildMagicShopRoom({ root, worldRoot, npcs = [], roomItems = [],
         name: entity.name,
         role: entity.role ?? "",
         prompt: entity.prompt,
+        actionType: entity.actionType ?? "",
+        itemId: entity.itemId ?? "",
+        coinType: entity.coinType ?? "",
+        quantity: entity.quantity ?? 1,
         x: entity.position.x,
         z: entity.position.z
       }));
@@ -5257,9 +5269,11 @@ function addHiddenCaveEntities(root, materials, world, roomItems, roomCoins, int
       id: normalized.id,
       name: normalized.name,
       role: "Cave Loot",
-      prompt: `Inspect: ${normalized.name}`,
+      prompt: `Pick up: ${normalized.name}`,
       description: normalized.description ?? "",
       quantity: normalized.quantity,
+      actionType: "PICKUP_ITEM",
+      itemId: normalized.id,
       position: new THREE.Vector3(x, 0, z)
     });
   }

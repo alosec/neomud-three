@@ -43,6 +43,7 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, and keep a selected-target ring on a clicked interactable while its panel is open. Town Square screenshot QA verifies Old Wren hover/selection and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
    - Feature prompts now preserve semantic verbs too: treasure/drop features such as the Hidden Cave chest read as `Open` rather than generic `Pick up`.
+   - Server-dropped Hidden Cave item loot now carries `PICKUP_ITEM` action/debug metadata, giving item drops and coin piles the same `Pick up` affordance path.
    - Hostile targets now get first-pass combat affordance treatment: red selected-target marker colors plus a compact hostile target frame/health bar in the interaction panel. Hostile panels also show disabled `Basic Attack` and class-skill action slots with explicit server-authoritative command-path messaging. This is explicit target/action UI only; combat authority still belongs on the server/game model.
    - Do not solve this by adding more floating labels. The sign clipping issue is evidence that navigation affordances should become stable world objects and clickable surfaces, not camera-facing sprites mounted inside geometry.
 
@@ -65,8 +66,9 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
    Remaining first-slice gap:
    - Selection feedback needs stronger object-level affordance language:
      target outlines/material response, target persistence rules after panel
-     close, real attack/ability commands, and item/loot hover parity across
-     authored rooms.
+     close and real attack/ability commands. Item/loot hover parity exists for
+     the Hidden Cave server-loot path, but should be audited across future
+     authored rooms as they gain live drops.
    - Click-to-move still uses direct steering plus existing collider pushout,
      not pathfinding or navmesh.
 

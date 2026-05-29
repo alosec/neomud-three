@@ -24,6 +24,9 @@ Implemented:
 - Corrected feature action wording so treasure/drop features such as the Hidden
   Cave chest read as `Open`, not `Pick up`; disabled action buttons preserve
   the action verb, e.g. `Open unavailable`.
+- Added `PICKUP_ITEM` action/debug metadata to Hidden Cave dropped item markers,
+  so server-spawned item drops and coin piles share the same pickup affordance
+  path.
 - Cleared hover state on pointer leave, click commit, room switch, and debug player placement so stale affordances do not leak between rooms.
 - Exposed hover helpers through `window.__neomudThreeDebug` for screenshot QA.
 
@@ -53,6 +56,8 @@ Evidence:
   combat command slots, and explains the server-authority requirement.
 - Offline smoke QA verifies the Hidden Cave chest hover/proximity/action button
   use `Open` semantics.
+- Server-backed QA passed after the dropped-item metadata change, covering the
+  live chest -> loot -> pickup -> inventory/coins path.
 - `qa/latest/offline-hostile-target-panel.png` captures the hostile target panel for direct visual review.
 
 Remaining gap:
