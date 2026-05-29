@@ -194,32 +194,88 @@ function plazaPaverTexture() {
   });
 }
 
+function calmTempleMarbleTexture() {
+  return proceduralTexture("temple-calm-marble-v1", [4.4, 7.2], (ctx, width, height, random) => {
+    ctx.fillStyle = "#cfc8b4";
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = "rgba(106, 89, 58, 0.13)";
+    ctx.lineWidth = 1.4;
+    const cell = 72;
+    for (let x = 0; x <= width + cell; x += cell) {
+      ctx.beginPath();
+      ctx.moveTo(x + random() * 4 - 2, 0);
+      ctx.lineTo(x + random() * 4 - 2, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= height + cell; y += cell) {
+      ctx.beginPath();
+      ctx.moveTo(0, y + random() * 4 - 2);
+      ctx.lineTo(width, y + random() * 4 - 2);
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < 26; i++) {
+      const y = random() * height;
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(130, 107, 69, ${0.035 + random() * 0.04})`;
+      ctx.lineWidth = 0.8 + random() * 1.2;
+      ctx.moveTo(-12, y);
+      ctx.bezierCurveTo(width * 0.3, y + random() * 24 - 12, width * 0.65, y + random() * 28 - 14, width + 12, y + random() * 20 - 10);
+      ctx.stroke();
+    }
+  });
+}
+
+function calmTempleLimestoneTexture() {
+  return proceduralTexture("temple-calm-limestone-v1", [2.2, 2.2], (ctx, width, height, random) => {
+    valueNoise(ctx, width, height, "#b4aa94", 650, 0.045, random);
+    ctx.strokeStyle = "rgba(80, 70, 54, 0.11)";
+    ctx.lineWidth = 1.2;
+    const blockW = 88;
+    const blockH = 54;
+    for (let y = 0; y <= height + blockH; y += blockH) {
+      const offset = Math.floor(y / blockH) % 2 ? blockW / 2 : 0;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+      for (let x = -blockW; x <= width + blockW; x += blockW) {
+        ctx.beginPath();
+        ctx.moveTo(x + offset, y);
+        ctx.lineTo(x + offset, y + blockH);
+        ctx.stroke();
+      }
+    }
+  });
+}
+
 const MATERIAL_DEFINITION_LIST = [
   {
     id: "temple.marble.floor",
     legacyKey: "marble",
     family: "temple",
-    kind: "tileable-material",
+    kind: "procedural-material",
     intendedUse: ["cathedral-floor"],
-    textureAsset: "templeMarbleFloor",
-    repeat: [3.2, 5.6],
-    roughness: 0.34,
-    metalness: 0.02,
+    textureAsset: "templeCalmMarbleV1",
+    repeat: [4.4, 7.2],
+    roughness: 0.68,
+    metalness: 0,
     approved: true,
-    create: () => standardMaterial({ map: texture("templeMarbleFloor"), roughness: 0.34, metalness: 0.02 })
+    create: () => standardMaterial({ map: calmTempleMarbleTexture(), color: 0xf0ead8, roughness: 0.68, metalness: 0 })
   },
   {
     id: "temple.limestone.wall",
     legacyKey: "stone",
     family: "temple",
-    kind: "tileable-material",
+    kind: "procedural-material",
     intendedUse: ["cathedral-wall", "stone-trim"],
-    textureAsset: "templeLimestoneWall",
-    repeat: [2, 2],
-    roughness: 0.84,
+    textureAsset: "templeCalmLimestoneV1",
+    repeat: [2.2, 2.2],
+    roughness: 0.9,
     metalness: 0,
     approved: true,
-    create: () => standardMaterial({ map: texture("templeLimestoneWall"), roughness: 0.84 })
+    create: () => standardMaterial({ map: calmTempleLimestoneTexture(), color: 0xe6dcc3, roughness: 0.9 })
   },
   {
     id: "temple.stained-glass.alpha",

@@ -33,8 +33,8 @@
     },
     "cohesion": {
       "score": 1,
-      "notes": "The simpler geometry fits the low-poly target better, but the pew material still does not harmonize with the bright marble floor and stained-glass focal language.",
-      "followUp": "Adjust material values after the Temple floor/wall material hierarchy is calmed."
+      "notes": "The simpler geometry fits the low-poly target better, and the calmer floor/wall material pass helps, but pew rows still feel visually heavier than the sacred-room role wants.",
+      "followUp": "Use another pass on pew value/scale or nave composition after addressing the black upper void."
     },
     "scale": {
       "score": 1,
@@ -42,12 +42,14 @@
       "followUp": "Use semantic row pitch, aisle width, back height, and altar clearance constraints before export."
     },
     "materialLanguage": {
-      "score": 0,
-      "notes": "Rail striping is reduced, but the dark pew planes still compete against the over-bright floor/wall treatment instead of sitting quietly in the nave."
+      "score": 1,
+      "notes": "The calmer procedural floor/wall materials remove the worst texture clash, but dark pew planes still need better value hierarchy.",
+      "followUp": "Reduce pew back/end-panel darkness or create a lighter approved pew wood variant."
     },
     "visualHierarchy": {
-      "score": 0,
-      "notes": "The repeated dark backs still pull the eye away from the altar and stained glass in the player-view nave shot."
+      "score": 1,
+      "notes": "The altar and stained glass are more readable after the floor/wall pass, but repeated pew backs still pull too much attention in the player-view nave shot.",
+      "followUp": "Tune pew value and nave lighting so the rows frame the altar instead of forming the dominant pattern."
     },
     "flow": {
       "score": 1,
@@ -62,8 +64,8 @@
   },
   "acceptedAs": null,
   "blockedBy": [
-    "pew material contrast must sit lower in hierarchy than altar and stained glass",
-    "Temple floor/wall material language is still loud enough to make dark pew rows feel harsher",
+    "pew material contrast still sits too close to altar and stained-glass prominence",
+    "black upper void keeps the Temple from feeling like a monumental bounded cathedral",
     "row composition must feel more processional and less like repeated dark blocks"
   ]
 }
