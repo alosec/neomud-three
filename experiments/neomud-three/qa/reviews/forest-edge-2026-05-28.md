@@ -26,3 +26,18 @@ Total: 11/12.
 - The first depth pass added side shrub masses, a back tree layer, high canopy chunks, and Prop Zoo-approved ancient tree/log/stone props.
 - Next forest pass should improve the remaining backdrop seam and path/grass material integration.
 - Do not add more forest rooms until this threshold reads less like a stage with a wallpaper backplane.
+
+## Score After Outdoor Ground Read Pass
+
+- Navigation readability: 2/2. The central trail and north/south exits remain clear.
+- Scale believability: 1/2. Softer forest ground materials reduce the placeholder-lawn read, but the room still exposes the stage/backdrop construction.
+- Semantic match: 2/2. The room still reads as the forest threshold beyond the North Gate.
+- Interaction clarity: 2/2. Forest Rat staging and physical exit affordances are unchanged.
+- Server sync: 2/2. Offline smoke and authored room-shot QA pass; server protocol was not changed.
+- Performance: 2/2. Latest smoke reports Forest Edge at 60 calls / 53,619 triangles / 49 textures / 47 geometries, within budget.
+
+Total: 11/12.
+
+Visual delta: added approved forest ground/trail/moss/shadow materials, replaced the prior packed-dirt rectangles in Forest Edge with softer moss patches, and reduced hard dark ground blocks.
+
+Remaining visual gap: this is cleaner but still not final outdoor art. The next improvement should be background/seam treatment or Blender-authored terrain, not more flat overlay rectangles.

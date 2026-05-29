@@ -3211,12 +3211,13 @@ function northGateTriggers() {
 }
 
 function addForestEdgeStage(root, materials, worldRoot) {
-  addGroundPlane(root, materials.foliageDark, FOREST_EDGE.width, FOREST_EDGE.depth);
+  addGroundPlane(root, materials.forestGround ?? materials.foliageDark, FOREST_EDGE.width, FOREST_EDGE.depth);
   addInstancedSurfaceRects(root, materials, [
-    { material: "road", x: 0, z: 0, width: 5.8, depth: FOREST_EDGE.depth, y: 0.022 },
-    { material: "packedDirt", x: 0, z: 10.8, width: 11.2, depth: 8.8, y: 0.016 },
-    { material: "packedDirt", x: 0, z: -12.2, width: 8.4, depth: 9.2, y: 0.018 }
+    { material: "forestTrail", x: 0, z: 0, width: 5.8, depth: FOREST_EDGE.depth, y: 0.022 },
+    { material: "forestMossLight", x: 0, z: 10.8, width: 10.4, depth: 6.4, y: 0.016 },
+    { material: "forestMossLight", x: 0, z: -12.2, width: 7.8, depth: 6.8, y: 0.018 }
   ], "forest-edge-surfaces");
+  addForestGroundBreakup(root, materials, "edge");
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4, {
     unlit: true,
@@ -3272,6 +3273,59 @@ function addForestEdgeSouthTownWall(root, materials) {
   addInstancedBoxes(root, materials.stone, stone, "forest-edge-south-wall-stone");
   addInstancedBoxes(root, materials.trimLight, trim, "forest-edge-south-wall-trim", { castShadow: false, receiveShadow: true });
   addInstancedBoxes(root, materials.portalDark, dark, "forest-edge-south-gate-shadow", { castShadow: false, receiveShadow: false });
+}
+
+function addForestGroundBreakup(root, materials, variant) {
+  const shadow = [];
+  const moss = [];
+  const leaf = [];
+  const trail = [];
+  const edgeMode = variant === "edge";
+
+  const clusters = edgeMode
+    ? [
+        [-10.8, 8.8, 4.4, 5.8, -0.16], [10.6, 8.6, 4.2, 5.6, 0.18],
+        [-11.8, -4.4, 4.8, 7.2, 0.12], [11.6, -4.8, 4.6, 7.0, -0.14],
+        [-7.2, -15.2, 4.4, 5.4, -0.28], [7.0, -15.4, 4.4, 5.4, 0.26]
+      ]
+    : [
+        [-10.8, 10.8, 4.6, 5.8, 0.14], [10.8, 10.6, 4.6, 5.8, -0.16],
+        [-10.7, -1.2, 5.2, 8.2, -0.12], [10.8, -1.6, 5.2, 8.0, 0.16],
+        [-8.2, -14.4, 4.6, 6.0, 0.22], [8.6, -14.6, 4.6, 6.2, -0.2],
+        [9.8, 3.7, 5.8, 3.8, 0.04]
+      ];
+
+  for (const [x, z, width, depth, rotationZ] of clusters) {
+    shadow.push({ x, y: 0.033, z, width: width * 0.48, depth: depth * 0.42, rotationZ });
+    shadow.push({ x: x * 0.96, y: 0.033, z: z + 1.7, width: width * 0.34, depth: depth * 0.28, rotationZ: -rotationZ * 0.7 });
+    moss.push({ x: x * 0.94, y: 0.035, z: z + 0.9, width: width * 0.42, depth: depth * 0.28, rotationZ: -rotationZ * 0.8 });
+  }
+
+  const trailZs = edgeMode ? [-15.8, -8.6, -1.8, 5.4, 12.8] : [-15.4, -8.2, -1.0, 6.4, 13.2];
+  for (const [index, z] of trailZs.entries()) {
+    trail.push({ x: index % 2 ? -1.25 : 1.15, y: 0.037, z, width: 1.35, depth: 0.24, rotationZ: index % 2 ? -0.24 : 0.2 });
+    trail.push({ x: index % 2 ? 1.95 : -1.8, y: 0.037, z: z + 2.6, width: 0.9, depth: 0.2, rotationZ: index % 2 ? 0.18 : -0.2 });
+  }
+
+  const leafPoints = edgeMode
+    ? [[-7.8, 4.5], [-5.9, -2.2], [7.4, 4.0], [9.2, -2.4], [-3.6, -12.2], [3.4, -12.8], [-12.2, 13.0], [12.4, 12.5]]
+    : [[-6.4, 5.8], [6.8, 5.4], [-5.5, -7.8], [5.6, -8.2], [11.2, 1.2], [11.8, 6.8], [-12.4, 0.4], [12.8, -13.2]];
+  for (const [index, [x, z]] of leafPoints.entries()) {
+    leaf.push({ x, y: 0.041, z, width: 0.42, depth: 0.08, rotationZ: (index % 2 ? -0.42 : 0.36) });
+    leaf.push({ x: x + 0.38, y: 0.041, z: z + 0.24, width: 0.3, depth: 0.07, rotationZ: (index % 2 ? 0.28 : -0.3) });
+  }
+
+  addInstancedSurfaceRects(root, {
+    forestShadow: materials.forestShadow ?? materials.foliageDark,
+    forestMossLight: materials.forestMossLight ?? materials.foliage,
+    forestTrail: materials.forestTrail ?? materials.road,
+    leaf: materials.awningGold
+  }, [
+    ...shadow.map((patch) => ({ ...patch, material: "forestShadow" })),
+    ...moss.map((patch) => ({ ...patch, material: "forestMossLight" })),
+    ...trail.map((patch) => ({ ...patch, material: "forestTrail" })),
+    ...leaf.map((patch) => ({ ...patch, material: "leaf" }))
+  ], `forest-${variant}-ground-breakup`);
 }
 
 function addForestEdgeDepthLayers(root, materials) {
@@ -3502,14 +3556,15 @@ function forestEdgeTriggers() {
 }
 
 function addForestPathStage(root, materials, worldRoot) {
-  addGroundPlane(root, materials.foliageDark, FOREST_PATH.width, FOREST_PATH.depth);
+  addGroundPlane(root, materials.forestGround ?? materials.foliageDark, FOREST_PATH.width, FOREST_PATH.depth);
   addInstancedSurfaceRects(root, materials, [
-    { material: "road", x: 0, z: 3.5, width: 5.2, depth: 40.2, y: 0.022 },
-    { material: "road", x: 7.0, z: 3.6, width: 13.8, depth: 4.4, y: 0.024 },
-    { material: "packedDirt", x: 0, z: 11.8, width: 10.6, depth: 7.6, y: 0.016 },
-    { material: "packedDirt", x: 0, z: -13.6, width: 9.6, depth: 9.0, y: 0.018 },
-    { material: "packedDirt", x: 10.2, z: 3.6, width: 8.2, depth: 7.4, y: 0.017 }
+    { material: "forestTrail", x: 0, z: 3.5, width: 5.2, depth: 40.2, y: 0.022 },
+    { material: "forestTrail", x: 7.0, z: 3.6, width: 13.8, depth: 4.4, y: 0.024 },
+    { material: "forestMossLight", x: 0, z: 11.8, width: 9.8, depth: 5.9, y: 0.016 },
+    { material: "forestMossLight", x: 0, z: -13.6, width: 8.8, depth: 6.8, y: 0.018 },
+    { material: "forestMossLight", x: 10.2, z: 3.6, width: 7.0, depth: 5.2, y: 0.017 }
   ], "forest-path-surfaces");
+  addForestGroundBreakup(root, materials, "path");
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.5, -28.2, 40, 22, {
     unlit: true,

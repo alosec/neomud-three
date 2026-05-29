@@ -25,3 +25,18 @@ Total: 11/12.
 - Accepted as an authored playable route room, not final forest art.
 - The forest rooms are now functionally coherent but share the same visual limitation: flat generated background plus low-poly tree masses.
 - Next forest work should refine material/lighting/depth coherence before adding Deep Forest or Sunlit Clearing.
+
+## Score After Outdoor Ground Read Pass
+
+- Navigation readability: 2/2. South/North/East exits remain exposed through visible trail geometry and labels.
+- Scale believability: 1/2. Softer moss/trail patches reduce the blocky flat-lawn read, but the backdrop/stage edge is still apparent.
+- Semantic match: 2/2. The room continues to read as the winding forest route with a branch toward the clearing.
+- Interaction clarity: 2/2. Shadow Wolf and Forest Bandit staging are unchanged.
+- Server sync: 2/2. Offline smoke and authored room-shot QA pass; server protocol was not changed.
+- Performance: 2/2. Latest smoke reports Forest Path at 60 calls / 54,077 triangles / 54 textures / 42 geometries, within budget.
+
+Total: 11/12.
+
+Visual delta: replaced harsh packed-dirt overlays with approved forest moss materials, added quieter forest ground/trail material IDs, and kept the path readable without the large black rectangle artifacts.
+
+Remaining visual gap: the stage still needs a better scenic boundary and terrain model. Do not keep solving forest art with more coplanar rectangles.

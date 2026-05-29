@@ -392,3 +392,18 @@ Visual delta: changed Market shopfront walls from warm plaster to the cooler app
 QA delta: `node --check`, diff hygiene, authored room screenshots, Material Lab/Prop Zoo QA, fixed Town Square screenshots, and full offline smoke all pass.
 
 Remaining visual gap: Market Street is more restrained but still needs stronger authored storefront silhouettes and less repeated facade rhythm.
+
+## Score After Outdoor Surface Softening Pass
+
+- Navigation readability: 2/2. Town Square exits, fountain, NPC staging, and compass/HUD affordances remain readable.
+- Scale believability: 1/2. Softer ground/road/plaza values reduce the outdoor placeholder feel, but the landmarks remain visibly simple low-poly architecture.
+- Semantic match: 2/2. The room still reads as the civic town plaza with gate, market, tavern, temple, fountain, and named NPCs.
+- Interaction clarity: 2/2. Physical exits and proximity prompts are unchanged.
+- Server sync: 2/2. Offline smoke, fixed Town Square screenshots, and authored room-shot QA pass; server protocol was not changed.
+- Performance: 2/2. Latest fixed Town Square anchors report 125 calls / 69,321 triangles / 27 textures / 194 geometries, within budget.
+
+Total: 11/12
+
+Visual delta: lightened and unified the approved town road, plaza paver, packed-dirt, path-edge, and contact-shadow materials. This reduces the excessively muddy outdoor blocks without changing layout or adding new assets.
+
+Remaining visual gap: the town will not get substantially better through material tinting alone. Next meaningful outdoor work should target authored terrain/backdrop boundaries or rebuild one landmark in Blender-level geometry.
