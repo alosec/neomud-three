@@ -100,7 +100,7 @@ async function main() {
         landmark.sourceBrief?.endsWith("town_temple/level-brief.json") &&
         landmark.lightNodes >= 5 &&
         landmark.runtimeLights?.length >= 5 &&
-        landmark.materialRemaps?.length >= 5
+        landmark.materialRemaps?.length >= 8
       ),
       `expected Temple to use Blender GLB level package, got ${JSON.stringify(templeLandmarks)}`
     );

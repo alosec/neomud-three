@@ -286,6 +286,9 @@ const MATERIAL_DEFINITION_LIST = [
     create: () => standardMaterial({ map: texture("templeAltarCloth"), roughness: 0.62 })
   },
   colorMaterial("temple.trim.limestone", "trim", "temple", "stone-trim", 0xbeb39c, { roughness: 0.65 }),
+  colorMaterial("temple.pew.oak", "pewOak", "temple", "cathedral-pew", 0x6c3f18, { roughness: 0.76 }),
+  colorMaterial("temple.pew.endgrain", "pewEndgrain", "temple", "cathedral-pew-endgrain", 0x321807, { roughness: 0.84 }),
+  colorMaterial("temple.pew.worn-edge", "pewWornEdge", "temple", "cathedral-pew-edge-highlight", 0xb77d34, { roughness: 0.68 }),
   colorMaterial("temple.window.frame", "windowFrame", "temple", "window-frame", 0x58452f, { roughness: 0.52, metalness: 0.18 }),
   colorMaterial("temple.window.reveal", "windowReveal", "temple", "window-reveal", 0xa79b83, { roughness: 0.86 }),
   {
@@ -511,6 +514,9 @@ export function makeTempleMaterials() {
     glass: createApprovedMaterial("temple.stained-glass.alpha"),
     altar: createApprovedMaterial("temple.altar.cloth"),
     trim: createApprovedMaterial("temple.trim.limestone"),
+    pewOak: createApprovedMaterial("temple.pew.oak"),
+    pewEndgrain: createApprovedMaterial("temple.pew.endgrain"),
+    pewWornEdge: createApprovedMaterial("temple.pew.worn-edge"),
     windowFrame: createApprovedMaterial("temple.window.frame"),
     windowReveal: createApprovedMaterial("temple.window.reveal"),
     windowGlow: createApprovedMaterial("temple.window.glow")

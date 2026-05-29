@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T00:00:40.508Z",
+  "updated": "2026-05-29T00:06:25.288Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -3105,6 +3105,35 @@
       ],
       "created": "2026-05-28T23:54:49Z",
       "updated": "2026-05-28T23:59:32Z"
+    },
+    {
+      "id": "neo-1fb2.92",
+      "project": "NeoMud",
+      "title": "Remap Temple pew woods through approved material IDs",
+      "description": "",
+      "type": "task",
+      "priority": 1,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-1fb2",
+      "close_reason": "done",
+      "labels": [
+        "blender",
+        "cathedral",
+        "materials",
+        "neomud-three",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 127,
+          "body": "Added approved Temple pew wood material IDs, remapped warm oak/endgrain/worn-edge GLB names at runtime, and verified lab/room/offline/server QA.",
+          "created": "2026-05-29T00:05:13Z"
+        }
+      ],
+      "created": "2026-05-29T00:02:04Z",
+      "updated": "2026-05-29T00:05:13Z"
     }
   ]
 }
