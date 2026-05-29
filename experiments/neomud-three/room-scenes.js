@@ -1650,6 +1650,7 @@ function addMarketStage(root, materials, worldRoot) {
   addMarketOverheadDressing(root, materials);
   const forge = addMarketForge(root, materials);
   addMarketDressing(root, materials);
+  addMarketStreetFinish(root, materials);
   addMarketExitAffordances(root);
 
   const ambientFill = new THREE.HemisphereLight(0xeef7ff, 0x5a4634, 1.15);
@@ -2022,6 +2023,49 @@ function addMarketDressing(root, materials) {
   for (const [materialKey, boxes] of produce) {
     addInstancedBoxes(root, material(materials, materialKey), boxes, `market-dressing-produce-${materialKey}`);
   }
+}
+
+function addMarketStreetFinish(root, materials) {
+  addInstancedSurfaceRects(root, materials, [
+    { material: "road", x: -5.2, z: 0, width: 14.2, depth: 4.4, y: 0.052 },
+    { material: "road", x: 5.5, z: 0, width: 10.4, depth: 4.1, y: 0.054 },
+    { material: "road", x: -15.4, z: 0, width: 4.0, depth: 4.6, y: 0.056 },
+    { material: "road", x: 14.4, z: 0, width: 4.2, depth: 4.8, y: 0.056 }
+  ], "market-street-finish-surfaces");
+
+  const stallSkirtsByMaterial = new Map([
+    ["awningBlue", []],
+    ["awningGold", []],
+    ["awningRed", []]
+  ]);
+  for (const stall of MARKET_STALLS) {
+    const materialKey = stall.awningMaterial ?? "awningGold";
+    const side = stall.z < 0 ? 1 : -1;
+    stallSkirtsByMaterial.get(materialKey)?.push({
+      x: stall.x,
+      y: 0.98,
+      z: stall.z + side * 0.78,
+      width: 2.7,
+      height: 0.34,
+      depth: 0.08,
+      rotationY: stall.rotationY ?? 0
+    });
+  }
+  for (const [materialKey, boxes] of stallSkirtsByMaterial) {
+    addInstancedBoxes(root, material(materials, materialKey), boxes, `market-stall-front-skirts-${materialKey}`, {
+      castShadow: false,
+      receiveShadow: true
+    });
+  }
+
+  addInstancedBoxes(root, materials.sign, [
+    { x: -10.1, y: 1.22, z: -4.92, width: 0.34, height: 0.16, depth: 0.34 },
+    { x: -3.8, y: 1.18, z: -4.86, width: 0.3, height: 0.14, depth: 0.3 },
+    { x: 3.8, y: 1.2, z: -4.9, width: 0.32, height: 0.15, depth: 0.32 },
+    { x: -7.4, y: 1.2, z: 4.88, width: 0.32, height: 0.15, depth: 0.32 },
+    { x: 0.1, y: 1.18, z: 4.88, width: 0.28, height: 0.14, depth: 0.28 },
+    { x: 7.55, y: 1.22, z: 4.92, width: 0.34, height: 0.16, depth: 0.34 }
+  ], "market-merchandise-gold-accents", { castShadow: false, receiveShadow: true });
 }
 
 function addMarketExitAffordances(root) {
