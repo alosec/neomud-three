@@ -40,7 +40,6 @@ const pointerRaycaster = new THREE.Raycaster();
 const pointerNdc = new THREE.Vector2();
 const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 const clickTargetPoint = new THREE.Vector3();
-const resolvedClickTargetPoint = new THREE.Vector3();
 
 const keys = new Set();
 let world = null;
@@ -779,7 +778,6 @@ function setClickMoveTarget(point) {
   const target = point.clone();
   target.y = 0;
   roomRuntime?.clamp?.(target);
-  resolveReachableClickTarget(player.position, target);
   movement.clickTarget = target;
   ensureClickTargetMarker().position.copy(target).setY(0.055);
   ensureClickTargetMarker().visible = true;
@@ -787,79 +785,6 @@ function setClickMoveTarget(point) {
     x: target.x,
     y: target.y,
     z: target.z
-  };
-}
-
-function resolveReachableClickTarget(origin, target) {
-  const colliders = roomRuntime?.debugColliders?.() ?? [];
-  if (!colliders.length) return target;
-
-  const dx = target.x - origin.x;
-  const dz = target.z - origin.z;
-  const distance = Math.hypot(dx, dz);
-  if (distance <= 0.001) return target;
-
-  let nearestHit = null;
-  for (const collider of colliders) {
-    const hit = segmentHitInflatedCollider(origin, target, collider);
-    if (hit && (!nearestHit || hit.t < nearestHit.t)) nearestHit = hit;
-  }
-  if (!nearestHit) return target;
-
-  const safeDistance = Math.max(0, nearestHit.distance - 0.28);
-  const safeT = THREE.MathUtils.clamp(safeDistance / distance, 0, 1);
-  resolvedClickTargetPoint.set(
-    origin.x + dx * safeT,
-    0,
-    origin.z + dz * safeT
-  );
-  target.copy(resolvedClickTargetPoint);
-  roomRuntime?.clamp?.(target);
-  return target;
-}
-
-function segmentHitInflatedCollider(origin, target, collider) {
-  if (!collider?.center || !collider?.size) return null;
-  const [cx, cz] = collider.center;
-  const [width, depth] = collider.size;
-  const radius = Number(collider.radius ?? 0.42);
-  const minX = cx - width / 2 - radius;
-  const maxX = cx + width / 2 + radius;
-  const minZ = cz - depth / 2 - radius;
-  const maxZ = cz + depth / 2 + radius;
-  const dx = target.x - origin.x;
-  const dz = target.z - origin.z;
-
-  let tMin = 0;
-  let tMax = 1;
-  const xRange = segmentAxisRange(origin.x, dx, minX, maxX);
-  if (!xRange) return null;
-  tMin = Math.max(tMin, xRange.min);
-  tMax = Math.min(tMax, xRange.max);
-  const zRange = segmentAxisRange(origin.z, dz, minZ, maxZ);
-  if (!zRange) return null;
-  tMin = Math.max(tMin, zRange.min);
-  tMax = Math.min(tMax, zRange.max);
-  if (tMin > tMax || tMax < 0 || tMin > 1) return null;
-
-  const t = THREE.MathUtils.clamp(tMin, 0, 1);
-  return {
-    colliderId: collider.id ?? "",
-    t,
-    distance: Math.hypot(dx, dz) * t
-  };
-}
-
-function segmentAxisRange(origin, delta, min, max) {
-  if (Math.abs(delta) < 0.00001) {
-    return origin >= min && origin <= max ? { min: 0, max: 1 } : null;
-  }
-  const inv = 1 / delta;
-  const t1 = (min - origin) * inv;
-  const t2 = (max - origin) * inv;
-  return {
-    min: Math.min(t1, t2),
-    max: Math.max(t1, t2)
   };
 }
 

@@ -111,8 +111,8 @@ async function main() {
     const blockedMove = await page.evaluate(() => window.__neomudThreeDebug.clickGround({ x: 0, z: 0 }));
     assert.equal(blockedMove.type, "move");
     assert.ok(
-      blockedMove.target.z > 2.2 && blockedMove.target.z < 9.8,
-      `expected click target behind fountain to resolve to near walkable edge, got ${JSON.stringify(blockedMove)}`
+      Math.hypot(blockedMove.target.x, blockedMove.target.z) > 2.1,
+      `expected click target inside fountain to clamp outside the collider, got ${JSON.stringify(blockedMove)}`
     );
     const resolvedTarget = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
     assert.ok(resolvedTarget.markerVisible, `expected resolved target marker to stay visible: ${JSON.stringify(resolvedTarget)}`);
