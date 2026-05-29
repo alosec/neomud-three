@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T06:08:00.000Z",
+  "updated": "2026-05-30T06:28:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-d5b1",
+      "project": "NeoMud",
+      "title": "Show MP in the playable HUD",
+      "description": "Expose mana/resource state in the primary play HUD so spell readiness and server spell results are visible during normal play, not only in debug metadata or character panels.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "hud",
+        "combat",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "The top player HUD now renders a compact MP value/bar beside HP and updates it from playerProfile MP. Offline QA asserts 18/18 at boot, injects a failed Smite spell_cast_result with newMp=0, and verifies the HUD changes to 0/18. Server-backed QA verifies live sessions expose an MP value.",
+          "created": "2026-05-30T06:28:00Z"
+        }
+      ],
+      "created": "2026-05-30T06:28:00Z",
+      "updated": "2026-05-30T06:28:00Z"
+    },
     {
       "id": "neo-c18f",
       "project": "NeoMud",

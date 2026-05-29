@@ -80,7 +80,9 @@ Playable Three.js lab:
   HP bar, and world-space feedback without creating a local combat simulation.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
-  `Need 5 MP` for QA/future UI rendering.
+  `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside
+  HP, and offline QA verifies the MP bar/value updates when a spell result
+  drives current MP to zero.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.

@@ -61,6 +61,7 @@ async function main() {
     assert.equal(await page.locator("#compass").count(), 1);
     assert.equal(await page.locator("#mini-map .mini-cell.exit").count(), 1);
     assert.match(await page.locator("#hp-value").textContent(), /^86\/86$/);
+    assert.match(await page.locator("#mp-value").textContent(), /^18\/18$/);
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.camera.mode), "isometric");
     assert.equal(await page.locator('[data-camera-mode="isometric"].active').count(), 1);
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform")), "platform");
@@ -584,6 +585,7 @@ async function main() {
       message: "Not enough mana! (need 5, have 0)",
       newMp: 0
     }));
+    assert.match(await page.locator("#mp-value").textContent(), /^0\/18$/);
     const noManaCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
     assert.equal(noManaCombatActions[1]?.spellId, "SMITE");
     assert.equal(noManaCombatActions[1]?.resourceReady, false);

@@ -239,6 +239,14 @@ body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   color: #f0a070;
 }
 
+.mp-row {
+  margin-top: 7px;
+}
+
+.mp-row span {
+  color: #8fc4ff;
+}
+
 .hp-row strong {
   color: #fff4c7;
   font-size: 12px;
@@ -260,6 +268,18 @@ body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   box-shadow: 0 0 10px rgba(240, 112, 78, 0.42);
   transform: scaleX(1);
   transform-origin: left center;
+}
+
+.mp-track {
+  height: 6px;
+  margin-top: 5px;
+  border-color: rgba(120, 176, 255, 0.3);
+  background: rgba(7, 15, 32, 0.74);
+}
+
+.mp-track span {
+  background: linear-gradient(90deg, #3778d8, #78b0ff 70%, #c6ddff);
+  box-shadow: 0 0 10px rgba(100, 150, 255, 0.34);
 }
 
 .pickup-feedback {

@@ -65,6 +65,7 @@ async function main() {
     assert.equal(server.phase, "playing");
     assert.ok(server.player?.isGuest, `expected guest player, got ${JSON.stringify(server.player)}`);
     assert.ok(server.messageCount >= 7, `expected several protocol messages, got ${server.messageCount}`);
+    assert.match(await page.locator("#mp-value").textContent(), /^\d+\/\d+$/);
 
     assert.equal((await page.locator("#room-name").textContent()).trim(), "Temple of the Dawn");
     assert.match(await page.locator("#status-text").textContent(), /Kotlin server:/);
@@ -364,6 +365,7 @@ async function main() {
         null,
         { timeout: 8_000 }
       );
+      assert.match(await page.locator("#mp-value").textContent(), /^\d+\/\d+$/);
       const skillActionsAfter = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
       assert.equal(skillActionsAfter[1]?.command, "skill:BASH");
       assert.equal(skillActionsAfter[1]?.enabled, true);

@@ -27,6 +27,8 @@ const compassNeedle = document.querySelector("#compass-needle");
 const interactionPrompt = document.querySelector("#interaction-prompt");
 const hpFill = document.querySelector("#hp-fill");
 const hpValue = document.querySelector("#hp-value");
+const mpFill = document.querySelector("#mp-fill");
+const mpValue = document.querySelector("#mp-value");
 const movementChip = document.querySelector("#movement-chip");
 const pickupFeedback = document.querySelector("#pickup-feedback");
 const pickupFeedbackTitle = document.querySelector("#pickup-feedback-title");
@@ -3286,10 +3288,14 @@ function installDebugApi() {
 }
 
 function updatePlayerHud() {
-  if (!hpFill || !hpValue || !movementChip) return;
+  if (!hpFill || !hpValue || !mpFill || !mpValue || !movementChip) return;
   const maxHp = Math.max(1, Number(playerProfile.maxHp) || 1);
   const hp = THREE.MathUtils.clamp(Number(playerProfile.hp) || 0, 0, maxHp);
+  const maxMp = Math.max(1, Number(playerProfile.maxMp) || 1);
+  const mp = THREE.MathUtils.clamp(Number(playerProfile.mp) || 0, 0, maxMp);
   hpValue.textContent = `${Math.round(hp)}/${Math.round(maxHp)}`;
   hpFill.style.transform = `scaleX(${hp / maxHp})`;
+  mpValue.textContent = `${Math.round(mp)}/${Math.round(maxMp)}`;
+  mpFill.style.transform = `scaleX(${mp / maxMp})`;
   movementChip.textContent = movement.grounded ? (movement.running ? "Run" : "Walk") : "Air";
 }
