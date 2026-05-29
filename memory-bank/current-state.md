@@ -55,7 +55,9 @@ Playable Three.js lab:
   target's actual scene group now receives a subtle hover/selection scale pulse
   so the selected object itself responds in-world. Screenshot QA verifies Old
   Wren hover/selection object highlighting plus North Gate hover before click
-  routing. Hover/proximity action language now respects entity
+  routing. Physical Town Square exit boards now carry exit target metadata and
+  are directly raycast-clickable in Iso mode; clicking the Gate board routes
+  through the same selected pending-exit path as trigger-volume clicks. Hover/proximity action language now respects entity
   semantics: normal NPCs read as `Talk to`, loot reads as `Pick up`, generic
   objects read as `Inspect`, and hostile forest entities read as `Engage`.
   Iso movement now also supports click-and-hold dragging: holding the primary

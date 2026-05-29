@@ -977,15 +977,23 @@ function handleCanvasPointerMove(event) {
     clearHoverTarget();
     return;
   }
-  const point = pointOnGroundFromEvent(event);
-  if (!point) {
-    clearHoverTarget();
-    return;
-  }
   if (movement.holdMoveActive && event.pointerId === movement.holdMovePointerId && (event.buttons & 1) === 1) {
+    const point = pointOnGroundFromEvent(event);
+    if (!point) return;
     setClickMoveTarget(point);
     clearHoverTarget();
     clearSelectionTarget({ clearInteractable: true });
+    return;
+  }
+  const worldTarget = worldTargetFromEvent(event);
+  if (worldTarget) {
+    clearHoverTarget();
+    setHoverTarget(worldTarget);
+    return;
+  }
+  const point = pointOnGroundFromEvent(event);
+  if (!point) {
+    clearHoverTarget();
     return;
   }
   setHoverTargetFromPoint(point);
@@ -1003,6 +1011,14 @@ function handleCanvasPointerDown(event) {
   event.preventDefault();
   closePanel();
   setInputMode("play");
+  const worldTarget = worldTargetFromEvent(event);
+  if (worldTarget?.type === "exit") {
+    clearHoldMove();
+    clearHoverTarget();
+    setSelectionTarget(worldTarget);
+    startPendingExit(worldTarget);
+    return;
+  }
   const point = pointOnGroundFromEvent(event);
   if (!point) return;
   const result = handleGroundClick(point);
@@ -1062,13 +1078,34 @@ function isHudPointerTarget(target) {
 }
 
 function pointOnGroundFromEvent(event) {
+  setPointerRaycasterFromEvent(event);
+  if (!pointerRaycaster.ray.intersectPlane(groundPlane, clickTargetPoint)) return null;
+  clickTargetPoint.y = 0;
+  return clickTargetPoint.clone();
+}
+
+function worldTargetFromEvent(event) {
+  setPointerRaycasterFromEvent(event);
+  const hit = renderEngine.raycastWorldTargets(pointerRaycaster)[0];
+  const exitAffordance = hit?.object?.userData?.exitAffordance;
+  if (!exitAffordance?.targetId) return null;
+  const room = world.rooms.get(exitAffordance.targetId);
+  const position = exitAffordance.position?.clone?.() ?? new THREE.Vector3(hit.point.x, 0, hit.point.z);
+  const direction = exitAffordance.direction ?? directionForTarget(world.rooms.get(currentRoomId), exitAffordance.targetId);
+  return {
+    type: "exit",
+    targetId: exitAffordance.targetId,
+    direction,
+    position,
+    label: `Travel ${direction ? direction.toLowerCase() : "to"} ${room?.name ?? exitAffordance.label ?? exitAffordance.targetId}`
+  };
+}
+
+function setPointerRaycasterFromEvent(event) {
   const rect = canvas.getBoundingClientRect();
   pointerNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   pointerNdc.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
   pointerRaycaster.setFromCamera(pointerNdc, camera);
-  if (!pointerRaycaster.ray.intersectPlane(groundPlane, clickTargetPoint)) return null;
-  clickTargetPoint.y = 0;
-  return clickTargetPoint.clone();
 }
 
 function setClickMoveTarget(point) {

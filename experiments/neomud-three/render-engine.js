@@ -107,10 +107,20 @@ export function createRenderEngine(canvas) {
           y: object.position.y,
           z: object.position.z,
           rotationY: object.rotation?.y ?? 0,
+          exitTarget: object.userData?.exitAffordance?.targetId ?? "",
+          exitDirection: object.userData?.exitAffordance?.direction ?? "",
           type: object.isSprite ? "sprite" : object.isMesh ? "mesh" : object.type
         });
       });
       return boards;
+    },
+    raycastWorldTargets(raycaster) {
+      const targets = [];
+      worldRoot.traverse((object) => {
+        if (!object.visible || !object.isMesh) return;
+        if (object.userData?.exitAffordance) targets.push(object);
+      });
+      return targets.length ? raycaster.intersectObjects(targets, false) : [];
     },
     get cameraObstruction() {
       return cameraObstruction;

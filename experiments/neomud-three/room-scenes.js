@@ -7558,7 +7558,7 @@ function addTownSpecExitAffordances(root, spec) {
 
     const [x, y, z] = affordance.board.center;
     const [width, height] = affordance.board.size;
-    addTextBoard(root, affordance.label, {
+    const board = addTextBoard(root, affordance.label, {
       x,
       y,
       z,
@@ -7569,6 +7569,12 @@ function addTownSpecExitAffordances(root, spec) {
       rotationY: exitBoardRotation(exit.direction),
       billboard: false
     });
+    board.userData.exitAffordance = {
+      targetId: exit.targetId,
+      direction: exit.direction,
+      label: affordance.label,
+      position: new THREE.Vector3(affordance.threshold.center[0], 0, affordance.threshold.center[2])
+    };
 
     const [tx, , tz] = affordance.threshold.center;
     const [tw, td] = affordance.threshold.size;

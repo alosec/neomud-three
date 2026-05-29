@@ -435,6 +435,36 @@ async function main() {
       window.__neomudThreeDebug.room.triggers.find((trigger) => trigger.id === "exit-north-gate")
     );
     assert.ok(gateTrigger, "expected north Gate trigger for click routing");
+    const gateBoard = await page.evaluate(() =>
+      window.__neomudThreeDebug.room.textBoards.find((board) => board.text === "Gate" && board.exitTarget === "town:gate")
+    );
+    assert.ok(gateBoard, "expected physical Gate board to expose exit target metadata");
+    assert.equal(gateBoard.type, "mesh");
+    assert.equal(gateBoard.billboard, false);
+    const gateBoardScreen = await page.evaluate((board) =>
+      window.__neomudThreeDebug.worldToScreen({ x: board.x, y: board.y, z: board.z })
+    , gateBoard);
+    assert.ok(gateBoardScreen.visible, `expected physical Gate board to be visible for clicking: ${JSON.stringify({ gateBoard, gateBoardScreen })}`);
+    await page.mouse.click(gateBoardScreen.x, gateBoardScreen.y);
+    await page.waitForFunction(() =>
+      window.__neomudThreeDebug.clickMove.pendingExit?.targetId === "town:gate" ||
+      window.__neomudThreeDebug.currentRoomId === "town:gate",
+    null, { timeout: 3_000 });
+    const boardExitState = await page.evaluate(() => ({
+      roomId: window.__neomudThreeDebug.currentRoomId,
+      pendingExit: window.__neomudThreeDebug.clickMove.pendingExit,
+      selection: window.__neomudThreeDebug.selection
+    }));
+    if (boardExitState.roomId !== "town:gate") {
+      assert.equal(boardExitState.pendingExit?.direction, "NORTH", `expected Gate board click to route through pending exit metadata: ${JSON.stringify(boardExitState)}`);
+      assert.equal(boardExitState.selection?.target?.targetId, "town:gate", `expected Gate board click to select the exit target: ${JSON.stringify(boardExitState)}`);
+    }
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.setRoom("town:square");
+      window.__neomudThreeDebug.setCameraMode("isometric");
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 10.4, heading: 0 });
+    });
+    await settleFrames(page);
     const exitHover = await page.evaluate((trigger) =>
       window.__neomudThreeDebug.hoverGround({ x: trigger.trigger.center[0], z: trigger.trigger.center[2] })
     , gateTrigger);
