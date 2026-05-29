@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
+export const PLAYER_MODEL_SCALE = 1.32;
 
 const sharedGeometries = new Map();
 
@@ -77,7 +78,7 @@ async function loadSkinnedHero(state, materials) {
     const gltf = await new GLTFLoader().loadAsync(PLAYER_MODEL_URL);
     const model = gltf.scene;
     model.name = "Xbot skinned player rig";
-    model.scale.setScalar(0.96);
+    model.scale.setScalar(PLAYER_MODEL_SCALE);
     model.rotation.y = Math.PI;
     model.visible = true;
 
