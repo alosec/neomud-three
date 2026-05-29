@@ -1134,14 +1134,16 @@ function handleGroundClick(point) {
   if (clickTarget.type === "interactable") {
     clearHoverTarget();
     setSelectionTarget(clickTarget);
-    const autoEngage = isHostileEntity(clickTarget.entity) && serverCanDriveMovement();
-    startPendingInteraction(clickTarget.entity, { autoEngage });
+    const autoEngage = Boolean(isHostileEntity(clickTarget.entity) && serverCanDriveMovement());
+    const autoUse = canAutoUseEntity(clickTarget.entity);
+    startPendingInteraction(clickTarget.entity, { autoEngage, autoUse });
     return {
       type: "interactable",
       id: clickTarget.entity.id,
       kind: clickTarget.entity.kind,
       pending: true,
-      autoEngage
+      autoEngage,
+      autoUse
     };
   }
 
@@ -1211,6 +1213,10 @@ function actionVerbForEntity(entity) {
 
 function isHostileEntity(entity) {
   return String(entity?.prompt ?? "").toLowerCase().startsWith("engage:");
+}
+
+function canAutoUseEntity(entity) {
+  return Boolean(entity?.actionType && !isHostileEntity(entity) && serverCanDriveMovement() && !entity.actionConsumed);
 }
 
 function targetHealthForEntity(entity) {
@@ -1381,6 +1387,7 @@ function startPendingInteraction(entity, options = {}) {
     id: entity.id,
     kind: entity.kind,
     autoEngage: Boolean(options.autoEngage),
+    autoUse: Boolean(options.autoUse),
     entity: { ...entity },
     position: entity.position.clone?.() ?? new THREE.Vector3(entity.position.x ?? 0, 0, entity.position.z ?? 0)
   };
@@ -1398,7 +1405,10 @@ function updatePendingInteraction() {
   movement.pendingInteractable = null;
   clearClickMoveTarget();
   nearbyInteractable = entity;
-  interactWithNearby(entity, { autoEngage: Boolean(pending.autoEngage) });
+  interactWithNearby(entity, {
+    autoEngage: Boolean(pending.autoEngage),
+    autoUse: Boolean(pending.autoUse)
+  });
 }
 
 function approachPointForInteractable(entity) {
@@ -2143,6 +2153,8 @@ function interactWithNearby(entity = nearbyInteractable, options = {}) {
   openPanel("interaction");
   if (options.autoEngage && isHostileEntity(selectedInteractable) && serverCanDriveMovement()) {
     useCombatCommand("attack");
+  } else if (options.autoUse && canAutoUseEntity(selectedInteractable)) {
+    useSelectedInteractable(selectedInteractable.id);
   }
   updateInteractionPrompt();
 }
@@ -2604,6 +2616,7 @@ function installDebugApi() {
               id: movement.pendingInteractable.id,
               kind: movement.pendingInteractable.kind,
               autoEngage: Boolean(movement.pendingInteractable.autoEngage),
+              autoUse: Boolean(movement.pendingInteractable.autoUse),
               x: movement.pendingInteractable.position.x,
               z: movement.pendingInteractable.position.z
             }

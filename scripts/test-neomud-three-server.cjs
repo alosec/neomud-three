@@ -367,16 +367,12 @@ async function main() {
 
     const caveChest = hiddenCaveEntities.find((entity) => entity.id === "cave_chest");
     await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.55, z, heading: Math.PI / 2 }), caveChest);
-    await page.waitForFunction(
-      () => window.__neomudThreeDebug.room.nearbyInteractable?.id === "cave_chest",
-      null,
-      { timeout: 2_000 }
-    );
-    await page.keyboard.press("f");
-    assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
-    assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), false);
     const beforeInteractMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
-    await page.locator('[data-interact-feature="cave_chest"]').click();
+    const chestClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), caveChest);
+    assert.equal(chestClick.type, "interactable");
+    assert.equal(chestClick.id, "cave_chest");
+    assert.equal(chestClick.autoUse, true);
+    assert.equal(await page.locator("#panel-title").textContent(), "moss-covered stone chest");
     await page.waitForFunction(
       (before) => window.__neomudThreeDebug.server.messageCount > before && window.__neomudThreeDebug.server.lastInteractionResult,
       beforeInteractMessages,
@@ -418,21 +414,16 @@ async function main() {
         };
       });
       await page.evaluate(({ x, z }) => window.__neomudThreeDebug.placePlayer({ x: x - 1.0, z, heading: Math.PI / 2 }), lootTarget);
-      await page.waitForFunction(
-        (targetId) => window.__neomudThreeDebug.room.nearbyInteractable?.id === targetId,
-        lootTarget.id,
-        { timeout: 2_000 }
-      );
-      assert.match(await page.locator("#interaction-prompt").textContent(), /Pick up/i);
-      await page.keyboard.press("f");
+      const beforePickupMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
+      const lootClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), lootTarget);
+      assert.equal(lootClick.type, "interactable");
+      assert.equal(lootClick.id, lootTarget.id);
+      assert.equal(lootClick.autoUse, true);
       const lootSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
       assert.equal(lootSelection.actionBadgeVisible, true);
       assert.equal(lootSelection.actionBadgeValue, "Pick up");
       assert.equal(lootSelection.actionBadgeType, lootTarget.actionType);
       assert.equal(lootSelection.healthBarVisible, false);
-      assert.equal(await page.locator(`[data-interact-feature="${lootTarget.id}"]`).textContent(), "Pick up");
-      const beforePickupMessages = await page.evaluate(() => window.__neomudThreeDebug.server.messageCount);
-      await page.locator(`[data-interact-feature="${lootTarget.id}"]`).click();
       await page.waitForFunction(
         (before) => window.__neomudThreeDebug.server.messageCount > before
           && /Picked up/i.test(window.__neomudThreeDebug.server.lastInteractionResult?.message ?? ""),
