@@ -221,7 +221,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
 5. Expand the test harness with real gameplay gates.
    - Assert physical exit traversal from temple to square through the live server, not only debug movement.
    - Keep the authored-room screenshot suite current for Temple, Town Square, Market Street, Magic Shop, Forge, North Gate, Forest Edge, Forest Path, Deep Forest, Hidden Cave, Sunlit Clearing, and Tavern after major renderer changes.
-   - Add collision and spawn-heading checks for each authored room.
+   - Collision and spawn-heading checks now run inside the authored-room
+     screenshot suite for every visited room. Future authored-room QA should
+     extend this into room-specific spawn-facing assertions when a room's
+     entrance orientation is part of the visual acceptance contract.
    - Keep adding fixed screenshot anchors before major visual passes, not after the fact.
    - Use the headed `scripts/play-neomud-three.cjs` loop to actually walk the scene while iterating, not only inspect static screenshots.
    - Use Scenic Review screenshots as a separate gate from player-follow screenshots. Player shots answer play readability; scenic shots answer representational sanity, abstraction consistency, scale, and room composition.

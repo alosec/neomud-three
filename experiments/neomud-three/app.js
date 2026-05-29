@@ -3333,6 +3333,17 @@ function installDebugApi() {
     get room() {
       return {
         id: currentRoomId,
+        source: roomRuntime?.source ?? "",
+        status: roomRuntime?.status ?? "",
+        spawn: roomRuntime?.spawn
+          ? {
+              x: roomRuntime.spawn.position?.x ?? 0,
+              y: roomRuntime.spawn.position?.y ?? 0,
+              z: roomRuntime.spawn.position?.z ?? 0,
+              heading: roomRuntime.spawn.heading ?? 0
+            }
+          : null,
+        cameraRig: roomRuntime?.camera ?? null,
         triggers: roomRuntime?.debugTriggers?.() ?? [],
         landmarks: roomRuntime?.debugLandmarks?.() ?? [],
         entities: roomRuntime?.debugEntities?.() ?? [],

@@ -92,6 +92,8 @@ async function main() {
       screenshots.push({ id: anchor.id, roomId: anchor.roomId, path: target });
 
       if (!seenRooms.has(anchor.roomId)) {
+        const roomContract = await page.evaluate(() => window.__neomudThreeDebug.room);
+        assertRoomContract(assert, roomContract);
         const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
         const budget = budgetStatus(anchor.roomId, stats);
         assertRenderBudget(assert, anchor.roomId, stats);
@@ -121,6 +123,35 @@ async function main() {
 
 async function settleFrames(page) {
   await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+}
+
+function assertRoomContract(assert, room) {
+  assert.ok(room?.id, `expected current room debug metadata, got ${JSON.stringify(room)}`);
+  assert.ok(room.spawn, `expected ${room.id} to expose a spawn point`);
+  for (const key of ["x", "y", "z", "heading"]) {
+    assert.equal(Number.isFinite(room.spawn[key]), true, `expected ${room.id} spawn.${key} to be finite: ${JSON.stringify(room.spawn)}`);
+  }
+  assert.ok(Math.abs(room.spawn.heading) <= Math.PI * 2 + 0.001, `expected ${room.id} spawn.heading in radians: ${JSON.stringify(room.spawn)}`);
+  assert.ok(
+    Array.isArray(room.colliders) && room.colliders.length > 0,
+    `expected ${room.id} to expose at least one collision volume`
+  );
+  for (const collider of room.colliders) {
+    assert.ok(collider.id, `expected ${room.id} collider id: ${JSON.stringify(collider)}`);
+    assert.ok(Array.isArray(collider.center) && collider.center.length === 2, `expected ${room.id} collider center: ${JSON.stringify(collider)}`);
+    assert.ok(Array.isArray(collider.size) && collider.size.length === 2, `expected ${room.id} collider size: ${JSON.stringify(collider)}`);
+    assert.ok(collider.size.every((value) => Number.isFinite(value) && value > 0), `expected ${room.id} positive collider size: ${JSON.stringify(collider)}`);
+  }
+  assert.ok(
+    Array.isArray(room.triggers) && room.triggers.length > 0,
+    `expected ${room.id} to expose at least one exit trigger`
+  );
+  for (const trigger of room.triggers) {
+    assert.ok(trigger.id, `expected ${room.id} trigger id: ${JSON.stringify(trigger)}`);
+    assert.ok(trigger.targetId, `expected ${room.id} trigger to declare targetId: ${JSON.stringify(trigger)}`);
+    assert.ok(trigger.direction, `expected ${room.id} trigger to declare direction: ${JSON.stringify(trigger)}`);
+    assert.ok(trigger.prompt, `expected ${room.id} trigger to declare prompt: ${JSON.stringify(trigger)}`);
+  }
 }
 
 async function launchBrowser() {

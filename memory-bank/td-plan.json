@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T05:48:00.000Z",
+  "updated": "2026-05-30T06:04:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -1283,10 +1283,15 @@
           "id": 119,
           "body": "Process reset: future visual/gameplay work should cite a pass contract and QA evidence instead of broad make-it-better scope.",
           "created": "2026-05-28T20:05:02Z"
+        },
+        {
+          "id": 120,
+          "body": "Authored-room screenshot QA now includes a reusable room contract gate: every visited room must expose finite spawn x/y/z/heading debug metadata, at least one collider, and at least one exit trigger with direction and targetId. This protects basic playability metadata across Temple, Town Square, Market, Magic Shop, Forge, North Gate, Forest rooms, Hidden Cave, Sunlit Clearing, and Tavern.",
+          "created": "2026-05-30T06:04:00Z"
         }
       ],
       "created": "2026-05-28T03:07:23Z",
-      "updated": "2026-05-28T20:05:02Z"
+      "updated": "2026-05-30T06:04:00Z"
     },
     {
       "id": "neo-1fb2.12",
