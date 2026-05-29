@@ -6221,9 +6221,11 @@ function addTownSpecSignpost(root, materials, signpostSpec) {
 }
 
 function addTownSpecChunkRings(root, materials, spec) {
+  addTownPaintedHorizons(root, materials, spec.chunkRings.filter((chunk) => chunk.kind === "backdrop"));
+
   for (const chunk of spec.chunkRings) {
     if (chunk.kind === "backdrop") {
-      addTownPaintedHorizon(root, materials, chunk);
+      continue;
     }
     if (chunk.kind === "surface-rects") {
       addInstancedSurfaceRects(root, materials, chunk.surfaces, `${chunk.id}-surfaces`);
@@ -6284,46 +6286,66 @@ function addTownSpecChunkRings(root, materials, spec) {
   }
 }
 
-function addTownPaintedHorizon(root, materials, chunk) {
+function horizonBox(chunk, local) {
+  const rotationY = chunk.rotationY ?? 0;
+  const cos = Math.cos(rotationY);
+  const sin = Math.sin(rotationY);
+  return {
+    ...local,
+    x: chunk.x + local.x * cos + local.z * sin,
+    z: chunk.z - local.x * sin + local.z * cos,
+    rotationY: (local.rotationY ?? 0) + rotationY
+  };
+}
+
+function addTownPaintedHorizons(root, materials, chunks) {
+  if (!chunks.length) return null;
   const group = new THREE.Group();
-  group.position.set(chunk.x, 0, chunk.z);
-  group.rotation.y = chunk.rotationY ?? 0;
-  group.userData = { visualRole: "painted-horizon", source: chunk.asset };
+  group.userData = { visualRole: "painted-horizon-system", count: chunks.length };
   root.add(group);
 
-  const span = chunk.width ?? 120;
-  const segments = 10;
-  const start = -span / 2;
   const darkFoliageBoxes = [];
   const foliageBoxes = [];
+  const mossBoxes = [];
   const plasterBoxes = [];
   const roofBoxes = [];
+  const groundEdgeBoxes = [];
 
-  for (let i = 0; i < segments; i++) {
-    const t = i / (segments - 1);
-    const x = start + t * span;
-    const wave = Math.sin(t * Math.PI * 2.8 + 0.4);
-    const farHeight = 2.2 + 1.0 * Math.sin(t * Math.PI * 1.7) + 0.55 * wave;
-    const nearHeight = 1.35 + 0.65 * Math.cos(t * Math.PI * 2.3);
-    const width = span / segments + 3.5;
+  for (const chunk of chunks) {
+    const span = chunk.width ?? 120;
+    const segments = 14;
+    const start = -span / 2;
 
-    darkFoliageBoxes.push({ x, y: 1.2 + farHeight * 0.42, z: -2.4, width, height: farHeight, depth: 1.2 });
-    foliageBoxes.push({ x: x + 1.2, y: 0.72 + nearHeight * 0.36, z: -0.35, width: width * 0.72, height: nearHeight, depth: 1.05 });
+    for (let i = 0; i < segments; i++) {
+      const t = i / (segments - 1);
+      const x = start + t * span;
+      const wave = Math.sin(t * Math.PI * 2.8 + 0.4);
+      const farHeight = 2.55 + 1.15 * Math.sin(t * Math.PI * 1.7) + 0.62 * wave;
+      const nearHeight = 1.65 + 0.72 * Math.cos(t * Math.PI * 2.3);
+      const width = span / segments + 4.2;
+
+      mossBoxes.push(horizonBox(chunk, { x: x + 0.5, y: 0.62, z: -3.05, width: width * 1.06, height: 1.24 + farHeight * 0.18, depth: 1.65 }));
+      darkFoliageBoxes.push(horizonBox(chunk, { x, y: 1.18 + farHeight * 0.48, z: -2.25, width, height: farHeight, depth: 1.35 }));
+      foliageBoxes.push(horizonBox(chunk, { x: x + 1.2, y: 0.78 + nearHeight * 0.43, z: -0.28, width: width * 0.76, height: nearHeight, depth: 1.18 }));
+    }
+
+    for (let i = 0; i < 7; i++) {
+      const x = start + 8 + i * (span - 16) / 6;
+      const y = 3.0 + (i % 3) * 0.38;
+      const width = 7.5 + (i % 2) * 3.0;
+      plasterBoxes.push(horizonBox(chunk, { x, y, z: -1.35, width, height: 1.05, depth: 0.52 }));
+      roofBoxes.push(horizonBox(chunk, { x, y: y + 0.72, z: -1.28, width: width * 0.88, height: 0.38, depth: 0.62 }));
+    }
+
+    groundEdgeBoxes.push(horizonBox(chunk, { x: 0, y: 0.08, z: 1.0, width: span, height: 0.12, depth: 1.6 }));
   }
 
-  for (let i = 0; i < 7; i++) {
-    const x = start + 8 + i * (span - 16) / 6;
-    const y = 3.1 + (i % 3) * 0.45;
-    const width = 8.0 + (i % 2) * 3.6;
-    plasterBoxes.push({ x, y, z: -1.45, width, height: 1.15, depth: 0.5 });
-    roofBoxes.push({ x, y: y + 0.78, z: -1.38, width: width * 0.88, height: 0.42, depth: 0.62 });
-  }
-
-  addInstancedBoxes(group, materials.foliageDark, darkFoliageBoxes, `${chunk.id}-far-foliage`, { castShadow: false });
-  addInstancedBoxes(group, materials.foliage, foliageBoxes, `${chunk.id}-near-foliage`, { castShadow: false });
-  addInstancedBoxes(group, materials.plasterQuiet, plasterBoxes, `${chunk.id}-quiet-buildings`, { castShadow: false });
-  addInstancedBoxes(group, materials.roofQuiet, roofBoxes, `${chunk.id}-quiet-roofs`, { castShadow: false });
-  addInstancedBoxes(group, materials.pathEdge, [{ x: 0, y: 0.08, z: 1.0, width: span, height: 0.12, depth: 1.6 }], `${chunk.id}-ground-edge`, {
+  addInstancedBoxes(group, materials.forestMossLight, mossBoxes, "town-horizon-soft-ground-terraces", { castShadow: false });
+  addInstancedBoxes(group, materials.foliageDark, darkFoliageBoxes, "town-horizon-far-foliage", { castShadow: false });
+  addInstancedBoxes(group, materials.foliage, foliageBoxes, "town-horizon-near-foliage", { castShadow: false });
+  addInstancedBoxes(group, materials.plasterQuiet, plasterBoxes, "town-horizon-quiet-buildings", { castShadow: false });
+  addInstancedBoxes(group, materials.roofQuiet, roofBoxes, "town-horizon-quiet-roofs", { castShadow: false });
+  addInstancedBoxes(group, materials.pathEdge, groundEdgeBoxes, "town-horizon-ground-edge", {
     castShadow: false
   });
   return group;
