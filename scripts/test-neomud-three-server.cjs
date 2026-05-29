@@ -311,6 +311,8 @@ async function main() {
       assert.equal(initialCombatActions[1]?.kind, "skill");
       assert.equal(initialCombatActions[1]?.skillId, "BASH");
       assert.equal(initialCombatActions[1]?.command, "skill:BASH");
+      assert.equal(initialCombatActions[1]?.resourceReady, true);
+      assert.equal(initialCombatActions[1]?.unavailableReason, "");
       assert.equal(initialCombatActions[1]?.enabled, true);
       await page.keyboard.press("Digit1");
       const hotkeyAttack = await page.evaluate(() => window.__neomudThreeDebug.server.pendingCombatCommand);

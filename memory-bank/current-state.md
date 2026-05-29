@@ -78,6 +78,9 @@ Playable Three.js lab:
   `skill_effect`, `spell_cast_result`, and `spell_effect` messages update the
   combat result frame, target HP, player MP/HP where applicable, selected-target
   HP bar, and world-space feedback without creating a local combat simulation.
+  Spell/skill action metadata also keeps the selected ability visible when MP
+  is too low, exposing `resourceReady:false` and a concrete warning such as
+  `Need 5 MP` for QA/future UI rendering.
   Iso mode also supports right-click cancellation for player control: it clears
   destination movement, hover, selection, and open panels without opening the
   browser context menu.

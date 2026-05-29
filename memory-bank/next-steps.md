@@ -122,8 +122,10 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      target meshes/sprites. Interaction panel close now preserves the selected
      world target until explicit cancel, room change, or a non-interaction panel
      clears it. Ability-command affordances now have a first server-backed
-     attack/skill/spell path, but cooldown display, MP warnings, richer cast
-     visuals, and multi-slot skill selection remain open.
+     attack/skill/spell path. Ability identity now remains stable when MP is
+     too low, and debug/UI metadata exposes resource readiness plus the exact
+     MP warning. Cooldown display, richer cast visuals, and multi-slot skill
+     selection remain open.
      Item/loot hover parity exists for the Hidden Cave server-loot path, but
      should be audited across future authored rooms as they gain live drops.
    - Click-to-move now has first-pass visibility-graph waypoint routing over

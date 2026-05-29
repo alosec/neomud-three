@@ -574,7 +574,20 @@ async function main() {
     assert.equal(offlineCombatActions[1]?.kind, "spell");
     assert.equal(offlineCombatActions[1]?.spellId, "SMITE");
     assert.equal(offlineCombatActions[1]?.command, "cast:SMITE");
+    assert.equal(offlineCombatActions[1]?.resourceReady, true);
+    assert.equal(offlineCombatActions[1]?.unavailableReason, "Server unavailable");
     assert.equal(offlineCombatActions[1]?.enabled, false);
+    await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
+      type: "spell_cast_result",
+      success: false,
+      spellName: "Smite",
+      message: "Not enough mana! (need 5, have 0)",
+      newMp: 0
+    }));
+    const noManaCombatActions = await page.evaluate(() => window.__neomudThreeDebug.selection.combatActions);
+    assert.equal(noManaCombatActions[1]?.spellId, "SMITE");
+    assert.equal(noManaCombatActions[1]?.resourceReady, false);
+    assert.equal(noManaCombatActions[1]?.resourceWarning, "Need 5 MP");
     await page.evaluate(() => window.__neomudThreeDebug.injectServerMessage({
       type: "combat_hit",
       attackerName: "Guest Adventurer",

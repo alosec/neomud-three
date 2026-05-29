@@ -1,11 +1,39 @@
 {
-  "updated": "2026-05-30T05:44:00.000Z",
+  "updated": "2026-05-30T06:08:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-c18f",
+      "project": "NeoMud",
+      "title": "Keep hostile ability identity stable with MP warnings",
+      "description": "Improve the hostile action row so spell/skill identity does not disappear when resource state changes. The selected ability should remain visible, expose resource readiness and concrete MP warning metadata, and disable only for explicit reasons such as server unavailable or insufficient MP.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "combat",
+        "ui",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "Ability selection no longer filters spells out solely because MP is low. Combat action metadata now exposes unavailableReason, resourceReady, and resourceWarning. Offline QA injects a failed Smite cast with newMp=0 and verifies SMITE remains selected with resourceReady=false and Need 5 MP; server-backed QA verifies Bash remains ready.",
+          "created": "2026-05-30T06:08:00Z"
+        }
+      ],
+      "created": "2026-05-30T06:08:00Z",
+      "updated": "2026-05-30T06:08:00Z"
+    },
     {
       "id": "neo-a42d",
       "project": "NeoMud",

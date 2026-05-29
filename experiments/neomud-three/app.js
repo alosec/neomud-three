@@ -2344,7 +2344,9 @@ function combatActionOptions(entity) {
         name: spell.name,
         command: `cast:${spell.id}`,
         detail: `${spell.manaCost} MP`,
-        manaCost: spell.manaCost ?? 0
+        manaCost: spell.manaCost ?? 0,
+        resourceReady: (spell.manaCost ?? 0) <= playerProfile.mp,
+        resourceWarning: (spell.manaCost ?? 0) <= playerProfile.mp ? "" : `Need ${spell.manaCost ?? 0} MP`
       }
     : skill
       ? {
@@ -2353,12 +2355,21 @@ function combatActionOptions(entity) {
           name: skill.name,
           command: `skill:${skill.id}`,
           detail: skill.manaCost ? `${skill.manaCost} MP` : "Skill",
-          manaCost: skill.manaCost ?? 0
+          manaCost: skill.manaCost ?? 0,
+          resourceReady: (skill.manaCost ?? 0) <= playerProfile.mp,
+          resourceWarning: (skill.manaCost ?? 0) <= playerProfile.mp ? "" : `Need ${skill.manaCost ?? 0} MP`
         }
       : null;
   const combatReady = Boolean(serverCanDriveMovement());
   const engaged = combatReady && serverState.attackMode && serverState.selectedTargetId === entity.id;
   const pendingCombat = pendingCombatCommand?.targetId === entity.id ? pendingCombatCommand : null;
+  const abilityUnavailable = !ability
+    ? "No combat ability"
+    : !combatReady
+      ? "Server unavailable"
+      : !ability.resourceReady
+        ? ability.resourceWarning
+        : "";
   return [
     {
       hotkey: "1",
@@ -2378,9 +2389,12 @@ function combatActionOptions(entity) {
       skillId: ability?.kind === "skill" ? ability.id : "",
       manaCost: ability?.manaCost ?? 0,
       label: pendingCombat?.command === ability?.command ? "Working..." : ability?.name ?? "Class Skill",
-      detail: pendingCombat?.command === ability?.command ? "Awaiting server" : ability?.detail ?? "No combat ability",
+      detail: pendingCombat?.command === ability?.command ? "Awaiting server" : (abilityUnavailable || ability?.detail || "No combat ability"),
       command: ability?.command ?? "ability",
-      enabled: combatReady && Boolean(ability) && !pendingCombat
+      unavailableReason: abilityUnavailable,
+      resourceReady: ability?.resourceReady ?? false,
+      resourceWarning: ability?.resourceWarning ?? "",
+      enabled: combatReady && Boolean(ability) && ability.resourceReady && !pendingCombat
     }
   ];
 }
@@ -2392,7 +2406,6 @@ function combatSpellForProfile() {
   return world.catalogs.spells.find((candidate) => (
     schools.has(candidate.school)
     && (candidate.levelRequired ?? 1) <= playerProfile.level
-    && (candidate.manaCost ?? 0) <= playerProfile.mp
   )) ?? null;
 }
 
@@ -3076,6 +3089,9 @@ function installDebugApi() {
               spellId: action.spellId ?? "",
               skillId: action.skillId ?? "",
               manaCost: action.manaCost ?? 0,
+              unavailableReason: action.unavailableReason ?? "",
+              resourceReady: Boolean(action.resourceReady),
+              resourceWarning: action.resourceWarning ?? "",
               enabled: Boolean(action.enabled)
             }))
           : [],
