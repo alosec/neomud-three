@@ -76,7 +76,12 @@ action-RPG room flow over NeoMud's authoritative rooms/exits/server state.
      a transient low-opacity material clone; QA verifies that fallback in the
      Tavern as `town-shot-tavern-iso-fade.png`. Faded blockers remain eligible
      as camera blockers until restored, avoiding frame-to-frame fade flicker.
-   - Direct click routing now covers existing NPC/item interaction panels and exit moves through the existing command path. Next implementation should deepen object-level affordance language beyond the current marker/pulse layer.
+   - Direct click routing now covers existing NPC/item interaction panels and
+     exit moves through the existing command path. Interactable clicks now select
+     the target, route the avatar to an approach point, and open the interaction
+     panel only once the avatar reaches interaction range, which better matches
+     Diablo-like click-to-interact flow. Next implementation should deepen
+     object-level affordance language beyond the current marker/pulse layer.
    - First hover/selection slice exists: Iso mode can classify the ground point under the pointer, show a small target marker for NPCs/items/exits, show a concise `Click ...` interaction prompt before the user commits, keep a selected-target ring on a clicked interactable while its panel is open, and pulse the actual target scene group on hover/selection. Town Square screenshot QA verifies Old Wren hover/selection object highlighting and North Gate hover.
    - Target prompts now use semantic verbs from entity prompt/action data: `Talk to`, `Engage`, `Inspect`, or `Pick up`. Forest hostile QA verifies Forest Rat and Shadow Wolf read as `Engage` before any combat system exists.
    - Feature prompts now preserve semantic verbs too: treasure/drop features such as the Hidden Cave chest read as `Open` rather than generic `Pick up`.

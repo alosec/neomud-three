@@ -39,7 +39,12 @@ Playable Three.js lab:
   preserving keyboard movement as fallback. The ground-click path also checks
   nearby interactables and exit trigger volumes before treating the click as a
   movement target, so NPC/item clicks open the existing interaction panel and
-  exit clicks route through the existing move command path. Iso mode also has
+  exit clicks route through the existing move command path. Iso click-to-interact
+  now uses an approach flow instead of opening distant panels instantly: clicking
+  an interactable selects/highlights it, routes the avatar to an approach point,
+  and opens the interaction panel only once the avatar reaches interaction
+  range. Debug state exposes the pending interaction target and Town Square QA
+  verifies Old Wren real-click/debug-click approach behavior. Iso mode also has
   first-pass hover targeting for clickable NPCs/items/exits: hovered targets get
   a small world marker and a concise DOM prompt, clicked interactables get a
   persistent selected-target ring while the interaction panel is open, and the

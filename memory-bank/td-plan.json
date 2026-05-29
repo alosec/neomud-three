@@ -104,6 +104,11 @@
           "created": "2026-05-29T21:45:00Z"
         },
         {
+          "id": 21,
+          "body": "Click-to-interact now uses an approach flow: clicking an interactable selects/highlights it, routes the avatar to an approach point, tracks a pendingInteraction in debug state, and opens the panel only once in range. Town Square QA covers Old Wren real-click and debug-click approach behavior.",
+          "created": "2026-05-29T22:10:00Z"
+        },
+        {
           "id": 9,
           "body": "Iso click-and-hold movement added: primary pointer down on open ground starts hold movement, pointer drag updates the destination marker continuously, and pointer release stops hold state while preserving the active destination. Town Square screenshot QA uses a real mouse drag and captures isometric-hold-move.",
           "created": "2026-05-29T16:36:00Z"
@@ -160,7 +165,7 @@
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T21:45:00Z"
+      "updated": "2026-05-29T22:10:00Z"
     },
     {
       "id": "neo-9c72",

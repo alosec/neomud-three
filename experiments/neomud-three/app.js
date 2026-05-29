@@ -112,7 +112,8 @@ const controls = {
   gravity: 14.5,
   maxAirControl: 0.55,
   clickArriveDistance: 0.38,
-  clickWaypointLookahead: 1.45
+  clickWaypointLookahead: 1.45,
+  clickInteractDistance: 2.12
 };
 
 const cameraControls = {
@@ -141,6 +142,7 @@ const movement = {
   selectionTarget: null,
   selectionMarker: null,
   targetObjectHighlight: null,
+  pendingInteractable: null,
   holdMoveActive: false,
   holdMovePointerId: null
 };
@@ -783,12 +785,14 @@ function pointOnGroundFromEvent(event) {
 }
 
 function setClickMoveTarget(point) {
+  const pendingInteractable = movement.pendingInteractable;
   const target = point.clone();
   target.y = 0;
   roomRuntime?.clamp?.(target);
   movement.clickPath = routeClickPath(player.position, target);
   movement.clickPathIndex = 0;
   movement.clickTarget = movement.clickPath[0] ?? target;
+  movement.pendingInteractable = pendingInteractable;
   ensureClickTargetMarker().position.copy(target).setY(0.055);
   ensureClickTargetMarker().visible = true;
   return {
@@ -1004,15 +1008,14 @@ function handleGroundClick(point) {
 
   const clickTarget = classifyGroundPoint(target);
   if (clickTarget.type === "interactable") {
-    clearClickMoveTarget();
     clearHoverTarget();
     setSelectionTarget(clickTarget);
-    nearbyInteractable = clickTarget.entity;
-    interactWithNearby();
+    startPendingInteraction(clickTarget.entity);
     return {
       type: "interactable",
       id: clickTarget.entity.id,
-      kind: clickTarget.entity.kind
+      kind: clickTarget.entity.kind,
+      pending: true
     };
   }
 
@@ -1164,6 +1167,56 @@ function clearSelectionTarget() {
   updateInteractionPrompt();
 }
 
+function startPendingInteraction(entity) {
+  if (!entity?.position) return;
+  const distance = horizontalDistance(player.position, entity.position);
+  if (distance <= controls.clickInteractDistance) {
+    clearClickMoveTarget();
+    movement.pendingInteractable = null;
+    nearbyInteractable = entity;
+    interactWithNearby(entity);
+    return;
+  }
+
+  movement.pendingInteractable = {
+    id: entity.id,
+    kind: entity.kind,
+    entity: { ...entity },
+    position: entity.position.clone?.() ?? new THREE.Vector3(entity.position.x ?? 0, 0, entity.position.z ?? 0)
+  };
+  const approach = approachPointForInteractable(entity);
+  setClickMoveTarget(approach);
+}
+
+function updatePendingInteraction() {
+  const pending = movement.pendingInteractable;
+  if (!pending) return;
+  const latest = roomRuntime?.nearestInteractable?.(pending.position, 0.1);
+  const entity = latest?.id === pending.id ? latest : pending.entity;
+  if (horizontalDistance(player.position, pending.position) > controls.clickInteractDistance) return;
+
+  movement.pendingInteractable = null;
+  clearClickMoveTarget();
+  nearbyInteractable = entity;
+  interactWithNearby(entity);
+}
+
+function approachPointForInteractable(entity) {
+  const position = entity.position.clone?.() ?? new THREE.Vector3(entity.position.x ?? 0, 0, entity.position.z ?? 0);
+  const fromTarget = player.position.clone().sub(position);
+  fromTarget.y = 0;
+  if (fromTarget.lengthSq() < 0.0001) fromTarget.set(0, 0, 1);
+  fromTarget.normalize();
+  const point = position.clone().addScaledVector(fromTarget, Math.max(1.08, controls.clickInteractDistance * 0.72));
+  point.y = 0;
+  roomRuntime?.clamp?.(point);
+  return point;
+}
+
+function horizontalDistance(a, b) {
+  return Math.hypot((a?.x ?? 0) - (b?.x ?? 0), (a?.z ?? 0) - (b?.z ?? 0));
+}
+
 function applyTargetObjectHighlight(target, mode = null) {
   const current = movement.targetObjectHighlight;
   const nextObject = target?.id ? findTargetSceneObject(target) : null;
@@ -1216,8 +1269,15 @@ function clearClickMoveTarget() {
   movement.clickTarget = null;
   movement.clickPath = [];
   movement.clickPathIndex = 0;
+  movement.pendingInteractable = null;
   clearHoldMove();
   if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
+}
+
+function finishClickMovePath() {
+  const pendingInteractable = movement.pendingInteractable;
+  clearClickMoveTarget();
+  movement.pendingInteractable = pendingInteractable;
 }
 
 function ensureClickTargetMarker() {
@@ -1749,9 +1809,9 @@ function updateInteractionPrompt() {
   interactionPrompt.classList.remove("hidden");
 }
 
-function interactWithNearby() {
-  if (!nearbyInteractable) return;
-  selectedInteractable = { ...nearbyInteractable };
+function interactWithNearby(entity = nearbyInteractable) {
+  if (!entity) return;
+  selectedInteractable = { ...entity };
   lastInteractionResult = null;
   appendLog(`${selectedInteractable.prompt}.`);
   openPanel("interaction");
@@ -1850,6 +1910,7 @@ function updatePlayer(dt) {
   const running = keys.has("ShiftLeft") || keys.has("ShiftRight");
   const hasKeyboardMove = keyboardForwardInput !== 0 || strafeInput !== 0 || turnInput !== 0;
   if (hasKeyboardMove && movement.clickTarget) clearClickMoveTarget();
+  updatePendingInteraction();
 
   let forwardInput = keyboardForwardInput;
   let desiredClickDirection = null;
@@ -1861,7 +1922,7 @@ function updatePlayer(dt) {
     if (distance <= controls.clickArriveDistance) {
       movement.clickPathIndex += 1;
       movement.clickTarget = movement.clickPath[movement.clickPathIndex] ?? null;
-      if (!movement.clickTarget) clearClickMoveTarget();
+      if (!movement.clickTarget) finishClickMovePath();
     } else {
       desiredClickDirection = toTarget.normalize();
       movement.heading = Math.atan2(desiredClickDirection.x, -desiredClickDirection.z);
@@ -2081,7 +2142,15 @@ function installDebugApi() {
         pathLength: movement.clickPath.length,
         pathIndex: movement.clickPathIndex,
         markerVisible: Boolean(movement.clickTargetMarker?.visible),
-        holdActive: movement.holdMoveActive
+        holdActive: movement.holdMoveActive,
+        pendingInteraction: movement.pendingInteractable
+          ? {
+              id: movement.pendingInteractable.id,
+              kind: movement.pendingInteractable.kind,
+              x: movement.pendingInteractable.position.x,
+              z: movement.pendingInteractable.position.z
+            }
+          : null
       };
     },
     get hover() {

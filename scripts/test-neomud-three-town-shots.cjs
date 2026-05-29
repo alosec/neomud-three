@@ -231,7 +231,8 @@ async function main() {
     const oldWrenScreen = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.worldToScreen({ x, y: 1.25, z }), oldWren);
     assert.ok(oldWrenScreen.visible, `expected Old Wren to project into the Iso camera view: ${JSON.stringify(oldWrenScreen)}`);
     await page.mouse.click(oldWrenScreen.x, oldWrenScreen.y);
-    await page.waitForTimeout(120);
+    await page.waitForFunction(() => window.__neomudThreeDebug.clickMove.pendingInteraction?.id === "npc:old_wren", null, { timeout: 2_000 });
+    await page.waitForFunction(() => document.querySelector("#panel-title")?.textContent === "Old Wren", null, { timeout: 6_000 });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
     assert.equal(await page.locator("#game-panel.hidden").count(), 0, "expected Iso real-click interaction panel to remain open");
     await page.keyboard.press("Escape");
@@ -252,17 +253,24 @@ async function main() {
     await page.screenshot({ path: clickTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-click-target", path: clickTarget });
 
+    await page.evaluate(() => {
+      window.__neomudThreeDebug.placePlayer({ x: 0, z: 4.2, heading: 0 });
+    });
     const npcClick = await page.evaluate(({ x, z }) => window.__neomudThreeDebug.clickGround({ x, z }), oldWren);
-    assert.deepEqual(npcClick, { type: "interactable", id: "npc:old_wren", kind: "npc" });
-    assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    assert.deepEqual(npcClick, { type: "interactable", id: "npc:old_wren", kind: "npc", pending: true });
     const selectedNpc = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(selectedNpc.markerVisible, true);
     assert.equal(selectedNpc.objectHighlighted, true);
     assert.equal(selectedNpc.target.id, "npc:old_wren");
+    const pendingNpc = await page.evaluate(() => window.__neomudThreeDebug.clickMove.pendingInteraction);
+    assert.equal(pendingNpc.id, "npc:old_wren");
     const selectionTarget = path.join(qaDir, "town-shot-isometric-selection-target.png");
     await page.screenshot({ path: selectionTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-selection-target", path: selectionTarget });
-    await page.keyboard.press("Escape");
+    await page.waitForFunction(() => document.querySelector("#panel-title")?.textContent === "Old Wren", null, { timeout: 6_000 });
+    assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
+    await page.evaluate(() => window.__neomudThreeDebug.cancelIsoTargeting());
+    await page.waitForFunction(() => document.querySelector("#game-panel")?.classList.contains("hidden"), null, { timeout: 2_000 });
     const clearedSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
     assert.equal(clearedSelection.markerVisible, false);
     assert.equal(clearedSelection.active, false);
