@@ -263,6 +263,9 @@ async function main() {
     await page.waitForFunction(() => window.__neomudThreeDebug.clickMove.pendingInteraction?.id === "npc:old_wren", null, { timeout: 2_000 });
     const pendingWrenApproach = await page.evaluate(() => window.__neomudThreeDebug.clickMove);
     assert.equal(pendingWrenApproach.pathClear, true, `expected NPC approach route to clear colliders: ${JSON.stringify(pendingWrenApproach)}`);
+    const approachHud = await page.evaluate(() => window.__neomudThreeDebug.hud);
+    assert.equal(approachHud.actionState, "approach", `expected HUD to show clicked NPC approach state: ${JSON.stringify(approachHud)}`);
+    assert.equal(approachHud.action, "Approach");
     await page.waitForFunction(() => document.querySelector("#panel-title")?.textContent === "Old Wren", null, { timeout: 6_000 });
     assert.equal(await page.locator("#panel-title").textContent(), "Old Wren");
     const facedWren = await page.evaluate((target) => {
@@ -436,6 +439,9 @@ async function main() {
     assert.deepEqual(exitClick, { type: "exit", targetId: "town:gate", pending: true });
     const pendingExit = await page.evaluate(() => window.__neomudThreeDebug.clickMove.pendingExit);
     assert.equal(pendingExit.targetId, "town:gate");
+    const travelHud = await page.evaluate(() => window.__neomudThreeDebug.hud);
+    assert.equal(travelHud.actionState, "travel", `expected HUD to show clicked exit travel state: ${JSON.stringify(travelHud)}`);
+    assert.equal(travelHud.action, "Travel");
     assert.ok(await page.evaluate(() => window.__neomudThreeDebug.clickMove.markerVisible), "expected exit click to route through visible movement marker");
     await page.waitForFunction(() => window.__neomudThreeDebug.currentRoomId === "town:gate", null, { timeout: 5_000 });
 

@@ -484,6 +484,23 @@ async function main() {
     assert.equal(await chestActionButton.locator("kbd").textContent(), "1");
     assert.match(await chestActionButton.textContent(), /1\s*Open/);
     await page.keyboard.press("Digit1");
+    await page.waitForFunction(
+      () => {
+        const hud = window.__neomudThreeDebug.hud;
+        const server = window.__neomudThreeDebug.server;
+        return hud.actionState === "working" || server.lastInteractionResult;
+      },
+      null,
+      { timeout: 2_000 }
+    );
+    const workingHud = await page.evaluate(() => ({
+      hud: window.__neomudThreeDebug.hud,
+      result: window.__neomudThreeDebug.server.lastInteractionResult
+    }));
+    assert.ok(
+      workingHud.hud.actionState === "working" || workingHud.result,
+      `expected HUD to show working state or server to respond immediately`
+    );
     const chestActionState = await page.evaluate(() => ({
       pending: window.__neomudThreeDebug.server.pendingInteractionAction,
       result: window.__neomudThreeDebug.server.lastInteractionResult

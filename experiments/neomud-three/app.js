@@ -1576,6 +1576,7 @@ function startPendingInteraction(entity, options = {}) {
   };
   const approach = approachPointForInteractable(entity);
   setClickMoveTarget(approach);
+  updatePlayerHud();
 }
 
 function startPendingExit(exitTarget) {
@@ -1596,6 +1597,7 @@ function startPendingExit(exitTarget) {
     position
   };
   setClickMoveTarget(position);
+  updatePlayerHud();
 }
 
 function updatePendingInteraction() {
@@ -3306,6 +3308,14 @@ function installDebugApi() {
     get avatar() {
       return player.userData.avatarInfo?.() ?? { loaded: false, loadFailed: true, activeAnimation: "missing" };
     },
+    get hud() {
+      return {
+        hp: hpValue?.textContent ?? "",
+        mp: mpValue?.textContent ?? "",
+        action: movementChip?.textContent ?? "",
+        actionState: movementChip?.dataset?.state ?? ""
+      };
+    },
     get room() {
       return {
         id: currentRoomId,
@@ -3505,5 +3515,20 @@ function updatePlayerHud() {
   hpFill.style.transform = `scaleX(${hp / maxHp})`;
   mpValue.textContent = `${Math.round(mp)}/${Math.round(maxMp)}`;
   mpFill.style.transform = `scaleX(${mp / maxMp})`;
-  movementChip.textContent = movement.grounded ? (movement.running ? "Run" : "Walk") : "Air";
+  const actionState = playerActionState();
+  movementChip.textContent = actionState.label;
+  movementChip.dataset.state = actionState.state;
+}
+
+function playerActionState() {
+  if (!movement.grounded) return { state: "air", label: "Air" };
+  if (pendingInteractionAction || pendingCombatCommand) return { state: "working", label: "Working" };
+  if (selectedInteractable && isHostileEntity(selectedInteractable) && serverState.attackMode && serverState.selectedTargetId === selectedInteractable.id) {
+    return { state: "combat", label: "Attacking" };
+  }
+  if (movement.pendingInteractable) return { state: "approach", label: "Approach" };
+  if (movement.pendingExit) return { state: "travel", label: "Travel" };
+  if (movement.clickTarget) return { state: "move", label: movement.running ? "Running" : "Moving" };
+  if (movement.running) return { state: "run", label: "Run" };
+  return { state: "walk", label: "Walk" };
 }

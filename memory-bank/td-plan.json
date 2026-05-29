@@ -1,11 +1,40 @@
 {
-  "updated": "2026-05-29T20:58:00.000Z",
+  "updated": "2026-05-29T21:11:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
     "binary": "/Users/alex/.local/bin/td"
   },
   "tasks": [
+    {
+      "id": "neo-c91e",
+      "project": "NeoMud",
+      "title": "Show contextual player action state in HUD",
+      "description": "Make the top HUD movement chip communicate the current player intent/action state instead of only Walk/Run, so clicked movement, NPC approach, exit travel, server work, and combat are easier to read during play.",
+      "type": "task",
+      "priority": 0,
+      "status": "done",
+      "status_type": "completed",
+      "parent": "neo-3361",
+      "close_reason": "implemented",
+      "labels": [
+        "neomud-three",
+        "hud",
+        "isometric",
+        "playability",
+        "qa"
+      ],
+      "blockers": [],
+      "comments": [
+        {
+          "id": 0,
+          "body": "The movement chip now derives a contextual action state: Air, Working, Attacking, Approach, Travel, Moving/Running, Run, or Walk. It exposes data-state for styling/debug, and debug.hud reports hp/mp/action/actionState. Town Square screenshot QA asserts Approach during clicked NPC approach and Travel during clicked exit routing; server-backed QA checks the HUD reaches Working or gets an immediate server result after the chest hotkey action.",
+          "created": "2026-05-29T21:11:00Z"
+        }
+      ],
+      "created": "2026-05-29T21:11:00Z",
+      "updated": "2026-05-29T21:11:00Z"
+    },
     {
       "id": "neo-d9fd",
       "project": "NeoMud",

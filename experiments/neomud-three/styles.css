@@ -340,7 +340,7 @@ body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   position: absolute;
   right: 10px;
   bottom: -20px;
-  min-width: 42px;
+  min-width: 54px;
   padding: 3px 7px;
   border: 1px solid rgba(244, 206, 120, 0.3);
   color: #dec486;
@@ -349,6 +349,23 @@ body[data-input-mode="play"][data-camera-mode="platform"] .crosshair {
   font-weight: 900;
   text-align: center;
   text-transform: uppercase;
+}
+
+.movement-chip[data-state="approach"],
+.movement-chip[data-state="travel"],
+.movement-chip[data-state="move"] {
+  border-color: rgba(143, 255, 226, 0.42);
+  color: #ccfff3;
+}
+
+.movement-chip[data-state="working"] {
+  border-color: rgba(255, 210, 120, 0.5);
+  color: #ffe2a0;
+}
+
+.movement-chip[data-state="combat"] {
+  border-color: rgba(255, 112, 92, 0.52);
+  color: #ffb19f;
 }
 
 body[data-input-mode="play"] .mode-panel {

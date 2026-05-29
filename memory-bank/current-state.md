@@ -95,6 +95,9 @@ Playable Three.js lab:
   actions. The corresponding panel action button now renders a compact `1`
   keycap beside the action label, including disabled offline states such as
   `Open unavailable`.
+  The top HUD action chip now reports the player intent/state instead of only
+  movement gait: `Approach`, `Travel`, `Moving`, `Working`, and `Attacking`
+  are shown when click routing, server actions, or combat are active.
   Spell/skill action metadata also keeps the selected ability visible when MP
   is too low, exposing `resourceReady:false` and a concrete warning such as
   `Need 5 MP` for QA/future UI rendering. The top HUD now shows MP alongside
