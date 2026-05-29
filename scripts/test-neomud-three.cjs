@@ -9,6 +9,7 @@ const { assertRenderBudget, budgetStatus, writeQaReport } = require("./neomud-th
 const url = process.env.NEOMUD_THREE_URL || "http://127.0.0.1:4183/experiments/neomud-three/?offline=1";
 const headed = process.env.HEADED === "1";
 const qaDir = process.env.NEOMUD_THREE_QA_DIR || path.resolve(__dirname, "../experiments/neomud-three/qa/latest");
+const MIN_READABLE_PLAYER_SCALE = 1.7;
 
 async function main() {
   const browser = await launchBrowser();
@@ -49,7 +50,7 @@ async function main() {
     assert.equal(avatar.model, "Xbot.glb");
     assert.equal(avatar.animationSource, "Xbot.glb-reference-loaded");
     assert.equal(avatar.visualTreatment, "clean-xbot-neutral-v2");
-    assert.ok(avatar.modelScale >= 1.25, `expected readable player scale, got ${JSON.stringify(avatar)}`);
+    assert.ok(avatar.modelScale >= MIN_READABLE_PLAYER_SCALE, `expected readable player scale, got ${JSON.stringify(avatar)}`);
     assert.equal(avatar.overlay, false);
     assert.equal(avatar.proxy, false);
 

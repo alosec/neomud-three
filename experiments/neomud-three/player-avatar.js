@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 export const PLAYER_MODEL_URL = "/experiments/neomud-three/assets/models/Xbot.glb";
-export const PLAYER_MODEL_SCALE = 1.32;
+export const PLAYER_MODEL_SCALE = 1.72;
 
 const sharedGeometries = new Map();
 
@@ -18,7 +18,7 @@ export function makePlayerAvatar() {
   const rig = makeAdventurerRig(materials);
   visualRoot.add(rig.group);
 
-  const shadow = new THREE.Mesh(new THREE.CircleGeometry(0.82, 48), materials.shadow);
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(1.06, 48), materials.shadow);
   shadow.name = "Player contact shadow";
   shadow.rotation.x = -Math.PI / 2;
   shadow.position.y = 0.018;

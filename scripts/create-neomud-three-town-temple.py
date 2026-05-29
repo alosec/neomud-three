@@ -638,9 +638,19 @@ def build_level():
     # front of the stained glass from gameplay camera angles and failed visual
     # QA. Keep the rhythm on the wall plane instead of obstructing the windows.
     for side_x, side_name in [(-12.72, "west"), (12.72, "east")]:
+        inward = 1 if side_x < 0 else -1
+        cube3(f"VIS_{side_name}_lower_wainscot_band", side_x + inward * 0.03, 1.18, -8, 0.18, 1.36, 55.0, trim, semantic="cathedral_lower_wainscot")
+        cube3(f"VIS_{side_name}_upper_shadow_band", side_x + inward * 0.04, 8.7, -8, 0.16, 0.28, 55.0, dark, semantic="cathedral_upper_shadow_band")
         for index, z in enumerate([-34.0, -23.65, -13.95, -4.25, 5.45, 15.15], start=1):
             cube3(f"VIS_{side_name}_wall_rib_{index:02d}", side_x, 3.25, z, 0.34, 6.5, 0.44, trim, semantic="cathedral_wall_rib")
             cube3(f"VIS_{side_name}_wall_rib_cap_{index:02d}", side_x, 6.6, z, 0.54, 0.34, 1.05, trim, semantic="cathedral_wall_rib_cap")
+        for index, z in enumerate([-32.1, -22.1, -12.4, -2.7, 7.0, 16.4], start=1):
+            cube3(f"VIS_{side_name}_lower_panel_inset_{index:02d}", side_x + inward * 0.055, 1.82, z, 0.12, 0.62, 2.3, limestone, semantic="cathedral_lower_wall_panel")
+            cube3(f"VIS_{side_name}_lower_panel_shadow_{index:02d}", side_x + inward * 0.07, 1.82, z, 0.08, 0.44, 1.78, dark, semantic="cathedral_lower_wall_shadow")
+
+    for z, label in [(-38.08, "north"), (21.82, "south")]:
+        cube3(f"VIS_{label}_wall_lower_wainscot", 0, 1.18, z, 22.5, 1.36, 0.18, trim, semantic="cathedral_lower_wainscot")
+        cube3(f"VIS_{label}_wall_upper_shadow", 0, 8.72, z, 22.5, 0.28, 0.16, dark, semantic="cathedral_upper_shadow_band")
 
     # Stained glass window bays.
     for side_x, side_name, inward in [(-13.05, "west", 1), (13.05, "east", -1)]:
