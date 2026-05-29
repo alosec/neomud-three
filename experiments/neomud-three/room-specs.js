@@ -523,10 +523,7 @@ export const TOWN_SQUARE_SPEC = {
       { x: -18.7, z: 5.55, rotationY: Math.PI / 2 + 0.24 }
     ],
     templeForecourt: {
-      sunInlays: [
-        { x: 0, z: 15.1, radius: 1.15 },
-        { x: 0, z: 17.55, radius: 0.82 }
-      ],
+      sunInlays: [],
       offeringPlinths: [
         { x: -3.65, z: 18.0, rotationY: -0.1 },
         { x: 3.65, z: 18.0, rotationY: 0.1 }

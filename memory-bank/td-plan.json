@@ -4127,10 +4127,10 @@
       "description": "Identify and remove or correctly attach the weird floating visual artifact in front of the Town Square south Temple/cathedral landmark. Inspect the south-temple-threshold/forecourt geometry, signs, windows, boards, candles, plinths, and any billboard/text-board elements from multiple Scenic Review angles. The fix should preserve the Temple exit affordance, physical trigger, clickability, and screenshot QA while eliminating the floating/visually detached object.",
       "type": "bug",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "completed",
       "parent": "neo-1fb2.8",
-      "close_reason": "",
+      "close_reason": "done: removed the bright detached forecourt sun inlay that read as a floating artifact and verified Town Square screenshot QA",
       "labels": [
         "neomud-three",
         "town-square",
@@ -4144,10 +4144,15 @@
           "id": 0,
           "body": "User reported a weird floating thing in front of the Town Square temple. Needs visual inspection and a surgical asset/layout fix, separate from the broader Town Square scale/diversity pass.",
           "created": "2026-05-30T07:20:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Removed the bright Temple forecourt sun inlay rings/spokes from Town Square; screenshot QA now shows a cleaner grounded Temple approach without the detached circular symbol.",
+          "created": "2026-05-30T08:02:00Z"
         }
       ],
       "created": "2026-05-30T07:20:00Z",
-      "updated": "2026-05-30T07:20:00Z"
+      "updated": "2026-05-30T08:02:00Z"
     },
     {
       "id": "neo-1fb2.96",
