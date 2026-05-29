@@ -1013,7 +1013,7 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
   const entityLayer = new THREE.Group();
   root.add(entityLayer);
 
-  addNorthGateStage(root, materials, worldRoot);
+  const gateStage = addNorthGateStage(root, materials, worldRoot);
 
   const syncEntities = ({ npcs: nextNpcs = npcs, roomItems: nextRoomItems = roomItems } = {}) => {
     disposeObjectTree(entityLayer);
@@ -1062,6 +1062,22 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
     debugEntities() {
       return interactables.map(debugEntityInfo);
     },
+    debugLandmarks() {
+      return [
+        {
+          id: "north-gate-portcullis",
+          label: "North Gate Portcullis",
+          kind: "gate",
+          state: gateStage.portcullisOpenAmount > 0.55 ? "open" : "closed",
+          openAmount: gateStage.portcullisOpenAmount,
+          position: {
+            x: gateStage.portcullisGroup?.position.x ?? 0,
+            y: gateStage.portcullisGroup?.position.y ?? 0,
+            z: gateStage.portcullisGroup?.position.z ?? 0
+          }
+        }
+      ];
+    },
     debugColliders() {
       return debugColliders(NORTH_GATE_COLLIDERS, 0.42);
     },
@@ -1077,7 +1093,15 @@ export function buildNorthGateRoom({ root, worldRoot, npcs = [], roomItems = [],
       }
       return nearest;
     },
-    update(dt) {
+    update(dt, player) {
+      const nearForestGate = player
+        ? Math.abs(player.position.x) < 4.4 && player.position.z < -1.6
+        : false;
+      const targetOpen = nearForestGate ? 1 : 0;
+      gateStage.portcullisOpenAmount = THREE.MathUtils.damp(gateStage.portcullisOpenAmount, targetOpen, 7.5, dt);
+      if (gateStage.portcullisGroup) {
+        gateStage.portcullisGroup.position.y = gateStage.portcullisOpenAmount * 3.35;
+      }
       entityLayer.children.forEach((child, index) => {
         if (child.userData.kind === "npc") {
           child.position.y = Math.sin(performance.now() * 0.0015 + index) * 0.018;
@@ -3182,7 +3206,7 @@ function addNorthGateStage(root, materials, worldRoot) {
     { material: "pathEdge", x: 0, z: -7.5, width: 7.2, depth: 3.1, y: 0.036, rotationZ: 0.02, seed: 65 }
   ], "north-gate-ground-breakup");
 
-  addNorthGateWalls(root, materials);
+  const wallState = addNorthGateWalls(root, materials);
   addNorthGateDressing(root, materials);
   addNorthGateForestEdge(root, materials);
   addNorthGateExitAffordances(root);
@@ -3197,6 +3221,11 @@ function addNorthGateStage(root, materials, worldRoot) {
   const gateLight = new THREE.PointLight(0xffc070, 2.2, 10.5);
   gateLight.position.set(0, 4.0, -8.8);
   root.add(gateLight);
+
+  return {
+    ...wallState,
+    portcullisOpenAmount: 0
+  };
 }
 
 function addNorthGateWalls(root, materials) {
@@ -3204,6 +3233,7 @@ function addNorthGateWalls(root, materials) {
   const darkStone = [];
   const trim = [];
   const timber = [];
+  const portcullis = [];
   const windowSlits = [];
 
   for (const side of [-1, 1]) {
@@ -3225,10 +3255,10 @@ function addNorthGateWalls(root, materials) {
   timber.push({ x: -2.52, y: 2.45, z: -5.96, width: 0.18, height: 3.9, depth: 0.22 });
   timber.push({ x: 2.52, y: 2.45, z: -5.96, width: 0.18, height: 3.9, depth: 0.22 });
   for (const x of [-2.1, -1.4, -0.7, 0, 0.7, 1.4, 2.1]) {
-    timber.push({ x, y: 2.36, z: -5.7, width: 0.11, height: 3.72, depth: 0.12 });
+    portcullis.push({ x, y: 2.36, z: -5.7, width: 0.11, height: 3.72, depth: 0.12 });
   }
   for (const y of [1.2, 2.45, 3.7]) {
-    timber.push({ x: 0, y, z: -5.68, width: 4.85, height: 0.11, depth: 0.12 });
+    portcullis.push({ x: 0, y, z: -5.68, width: 4.85, height: 0.11, depth: 0.12 });
   }
   trim.push({ x: 0, y: 7.45, z: -5.98, width: 9.8, height: 0.28, depth: 0.28 });
   trim.push({ x: 0, y: 0.18, z: -5.75, width: 7.2, height: 0.22, depth: 0.5 });
@@ -3236,8 +3266,13 @@ function addNorthGateWalls(root, materials) {
   addInstancedBoxes(root, materials.stone, stone, "north-gate-room-stone");
   addInstancedBoxes(root, materials.darkStone, darkStone, "north-gate-room-dark-stone");
   addInstancedBoxes(root, materials.trimLight, trim, "north-gate-room-trim");
-  addInstancedBoxes(root, materials.darkTimber, timber, "north-gate-room-portcullis");
+  addInstancedBoxes(root, materials.darkTimber, timber, "north-gate-room-timber");
+  const portcullisGroup = new THREE.Group();
+  portcullisGroup.userData.visualRole = "north-gate-room-portcullis";
+  root.add(portcullisGroup);
+  addInstancedBoxes(portcullisGroup, materials.darkTimber, portcullis, "north-gate-room-portcullis-bars");
   addInstancedBoxes(root, materials.windowDark, windowSlits, "north-gate-room-arrow-slits", { castShadow: false, receiveShadow: false });
+  return { portcullisGroup };
 }
 
 function addNorthGateDressing(root, materials) {

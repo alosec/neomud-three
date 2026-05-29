@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T06:43:00.000Z",
+  "updated": "2026-05-30T07:50:00Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -4297,10 +4297,10 @@
       "description": "Fix the North Gate/Gate exit interaction so leaving through the gate has a readable visual response. Currently the gate does not really open when the player exits, making the transition feel broken. Add or repair an explicit gate-open animation/state, doorway clearance, or transition affordance tied to the existing server-authoritative exit flow. Preserve room graph movement, physical trigger/click behavior, and screenshot/server QA.",
       "type": "bug",
       "priority": 0,
-      "status": "todo",
-      "status_type": "open",
+      "status": "done",
+      "status_type": "closed",
       "parent": "neo-1fb2.8",
-      "close_reason": "",
+      "close_reason": "implemented",
       "labels": [
         "neomud-three",
         "north-gate",
@@ -4314,10 +4314,15 @@
           "id": 0,
           "body": "User reported that when leaving through the gate, the gate does not really open. Needs visible transition/animation feedback rather than only an invisible room switch.",
           "created": "2026-05-30T07:35:00Z"
+        },
+        {
+          "id": 1,
+          "body": "Implemented North Gate portcullis as a separate runtime group that raises when the player approaches the forest-side exit. Room-shot QA now asserts the gate starts closed from town-side entry and opens near the forest threshold.",
+          "created": "2026-05-30T07:50:00Z"
         }
       ],
       "created": "2026-05-30T07:35:00Z",
-      "updated": "2026-05-30T07:35:00Z"
+      "updated": "2026-05-30T07:50:00Z"
     },
     {
       "id": "neo-1fb2.99",

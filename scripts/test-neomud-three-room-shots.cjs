@@ -85,6 +85,24 @@ async function main() {
           assert.equal(board.type, "mesh", `expected ${label} to render as fixed mesh board, got ${JSON.stringify(board)}`);
           assert.equal(board.billboard, false, `expected ${label} to avoid camera-facing billboard behavior, got ${JSON.stringify(board)}`);
         }
+        const gate = await page.evaluate(() =>
+          window.__neomudThreeDebug.room.landmarks.find((candidate) => candidate.id === "north-gate-portcullis")
+        );
+        assert.ok(gate, "expected North Gate to expose portcullis debug state");
+        assert.equal(gate.state, "closed", `expected town-side North Gate portcullis to start closed: ${JSON.stringify(gate)}`);
+      }
+
+      if (anchor.id === "north-gate-forest") {
+        await page.waitForFunction(() => {
+          const gate = window.__neomudThreeDebug.room.landmarks.find((candidate) => candidate.id === "north-gate-portcullis");
+          return gate?.state === "open" && gate?.position?.y > 1.8;
+        }, null, { timeout: 2_000 });
+        const gate = await page.evaluate(() =>
+          window.__neomudThreeDebug.room.landmarks.find((candidate) => candidate.id === "north-gate-portcullis")
+        );
+        assert.ok(gate, "expected North Gate to expose portcullis debug state near forest threshold");
+        assert.equal(gate.state, "open", `expected forest-side North Gate portcullis to open near exit: ${JSON.stringify(gate)}`);
+        assert.ok(gate.position.y > 1.8, `expected raised portcullis y position near forest threshold: ${JSON.stringify(gate)}`);
       }
 
       const target = path.join(qaDir, anchor.filename);
