@@ -22,9 +22,10 @@ Playable Three.js lab:
 - Movement is sane enough to be the baseline: WASD/arrows for walk and turn, Q/E for strafe, Shift to run, Space to jump, diagonal movement works, camera follows heading.
 - The main client now has two visual modes: `Platform`, the existing
   behind-character/pointer-lock camera, and `Iso`, the first elevated
-  action-RPG camera option for the Diablo-like control direction. Iso mode is
-  currently a visual/camera slice only; click-to-move is still the next
-  implementation step.
+  action-RPG camera option for the Diablo-like control direction. Iso mode now
+  has the first click-to-move slice: canvas clicks raycast to the ground plane,
+  show a destination marker, and steer the avatar toward the target while
+  preserving keyboard movement as fallback.
 - Shift-running is now visibly faster, the top HUD shows HP and current movement mode, and grounded walking no longer adds a procedural bob on top of the skinned walk/run animation.
 - The player avatar now renders the vendored Three.js/Xbot GLTF as the visible animated baseline because its walk/run/jump clips are more useful than the self-authored procedural proxy. It is scaled back to a readable in-world size and recolored as `xbot-stylized-teal-v3` so it reads less like a flat gray mannequin. This is still placeholder art, not accepted final player art.
 - The room graph comes from NeoMud data, while the 3D geometry is hand-authored/spec-authored for the vertical slice.
@@ -207,10 +208,9 @@ Local app/server status:
 Known rough edges:
 
 - The current runtime is still primarily tuned around third-person/chase camera
-  movement. `Iso` mode exists as the first visual option, but this is still a
-  transitional state until click-to-move, destination markers, clickable
-  exits/interactables, and existing server-authoritative command routing are
-  implemented.
+  movement. `Iso` mode now has direct ground click-to-move and a destination
+  marker, but this is still a transitional state until direct clickable
+  exits/interactables and richer ARPG selection feedback are implemented.
 - The workflow itself now has an explicit anti-overcorrection guard, because
   recent avatar scale/camera/detail passes showed a tendency to swing too far
   from one piece of feedback. Future visual passes that touch scale, camera,

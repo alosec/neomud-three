@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-29T15:02:00.000Z",
+  "updated": "2026-05-29T15:18:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -67,10 +67,15 @@
           "id": 2,
           "body": "First visual-mode slice implemented: HUD camera toggle supports Platform and Iso. Platform preserves the current behind-character pointer-lock view; Iso provides elevated ARPG camera and keeps cursor visible for future click-to-move. Next slice should add ground raycast click target, destination marker, and clickable exits through the existing move command path.",
           "created": "2026-05-29T15:02:00Z"
+        },
+        {
+          "id": 3,
+          "body": "First click-to-move slice implemented: Iso mode canvas clicks raycast to the ground plane, clamp through room runtime, show a destination marker, and steer the avatar toward the target. Keyboard movement cancels the click target. QA includes debug API movement plus real browser mouse click in Town Square Iso screenshot test. Remaining gap: direct click selection for exits/NPCs/items.",
+          "created": "2026-05-29T15:18:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-29T15:02:00Z"
+      "updated": "2026-05-29T15:18:00Z"
     },
     {
       "id": "neo-1fb2",

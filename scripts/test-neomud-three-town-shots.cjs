@@ -71,6 +71,21 @@ async function main() {
     const isoTarget = path.join(qaDir, "town-shot-isometric-plaza.png");
     await page.screenshot({ path: isoTarget, animations: "disabled" });
     screenshots.push({ id: "isometric-plaza", path: isoTarget });
+    const beforeClick = await page.evaluate(() => window.__neomudThreeDebug.player);
+    await page.mouse.click(760, 525);
+    await page.waitForTimeout(700);
+    const afterClick = await page.evaluate(() => ({
+      player: window.__neomudThreeDebug.player,
+      clickMove: window.__neomudThreeDebug.clickMove
+    }));
+    assert.ok(afterClick.clickMove.markerVisible, `expected visible click destination marker: ${JSON.stringify(afterClick)}`);
+    assert.ok(
+      Math.hypot(afterClick.player.x - beforeClick.x, afterClick.player.z - beforeClick.z) > 0.6,
+      `expected real pointer click to move avatar in Iso mode: ${JSON.stringify({ beforeClick, afterClick })}`
+    );
+    const clickTarget = path.join(qaDir, "town-shot-isometric-click-target.png");
+    await page.screenshot({ path: clickTarget, animations: "disabled" });
+    screenshots.push({ id: "isometric-click-target", path: clickTarget });
 
     const stats = await page.evaluate(() => window.__neomudThreeDebug.render);
     const budget = budgetStatus("town:square", stats);

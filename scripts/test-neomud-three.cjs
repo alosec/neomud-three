@@ -69,6 +69,17 @@ async function main() {
     assert.equal(isoCamera.mode, "isometric");
     assert.ok(isoCamera.position.y > 12, `expected elevated isometric camera, got ${JSON.stringify(isoCamera)}`);
     assert.equal(await page.locator('[data-camera-mode="isometric"].active').count(), 1);
+    const clickStart = await page.evaluate(() => window.__neomudThreeDebug.player);
+    const clickTarget = await page.evaluate(() => window.__neomudThreeDebug.setClickMoveTarget({ x: 0, z: -7 }));
+    assert.deepEqual(await page.evaluate(() => window.__neomudThreeDebug.clickMove), {
+      active: true,
+      target: clickTarget,
+      markerVisible: true
+    });
+    await page.waitForTimeout(900);
+    const clickAfter = await page.evaluate(() => window.__neomudThreeDebug.player);
+    assert.ok(clickAfter.z > clickStart.z + 1.8, `expected click-to-move to advance toward target, got ${JSON.stringify({ clickStart, clickAfter, clickTarget })}`);
+    assert.ok(await page.evaluate(() => window.__neomudThreeDebug.clickMove.markerVisible), "expected click destination marker to remain visible while walking");
     await saveScreenshot(page, "offline-temple-isometric.png");
     assert.equal(await page.evaluate(() => window.__neomudThreeDebug.setCameraMode("platform")), "platform");
     await settleFrames(page);

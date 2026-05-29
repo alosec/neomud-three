@@ -36,6 +36,10 @@ const cameraModeButtons = [...document.querySelectorAll("[data-camera-mode]")];
 const renderEngine = createRenderEngine(canvas);
 const { camera, player, clock } = renderEngine;
 const urlParams = new URLSearchParams(window.location.search);
+const pointerRaycaster = new THREE.Raycaster();
+const pointerNdc = new THREE.Vector2();
+const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+const clickTargetPoint = new THREE.Vector3();
 
 const keys = new Set();
 let world = null;
@@ -104,7 +108,8 @@ const controls = {
   braking: 0.000035,
   jumpVelocity: 5.2,
   gravity: 14.5,
-  maxAirControl: 0.55
+  maxAirControl: 0.55,
+  clickArriveDistance: 0.38
 };
 
 const movement = {
@@ -114,7 +119,9 @@ const movement = {
   grounded: true,
   jumpQueued: false,
   running: false,
-  walkClock: 0
+  walkClock: 0,
+  clickTarget: null,
+  clickTargetMarker: null
 };
 
 const playableKeys = new Set([
@@ -176,6 +183,7 @@ async function main() {
   window.addEventListener("mousemove", handleMouseMove);
   document.addEventListener("pointerlockchange", handlePointerLockChange);
   canvas.addEventListener("click", requestPlayMode);
+  canvas.addEventListener("pointerdown", handleCanvasPointerDown);
   playButton.addEventListener("click", requestPlayMode);
   menuButton.addEventListener("click", () => openPanel(activePanel ?? "map"));
   for (const button of cameraModeButtons) {
@@ -531,6 +539,7 @@ function setRoom(roomId, options = {}) {
   movement.grounded = true;
   movement.jumpQueued = false;
   movement.walkClock = 0;
+  clearClickMoveTarget();
   player.rotation.set(0, -movement.heading, 0);
 
   roomName.textContent = room.name;
@@ -642,6 +651,75 @@ function handleMouseMove(event) {
 
 function handlePointerLockChange() {
   setInputMode(document.pointerLockElement === canvas ? "play" : "menu");
+}
+
+function handleCanvasPointerDown(event) {
+  if (cameraMode !== "isometric" || activePanel || event.button !== 0) return;
+  if (isHudPointerTarget(event.target)) return;
+  event.preventDefault();
+  closePanel();
+  setInputMode("play");
+  const point = pointOnGroundFromEvent(event);
+  if (!point) return;
+  setClickMoveTarget(point);
+}
+
+function isHudPointerTarget(target) {
+  return target && target !== canvas;
+}
+
+function pointOnGroundFromEvent(event) {
+  const rect = canvas.getBoundingClientRect();
+  pointerNdc.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointerNdc.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+  pointerRaycaster.setFromCamera(pointerNdc, camera);
+  if (!pointerRaycaster.ray.intersectPlane(groundPlane, clickTargetPoint)) return null;
+  clickTargetPoint.y = 0;
+  return clickTargetPoint.clone();
+}
+
+function setClickMoveTarget(point) {
+  const target = point.clone();
+  target.y = 0;
+  roomRuntime?.clamp?.(target);
+  movement.clickTarget = target;
+  ensureClickTargetMarker().position.copy(target).setY(0.055);
+  ensureClickTargetMarker().visible = true;
+  return {
+    x: target.x,
+    y: target.y,
+    z: target.z
+  };
+}
+
+function clearClickMoveTarget() {
+  movement.clickTarget = null;
+  if (movement.clickTargetMarker) movement.clickTargetMarker.visible = false;
+}
+
+function ensureClickTargetMarker() {
+  if (movement.clickTargetMarker) return movement.clickTargetMarker;
+  const group = new THREE.Group();
+  group.name = "Click move destination marker";
+  group.userData.cameraIgnore = true;
+
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.48, 0.035, 8, 36),
+    new THREE.MeshBasicMaterial({ color: 0xf4ce78, transparent: true, opacity: 0.82, depthWrite: false })
+  );
+  ring.rotation.x = Math.PI / 2;
+
+  const core = new THREE.Mesh(
+    new THREE.CircleGeometry(0.17, 24),
+    new THREE.MeshBasicMaterial({ color: 0xfff1c2, transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide })
+  );
+  core.rotation.x = -Math.PI / 2;
+
+  group.add(ring, core);
+  group.visible = false;
+  renderEngine.scene.add(group);
+  movement.clickTargetMarker = group;
+  return group;
 }
 
 function requestPlayMode() {
@@ -1103,20 +1181,42 @@ function render() {
 }
 
 function updatePlayer(dt) {
-  const forwardInput = axis("KeyW", "ArrowUp") - axis("KeyS", "ArrowDown");
+  const keyboardForwardInput = axis("KeyW", "ArrowUp") - axis("KeyS", "ArrowDown");
   const turnInput = axis("KeyD", "ArrowRight") - axis("KeyA", "ArrowLeft");
   const strafeInput = axis("KeyE") - axis("KeyQ");
   const running = keys.has("ShiftLeft") || keys.has("ShiftRight");
+  const hasKeyboardMove = keyboardForwardInput !== 0 || strafeInput !== 0 || turnInput !== 0;
+  if (hasKeyboardMove && movement.clickTarget) clearClickMoveTarget();
+
+  let forwardInput = keyboardForwardInput;
+  let desiredClickDirection = null;
+  if (movement.clickTarget && !hasKeyboardMove) {
+    const toTarget = movement.clickTarget.clone().sub(player.position);
+    toTarget.y = 0;
+    const distance = toTarget.length();
+    if (distance <= controls.clickArriveDistance) {
+      clearClickMoveTarget();
+    } else {
+      desiredClickDirection = toTarget.normalize();
+      movement.heading = Math.atan2(desiredClickDirection.x, -desiredClickDirection.z);
+      forwardInput = 1;
+    }
+  }
+
   const turningScale = running && forwardInput > 0 ? 1.16 : 1;
 
-  movement.heading += turnInput * controls.turnRate * turningScale * dt;
-  movement.heading = THREE.MathUtils.euclideanModulo(movement.heading + Math.PI, Math.PI * 2) - Math.PI;
+  if (!desiredClickDirection) {
+    movement.heading += turnInput * controls.turnRate * turningScale * dt;
+    movement.heading = THREE.MathUtils.euclideanModulo(movement.heading + Math.PI, Math.PI * 2) - Math.PI;
+  }
 
   const forward = new THREE.Vector3(Math.sin(movement.heading), 0, -Math.cos(movement.heading));
   const right = new THREE.Vector3(Math.cos(movement.heading), 0, Math.sin(movement.heading));
   const desired = new THREE.Vector3();
 
-  if (forwardInput !== 0) {
+  if (desiredClickDirection) {
+    desired.copy(desiredClickDirection);
+  } else if (forwardInput !== 0) {
     desired.addScaledVector(forward, forwardInput < 0 ? forwardInput * controls.backpedalScale : forwardInput);
   }
   if (strafeInput !== 0) {
@@ -1151,6 +1251,11 @@ function updatePlayer(dt) {
 
   const horizontalSpeed = movement.velocity.length();
   movement.walkClock += horizontalSpeed * dt * 4.4;
+  if (movement.clickTargetMarker?.visible) {
+    movement.clickTargetMarker.rotation.y += dt * 1.8;
+    const pulse = 1 + Math.sin(performance.now() * 0.006) * 0.08;
+    movement.clickTargetMarker.scale.setScalar(pulse);
+  }
   movement.running = running && hasMoveIntent && horizontalSpeed > controls.walkSpeed * 0.82;
   player.rotation.y = -movement.heading;
   player.rotation.z = THREE.MathUtils.lerp(player.rotation.z, -strafeInput * 0.045 - turnInput * 0.035, 1 - Math.pow(0.0008, dt));
@@ -1237,6 +1342,15 @@ function installDebugApi() {
           z: camera.position.z
         },
         obstruction: renderEngine.cameraObstruction
+      };
+    },
+    get clickMove() {
+      return {
+        active: Boolean(movement.clickTarget),
+        target: movement.clickTarget
+          ? { x: movement.clickTarget.x, y: movement.clickTarget.y, z: movement.clickTarget.z }
+          : null,
+        markerVisible: Boolean(movement.clickTargetMarker?.visible)
       };
     },
     get effects() {
@@ -1332,9 +1446,13 @@ function installDebugApi() {
       movement.grounded = true;
       movement.jumpQueued = false;
       movement.running = false;
+      clearClickMoveTarget();
       player.rotation.set(0, -movement.heading, 0);
       updateCamera(1, true);
       return this.player;
+    },
+    setClickMoveTarget({ x = player.position.x, z = player.position.z } = {}) {
+      return setClickMoveTarget(new THREE.Vector3(x, 0, z));
     },
     reconnectServer() {
       serverState.client?.close();
