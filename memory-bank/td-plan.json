@@ -1,5 +1,5 @@
 {
-  "updated": "2026-05-30T01:18:00.000Z",
+  "updated": "2026-05-30T01:34:00.000Z",
   "project": "NeoMud",
   "tdWorld": {
     "localPath": "/Users/alex/Workspace/tinyfatco/td-world",
@@ -197,10 +197,15 @@
           "id": 28,
           "body": "Selected non-hostile interactables now get a small in-world action badge attached to the selected-target ring. The badge is color/shape coded for Open, Talk, item pickup, and coin pickup without adding floating text labels. Offline QA verifies the Hidden Cave chest shows an Open/TREASURE_DROP badge; server-backed QA verifies live Cave Loot shows Pick up with PICKUP_ITEM/PICKUP_COINS semantics.",
           "created": "2026-05-30T01:18:00Z"
+        },
+        {
+          "id": 29,
+          "body": "Selection cleanup hardened: room changes now close any open panel, clear selected interactable/action result state, and force selected health/action badges to hide with empty debug metadata. Offline QA opens the Hidden Cave chest, switches rooms, and verifies the panel, marker, action badge, and selectedInteractableId are cleared.",
+          "created": "2026-05-30T01:34:00Z"
         }
       ],
       "created": "2026-05-29T14:31:20Z",
-      "updated": "2026-05-30T01:18:00Z"
+      "updated": "2026-05-30T01:34:00Z"
     },
     {
       "id": "neo-9c72",

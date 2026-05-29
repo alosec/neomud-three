@@ -664,6 +664,10 @@ function setRoom(roomId, options = {}) {
   nearbyInteractable = null;
   selectedInteractable = null;
   lastCombatResult = null;
+  lastInteractionResult = null;
+  activePanel = null;
+  panel.classList.add("hidden");
+  updatePanelButtons();
   updateInteractionPrompt();
   refreshRoomDebugOverlay();
   renderEngine.applyEnvironment(roomRuntime.environment);
@@ -680,7 +684,7 @@ function setRoom(roomId, options = {}) {
   movement.walkClock = 0;
   clearClickMoveTarget();
   clearHoverTarget();
-  clearSelectionTarget();
+  clearSelectionTarget({ clearInteractable: true });
   player.rotation.set(0, -movement.heading, 0);
 
   roomName.textContent = room.name;
@@ -807,7 +811,7 @@ function handleCanvasPointerMove(event) {
   if (movement.holdMoveActive && event.pointerId === movement.holdMovePointerId && (event.buttons & 1) === 1) {
     setClickMoveTarget(point);
     clearHoverTarget();
-    clearSelectionTarget();
+    clearSelectionTarget({ clearInteractable: true });
     return;
   }
   setHoverTargetFromPoint(point);
@@ -863,7 +867,7 @@ function handleCanvasContextMenu(event) {
 function cancelIsoTargeting() {
   clearClickMoveTarget();
   clearHoverTarget();
-  clearSelectionTarget();
+  clearSelectionTarget({ clearInteractable: true });
   closePanel();
   setInputMode("play");
 }
@@ -1291,8 +1295,16 @@ function setSelectionTarget(target) {
   return movement.selectionTarget;
 }
 
-function clearSelectionTarget() {
-  if (!movement.selectionTarget && !movement.selectionMarker?.visible) return;
+function clearSelectionTarget({ clearInteractable = false } = {}) {
+  if (clearInteractable) {
+    selectedInteractable = null;
+    lastInteractionResult = null;
+  }
+  if (!movement.selectionTarget && !movement.selectionMarker?.visible) {
+    updateSelectionHealthBar(null);
+    updateSelectionActionBadge(null);
+    return;
+  }
   movement.selectionTarget = null;
   if (movement.selectionMarker) movement.selectionMarker.visible = false;
   updateSelectionHealthBar(null);
@@ -1678,7 +1690,7 @@ function openPanel(panelId) {
   if (!panelOrder.includes(panelId) && panelId !== "interaction") return;
   if (document.pointerLockElement === canvas) document.exitPointerLock();
   if (panelId !== "interaction") {
-    clearSelectionTarget();
+    clearSelectionTarget({ clearInteractable: true });
   }
   activePanel = panelId;
   keys.clear();
@@ -1690,7 +1702,7 @@ function openPanel(panelId) {
 
 function closePanel() {
   activePanel = null;
-  clearSelectionTarget();
+  clearSelectionTarget({ clearInteractable: true });
   panel.classList.add("hidden");
   updatePanelButtons();
   updateInteractionPrompt();
@@ -2619,6 +2631,7 @@ function installDebugApi() {
         actionBadgeVisible: Boolean(movement.selectionActionBadge?.visible),
         actionBadgeValue: movement.selectionActionBadge?.userData?.value ?? "",
         actionBadgeType: movement.selectionActionBadge?.userData?.actionType ?? "",
+        selectedInteractableId: selectedInteractable?.id ?? "",
         objectHighlighted: movement.targetObjectHighlight?.mode === "selected"
       };
     },
@@ -2738,7 +2751,7 @@ function installDebugApi() {
       movement.running = false;
       clearClickMoveTarget();
       clearHoverTarget();
-      clearSelectionTarget();
+      clearSelectionTarget({ clearInteractable: true });
       player.rotation.set(0, -movement.heading, 0);
       updateCamera(1, true);
       return this.player;
@@ -2757,7 +2770,7 @@ function installDebugApi() {
       return this.hover;
     },
     clearSelection() {
-      clearSelectionTarget();
+      clearSelectionTarget({ clearInteractable: true });
       return this.selection;
     },
     cancelIsoTargeting() {

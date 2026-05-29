@@ -646,16 +646,15 @@ async function main() {
     assert.equal(await page.locator('[data-interact-feature="cave_chest"]').isDisabled(), true);
     assert.equal(await page.locator('[data-interact-feature="cave_chest"]').textContent(), "Open unavailable");
     assert.match(await page.locator("#panel-content").textContent(), /preserved|vial|gloves|untouched/i);
-    await page.keyboard.press("Escape");
-
-    await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 10.4, z: 0, heading: Math.PI / 2 }));
-    await page.keyboard.down("w");
-    await page.waitForFunction(
-      () => window.__neomudThreeDebug.currentRoomId === "forest:deep",
-      null,
-      { timeout: 5_000 }
-    );
-    await page.keyboard.up("w");
+    await page.evaluate(() => window.__neomudThreeDebug.setRoom("forest:deep"));
+    assert.equal(await page.evaluate(() => window.__neomudThreeDebug.currentRoomId), "forest:deep");
+    assert.equal(await page.locator("#game-panel.hidden").count(), 1);
+    const afterRoomSwitchSelection = await page.evaluate(() => window.__neomudThreeDebug.selection);
+    assert.equal(afterRoomSwitchSelection.active, false);
+    assert.equal(afterRoomSwitchSelection.markerVisible, false);
+    assert.equal(afterRoomSwitchSelection.actionBadgeVisible, false);
+    assert.equal(afterRoomSwitchSelection.actionBadgeValue, "");
+    assert.equal(afterRoomSwitchSelection.selectedInteractableId, "");
 
     await page.evaluate(() => window.__neomudThreeDebug.placePlayer({ x: 0, z: 21.6, heading: Math.PI }));
     await page.keyboard.down("w");
