@@ -88,7 +88,7 @@ Remaining visual gap: stop doing incremental proxy polish unless it fixes a conc
 - Silhouette: 1/2. The v7 candidate moves from mostly box-instanced construction to an articulated capsule/limb adventurer with clearer legs, arms, staff, cloak, and walking poses. It still reads as a proxy rather than production character art.
 - Art direction match: 1/2. The character is more organic in motion and fits the low-poly diorama better from third-person gameplay cameras, but it is not a final authored NeoMud character.
 - Performance: 2/2. Latest offline smoke reports Temple 55 calls / 23,024 triangles, Town Square 231 calls / 32,018 triangles, Market Street 153 calls / 17,476 triangles, and Tavern 50 calls / 17,620 triangles. Market Street's call budget was raised from 150 to 160 to account for the more expensive visible avatar while staying below comparable authored-room budgets.
-- QA coverage: 2/2. Added `avatar-lab.html` with idle front, walk side, run back, and jump stations. Lab, room-shot, offline smoke, and server-backed QA now assert `visualTreatment: procedural-adventurer-proxy-v7` / `proxy: true` and pass.
+- QA coverage: 2/2. Added `avatar-lab.html` with idle back, walk side, run front, and jump stations. Lab, room-shot, offline smoke, and server-backed QA now assert `visualTreatment: procedural-adventurer-proxy-v7` / `proxy: true` and pass.
 
 Total: 7/10
 

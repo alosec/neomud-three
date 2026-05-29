@@ -34,9 +34,9 @@ scene.add(key);
 addGroundPlane(root, materials.packedDirt, 16, 8, { z: 0.6 });
 
 const STATIONS = [
-  { id: "idle-front", label: "Idle Front", x: -4.15, rotationY: 0, speed: 0, grounded: true },
+  { id: "idle-back", label: "Idle Back", x: -4.15, rotationY: 0, speed: 0, grounded: true },
   { id: "walk-side", label: "Walk Side", x: -1.35, rotationY: -Math.PI * 0.5, speed: 3.8, grounded: true },
-  { id: "run-back", label: "Run Back", x: 1.35, rotationY: Math.PI, speed: 7.4, grounded: true },
+  { id: "run-front", label: "Run Front", x: 1.35, rotationY: Math.PI, speed: 7.4, grounded: true },
   { id: "jump-three-quarter", label: "Jump", x: 4.15, rotationY: Math.PI * 1.25, speed: 3.0, grounded: false, verticalVelocity: 5.8 }
 ];
 

@@ -121,7 +121,7 @@ async function main() {
       }
       if (lab.id === "avatar-lab") {
         assert.equal(snapshot.stations.length, 4, `expected four avatar QA stations: ${JSON.stringify(snapshot.stations)}`);
-        assert.deepEqual(snapshot.stations.map((station) => station.id), ["idle-front", "walk-side", "run-back", "jump-three-quarter"]);
+        assert.deepEqual(snapshot.stations.map((station) => station.id), ["idle-back", "walk-side", "run-front", "jump-three-quarter"]);
         for (const station of snapshot.stations) {
           assert.equal(station.avatar.loaded, true, `expected ${station.id} avatar reference to load: ${JSON.stringify(station)}`);
           assert.equal(station.avatar.visualTreatment, "procedural-adventurer-proxy-v7");
