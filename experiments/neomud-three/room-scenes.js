@@ -1482,7 +1482,10 @@ function addMarketStage(root, materials, worldRoot) {
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/town_market.webp`, MARKET.eastExitX + 8.2, 5.6, 0, 18, 8.8, {
     rotationY: -Math.PI / 2,
-    opacity: 0.045
+    opacity: 0.16,
+    unlit: true,
+    castShadow: false,
+    receiveShadow: false
   });
 
   addMarketShopfronts(root, materials);
@@ -2860,7 +2863,11 @@ function addNorthGateStage(root, materials, worldRoot) {
     { material: "plazaStone", x: 0, z: -11.8, width: 8.6, depth: 4.2, y: 0.034 }
   ], "north-gate-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_edge.webp`, 0, 8.9, -24.4, 34, 19.2);
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_edge.webp`, 0, 8.9, -24.4, 34, 19.2, {
+    unlit: true,
+    castShadow: false,
+    receiveShadow: false
+  });
   addNorthGateWalls(root, materials);
   addNorthGateDressing(root, materials);
   addNorthGateForestEdge(root, materials);
@@ -3119,15 +3126,21 @@ function addForestEdgeStage(root, materials, worldRoot) {
     { material: "packedDirt", x: 0, z: -12.2, width: 8.4, depth: 9.2, y: 0.018 }
   ], "forest-edge-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4, { castShadow: false });
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.2, -27.2, 38, 21.4, {
+    unlit: true,
+    castShadow: false,
+    receiveShadow: false
+  });
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, -15.8, 7.4, -4.2, 26, 16.2, {
     rotationY: Math.PI / 2,
     opacity: 0.72,
+    unlit: true,
     castShadow: false
   });
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 15.8, 7.4, -4.2, 26, 16.2, {
     rotationY: -Math.PI / 2,
     opacity: 0.72,
+    unlit: true,
     castShadow: false
   });
   addForestEdgeDepthLayers(root, materials);
@@ -3406,7 +3419,11 @@ function addForestPathStage(root, materials, worldRoot) {
     { material: "packedDirt", x: 10.2, z: 3.6, width: 8.2, depth: 7.4, y: 0.017 }
   ], "forest-path-surfaces");
 
-  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.5, -28.2, 40, 22);
+  addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_path.webp`, 0, 9.5, -28.2, 40, 22, {
+    unlit: true,
+    castShadow: false,
+    receiveShadow: false
+  });
   addForestPathDepth(root, materials);
   addForestPathTrees(root, materials);
   addForestPathDressing(root, materials);
@@ -3728,6 +3745,7 @@ function addSunlitClearingStage(root, materials, worldRoot) {
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_clearing.webp`, 0, 8.8, -19.2, 34, 18.0, {
     opacity: 0.32,
+    unlit: true,
     castShadow: false
   });
   addSunlitClearingTreeRing(root, materials);
@@ -3966,7 +3984,10 @@ function addDeepForestStage(root, materials, worldRoot) {
   ], "deep-forest-surfaces");
 
   addBackdrop(root, `${worldRoot}/assets/images/rooms/forest_deep.webp`, 0, 9.4, -26.8, 39, 21, {
-    opacity: 0.24
+    opacity: 0.34,
+    unlit: true,
+    castShadow: false,
+    receiveShadow: false
   });
 
   addDeepForestDepth(root, materials);
@@ -5191,11 +5212,12 @@ function addArch(root, z, materials) {
 
 function addBackdrop(root, path, x, y, z, width, height, options = {}) {
   const map = texture(path);
+  const Material = options.unlit ? THREE.MeshBasicMaterial : THREE.MeshStandardMaterial;
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
-    new THREE.MeshStandardMaterial({
+    new Material({
       map,
-      roughness: 0.9,
+      roughness: options.unlit ? undefined : 0.9,
       side: THREE.DoubleSide,
       transparent: options.opacity !== undefined,
       opacity: options.opacity ?? 1
