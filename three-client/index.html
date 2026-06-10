@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoMud 3D</title>
+  <style>
+    :root {
+      --gold: #d4af37;
+      --bone: #e8e0cc;
+      --panel: rgba(12, 10, 8, 0.82);
+      --panel-border: rgba(212, 175, 55, 0.35);
+      --hp: #b03030;
+      --mp: #3a5fb0;
+      --xp: #7a5fc0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #07060a; }
+    body { font-family: Georgia, 'Times New Roman', serif; color: var(--bone); }
+    #app { position: fixed; inset: 0; }
+    canvas { display: block; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Login overlay ───────────────────────── */
+    #login {
+      position: fixed; inset: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, #15101e 0%, #07060a 75%);
+    }
+    #login .card {
+      width: 380px; padding: 32px 36px; text-align: center;
+    }
+    #login h1 {
+      font-size: 34px; letter-spacing: 6px; color: var(--gold);
+      text-shadow: 0 0 24px rgba(212,175,55,0.4); margin-bottom: 4px;
+    }
+    #login .sub { font-size: 13px; opacity: 0.6; font-style: italic; margin-bottom: 24px; }
+    #login input, #login select {
+      width: 100%; padding: 10px 12px; margin-bottom: 12px;
+      background: rgba(0,0,0,0.5); border: 1px solid var(--panel-border);
+      border-radius: 4px; color: var(--bone); font-family: inherit; font-size: 15px;
+    }
+    #login button {
+      width: 100%; padding: 12px; margin-top: 4px;
+      background: linear-gradient(180deg, #6d5418, #4a3810);
+      border: 1px solid var(--gold); border-radius: 4px;
+      color: #ffe9a8; font-family: inherit; font-size: 16px; letter-spacing: 2px;
+      cursor: pointer;
+    }
+    #login button:hover { filter: brightness(1.25); }
+    #login button:disabled { opacity: 0.4; cursor: default; }
+    #login .status { margin-top: 14px; font-size: 13px; min-height: 18px; color: #c08080; }
+
+    /* ── HUD ─────────────────────────────────── */
+    #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; display: none; }
+    #hud > * { pointer-events: auto; }
+
+    #vitals {
+      position: absolute; top: 14px; left: 14px; padding: 12px 16px; width: 260px;
+    }
+    #vitals .name { font-size: 17px; color: var(--gold); margin-bottom: 6px; }
+    #vitals .name small { color: var(--bone); opacity: 0.6; font-size: 12px; margin-left: 6px; }
+    .bar { height: 14px; border-radius: 3px; background: rgba(255,255,255,0.08); margin-bottom: 5px; position: relative; overflow: hidden; }
+    .bar .fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+    .bar .txt { position: absolute; inset: 0; font-size: 10px; line-height: 14px; text-align: center; color: #fff; text-shadow: 0 1px 2px #000; font-family: monospace; }
+    .bar.hp .fill { background: linear-gradient(180deg, #d04040, #802020); }
+    .bar.mp .fill { background: linear-gradient(180deg, #5070d0, #283a80); }
+    .bar.xp .fill { background: linear-gradient(180deg, #9070e0, #4a3580); }
+    .bar.xp { height: 7px; } .bar.xp .txt { display: none; }
+
+    #room-title {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      padding: 10px 26px; text-align: center; max-width: 46vw;
+    }
+    #room-title .rn { font-size: 19px; color: var(--gold); letter-spacing: 1px; }
+    #room-title .zn { font-size: 11px; opacity: 0.55; font-style: italic; letter-spacing: 2px; text-transform: uppercase; }
+
+    #target {
+      position: absolute; top: 14px; right: 14px; padding: 12px 16px; width: 230px; display: none;
+    }
+    #target .tn { font-size: 15px; color: #e0a0a0; margin-bottom: 6px; }
+    #target .actions { display: flex; gap: 6px; margin-top: 8px; }
+    .btn {
+      flex: 1; padding: 7px 4px; font-family: inherit; font-size: 12px; letter-spacing: 1px;
+      background: rgba(120, 30, 30, 0.55); border: 1px solid rgba(220, 100, 100, 0.5);
+      border-radius: 4px; color: var(--bone); cursor: pointer;
+    }
+    .btn:hover { filter: brightness(1.4); }
+    .btn.gold { background: rgba(109, 84, 24, 0.55); border-color: var(--panel-border); }
+
+    #log {
+      position: absolute; bottom: 60px; left: 14px; width: 420px; max-height: 270px;
+      padding: 10px 14px; overflow-y: auto; font-size: 13px; line-height: 1.45;
+      scrollbar-width: thin; mask-image: linear-gradient(180deg, transparent, #000 22px);
+    }
+    #log .l-sys { color: #9a8f72; font-style: italic; }
+    #log .l-say { color: #a8c8e8; }
+    #log .l-combat { color: #d89090; }
+    #log .l-good { color: #90c890; }
+    #log .l-xp { color: #b8a0e8; }
+    #log .l-err { color: #e07070; }
+
+    #chatbox {
+      position: absolute; bottom: 14px; left: 14px; width: 420px; display: flex; gap: 8px;
+    }
+    #chat-input {
+      flex: 1; padding: 9px 12px; background: var(--panel); border: 1px solid var(--panel-border);
+      border-radius: 6px; color: var(--bone); font-family: inherit; font-size: 14px;
+    }
+    #chat-input::placeholder { color: rgba(232,224,204,0.3); }
+
+    #hint {
+      position: absolute; bottom: 14px; right: 14px; padding: 8px 14px;
+      font-size: 11.5px; opacity: 0.75; letter-spacing: 0.5px;
+    }
+
+    #attack-indicator {
+      position: absolute; top: 118px; right: 14px; padding: 7px 14px; display: none;
+      color: #ff8080; font-size: 13px; letter-spacing: 2px; border-color: rgba(220,100,100,0.6);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.45; } }
+
+    /* floating combat text */
+    .float-dmg {
+      position: fixed; z-index: 20; pointer-events: none;
+      font-family: Georgia, serif; font-weight: bold; text-shadow: 0 2px 4px #000;
+      animation: floatUp 1.4s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { transform: translate(-50%, 0); opacity: 1; }
+      100% { transform: translate(-50%, -90px); opacity: 0; }
+    }
+
+    /* modal (tutorials, dialogue) */
+    #modal {
+      position: fixed; inset: 0; z-index: 60; display: none;
+      align-items: center; justify-content: center; background: rgba(0,0,0,0.55);
+    }
+    #modal .card { width: 440px; max-height: 70vh; overflow-y: auto; padding: 26px 30px; }
+    #modal h2 { color: var(--gold); font-size: 20px; margin-bottom: 12px; }
+    #modal p { font-size: 14px; line-height: 1.6; white-space: pre-wrap; margin-bottom: 18px; }
+    #modal button {
+      padding: 9px 28px; background: rgba(109,84,24,0.6); border: 1px solid var(--gold);
+      border-radius: 4px; color: #ffe9a8; font-family: inherit; font-size: 14px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="login">
+    <div class="card panel">
+      <h1>NEOMUD</h1>
+      <div class="sub">a 3D window into the dungeon</div>
+      <input id="login-name" type="text" maxlength="20" placeholder="Character name" autocomplete="off" />
+      <select id="login-class"><option>connecting…</option></select>
+      <select id="login-race"><option>connecting…</option></select>
+      <select id="login-gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+      <button id="login-btn" disabled>ENTER THE WORLD</button>
+      <div class="status" id="login-status"></div>
+    </div>
+  </div>
+
+  <div id="hud">
+    <div id="vitals" class="panel">
+      <div class="name"><span id="v-name">—</span><small id="v-meta"></small></div>
+      <div class="bar hp"><div class="fill" id="v-hp"></div><div class="txt" id="v-hp-t"></div></div>
+      <div class="bar mp"><div class="fill" id="v-mp"></div><div class="txt" id="v-mp-t"></div></div>
+      <div class="bar xp"><div class="fill" id="v-xp"></div><div class="txt"></div></div>
+    </div>
+
+    <div id="room-title" class="panel">
+      <div class="rn" id="rt-name">—</div>
+      <div class="zn" id="rt-zone"></div>
+    </div>
+
+    <div id="target" class="panel">
+      <div class="tn" id="t-name">—</div>
+      <div class="bar hp"><div class="fill" id="t-hp"></div><div class="txt" id="t-hp-t"></div></div>
+      <div class="actions">
+        <button class="btn" id="t-attack">ATTACK</button>
+        <button class="btn gold" id="t-clear">CLEAR</button>
+      </div>
+    </div>
+
+    <div id="attack-indicator" class="panel">⚔ ATTACKING</div>
+
+    <div id="log" class="panel"></div>
+    <div id="chatbox">
+      <input id="chat-input" type="text" placeholder="Say something… (Enter)" autocomplete="off" />
+    </div>
+    <div id="hint" class="panel">click glowing tile → move · click creature → target · double-click → attack · drag → orbit · scroll → zoom</div>
+  </div>
+
+  <div id="modal">
+    <div class="card panel">
+      <h2 id="m-title"></h2>
+      <p id="m-body"></p>
+      <button id="m-ok">Continue</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
