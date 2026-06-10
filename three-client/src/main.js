@@ -1,5 +1,5 @@
 import { GameSocket } from './net.js'
-import { World } from './world.js'
+import { Arena } from './arena.js'
 
 const SERVER_HTTP = localStorage.getItem('neomud_server') || 'http://localhost:8080'
 const SERVER_WS = SERVER_HTTP.replace(/^http/, 'ws') + '/game'
@@ -22,8 +22,9 @@ const state = {
 }
 
 window.__nm = state // debug handle
-const world = new World($('app'), SERVER_HTTP)
+const world = new Arena($('app'), SERVER_HTTP)
 window.__world = world
+state.roomNames = {}
 world.start()
 const sock = new GameSocket(SERVER_WS)
 
@@ -121,18 +122,31 @@ function syncEntities() {
   updateTargetPanel()
 }
 
-function applyRoom(room, players, npcs) {
-  const firstRoom = !state.room
+function applyRoom(room, players, npcs, entryDir = null) {
+  const changed = !state.room || state.room.id !== room.id
   state.room = room
   state.players = players
   state.npcs = npcs
   if (state.selectedTarget && !npcs.some(n => n.id === state.selectedTarget)) {
     state.selectedTarget = null
   }
-  world.setCurrentRoom(room.id, { teleport: firstRoom })
+  if (changed) {
+    const destNames = {}
+    for (const toId of Object.values(room.exits || {})) {
+      destNames[toId] = state.roomNames[toId] || toId.split(':').pop().replace(/_/g, ' ')
+    }
+    world.buildRoom(room, destNames, entryDir)
+    fade(false)
+  }
   updateRoomTitle()
   syncEntities()
 }
+
+// fade overlay for room transitions
+const fadeEl = document.createElement('div')
+fadeEl.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.35s ease;z-index:40'
+document.body.appendChild(fadeEl)
+function fade(out) { fadeEl.style.opacity = out ? '1' : '0' }
 
 // ── modal ───────────────────────────────────────────────────
 function showModal(title, body) {
@@ -179,17 +193,15 @@ sock.on('login_ok', (m) => {
   $('login').style.display = 'none'
   $('hud').style.display = 'block'
   updateVitals()
-  log(`Welcome, ${m.player.name}. Click a glowing tile to walk.`, 'l-good')
+  log(`Welcome, ${m.player.name}. Click the ground to walk; step into a portal to travel.`, 'l-good')
 })
 
 sock.on('room_info', (m) => applyRoom(m.room, m.players, m.npcs))
-sock.on('move_ok', (m) => applyRoom(m.room, m.players, m.npcs))
-sock.on('move_error', (m) => log(m.reason, 'l-err'))
+sock.on('move_ok', (m) => applyRoom(m.room, m.players, m.npcs, m.direction))
+sock.on('move_error', (m) => { log(m.reason, 'l-err'); fade(false) })
 
 sock.on('map_data', (m) => {
-  world.buildMap(m.rooms, m.visitedRooms)
-  world.setCurrentRoom(m.playerRoomId, { teleport: !state.mapBuilt })
-  state.mapBuilt = true
+  for (const r of m.rooms) state.roomNames[r.id] = r.name
 })
 
 sock.on('room_items_update', (m) => {
@@ -326,16 +338,21 @@ sock.on('__closed', () => {
 })
 
 // ── picking / click-to-move ─────────────────────────────────
+world.onPortal = (dir, locked) => {
+  if (locked) { log('That way is locked.', 'l-err'); return }
+  fade(true)
+  sock.send('move', { direction: dir })
+}
+
 world.onPick = (pick, isDouble) => {
-  if (pick.kind === 'room') {
-    if (!state.room || pick.id === state.room.id) return
-    const entry = Object.entries(state.room.exits || {}).find(([, to]) => to === pick.id)
-    if (entry) sock.send('move', { direction: entry[0] })
-  } else if (pick.kind === 'npc') {
+  if (pick.kind === 'npc') {
     state.selectedTarget = pick.id
     sock.send('select_target', { npcId: pick.id })
     updateTargetPanel()
-    if (isDouble) sock.send('attack_toggle', { enabled: true })
+    if (isDouble) {
+      sock.send('attack_toggle', { enabled: true })
+      world.approach(pick.key)
+    }
   } else if (pick.kind === 'item') {
     const gi = state.groundItems.find(g => g.itemId === pick.id)
     sock.send('pickup_item', { itemId: pick.id, quantity: gi?.quantity || 1 })
@@ -370,18 +387,13 @@ $('chat-input').addEventListener('keydown', (e) => {
   e.stopPropagation()
 })
 
-// keyboard movement (WASD/arrows) as a bonus
-const KEY_DIRS = {
-  w: 'NORTH', ArrowUp: 'NORTH', s: 'SOUTH', ArrowDown: 'SOUTH',
-  a: 'WEST', ArrowLeft: 'WEST', d: 'EAST', ArrowRight: 'EAST',
-  q: 'UP', e: 'DOWN'
-}
+// Enter focuses chat; lock arena input while typing
 addEventListener('keydown', (e) => {
   if (document.activeElement === $('chat-input')) return
-  if (e.key === 'Enter') { $('chat-input').focus(); e.preventDefault(); return }
-  const dir = KEY_DIRS[e.key]
-  if (dir && state.room && state.room.exits[dir]) sock.send('move', { direction: dir })
+  if (e.key === 'Enter') { $('chat-input').focus(); e.preventDefault() }
 })
+$('chat-input').addEventListener('focus', () => { world.inputLocked = true })
+$('chat-input').addEventListener('blur', () => { world.inputLocked = false })
 
 // ── login flow ──────────────────────────────────────────────
 function computeBaseStats(classDef, raceDef) {
