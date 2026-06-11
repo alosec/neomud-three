@@ -13,7 +13,8 @@ NPCs/players/loot are billboard sprites using the same server-hosted art as
 the 2D client.
 
 Rooms listed in `src/setpieces.js` get a bespoke hand-built layout (currently
-the Temple of the Dawn, Town Square, North Gate, and the Forest Edge campsite);
+the Temple of the Dawn, Town Square, North Gate, the Forest Edge campsite,
+The Rusty Tankard tavern interior, and Market Street);
 rooms without one fall back to the generic zone theme and show a floating
 "untamed lands" marker so the frontier of finished content is visible in-game.
 

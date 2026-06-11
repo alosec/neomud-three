@@ -315,12 +315,221 @@ function buildForestEdge(arena, room, rnd) {
   glowSphere(g, 0x88aaff, 0.1, -2, 2.0, 11.7)
 }
 
+
+// ═══ town:tavern — The Rusty Tankard (interior) ═════════════
+function buildTavern(arena) {
+  const g = arena.roomGroup
+  // plank floor instead of cobbles
+  arena.groundMesh.material = new THREE.MeshStandardMaterial({ map: TEX.planks(8), roughness: 0.9 })
+
+  const W = 18 // interior half-extent
+  const wallMat = mat('tavernwall', () => new THREE.MeshStandardMaterial({ map: TEX.plasterTimber(), roughness: 0.95 }))
+
+  // walls: solid north/south/west, east wall split around the portal
+  box(g, new THREE.BoxGeometry(W * 2 + 2, 7, 1), wallMat, 0, 3.5, -W)        // north
+  box(g, new THREE.BoxGeometry(W * 2 + 2, 7, 1), wallMat, 0, 3.5, W)         // south
+  box(g, new THREE.BoxGeometry(1, 7, W * 2 + 2), wallMat, -W, 3.5, 0)        // west
+  box(g, new THREE.BoxGeometry(1, 7, W - 4), wallMat, W, 3.5, -(W + 4) / 2 - 2)  // east upper
+  box(g, new THREE.BoxGeometry(1, 7, W - 4), wallMat, W, 3.5, (W + 4) / 2 + 2)   // east lower
+  box(g, new THREE.BoxGeometry(1, 2.2, 9), wallMat, W, 5.9, 0)               // east lintel over door
+
+
+  // fireplace on the north wall — stone chimney, roaring fire
+  box(g, new THREE.BoxGeometry(6, 7, 2), stoneMat(), -6, 3.5, -W + 1.2)
+  box(g, new THREE.BoxGeometry(4.2, 3, 1.6), mat('firedark', () => new THREE.MeshStandardMaterial({ color: 0x140d08 })), -6, 1.5, -W + 1.5)
+  const fire = box(g, new THREE.ConeGeometry(1.1, 2.2, 10),
+    new THREE.MeshBasicMaterial({ color: 0xff9028, transparent: true, opacity: 0.95 }), -6, 1.1, -W + 1.9, { shadow: false })
+  fire.userData.flame = true
+  pointLight(g, 0xff8830, 70, 26, -6, 2.2, -W + 3.5, true)
+  // log pile beside the hearth
+  for (let i = 0; i < 3; i++) {
+    box(g, new THREE.CylinderGeometry(0.22, 0.22, 1.6, 7), darkWoodMat(), -10.5 + i * 0.3, 0.25 + i * 0.32, -W + 2, { rx: Math.PI / 2 })
+  }
+
+  // the bar along the west wall, ale-stained counter
+  box(g, new THREE.BoxGeometry(2, 1.3, 14), woodMat(), -W + 4, 0.65, 2)
+  box(g, new THREE.BoxGeometry(2.4, 0.18, 14.4), darkWoodMat(), -W + 4, 1.35, 2)
+  // back shelf with glowing bottles
+  box(g, new THREE.BoxGeometry(0.7, 4.2, 13), darkWoodMat(), -W + 1.2, 2.1, 2)
+  const bottleColors = [0x77cc55, 0xcc8844, 0x9955cc, 0x5588cc, 0xcc5555]
+  for (let r = 0; r < 2; r++) {
+    for (let i = 0; i < 9; i++) {
+      box(g, new THREE.CylinderGeometry(0.09, 0.12, 0.5, 6),
+        new THREE.MeshBasicMaterial({ color: bottleColors[(i + r) % 5], transparent: true, opacity: 0.85 }),
+        -W + 1.2, 1.6 + r * 1.1, -4 + i * 1.4, { shadow: false })
+    }
+  }
+  pointLight(g, 0xffb866, 14, 11, -W + 3.5, 2.6, 2, true)
+  // kegs stacked at the bar end
+  for (const [kx, ky, kz] of [[-W + 4, 0.8, -7], [-W + 4, 0.8, -8.8], [-W + 4, 2.2, -7.9]]) {
+    box(g, new THREE.CylinderGeometry(0.8, 0.8, 1.5, 12), woodMat(), kx, ky, kz, { rx: Math.PI / 2, ry: 0.4 })
+  }
+
+  // scarred round tables with stools and mugs
+  const tablePos = [[3, -6], [9, 2], [1, 7], [-5, 8], [10, -8]]
+  for (const [tx, tz] of tablePos) {
+    box(g, new THREE.CylinderGeometry(1.5, 1.5, 0.16, 12), woodMat(), tx, 1.05, tz)
+    box(g, new THREE.CylinderGeometry(0.18, 0.26, 1.0, 8), darkWoodMat(), tx, 0.5, tz)
+    for (let st = 0; st < 3; st++) {
+      const a = st * 2.1 + tx
+      box(g, new THREE.CylinderGeometry(0.34, 0.34, 0.6, 8), darkWoodMat(), tx + Math.cos(a) * 2.1, 0.3, tz + Math.sin(a) * 2.1)
+    }
+    // mugs
+    box(g, new THREE.CylinderGeometry(0.12, 0.12, 0.22, 8), mat('pewter', () => new THREE.MeshStandardMaterial({ color: 0x8a8a92, roughness: 0.5, metalness: 0.6 })), tx + 0.5, 1.25, tz + 0.3)
+    box(g, new THREE.CylinderGeometry(0.12, 0.12, 0.22, 8), mat('pewter', () => new THREE.MeshStandardMaterial({ color: 0x8a8a92, roughness: 0.5, metalness: 0.6 })), tx - 0.6, 1.25, tz - 0.2)
+    // candle on each table
+    candle(g, tx, tz, 0.5)
+    pointLight(g, 0xffaa55, 7, 6, tx, 1.8, tz, true)
+  }
+
+  // wagon-wheel chandelier
+  const wheel = box(g, new THREE.TorusGeometry(2.2, 0.16, 8, 24), darkWoodMat(), 2, 4.6, 0, { rx: Math.PI / 2 })
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2
+    glowSphere(g, 0xffcc66, 0.1, 2 + Math.cos(a) * 2.2, 4.85, Math.sin(a) * 2.2)
+  }
+  box(g, new THREE.CylinderGeometry(0.04, 0.04, 1.0, 4), darkWoodMat(), 2, 5.2, 0)
+  pointLight(g, 0xffb866, 26, 18, 2, 4.4, 0, true)
+
+  // smoky haze: warm dim fog
+  arena.scene.fog = new THREE.FogExp2(0x1a120a, 0.022)
+  arena.scene.background = new THREE.Color(0x1a120a)
+}
+
+// ═══ town:market — Market Street ════════════════════════════
+function buildMarket(arena, room, rnd) {
+  const g = arena.roomGroup
+
+  // shopfront façades crowding both sides of an east-west lane
+  const faceMat = mat('shopface', () => new THREE.MeshStandardMaterial({ map: TEX.plasterTimber(), roughness: 0.95 }))
+  const signColors = [0x8a4a3a, 0x3a5a8a, 0x4a7a3a, 0x8a7a2a]
+  for (const sz of [-1, 1]) {
+    for (let i = 0; i < 4; i++) {
+      const x = -15 + i * 10 + (sz > 0 ? 4 : 0)
+      const w = 8 + rnd() * 2, h = 6.5 + rnd() * 2.5
+      const shop = box(g, new THREE.BoxGeometry(w, h, 5), faceMat, x, h / 2, sz * 14.5)
+      const roof = box(g, new THREE.BoxGeometry(w + 1, 1.2, 6), darkWoodMat(), x, h + 0.6, sz * 14.5)
+      roof.rotation.x = sz * 0.06
+      // hanging shop sign
+      box(g, new THREE.BoxGeometry(1.5, 1.0, 0.12),
+        new THREE.MeshStandardMaterial({ color: signColors[i % 4], roughness: 0.85 }),
+        x - w / 4, 3.4, sz * (14.5 - 2.7))
+      // doorway glow
+      box(g, new THREE.PlaneGeometry(1.2, 2.2),
+        new THREE.MeshBasicMaterial({ color: 0xffc878, transparent: true, opacity: 0.7 }),
+        x + w / 4, 1.1, sz * (14.5 - 2.55), { shadow: false })
+      // lit upper windows
+      for (let wi = 0; wi < 2; wi++) {
+        box(g, new THREE.PlaneGeometry(0.8, 1.0),
+          new THREE.MeshBasicMaterial({ color: 0xffd890 }),
+          x - w / 4 + wi * w / 2, h - 1.8, sz * (14.5 - 2.55), { shadow: false })
+      }
+    }
+  }
+
+  // lantern strings zig-zagging across the street
+  for (let i = 0; i < 3; i++) {
+    const x = -10 + i * 10
+    for (let j = 0; j < 7; j++) {
+      const fz = -10 + j * 3.4
+      const sag = Math.sin((j / 6) * Math.PI) * 1.2
+      glowSphere(g, [0xffc868, 0xff9868, 0xffe8a8][j % 3], 0.16, x + i, 6.8 - sag, fz)
+    }
+    pointLight(g, 0xffc878, 20, 18, x + i, 6, 0)
+  }
+
+  // market stalls with distinct wares
+  const stallDefs = [
+    // weapons: rack of swords
+    { x: -10, z: -8, ry: 0.2, canopy: 0xa03c34, wares: (s) => {
+      for (let i = 0; i < 4; i++) {
+        const sword = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.7, 0.22), mat('steel', () => new THREE.MeshStandardMaterial({ color: 0xb0b8c8, metalness: 0.8, roughness: 0.3 })))
+        sword.position.set(-1 + i * 0.7, 1.9, -0.4); sword.rotation.z = 0.15
+        s.add(sword)
+        const hilt = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 0.26), darkWoodMat())
+        hilt.position.set(-1 + i * 0.7 - 0.18, 1.25, -0.4); hilt.rotation.z = 0.15
+        s.add(hilt)
+      }
+    }},
+    // armor: stand with chestplate + helm
+    { x: 2, z: 9, ry: 2.9, canopy: 0x365a8c, wares: (s) => {
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.42, 1.1, 8), mat('steel2', () => new THREE.MeshStandardMaterial({ color: 0x98a0b0, metalness: 0.7, roughness: 0.4 })))
+      torso.position.set(0, 1.8, -0.2)
+      s.add(torso)
+      const helm = new THREE.Mesh(new THREE.SphereGeometry(0.32, 10, 8), torso.material)
+      helm.position.set(0, 2.6, -0.2)
+      s.add(helm)
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.6, 6), darkWoodMat())
+      post.position.set(0, 0.8, -0.2)
+      s.add(post)
+    }},
+    // potions: glowing bottle pyramid
+    { x: 12, z: -7, ry: -0.4, canopy: 0x4a7a3a, wares: (s) => {
+      const cols = [0xff5566, 0x55ff88, 0x5588ff, 0xffaa33, 0xcc66ff, 0x66ffee]
+      let n = 0
+      for (let row = 0; row < 3; row++) {
+        for (let i = 0; i <= 2 - row; i++) {
+          const b = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.45, 6),
+            new THREE.MeshBasicMaterial({ color: cols[n++ % 6], transparent: true, opacity: 0.9 }))
+          b.position.set(-0.5 + i * 0.5 + row * 0.25, 1.35 + row * 0.42, 0.1)
+          s.add(b)
+        }
+      }
+      const glow = new THREE.PointLight(0x88ffcc, 8, 6, 1.8)
+      glow.position.set(0, 1.8, 0)
+      s.add(glow)
+    }},
+    // trinkets: rugs + jewelry sparkle
+    { x: -2, z: -9, ry: -0.15, canopy: 0x8a7a2a, wares: (s) => {
+      for (let i = 0; i < 3; i++) {
+        const gem = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0),
+          new THREE.MeshBasicMaterial({ color: [0xff66aa, 0x66ddff, 0xffdd55][i] }))
+        gem.position.set(-0.7 + i * 0.7, 1.3, 0.1)
+        s.add(gem)
+      }
+    }}
+  ]
+  for (const def of stallDefs) {
+    const s = new THREE.Group()
+    const counter = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.0, 1.4), woodMat())
+    counter.position.y = 0.5; counter.castShadow = true
+    s.add(counter)
+    for (const [px, pz] of [[-1.7, -0.6], [1.7, -0.6], [-1.7, 0.6], [1.7, 0.6]]) {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.6, 6), woodMat())
+      post.position.set(px, 1.3, pz)
+      s.add(post)
+    }
+    const can = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.2),
+      new THREE.MeshStandardMaterial({ color: def.canopy, roughness: 0.9, side: THREE.DoubleSide }))
+    can.position.set(0, 2.75, 0); can.rotation.x = -Math.PI / 2 + 0.25
+    can.castShadow = true
+    s.add(can)
+    def.wares(s)
+    s.position.set(def.x, 0, def.z); s.rotation.y = def.ry
+    g.add(s)
+    pointLight(g, 0xffc878, 11, 8, def.x, 2.6, def.z, true)
+  }
+
+  // clutter: crates, barrels, sacks along the lane
+  for (let i = 0; i < 6; i++) {
+    const x = (rnd() - 0.5) * 28, z = (rnd() > 0.5 ? 1 : -1) * (10 + rnd() * 2)
+    if (rnd() > 0.6) box(g, new THREE.BoxGeometry(1.1, 1.1, 1.1), woodMat(), x, 0.55, z, { ry: rnd() * 3 })
+    else if (rnd() > 0.3) box(g, new THREE.CylinderGeometry(0.5, 0.6, 1.3, 10), woodMat(), x, 0.65, z)
+    else {
+      const sack = box(g, new THREE.SphereGeometry(0.55, 8, 6), mat('sack', () => new THREE.MeshStandardMaterial({ color: 0x9a8868, roughness: 1 })), x, 0.4, z)
+      sack.scale.y = 0.7
+    }
+  }
+}
+
 // ═══ registry ═══════════════════════════════════════════════
 export const SET_PIECES = {
   'town:temple': { theme: 'town', perimeter: false, build: buildTemple },
   'town:square': { theme: 'town', perimeter: true, build: buildSquare },
   'town:gate': { theme: 'town', perimeter: false, build: buildGate },
-  'forest:edge': { theme: 'forest', perimeter: true, build: buildForestEdge }
+  'forest:edge': { theme: 'forest', perimeter: true, build: buildForestEdge },
+  'town:tavern': { theme: 'town', perimeter: false, build: buildTavern },
+  'town:market': { theme: 'town', perimeter: false, build: buildMarket }
 }
 
 // marker for rooms that have no bespoke set piece yet
