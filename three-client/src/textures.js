@@ -181,3 +181,36 @@ export function portalSwirl() {
     })
   }, 1)
 }
+
+// ── wood planks (stalls, gates, furniture) ──────────────────
+export function planks(repeat = 2) {
+  const N = makeNoise(81), J = makeNoise(82)
+  return canvasTex(256, (ctx, size) => {
+    shade(ctx, size, (u, v) => {
+      const cols = 5
+      const col = Math.floor(u * cols)
+      const fu = (u * cols) % 1
+      const gap = fu < 0.05 || fu > 0.95 ? 0.5 : 1
+      const grain = fbm(N, u * 6 + col * 11, v * 28, 4)
+      const tint = J(col * 17.3, 0.5)
+      const b = (52 + grain * 38 + tint * 18) * gap
+      return [b, b * 0.72, b * 0.5]
+    })
+  }, repeat)
+}
+
+// ── marble (temple floor) ───────────────────────────────────
+export function marble(repeat = 5) {
+  const N = makeNoise(91)
+  return canvasTex(512, (ctx, size) => {
+    shade(ctx, size, (u, v) => {
+      const tiles = 4
+      const fx = (u * tiles) % 1, fy = (v * tiles) % 1
+      const edge = Math.min(fx, 1 - fx, fy, 1 - fy)
+      const gap = edge < 0.025 ? 0.55 : 1
+      const vein = Math.abs(Math.sin((u * 7 + fbm(N, u * 8, v * 8, 4) * 5) * Math.PI))
+      const base = (120 + fbm(N, u * 12, v * 12, 3) * 40 - Math.pow(vein, 8) * 60) * gap
+      return [base, base * 0.98, base * 0.94]
+    })
+  }, repeat)
+}

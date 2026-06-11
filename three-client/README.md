@@ -12,6 +12,11 @@ textures are procedural (multi-octave noise baked to canvases at startup);
 NPCs/players/loot are billboard sprites using the same server-hosted art as
 the 2D client.
 
+Rooms listed in `src/setpieces.js` get a bespoke hand-built layout (currently
+the Temple of the Dawn, Town Square, North Gate, and the Forest Edge campsite);
+rooms without one fall back to the generic zone theme and show a floating
+"untamed lands" marker so the frontier of finished content is visible in-game.
+
 ## Run
 
 ```bash
@@ -46,7 +51,9 @@ Point at a different server with
 - `src/arena.js` — Three.js arena: themed room construction, portals, lights,
   particles, entity billboards, HP bars, raycast picking, walking, follow camera.
 - `src/textures.js` — procedural tileable textures (cobblestone, forest floor,
-  stone, plaster/timber, bark, portal swirl).
+  stone, marble, planks, plaster/timber, bark, portal swirl).
+- `src/setpieces.js` — per-room hand-built layouts; add a room here to give it
+  its own identity (entry: `{ theme?, perimeter?: false, build(arena, room, rnd) }`).
 - `src/main.js` — game state, server message handlers, HUD, login flow.
 
 Auth uses the server's `guest_login` path (ephemeral character, no password),

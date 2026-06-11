@@ -4,6 +4,7 @@
 
 import * as THREE from 'three'
 import * as TEX from './textures.js'
+import { SET_PIECES, buildUnfinishedMarker } from './setpieces.js'
 
 export const HALF = 20            // walkable half-extent
 const WALL_R = 21.5               // perimeter wall distance
@@ -37,8 +38,8 @@ function mulberry32(seed) {
 // ── themes ──────────────────────────────────────────────────
 const themes = {
   town: {
-    fog: 0x14101c, fogDensity: 0.012,
-    ambient: [0xa89bb0, 1.1], hemi: [0x7080b8, 0x4a3828, 0.9],
+    fog: 0x14101c, fogDensity: 0.008,
+    ambient: [0xa89bb0, 1.4], hemi: [0x7080b8, 0x4a3828, 1.1],
     moon: [0x9fb0e8, 1.6],
     ground: () => TEX.cobblestone(),
     particles: { color: 0xffc878, count: 70, height: 5, speed: 0.25 }, // lantern motes
@@ -228,7 +229,8 @@ export class Arena {
     this.portalCooldown = 1.2 // grace so we don't instantly re-trigger
     this.marker.material.opacity = 0
 
-    const themeName = themeForZone(room.zoneId)
+    const setPiece = SET_PIECES[room.id]
+    const themeName = setPiece?.theme || themeForZone(room.zoneId)
     const T = themes[themeName]
     const rnd = mulberry32(hash(room.id))
 
@@ -259,10 +261,14 @@ export class Arena {
     this.groundMesh = ground
     this.roomGroup.add(ground)
 
-    // perimeter + props by theme
-    if (themeName === 'town') this._buildTown(rnd)
-    else if (themeName === 'forest') this._buildForest(rnd)
-    else this._buildDungeon(rnd)
+    // perimeter + props by theme (set pieces may opt out of the generic ring)
+    if (!setPiece || setPiece.perimeter !== false) {
+      if (themeName === 'town') this._buildTown(rnd)
+      else if (themeName === 'forest') this._buildForest(rnd)
+      else this._buildDungeon(rnd)
+    }
+    if (setPiece) setPiece.build(this, room, rnd)
+    else buildUnfinishedMarker(this)
 
     // portals for each exit
     const exits = Object.entries(room.exits || {})
@@ -681,9 +687,14 @@ export class Arena {
         p.light.intensity = (p.locked ? 12 : 24) + Math.sin(t * 3 + p.pos.z) * 5
       }
 
-      // flickering braziers
+      // flickering lights, spinning markers, flames
       this.roomGroup.traverse((o) => {
-        if (o.isPointLight && o.userData.flicker) o.intensity = 22 + Math.sin(t * 9 + o.position.x * 3) * 6 + Math.random() * 3
+        if (o.isPointLight && o.userData.flicker) {
+          o.userData.base ??= o.intensity
+          o.intensity = o.userData.base + Math.sin(t * 9 + o.position.x * 3) * o.userData.base * 0.25 + Math.random() * 2
+        }
+        if (o.userData.spin) { o.rotation.y = t * 0.6; o.position.y = 5.4 + Math.sin(t * 1.3) * 0.3 }
+        if (o.userData.flame) o.scale.y = 1 + Math.sin(t * 11) * 0.18 + Math.random() * 0.08
       })
 
       // particles drift
