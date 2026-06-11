@@ -984,6 +984,9 @@ export class Arena {
       this.torch.position.copy(this.avatar.position).add(new THREE.Vector3(0, 3.4, 0))
       this.torch.intensity = 55 + Math.sin(t * 7) * 6
 
+      // menu mode: slow cinematic orbit
+      if (this.menuOrbit) this.orbit.theta += dt * 0.06
+
       // camera follow
       if (!this.camTarget) this.camTarget = this.avatar.position.clone()
       if (this.camTargetSnap) { this.camTarget.copy(this.avatar.position); this.camTargetSnap = false }

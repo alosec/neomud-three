@@ -18,7 +18,11 @@ const state = {
   races: [],
   selectedTarget: null,  // npc id
   attackMode: false,
-  mapBuilt: false
+  mapBuilt: false,
+  inventory: [],
+  equipment: {},
+  coins: { copper: 0, silver: 0, gold: 0, platinum: 0 },
+  itemCatalog: {}
 }
 
 window.__nm = state // debug handle
@@ -27,6 +31,12 @@ window.__world = world
 window.__sock = null // set after construction
 state.roomNames = {}
 world.start()
+
+// menu backdrop: a moonlit grove slowly orbiting behind the login card
+world.buildRoom({ id: 'menu:grove', zoneId: 'forest', exits: {} }, {}, null)
+world.avatar.visible = false
+world.menuOrbit = true
+
 const sock = new GameSocket(SERVER_WS)
 window.__sock = sock
 
@@ -193,6 +203,88 @@ function playBgm(id) {
   }
 }
 
+// ── inventory ───────────────────────────────────────────────
+function itemImg(itemId) {
+  return `${SERVER_HTTP}/assets/images/items/${itemId.replace(':', '_')}.webp`
+}
+
+function renderInventory() {
+  const list = $('inv-list')
+  list.innerHTML = ''
+  const c = state.coins
+  $('inv-coins').textContent = `⛁ ${c.platinum ? c.platinum + 'p ' : ''}${c.gold ? c.gold + 'g ' : ''}${c.silver ? c.silver + 's ' : ''}${c.copper}c`
+  if (!state.inventory.length) {
+    const empty = document.createElement('div')
+    empty.style.cssText = 'opacity:0.45;font-style:italic;font-size:12.5px'
+    empty.textContent = 'Nothing but lint.'
+    list.appendChild(empty)
+    return
+  }
+  for (const it of state.inventory) {
+    const cat = state.itemCatalog[it.itemId] || {}
+    const row = document.createElement('div')
+    row.className = 'inv-item'
+    const img = document.createElement('img')
+    img.src = itemImg(it.itemId)
+    img.onerror = () => { img.style.visibility = 'hidden' }
+    const nm = document.createElement('div')
+    nm.className = 'nm'
+    nm.innerHTML = `${cat.name || it.itemId}${it.quantity > 1 ? ' ×' + it.quantity : ''}` +
+      `<small>${it.equipped ? '<span class="eq">equipped — ' + (it.slot || cat.slot) + '</span>' : (cat.type || '')}</small>`
+    row.append(img, nm)
+    if (cat.type === 'CONSUMABLE' || cat.useEffect) {
+      const b = document.createElement('button')
+      b.textContent = 'Use'
+      b.onclick = () => sock.send('use_item', { itemId: it.itemId })
+      row.appendChild(b)
+    } else if (it.equipped) {
+      const b = document.createElement('button')
+      b.textContent = 'Unequip'
+      b.onclick = () => sock.send('unequip_item', { slot: it.slot || cat.slot })
+      row.appendChild(b)
+    } else if (cat.slot) {
+      const b = document.createElement('button')
+      b.textContent = 'Equip'
+      b.onclick = () => sock.send('equip_item', { itemId: it.itemId, slot: cat.slot })
+      row.appendChild(b)
+    }
+    list.appendChild(row)
+  }
+}
+
+$('inv-btn').onclick = () => {
+  const p = $('inventory')
+  const open = p.style.display === 'block'
+  p.style.display = open ? 'none' : 'block'
+  if (!open) sock.send('view_inventory')
+}
+addEventListener('keydown', (e) => {
+  if (document.activeElement === $('chat-input')) return
+  if (e.key.toLowerCase() === 'i') $('inv-btn').onclick()
+})
+
+sock.on('item_catalog_sync', (m) => {
+  for (const it of m.items) state.itemCatalog[it.id] = it
+})
+sock.on('inventory_update', (m) => {
+  state.inventory = m.inventory
+  state.equipment = m.equipment
+  state.coins = m.coins
+  renderInventory()
+})
+for (const t of ['buy_result', 'sell_result', 'craft_result']) {
+  sock.on(t, (m) => {
+    if (m.updatedInventory) { state.inventory = m.updatedInventory; state.equipment = m.equipment; state.coins = m.updatedCoins; renderInventory() }
+    log(m.message, m.success ? 'l-good' : 'l-err')
+  })
+}
+sock.on('equip_update', () => sock.send('view_inventory'))
+sock.on('pickup_result', () => sock.send('view_inventory'))
+sock.on('loot_received', (m) => {
+  for (const it of m.items) log(`Looted ${it.itemName}${it.quantity > 1 ? ' ×' + it.quantity : ''}`, 'l-good')
+  sock.send('view_inventory')
+})
+
 // ── modal ───────────────────────────────────────────────────
 function showModal(title, body) {
   $('m-title').textContent = title
@@ -237,6 +329,8 @@ sock.on('login_ok', (m) => {
   state.player = m.player
   $('login').style.display = 'none'
   $('hud').style.display = 'block'
+  world.avatar.visible = true
+  world.menuOrbit = false
   updateVitals()
   log(`Welcome, ${m.player.name}. Click the ground to walk; step into a portal to travel.`, 'l-good')
 })
@@ -375,6 +469,7 @@ sock.on('item_used', (m) => {
   if (state.player) { state.player.currentHp = m.newHp; state.player.currentMp = m.newMp }
   updateVitals()
   log(m.message, 'l-good')
+  sock.send('view_inventory')
 })
 
 sock.on('tutorial', (m) => { if (m.blocking) showModal(m.title, m.content); else log(`${m.title}: ${m.content}`, 'l-sys') })

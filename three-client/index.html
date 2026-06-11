@@ -31,10 +31,12 @@
     #login {
       position: fixed; inset: 0; z-index: 50;
       display: flex; align-items: center; justify-content: center;
-      background: radial-gradient(ellipse at center, #15101e 0%, #07060a 75%);
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(7,6,10,0.72) 100%);
     }
     #login .card {
       width: 380px; padding: 32px 36px; text-align: center;
+      background: rgba(12, 10, 8, 0.72); backdrop-filter: blur(8px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.7);
     }
     #login h1 {
       font-size: 34px; letter-spacing: 6px; color: var(--gold);
@@ -138,6 +140,35 @@
       100% { transform: translate(-50%, -90px); opacity: 0; }
     }
 
+    /* inventory */
+    #inv-btn {
+      position: absolute; top: 118px; left: 14px; width: 44px; height: 44px;
+      font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--gold);
+    }
+    #inv-btn:hover { filter: brightness(1.4); }
+    #inventory {
+      position: absolute; top: 118px; left: 66px; width: 320px; max-height: 60vh;
+      padding: 14px 16px; display: none; overflow-y: auto; scrollbar-width: thin;
+    }
+    #inventory h3 { color: var(--gold); font-size: 15px; letter-spacing: 2px; margin-bottom: 10px; }
+    #inventory .coins { font-size: 13px; color: #e8c878; margin-bottom: 10px; }
+    .inv-item {
+      display: flex; align-items: center; gap: 10px; padding: 6px;
+      border: 1px solid transparent; border-radius: 4px; cursor: default;
+    }
+    .inv-item:hover { border-color: var(--panel-border); background: rgba(212,175,55,0.06); }
+    .inv-item img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 2px 3px #000); }
+    .inv-item .nm { flex: 1; font-size: 13px; }
+    .inv-item .nm small { display: block; opacity: 0.5; font-size: 10.5px; }
+    .inv-item .nm .eq { color: #8fc88f; }
+    .inv-item button {
+      padding: 4px 10px; font-size: 11px; font-family: inherit; cursor: pointer;
+      background: rgba(109,84,24,0.55); border: 1px solid var(--panel-border);
+      border-radius: 3px; color: var(--bone);
+    }
+    .inv-item button:hover { filter: brightness(1.4); }
+
     /* modal (tutorials, dialogue) */
     #modal {
       position: fixed; inset: 0; z-index: 60; display: none;
@@ -194,6 +225,13 @@
     </div>
 
     <div id="attack-indicator" class="panel">⚔ ATTACKING</div>
+
+    <div id="inv-btn" class="panel" title="Inventory (I)">🎒</div>
+    <div id="inventory" class="panel">
+      <h3>INVENTORY</h3>
+      <div class="coins" id="inv-coins"></div>
+      <div id="inv-list"></div>
+    </div>
 
     <div id="log" class="panel"></div>
     <div id="chatbox">
