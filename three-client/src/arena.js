@@ -368,7 +368,7 @@ export class Arena {
       const pos = new THREE.Vector3(v[0] * PORTAL_R, 0, v[1] * PORTAL_R)
       const locked = room.lockedExits && dir in room.lockedExits
       const vertical = dir === 'UP' || dir === 'DOWN'
-      this._buildPortal(dir, pos, destNames[toId] || dir.toLowerCase(), T, locked, vertical)
+      this._buildPortal(dir, pos, destNames[toId] || dir.toLowerCase(), T, locked, vertical, themeName)
     }
 
     // particles
@@ -390,27 +390,12 @@ export class Arena {
     this.camTargetSnap = true
   }
 
-  _buildPortal(dir, pos, destName, T, locked, vertical) {
+  _buildPortal(dir, pos, destName, T, locked, vertical, themeName = 'dungeon') {
     const g = new THREE.Group()
-    const stone = new THREE.MeshStandardMaterial({ map: TEX.stoneWall(1), roughness: 0.85 })
     const inward = pos.clone().multiplyScalar(-1).normalize()
+    const perp = new THREE.Vector3(-inward.z, 0, inward.x)
 
-    if (!vertical) {
-      // archway: two pillars + lintel
-      for (const side of [-1, 1]) {
-        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.9, 5.2, 0.9), stone)
-        const perp = new THREE.Vector3(-inward.z, 0, inward.x)
-        pillar.position.copy(pos).addScaledVector(perp, side * 1.9)
-        pillar.position.y = 2.6
-        pillar.castShadow = true
-        g.add(pillar)
-      }
-      const lintel = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.8, 1.1), stone)
-      lintel.position.copy(pos); lintel.position.y = 5.4
-      lintel.lookAt(lintel.position.clone().add(inward))
-      lintel.castShadow = true
-      g.add(lintel)
-    }
+    if (!vertical) this._buildGateFrame(g, pos, inward, perp, themeName)
 
     // glowing disc
     const color = locked ? 0xcc3322 : (vertical ? 0xd4af37 : 0x66aaff)
@@ -455,6 +440,82 @@ export class Arena {
 
     this.portals.push(portal)
     this.roomGroup.add(g)
+  }
+
+  // theme-styled gate frames around travel portals
+  _buildGateFrame(g, pos, inward, perp, themeName) {
+    const put = (mesh, side, up, fwd = 0) => {
+      mesh.position.copy(pos).addScaledVector(perp, side).addScaledVector(inward, fwd)
+      mesh.position.y = up
+      mesh.castShadow = true
+      g.add(mesh)
+      return mesh
+    }
+    const stone = new THREE.MeshStandardMaterial({ map: TEX.stoneWall(1), roughness: 0.85 })
+
+    if (themeName === 'forest' || themeName === 'marsh') {
+      // two living trees bending together into a natural arch
+      const bark = new THREE.MeshStandardMaterial({ map: TEX.bark(), roughness: 1 })
+      const leaf = new THREE.MeshStandardMaterial({ color: themeName === 'marsh' ? 0x2a4430 : 0x27482a, roughness: 1 })
+      for (const side of [-1, 1]) {
+        const trunk = put(new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 6.4, 7), bark), side * 2.2, 3.0)
+        trunk.rotation.z = -side * 0.35 * Math.sign(perp.x || 1)
+        trunk.rotateOnWorldAxis(inward.clone().cross(new THREE.Vector3(0, 1, 0)).normalize(), side * 0.32)
+        const blob = put(new THREE.Mesh(new THREE.SphereGeometry(1.5, 8, 6), leaf), side * 1.1, 6.1)
+        blob.scale.y = 0.7
+      }
+    } else if (themeName === 'volcanic') {
+      // jagged leaning basalt slabs
+      const basalt = new THREE.MeshStandardMaterial({ color: 0x241e20, roughness: 0.9 })
+      for (const side of [-1, 1]) {
+        const slab = put(new THREE.Mesh(new THREE.BoxGeometry(1.3, 6.4, 1.0), basalt), side * 2.1, 2.9)
+        slab.rotation.z = -side * 0.22
+        const shard = put(new THREE.Mesh(new THREE.ConeGeometry(0.5, 2.2, 5), basalt), side * 2.8, 1.0)
+        shard.rotation.z = side * 0.5
+      }
+    } else if (themeName === 'cave') {
+      // rough boulder mouth
+      const rock = new THREE.MeshStandardMaterial({ map: TEX.stoneWall(2), roughness: 0.95, color: 0x9090a8 })
+      for (const side of [-1, 1]) {
+        put(new THREE.Mesh(new THREE.DodecahedronGeometry(1.7, 0), rock), side * 2.4, 1.4).rotation.set(side, side * 2, 0)
+        put(new THREE.Mesh(new THREE.DodecahedronGeometry(1.3, 0), rock), side * 1.9, 3.8).rotation.set(side * 2, side, 1)
+      }
+      put(new THREE.Mesh(new THREE.DodecahedronGeometry(1.6, 0), rock), 0, 5.3).scale.set(1.6, 0.8, 1)
+    } else if (themeName === 'desert') {
+      // weathered half-buried sandstone
+      const sandstone = new THREE.MeshStandardMaterial({ color: 0x8a7858, roughness: 0.9 })
+      for (const side of [-1, 1]) {
+        const col = put(new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.75, 5.6, 9), sandstone), side * 2.1, 2.4)
+        col.rotation.z = -side * 0.08
+      }
+      const lintel = put(new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.9, 1.0), sandstone), 0, 5.2)
+      lintel.lookAt(lintel.position.clone().add(inward))
+      lintel.rotation.z += 0.06
+    } else if (themeName === 'necropolis') {
+      // wrought-iron cemetery gate posts with skull finials
+      const iron = new THREE.MeshStandardMaterial({ color: 0x1a1a22, metalness: 0.7, roughness: 0.4 })
+      const boneMat = new THREE.MeshStandardMaterial({ color: 0xc8c0a8, roughness: 0.85 })
+      for (const side of [-1, 1]) {
+        put(new THREE.Mesh(new THREE.BoxGeometry(0.5, 5.6, 0.5), iron), side * 2.0, 2.6)
+        put(new THREE.Mesh(new THREE.SphereGeometry(0.32, 8, 7), boneMat), side * 2.0, 5.7)
+        for (let b = 1; b < 4; b++) put(new THREE.Mesh(new THREE.BoxGeometry(0.12, 4.4, 0.12), iron), side * (2.0 - b * 0.5), 2.4)
+      }
+      const top = put(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.3, 0.3), iron), 0, 4.9)
+      top.lookAt(top.position.clone().add(inward))
+    } else if (themeName === 'moor') {
+      // a leaning menhir pair
+      for (const side of [-1, 1]) {
+        const menhir = put(new THREE.Mesh(new THREE.BoxGeometry(1.3, 5.8, 1.0),
+          new THREE.MeshStandardMaterial({ color: 0x55585c, roughness: 1 })), side * 2.2, 2.7)
+        menhir.rotation.z = -side * 0.12
+        menhir.rotation.y = side * 0.4
+      }
+    } else {
+      // default: dressed stone archway (town, dungeon)
+      for (const side of [-1, 1]) put(new THREE.Mesh(new THREE.BoxGeometry(0.9, 5.2, 0.9), stone), side * 1.9, 2.6)
+      const lintel = put(new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.8, 1.1), stone), 0, 5.4)
+      lintel.lookAt(lintel.position.clone().add(inward))
+    }
   }
 
   _textSprite(text, color = '#fff') {
