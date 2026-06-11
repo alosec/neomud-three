@@ -11,6 +11,8 @@
 import * as THREE from 'three'
 import * as TEX from './textures.js'
 
+const WALL_R = 21.5 // matches arena.js perimeter radius
+
 const mats = {}
 function mat(name, make) { return mats[name] ??= make() }
 
@@ -879,6 +881,317 @@ function buildHiddenCave(arena, room, rnd) {
   }
 }
 
+
+// ═══ marsh:edge — Marsh Edge ════════════════════════════════
+function buildMarshEdge(arena, room, rnd) {
+  const g = arena.roomGroup
+  // rotting boardwalk leading into the mire
+  for (let i = 0; i < 7; i++) {
+    const plank = box(g, new THREE.BoxGeometry(2.2, 0.14, 1.0), woodMat(), 0 + Math.sin(i * 0.5) * 1.2, 0.18 - (i % 3) * 0.05, 10 - i * 2.2, { ry: Math.sin(i * 0.5) * 0.2 })
+    plank.rotation.z = (rnd() - 0.5) * 0.08
+  }
+  for (let i = 0; i < 4; i++) {
+    box(g, new THREE.CylinderGeometry(0.12, 0.16, 1.1, 6), darkWoodMat(), -1.3 + (i % 2) * 2.6, 0.3, 9 - i * 4.4)
+  }
+  // tilted warning sign
+  box(g, new THREE.CylinderGeometry(0.08, 0.1, 2.4, 6), darkWoodMat(), 3, 1.2, 7, { ry: 0.2 }).rotation.z = 0.18
+  box(g, new THREE.BoxGeometry(1.7, 0.8, 0.1), woodMat(), 3.2, 2.1, 7, { ry: 0.35 }).rotation.z = 0.12
+  // half-sunk rowboat
+  const boat = box(g, new THREE.CylinderGeometry(1.0, 0.6, 3.4, 8, 1, true), darkWoodMat(), -8, 0.15, -4, { rx: Math.PI / 2, ry: 0.6 })
+  boat.scale.x = 0.55
+  boat.rotation.x += 0.25
+}
+
+// ═══ marsh:trail — Sunken Trail ═════════════════════════════
+function buildSunkenTrail(arena, room, rnd) {
+  const g = arena.roomGroup
+  // winding half-submerged plank path across the room
+  for (let i = 0; i < 14; i++) {
+    const z = -18 + i * 2.7
+    const x = Math.sin(i * 0.45) * 5
+    const sunk = (i % 4 === 2)
+    box(g, new THREE.BoxGeometry(2.0, 0.12, 1.1), woodMat(), x, sunk ? 0.02 : 0.18, z, { ry: Math.cos(i * 0.45) * 0.25 })
+  }
+  // crooked lantern posts along the trail, half-dead
+  for (const i of [2, 7, 12]) {
+    const z = -18 + i * 2.7
+    const x = Math.sin(i * 0.45) * 5 + 1.4
+    box(g, new THREE.CylinderGeometry(0.09, 0.12, 2.8, 6), darkWoodMat(), x, 1.4, z).rotation.z = (rnd() - 0.5) * 0.3
+    glowSphere(g, 0x9fd8a8, 0.14, x + 0.2, 2.7, z)
+    pointLight(g, 0x88cc99, i === 7 ? 16 : 8, 9, x, 2.7, z, true)
+  }
+}
+
+// ═══ marsh:shallows — Fetid Shallows ════════════════════════
+function buildShallows(arena, room, rnd) {
+  const g = arena.roomGroup
+  // one huge sheet of stagnant water with islands of mud
+  const water = box(g, new THREE.CircleGeometry(19, 40),
+    mat('fetidwater', () => new THREE.MeshStandardMaterial({
+      color: 0x1c2a1a, roughness: 0.12, metalness: 0.5, transparent: true, opacity: 0.94
+    })), 0, 0.05, 0, { rx: -Math.PI / 2, shadow: false })
+  for (let i = 0; i < 7; i++) {
+    const a = rnd() * Math.PI * 2, r = 4 + rnd() * 12
+    const mound = box(g, new THREE.SphereGeometry(1.4 + rnd() * 1.4, 9, 7),
+      mat('mudmound', () => new THREE.MeshStandardMaterial({ color: 0x2c3020, roughness: 1 })),
+      Math.cos(a) * r, -0.7, Math.sin(a) * r)
+    mound.scale.y = 0.5
+  }
+  // bubbles: tiny glow spheres that the orbit anim drifts
+  for (let i = 0; i < 8; i++) {
+    const b = glowSphere(g, 0x77aa66, 0.07, 0, 0.15, 0)
+    b.userData.orbit = { r: 2 + rnd() * 11, speed: 0.12 + rnd() * 0.2, phase: rnd() * 6, y: 0.12 }
+  }
+  // ribcage of something large breaking the surface
+  const boneMat = mat('bone', () => new THREE.MeshStandardMaterial({ color: 0xc8c0a8, roughness: 0.85 }))
+  for (let r = 0; r < 5; r++) {
+    const rib = box(g, new THREE.TorusGeometry(1.8 - r * 0.16, 0.1, 6, 14, Math.PI * 0.85), boneMat, -5 + r * 1.0, 0.1, 6, { ry: 0.2 })
+    rib.rotation.z = 0.15
+  }
+}
+
+// ═══ marsh:hollow — Hag's Hollow ════════════════════════════
+function buildHagsHollow(arena, room, rnd) {
+  const g = arena.roomGroup
+  // witch hut on stilts
+  const hut = new THREE.Group()
+  for (const [px, pz] of [[-1.6, -1.2], [1.6, -1.2], [-1.6, 1.2], [1.6, 1.2]]) {
+    const stilt = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 2.6, 6), darkWoodMat())
+    stilt.position.set(px, 1.3, pz); stilt.rotation.z = (rnd() - 0.5) * 0.15
+    hut.add(stilt)
+  }
+  const body = new THREE.Mesh(new THREE.BoxGeometry(4.6, 2.8, 3.6), woodMat())
+  body.position.y = 3.9; body.rotation.z = 0.04; body.castShadow = true
+  hut.add(body)
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(3.6, 2.4, 4), darkWoodMat())
+  roof.position.y = 6.4; roof.rotation.y = Math.PI / 4
+  hut.add(roof)
+  // glowing crooked windows
+  for (const wx of [-1.2, 1.2]) {
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.8),
+      new THREE.MeshBasicMaterial({ color: 0xaaff66 }))
+    win.position.set(wx, 4.0, 1.85)
+    hut.add(win)
+  }
+  hut.position.set(-6, 0, -6); hut.rotation.y = 0.5
+  g.add(hut)
+  pointLight(g, 0x99ff55, 22, 16, -6, 4.4, -4, true)
+
+  // cauldron over green fire
+  box(g, new THREE.SphereGeometry(1.0, 12, 8), mat('cauldron', () => new THREE.MeshStandardMaterial({ color: 0x222226, metalness: 0.6, roughness: 0.5 })), 4, 0.85, 2).scale.y = 0.8
+  const brew = box(g, new THREE.CircleGeometry(0.78, 16),
+    new THREE.MeshBasicMaterial({ color: 0x66ff44 }), 4, 1.45, 2, { rx: -Math.PI / 2, shadow: false })
+  const gfire = box(g, new THREE.ConeGeometry(0.5, 1.0, 8),
+    new THREE.MeshBasicMaterial({ color: 0x55ff33, transparent: true, opacity: 0.8 }), 4, 0.4, 2, { shadow: false })
+  gfire.userData.flame = true
+  pointLight(g, 0x55ff33, 34, 18, 4, 1.8, 2, true)
+  // hanging bone charms between posts
+  for (let i = 0; i < 4; i++) {
+    const x = -1 + i * 2.4, z = 7
+    box(g, new THREE.CylinderGeometry(0.05, 0.05, 2.2, 4), darkWoodMat(), x, 1.1, z)
+    glowSphere(g, 0xddddcc, 0.08, x, 2.0, z)
+    box(g, new THREE.BoxGeometry(0.1, 0.5, 0.1), mat('bone', () => new THREE.MeshStandardMaterial({ color: 0xc8c0a8 })), x, 1.6, z, { ry: rnd() })
+  }
+}
+
+// ═══ marsh:island — Mire Island ═════════════════════════════
+function buildMireIsland(arena, room, rnd) {
+  const g = arena.roomGroup
+  // dry hummock: raised earth disc
+  box(g, new THREE.CylinderGeometry(8, 9.5, 1.0, 24),
+    mat('hummock', () => new THREE.MeshStandardMaterial({ map: TEX.moorGrass(), roughness: 1 })), 0, 0.5, 0)
+  // ring of carved totem stones
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2 + 0.4
+    const h = 2.6 + rnd()
+    const totem = box(g, new THREE.BoxGeometry(0.9, h, 0.7), stoneMat(), Math.cos(a) * 5.5, 1 + h / 2, Math.sin(a) * 5.5, { ry: a })
+    totem.rotation.z = (rnd() - 0.5) * 0.1
+    // carved glow sigil
+    box(g, new THREE.PlaneGeometry(0.4, 0.9),
+      new THREE.MeshBasicMaterial({ color: 0x88ffcc, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending }),
+      Math.cos(a) * 5.1, 1 + h / 2, Math.sin(a) * 5.1, { ry: a + Math.PI, shadow: false })
+  }
+  // central fire pit, long cold, with offerings
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2
+    box(g, new THREE.DodecahedronGeometry(0.25, 0), mat('rock', () => new THREE.MeshStandardMaterial({ color: 0x4a4a52, roughness: 1 })), Math.cos(a) * 1.0, 1.15, Math.sin(a) * 1.0)
+  }
+  glowSphere(g, 0x88ffcc, 0.18, 0, 1.3, 0)
+  pointLight(g, 0x88ffcc, 16, 13, 0, 1.8, 0)
+}
+
+// ═══ marsh:heart — Heart of the Marsh ═══════════════════════
+function buildMarshHeart(arena, room, rnd) {
+  const g = arena.roomGroup
+  // colossal ancient tree at center, roots arching out
+  const barkMat = mat('bigbark', () => new THREE.MeshStandardMaterial({ map: TEX.bark(), roughness: 1 }))
+  const trunk = box(g, new THREE.CylinderGeometry(2.4, 3.6, 16, 12), barkMat, 0, 8, 0)
+  box(g, new THREE.SphereGeometry(7, 12, 9), mat('bigleaf', () => new THREE.MeshStandardMaterial({ color: 0x21381f, roughness: 1 })), 0, 17, 0).scale.y = 0.55
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2
+    const root = box(g, new THREE.CylinderGeometry(0.4, 0.7, 7, 7), barkMat, Math.cos(a) * 4.5, 1.2, Math.sin(a) * 4.5)
+    root.rotation.z = Math.cos(a) * 1.1
+    root.rotation.x = -Math.sin(a) * 1.1
+  }
+  // heavy concentration of wisps circling the trunk
+  for (let i = 0; i < 6; i++) {
+    const w = glowSphere(g, 0x99ffbb, 0.12, 0, 2, 0)
+    w.userData.orbit = { r: 5 + rnd() * 3, speed: 0.2 + rnd() * 0.3, phase: rnd() * 6, y: 1.5 + rnd() * 4 }
+  }
+  pointLight(g, 0x77eeaa, 30, 24, 0, 6, 0)
+  // heart-glow in a hollow of the trunk
+  box(g, new THREE.CircleGeometry(0.8, 16), new THREE.MeshBasicMaterial({ color: 0xaaffcc }), 0, 3, 3.4, { shadow: false })
+}
+
+// ═══ gorge:mouth — Gorge Mouth ══════════════════════════════
+function buildGorgeMouth(arena, room, rnd) {
+  const g = arena.roomGroup
+  // converging canyon walls funneling north
+  const basaltMat = mat('basalt', () => new THREE.MeshStandardMaterial({ color: 0x241e20, roughness: 0.9 }))
+  for (const sx of [-1, 1]) {
+    for (let i = 0; i < 5; i++) {
+      const z = 12 - i * 7
+      const off = 17 - i * 2.2
+      const h = 8 + rnd() * 5
+      const wall = box(g, new THREE.BoxGeometry(6, h, 7), basaltMat, sx * off, h / 2 - 1, z, { ry: sx * 0.18 })
+      wall.castShadow = true
+    }
+  }
+  // scattered scorched bones
+  const boneMat = mat('bone', () => new THREE.MeshStandardMaterial({ color: 0x9a9078, roughness: 0.9 }))
+  for (let i = 0; i < 7; i++) {
+    box(g, new THREE.CylinderGeometry(0.07, 0.09, 0.8 + rnd() * 0.7, 5), boneMat, (rnd() - 0.5) * 20, 0.1, (rnd() - 0.5) * 20, { rx: Math.PI / 2, ry: rnd() * 3 })
+  }
+  // heat shimmer light at the throat
+  pointLight(g, 0xff6622, 24, 20, 0, 2, -14, true)
+}
+
+// ═══ gorge:ledge — Narrow Ledge ═════════════════════════════
+function buildNarrowLedge(arena, room, rnd) {
+  const g = arena.roomGroup
+  // the east half of the room is a sheer drop into darkness
+  const voidMat = mat('chasm', () => new THREE.MeshBasicMaterial({ color: 0x050308 }))
+  box(g, new THREE.PlaneGeometry(26, 46), voidMat, 14, 0.08, 0, { rx: -Math.PI / 2, shadow: false })
+  // glow far below
+  box(g, new THREE.PlaneGeometry(18, 36),
+    new THREE.MeshBasicMaterial({ color: 0xff3300, transparent: true, opacity: 0.22, blending: THREE.AdditiveBlending }),
+    16, -0.1, 0, { rx: -Math.PI / 2, shadow: false })
+  // crumbling edge stones
+  const basaltMat = mat('basalt', () => new THREE.MeshStandardMaterial({ color: 0x241e20, roughness: 0.9 }))
+  for (let i = 0; i < 12; i++) {
+    box(g, new THREE.DodecahedronGeometry(0.5 + rnd() * 0.6, 0), basaltMat, 2.5 + rnd() * 1.5, 0.25, -20 + i * 3.6, { ry: rnd() * 3 })
+  }
+  // cliff wall on the west
+  for (let i = 0; i < 6; i++) {
+    const h = 9 + rnd() * 4
+    box(g, new THREE.BoxGeometry(5, h, 8), basaltMat, -16 - rnd() * 2, h / 2 - 1, -18 + i * 7.4)
+  }
+  // frayed rope bridge stub reaching over the void
+  for (let i = 0; i < 4; i++) {
+    box(g, new THREE.BoxGeometry(1.4, 0.1, 0.5), woodMat(), 4.5 + i * 1.2, 0.3 - i * 0.12, 4, { ry: (rnd() - 0.5) * 0.2 })
+  }
+  box(g, new THREE.CylinderGeometry(0.1, 0.12, 1.6, 6), darkWoodMat(), 4, 0.8, 3.2)
+  box(g, new THREE.CylinderGeometry(0.1, 0.12, 1.6, 6), darkWoodMat(), 4, 0.8, 4.8)
+}
+
+// ═══ gorge:fissure — Volcanic Fissure ═══════════════════════
+function buildFissure(arena, room, rnd) {
+  const g = arena.roomGroup
+  // a great glowing crack splitting the room
+  for (let i = 0; i < 9; i++) {
+    const z = -18 + i * 4.4
+    const x = Math.sin(i * 0.7) * 3
+    const w = 1.2 + Math.sin(i * 1.3) * 0.7 + 0.8
+    box(g, new THREE.PlaneGeometry(w, 5),
+      new THREE.MeshBasicMaterial({ color: 0xff5500, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending }),
+      x, 0.06, z, { rx: -Math.PI / 2, ry: 0, shadow: false }).rotation.z = Math.sin(i * 0.7) * 0.3
+  }
+  for (let i = 0; i < 4; i++) {
+    const z = -14 + i * 9
+    const heat = new THREE.PointLight(0xff4411, 30, 14, 1.8)
+    heat.position.set(Math.sin((z + 18) / 4.4 * 0.7) * 3, 1.2, z)
+    heat.userData.flicker = true
+    g.add(heat)
+  }
+  // charred rock lips along the crack
+  const basaltMat = mat('basalt', () => new THREE.MeshStandardMaterial({ color: 0x241e20, roughness: 0.9 }))
+  for (let i = 0; i < 16; i++) {
+    const z = -18 + rnd() * 36
+    const x = Math.sin((z + 18) / 4.4 * 0.7) * 3 + (rnd() > 0.5 ? 2.2 : -2.2) + (rnd() - 0.5)
+    box(g, new THREE.DodecahedronGeometry(0.4 + rnd() * 0.7, 0), basaltMat, x, 0.3, z, { ry: rnd() * 3 })
+  }
+  // sulfur crystals glowing yellow at the rim
+  for (let i = 0; i < 4; i++) {
+    const x = (rnd() - 0.5) * 24, z = (rnd() - 0.5) * 24
+    box(g, new THREE.ConeGeometry(0.22, 0.9, 5),
+      new THREE.MeshBasicMaterial({ color: 0xffcc33, transparent: true, opacity: 0.85 }), x, 0.45, z, { shadow: false })
+  }
+}
+
+// ═══ gorge:alcove — Shadowed Alcove ═════════════════════════
+function buildAlcove(arena, room, rnd) {
+  const g = arena.roomGroup
+  arena.scene.fog = new THREE.FogExp2(0x0a0608, 0.034)
+  arena.scene.background = new THREE.Color(0x0a0608)
+  const basaltMat = mat('basalt', () => new THREE.MeshStandardMaterial({ color: 0x241e20, roughness: 0.9 }))
+  // tight enclosing overhang
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2
+    const v = new THREE.Vector2(Math.cos(a), Math.sin(a))
+    if (Math.abs(v.x) > 0.92 || Math.abs(v.y) > 0.92) continue
+    const w = box(g, new THREE.DodecahedronGeometry(3.4 + rnd() * 1.6, 0), basaltMat, v.x * 17, 1.6 + rnd(), v.y * 17, { ry: rnd() * 3 })
+  }
+  // a den: gnawed bones, claw marks, two pairs of eyes
+  const boneMat = mat('bone', () => new THREE.MeshStandardMaterial({ color: 0x9a9078, roughness: 0.9 }))
+  for (let i = 0; i < 9; i++) {
+    box(g, new THREE.CylinderGeometry(0.06, 0.08, 0.6 + rnd() * 0.6, 5), boneMat, -3 + rnd() * 6, 0.08, -3 + rnd() * 6, { rx: Math.PI / 2, ry: rnd() * 3 })
+  }
+  for (const [ex, ez] of [[-9, -7], [8, 5]]) {
+    glowSphere(g, 0xff6633, 0.06, ex - 0.14, 1.0, ez)
+    glowSphere(g, 0xff6633, 0.06, ex + 0.14, 1.0, ez)
+  }
+  // single shaft of dim light from a crack above
+  const shaft = box(g, new THREE.PlaneGeometry(1.6, 12),
+    new THREE.MeshBasicMaterial({ color: 0xcc8866, transparent: true, opacity: 0.07, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }),
+    2, 5, -2, { shadow: false })
+  shaft.rotation.z = 0.2
+  pointLight(g, 0xcc8866, 10, 10, 2, 2, -2)
+}
+
+// ═══ gorge:depths — Gorge Depths ════════════════════════════
+function buildGorgeDepths(arena, room, rnd) {
+  const g = arena.roomGroup
+  const basaltMat = mat('basalt', () => new THREE.MeshStandardMaterial({ color: 0x241e20, roughness: 0.9 }))
+  // towering strata walls with glowing seams
+  for (let i = 0; i < 20; i++) {
+    const a = (i / 20) * Math.PI * 2
+    const v = new THREE.Vector2(Math.cos(a), Math.sin(a))
+    if (Math.abs(v.x) > 0.9 || Math.abs(v.y) > 0.9) continue
+    const h = 12 + rnd() * 6
+    box(g, new THREE.BoxGeometry(5.5, h, 3), basaltMat, v.x * (WALL_R + 1), h / 2 - 1, v.y * (WALL_R + 1), { ry: a })
+    // glowing seam between strata
+    box(g, new THREE.PlaneGeometry(4.8, 0.18),
+      new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending }),
+      v.x * (WALL_R - 0.6), 2 + rnd() * 4, v.y * (WALL_R - 0.6), { ry: a, shadow: false })
+  }
+  // lava-falls: glowing ribbons down the north wall into pools
+  for (const fx of [-8, 6]) {
+    box(g, new THREE.PlaneGeometry(1.6, 12),
+      new THREE.MeshBasicMaterial({ color: 0xff6611, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending }),
+      fx, 6, -16.5, { shadow: false })
+    box(g, new THREE.CircleGeometry(2.4, 22),
+      new THREE.MeshBasicMaterial({ color: 0xff5500 }), fx, 0.07, -14.5, { rx: -Math.PI / 2, shadow: false })
+    pointLight(g, 0xff5511, 44, 22, fx, 2, -14, true)
+  }
+  // molten rivulet crossing the floor between the pools
+  for (let i = 0; i < 6; i++) {
+    box(g, new THREE.PlaneGeometry(0.7, 4.2),
+      new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending }),
+      -8 + i * 2.8, 0.06, -13 + Math.sin(i) * 1.5, { rx: -Math.PI / 2, shadow: false }).rotation.z = 1.4 + Math.sin(i) * 0.3
+  }
+  pointLight(g, 0xff5522, 20, 18, 0, 1.5, -8, true)
+}
+
 // ═══ registry ═══════════════════════════════════════════════
 export const SET_PIECES = {
   'town:temple': { theme: 'town', perimeter: false, build: buildTemple },
@@ -894,7 +1207,18 @@ export const SET_PIECES = {
   'forest:deep': { theme: 'forest', perimeter: true, build: buildDeepForest },
   'forest:stream': { theme: 'forest', perimeter: true, build: buildStream },
   'forest:ruins': { theme: 'forest', perimeter: true, build: buildRuins },
-  'forest:cave': { theme: 'cave', perimeter: true, build: buildHiddenCave }
+  'forest:cave': { theme: 'cave', perimeter: true, build: buildHiddenCave },
+  'marsh:edge': { theme: 'marsh', perimeter: true, build: buildMarshEdge },
+  'marsh:trail': { theme: 'marsh', perimeter: true, build: buildSunkenTrail },
+  'marsh:shallows': { theme: 'marsh', perimeter: true, build: buildShallows },
+  'marsh:hollow': { theme: 'marsh', perimeter: true, build: buildHagsHollow },
+  'marsh:island': { theme: 'marsh', perimeter: true, build: buildMireIsland },
+  'marsh:heart': { theme: 'marsh', perimeter: true, build: buildMarshHeart },
+  'gorge:mouth': { theme: 'volcanic', perimeter: true, build: buildGorgeMouth },
+  'gorge:ledge': { theme: 'volcanic', perimeter: false, build: buildNarrowLedge },
+  'gorge:fissure': { theme: 'volcanic', perimeter: false, build: buildFissure },
+  'gorge:alcove': { theme: 'volcanic', perimeter: false, build: buildAlcove },
+  'gorge:depths': { theme: 'volcanic', perimeter: false, build: buildGorgeDepths }
 }
 
 // marker for rooms that have no bespoke set piece yet

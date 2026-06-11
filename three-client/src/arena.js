@@ -72,7 +72,7 @@ const themes = {
     moon: [0x88c8a8, 1.4],
     ground: () => TEX.mud(),
     particles: { color: 0x99ffbb, count: 90, height: 3, speed: 0.3 }, // wisps
-    torch: 0x88ffaa, sky: true, skyTop: 0x0a1810, skyBottom: 0x16291c
+    torch: 0x88ffaa, sky: true, skyTop: 0x0a1810, skyBottom: 0x16291c, rain: { count: 250, speed: 9, color: 0x668877, len: 0.5 }
   },
   volcanic: {
     fog: 0x180c08, fogDensity: 0.020,
@@ -112,7 +112,7 @@ const themes = {
     moon: [0xaaccc8, 1.7],
     ground: () => TEX.moorGrass(),
     particles: { color: 0xc8d8d8, count: 70, height: 5, speed: 1.0 }, // wind motes
-    torch: 0xcdddcc, sky: true, skyTop: 0x10141c, skyBottom: 0x222a30
+    torch: 0xcdddcc, sky: true, skyTop: 0x10141c, skyBottom: 0x222a30, rain: { count: 550, speed: 16, color: 0x8899aa, len: 0.9 }
   }
 }
 
@@ -374,9 +374,11 @@ export class Arena {
     // particles
     this._buildParticles(T.particles)
 
-    // sky dome, stars, moon (outdoor themes), drifting ground mist
+    // sky dome, stars, moon (outdoor themes), drifting ground mist, weather
     this._buildSky(T)
     this._buildMist(T)
+    this.rain = null
+    if (T.rain) this._buildRain(T.rain)
 
     // avatar entry point: come in from the portal opposite the travel direction
     let spawn = new THREE.Vector3(0, 0, 0)
@@ -1025,6 +1027,24 @@ export class Arena {
     }
   }
 
+  _buildRain(cfg) {
+    const n = cfg.count
+    const pos = new Float32Array(n * 6) // line segments: top + bottom vertex
+    for (let i = 0; i < n; i++) {
+      const x = (Math.random() - 0.5) * 50, y = Math.random() * 18, z = (Math.random() - 0.5) * 50
+      pos[i * 6] = x; pos[i * 6 + 1] = y; pos[i * 6 + 2] = z
+      pos[i * 6 + 3] = x; pos[i * 6 + 4] = y - cfg.len; pos[i * 6 + 5] = z
+    }
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    const lines = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+      color: cfg.color, transparent: true, opacity: 0.35
+    }))
+    lines.userData.cfg = cfg
+    this.rain = lines
+    this.roomGroup.add(lines)
+  }
+
   _buildParticles(cfg) {
     const n = cfg.count
     const pos = new Float32Array(n * 3)
@@ -1319,6 +1339,24 @@ export class Arena {
           if (arr[i * 3 + 1] < 0.3) arr[i * 3 + 1] = height
         }
         this.particles.geometry.attributes.position.needsUpdate = true
+      }
+
+      // rain fall
+      if (this.rain) {
+        const cfg = this.rain.userData.cfg
+        const arr = this.rain.geometry.attributes.position.array
+        const drop = cfg.speed * dt
+        for (let i = 0; i < cfg.count; i++) {
+          arr[i * 6 + 1] -= drop
+          arr[i * 6 + 4] -= drop
+          if (arr[i * 6 + 1] < 0) {
+            const x = this.avatar.position.x + (Math.random() - 0.5) * 50
+            const z = this.avatar.position.z + (Math.random() - 0.5) * 50
+            arr[i * 6] = x; arr[i * 6 + 1] = 18; arr[i * 6 + 2] = z
+            arr[i * 6 + 3] = x; arr[i * 6 + 4] = 18 - cfg.len; arr[i * 6 + 5] = z
+          }
+        }
+        this.rain.geometry.attributes.position.needsUpdate = true
       }
 
       // mist drift

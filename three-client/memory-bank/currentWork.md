@@ -22,7 +22,13 @@ over playability for now. Commit + push each milestone.
 8. `2005396e` combat/loot SFX from server bundle
 9. `3c5d8208` six new zone themes (marsh/volcanic/cave/desert/necropolis/moor)
    covering all 23 zones + hash-picked centerpieces for unbuilt rooms
-10. `a7d1831c` set pieces batch 3: tavern cellar, Enchanted Emporium
+10. `a7d1831c` set pieces batch 3 (town+forest complete)
+11. (this commit) batch 4: all 6 marsh rooms (boardwalk edge, sunken trail,
+   fetid shallows w/ ribcage, Hag's Hollow witch hut + green cauldron, Mire
+   Island totems, Heart of the Marsh colossal tree) + all 5 gorge rooms
+   (canyon mouth, chasm-side narrow ledge, winding lava fissure, predator
+   alcove with watching eyes, depths w/ twin lava-falls) + rain weather
+   Previously:  tavern cellar, Enchanted Emporium
    (rune circle, orbiting crystals, glowing tomes), Grimjaw's Forge (furnace,
    anvil, weapon racks, work lanterns), Sunlit Clearing (god-ray, wildflowers,
    butterflies), Deep Forest (dense + watching eyes), Forest Stream (water
@@ -34,8 +40,14 @@ Persistent test character exists: `__sock.send('login',{characterName:'Vistari',
 — avoids the 5/hour guest rate limit. HMR reload logs you out; just re-send.
 
 ## Set piece coverage
-All of town (8/8) and forest (7/7) bespoke. Marsh + gorge in progress
-(batch 4). Beyond that: zone themes + seeded centerpieces.
+Bespoke: town 8/8, forest 7/7, marsh 6/6, gorge 5/5 (26 rooms total).
+Beyond that: zone themes + seeded centerpieces. Weather: rain on moor,
+drizzle in marsh (theme `rain` config, LineSegments recycled around avatar).
+
+## Gotcha log
+- setpieces.js must keep its own WALL_R const (21.5) — importing from
+  arena.js would be circular; a missing const silently truncates builders
+  (caught when gorge:depths rendered near-empty).
 
 ## Next candidates (not started)
 - Vendor/trainer UI (interact_vendor / interact_trainer flows)
