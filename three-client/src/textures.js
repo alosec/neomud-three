@@ -209,7 +209,7 @@ export function marble(repeat = 5) {
       const edge = Math.min(fx, 1 - fx, fy, 1 - fy)
       const gap = edge < 0.025 ? 0.55 : 1
       const vein = Math.abs(Math.sin((u * 7 + fbm(N, u * 8, v * 8, 4) * 5) * Math.PI))
-      const base = (120 + fbm(N, u * 12, v * 12, 3) * 40 - Math.pow(vein, 8) * 60) * gap
+      const base = (88 + fbm(N, u * 12, v * 12, 3) * 34 - Math.pow(vein, 8) * 50) * gap
       return [base, base * 0.98, base * 0.94]
     })
   }, repeat)

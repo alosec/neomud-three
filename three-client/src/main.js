@@ -24,9 +24,11 @@ const state = {
 window.__nm = state // debug handle
 const world = new Arena($('app'), SERVER_HTTP)
 window.__world = world
+window.__sock = null // set after construction
 state.roomNames = {}
 world.start()
 const sock = new GameSocket(SERVER_WS)
+window.__sock = sock
 
 // ── log ─────────────────────────────────────────────────────
 function log(text, cls = 'l-sys') {
@@ -234,6 +236,7 @@ sock.on('combat_hit', (m) => {
   } else if (m.defenderId) {
     const npc = state.npcs.find(n => n.id === m.defenderId)
     if (npc) { npc.currentHp = m.defenderHp; npc.maxHp = m.defenderMaxHp; syncEntities() }
+    if (!m.isMiss) world.flashEntity(`npc:${m.defenderId}`)
     floatText(world.entityScreenPos(`npc:${m.defenderId}`),
       m.isMiss ? 'miss' : `${m.isBackstab ? '✦' : ''}${m.damage}`,
       m.isBackstab ? '#ffd060' : '#ffb050', m.isBackstab ? 28 : 22)
@@ -245,6 +248,7 @@ sock.on('combat_hit', (m) => {
 
 sock.on('npc_died', (m) => {
   log(`${m.npcName} is slain by ${m.killerName}!`, 'l-good')
+  world.killEntity(`npc:${m.npcId}`)
   state.npcs = state.npcs.filter(n => n.id !== m.npcId)
   if (state.selectedTarget === m.npcId) state.selectedTarget = null
   syncEntities()

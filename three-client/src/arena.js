@@ -3,6 +3,11 @@
 // stays authoritative — local walking is cosmetic until you cross a portal.
 
 import * as THREE from 'three'
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js'
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 import * as TEX from './textures.js'
 import { SET_PIECES, buildUnfinishedMarker } from './setpieces.js'
 
@@ -43,7 +48,7 @@ const themes = {
     moon: [0x9fb0e8, 1.6],
     ground: () => TEX.cobblestone(),
     particles: { color: 0xffc878, count: 70, height: 5, speed: 0.25 }, // lantern motes
-    torch: 0xffaa55
+    torch: 0xffaa55, sky: true, skyTop: 0x1a1430, skyBottom: 0x2a2040
   },
   forest: {
     fog: 0x0a140c, fogDensity: 0.013,
@@ -51,7 +56,7 @@ const themes = {
     moon: [0x9fc8b8, 1.9],
     ground: () => TEX.forestFloor(),
     particles: { color: 0xaaffaa, count: 110, height: 4, speed: 0.4 }, // fireflies
-    torch: 0xaaffcc
+    torch: 0xaaffcc, sky: true, skyTop: 0x07140e, skyBottom: 0x10241a
   },
   dungeon: {
     fog: 0x100c14, fogDensity: 0.024,
@@ -59,7 +64,7 @@ const themes = {
     moon: [0x8090c8, 1.0],
     ground: () => TEX.stoneSlabs(),
     particles: { color: 0xff8844, count: 60, height: 6, speed: 0.5 }, // embers
-    torch: 0xff7733
+    torch: 0xff7733, sky: false
   }
 }
 
@@ -88,8 +93,27 @@ export class Arena {
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
-    this.renderer.toneMappingExposure = 1.3
+    this.renderer.toneMappingExposure = 1.1
     container.appendChild(this.renderer.domElement)
+
+    // post-processing: bloom + vignette
+    this.composer = new EffectComposer(this.renderer)
+    this.composer.addPass(new RenderPass(this.scene, this.camera))
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.55, 0.9)
+    this.composer.addPass(this.bloom)
+    const vignette = new ShaderPass({
+      uniforms: { tDiffuse: { value: null }, strength: { value: 0.42 } },
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0); }',
+      fragmentShader: `varying vec2 vUv; uniform sampler2D tDiffuse; uniform float strength;
+        void main(){
+          vec4 c = texture2D(tDiffuse, vUv);
+          float d = distance(vUv, vec2(0.5));
+          c.rgb *= smoothstep(0.92, 0.42, d * strength * 2.0);
+          gl_FragColor = c;
+        }`
+    })
+    this.composer.addPass(vignette)
+    this.composer.addPass(new OutputPass())
 
     this.lightRig = new THREE.Group()
     this.roomGroup = new THREE.Group()    // rebuilt per room
@@ -121,6 +145,10 @@ export class Arena {
     this.scene.add(this.marker)
 
     this.entities = new Map()
+    this.dying = []                   // entities animating out
+    this.vel = new THREE.Vector3()    // avatar velocity (motion feel)
+    this.dustPool = []
+    this.lastDust = 0
     this.portals = []                 // {dir, pos, light, disc, label}
     this.walkTarget = null
     this.keys = {}
@@ -139,6 +167,7 @@ export class Arena {
     this.camera.aspect = innerWidth / innerHeight
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(innerWidth, innerHeight)
+    this.composer?.setSize(innerWidth, innerHeight)
   }
 
   _setupInput() {
@@ -282,6 +311,10 @@ export class Arena {
 
     // particles
     this._buildParticles(T.particles)
+
+    // sky dome, stars, moon (outdoor themes), drifting ground mist
+    this._buildSky(T)
+    this._buildMist(T)
 
     // avatar entry point: come in from the portal opposite the travel direction
     let spawn = new THREE.Vector3(0, 0, 0)
@@ -502,6 +535,90 @@ export class Arena {
     }
   }
 
+  _buildSky(T) {
+    if (!T.sky) return
+    // gradient dome
+    const c = document.createElement('canvas')
+    c.width = 4; c.height = 256
+    const ctx = c.getContext('2d')
+    const grad = ctx.createLinearGradient(0, 0, 0, 256)
+    grad.addColorStop(0, '#' + new THREE.Color(T.skyTop).getHexString())
+    grad.addColorStop(1, '#' + new THREE.Color(T.skyBottom).getHexString())
+    ctx.fillStyle = grad
+    ctx.fillRect(0, 0, 4, 256)
+    const domeTex = new THREE.CanvasTexture(c)
+    domeTex.colorSpace = THREE.SRGBColorSpace
+    const dome = new THREE.Mesh(
+      new THREE.SphereGeometry(220, 24, 12),
+      new THREE.MeshBasicMaterial({ map: domeTex, side: THREE.BackSide, fog: false, depthWrite: false })
+    )
+    this.roomGroup.add(dome)
+
+    // stars
+    const n = 600
+    const pos = new Float32Array(n * 3)
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2
+      const e = Math.random() * Math.PI * 0.48 + 0.04 // elevation
+      const r = 200
+      pos[i * 3] = Math.cos(a) * Math.cos(e) * r
+      pos[i * 3 + 1] = Math.sin(e) * r
+      pos[i * 3 + 2] = Math.sin(a) * Math.cos(e) * r
+    }
+    const sg = new THREE.BufferGeometry()
+    sg.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+    const stars = new THREE.Points(sg, new THREE.PointsMaterial({
+      color: 0xcdd8ff, size: 1.6, sizeAttenuation: false, fog: false,
+      transparent: true, opacity: 0.85
+    }))
+    this.roomGroup.add(stars)
+
+    // moon: bright disc + halo (bloom picks these up)
+    const moonPos = new THREE.Vector3(90, 110, -130)
+    const moon = new THREE.Mesh(new THREE.CircleGeometry(9, 32),
+      new THREE.MeshBasicMaterial({ color: 0xeef2ff, fog: false }))
+    moon.position.copy(moonPos)
+    moon.lookAt(0, 0, 0)
+    const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: this.portalTex, color: 0x8899cc, transparent: true, opacity: 0.35,
+      blending: THREE.AdditiveBlending, fog: false, depthWrite: false
+    }))
+    halo.scale.set(46, 46, 1)
+    halo.position.copy(moonPos)
+    this.roomGroup.add(moon, halo)
+  }
+
+  _mistTex() {
+    if (this._mistTexture) return this._mistTexture
+    const c = document.createElement('canvas')
+    c.width = c.height = 128
+    const ctx = c.getContext('2d')
+    const g = ctx.createRadialGradient(64, 64, 4, 64, 64, 64)
+    g.addColorStop(0, 'rgba(255,255,255,0.55)')
+    g.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 128, 128)
+    this._mistTexture = new THREE.CanvasTexture(c)
+    return this._mistTexture
+  }
+
+  _buildMist(T) {
+    const tint = new THREE.Color(T.fog).lerp(new THREE.Color(0xffffff), 0.55)
+    this.mist = []
+    for (let i = 0; i < 9; i++) {
+      const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: this._mistTex(), color: tint, transparent: true,
+        opacity: 0.05 + Math.random() * 0.05, depthWrite: false
+      }))
+      const sc = 16 + Math.random() * 18
+      sp.scale.set(sc, sc * 0.45, 1)
+      sp.position.set((Math.random() - 0.5) * 44, 1 + Math.random() * 2.2, (Math.random() - 0.5) * 44)
+      sp.userData.drift = { vx: (Math.random() - 0.5) * 0.35, vz: (Math.random() - 0.5) * 0.35, seed: Math.random() * 20 }
+      this.roomGroup.add(sp)
+      this.mist.push(sp)
+    }
+  }
+
   _buildParticles(cfg) {
     const n = cfg.count
     const pos = new Float32Array(n * 3)
@@ -561,7 +678,8 @@ export class Arena {
         const r = 4 + h1 * 9
         const a = h2 * Math.PI * 2
         group.position.set(Math.cos(a) * r, 0, Math.sin(a) * r)
-        ent = { group, sprite, hpBar, bobSeed: h1 * 10, wanderSeed: h2 * 50, kind: e.kind }
+        sprite.material.opacity = 0
+        ent = { group, sprite, hpBar, bobSeed: h1 * 10, wanderSeed: h2 * 50, kind: e.kind, fadeIn: 0, flash: 0, shake: 0 }
         this.entities.set(e.key, ent)
         this.entityGroup.add(group)
       }
@@ -594,6 +712,21 @@ export class Arena {
     bar.tex.needsUpdate = true
   }
 
+  flashEntity(key) {
+    const ent = this.entities.get(key)
+    if (!ent) return
+    ent.flash = 1
+    ent.shake = 0.5
+  }
+
+  killEntity(key) {
+    const ent = this.entities.get(key)
+    if (!ent) return
+    this.entities.delete(key)
+    if (ent.hpBar) ent.group.remove(ent.hpBar.sprite)
+    this.dying.push({ ent, life: 0.7 })
+  }
+
   setEntitySelected(key) {
     for (const [k, ent] of this.entities) {
       ent.sprite.material.color.set(k === key ? 0xffb0a0 : 0xffffff)
@@ -624,6 +757,19 @@ export class Arena {
     this.avatar.add(s)
   }
 
+  _spawnDust() {
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: this._mistTex(), color: 0xbbaa88, transparent: true, opacity: 0.4, depthWrite: false
+    }))
+    sp.scale.set(0.5, 0.5, 1)
+    sp.position.copy(this.avatar.position)
+    sp.position.y = 0.25
+    sp.position.x += (Math.random() - 0.5) * 0.5
+    sp.position.z += (Math.random() - 0.5) * 0.5
+    this.scene.add(sp)
+    this.dustPool.push({ sprite: sp, life: 0.9 })
+  }
+
   // walk toward a given entity (used when attacking)
   approach(key, within = 2.2) {
     const ent = this.entities.get(key)
@@ -645,23 +791,54 @@ export class Arena {
       if (this.keys['s'] || this.keys['arrowdown']) kz += 1
       if (this.keys['a'] || this.keys['arrowleft']) kx -= 1
       if (this.keys['d'] || this.keys['arrowright']) kx += 1
+      // desired direction (keyboard or click target)
+      const desired = new THREE.Vector3()
       if ((kx || kz) && !this.inputLocked) {
         const fwd = new THREE.Vector3(); this.camera.getWorldDirection(fwd)
         fwd.y = 0; fwd.normalize()
         const right = new THREE.Vector3(-fwd.z, 0, fwd.x)
-        const dir = new THREE.Vector3().addScaledVector(fwd, -kz).addScaledVector(right, kx).normalize()
-        this.avatar.position.addScaledVector(dir, WALK_SPEED * dt)
+        desired.addScaledVector(fwd, -kz).addScaledVector(right, kx).normalize()
         this.walkTarget = null
         this.marker.material.opacity = 0
-      }
-
-      // click-to-walk
-      if (this.walkTarget && !this.inputLocked) {
+      } else if (this.walkTarget && !this.inputLocked) {
         const d = this.walkTarget.clone().sub(this.avatar.position)
         d.y = 0
         const dist = d.length()
-        if (dist < 0.25) this.walkTarget = null
-        else this.avatar.position.addScaledVector(d.normalize(), Math.min(WALK_SPEED * dt, dist))
+        if (dist < 0.3) this.walkTarget = null
+        else desired.copy(d.normalize().multiplyScalar(Math.min(1, dist / 1.6)))
+      }
+
+      // accelerate toward desired velocity, exponential decel when idle
+      const targetVel = desired.multiplyScalar(WALK_SPEED)
+      this.vel.lerp(targetVel, 1 - Math.pow(0.0008, dt))
+      const speed = this.vel.length()
+      if (speed > 0.05) this.avatar.position.addScaledVector(this.vel, dt)
+
+      // walk bob + lean on the avatar sprite
+      if (this.avatarSprite) {
+        const bobAmp = Math.min(speed / WALK_SPEED, 1)
+        this.avatarSprite.position.y = 1.8 + Math.abs(Math.sin(t * 9)) * 0.22 * bobAmp
+        this.avatarSprite.material.rotation = THREE.MathUtils.lerp(
+          this.avatarSprite.material.rotation,
+          THREE.MathUtils.clamp(-this.vel.x * 0.012, -0.07, 0.07), 0.12)
+      }
+      // foot ring stretches with speed
+      const ringPulse = 1 + Math.min(speed / WALK_SPEED, 1) * 0.25
+      this.avatarRing.scale.setScalar(ringPulse)
+
+      // dust puffs at the feet while moving
+      if (speed > 2.5 && t - this.lastDust > 0.13) {
+        this.lastDust = t
+        this._spawnDust()
+      }
+      for (let i = this.dustPool.length - 1; i >= 0; i--) {
+        const d = this.dustPool[i]
+        d.life -= dt
+        d.sprite.position.y += dt * 0.7
+        d.sprite.material.opacity = Math.max(0, d.life * 0.5)
+        const sc = 0.5 + (0.9 - d.life) * 1.1
+        d.sprite.scale.set(sc, sc, 1)
+        if (d.life <= 0) { this.scene.remove(d.sprite); this.dustPool.splice(i, 1) }
       }
 
       // clamp to arena
@@ -710,13 +887,55 @@ export class Arena {
         this.particles.geometry.attributes.position.needsUpdate = true
       }
 
-      // entity idle wander + bob
+      // mist drift
+      if (this.mist) {
+        for (const sp of this.mist) {
+          const d = sp.userData.drift
+          sp.position.x += d.vx * dt
+          sp.position.z += d.vz * dt
+          sp.material.opacity = 0.05 + Math.sin(t * 0.3 + d.seed) * 0.03 + 0.03
+          if (Math.abs(sp.position.x) > 26) d.vx *= -1
+          if (Math.abs(sp.position.z) > 26) d.vz *= -1
+        }
+      }
+
+      // entity idle wander + bob + spawn fade + hit flash/shake
       for (const ent of this.entities.values()) {
         if (ent.kind === 'npc') {
           ent.group.position.x += Math.sin(t * 0.3 + ent.wanderSeed) * dt * 0.35
           ent.group.position.z += Math.cos(t * 0.27 + ent.wanderSeed * 1.7) * dt * 0.35
         }
-        ent.sprite.position.y = ent.sprite.scale.y / 2 + 0.1 + Math.sin(t * 1.7 + ent.bobSeed) * 0.06
+        let sy = ent.sprite.scale.y / 2 + 0.1 + Math.sin(t * 1.7 + ent.bobSeed) * 0.06
+        let sx = 0
+        if (ent.fadeIn !== undefined && ent.fadeIn < 1) {
+          ent.fadeIn = Math.min(1, ent.fadeIn + dt * 2.4)
+          ent.sprite.material.opacity = ent.fadeIn
+          sy += (1 - ent.fadeIn) * 0.8 // drop in from slightly above
+        }
+        if (ent.flash > 0) {
+          ent.flash = Math.max(0, ent.flash - dt * 5)
+          const f = ent.flash
+          ent.sprite.material.color.setRGB(1, 1 - f * 0.65, 1 - f * 0.65)
+        }
+        if (ent.shake > 0) {
+          ent.shake = Math.max(0, ent.shake - dt * 2.2)
+          sx = Math.sin(t * 55) * ent.shake * 0.22
+        }
+        ent.sprite.position.y = sy
+        ent.sprite.position.x = sx
+      }
+
+      // death dissolve: scale up, tint, fade, sink
+      for (let i = this.dying.length - 1; i >= 0; i--) {
+        const d = this.dying[i]
+        d.life -= dt
+        const k = Math.max(0, d.life / 0.7)
+        d.ent.sprite.material.opacity = k
+        d.ent.sprite.material.color.setRGB(1, 0.5 + k * 0.5, 0.4 + k * 0.6)
+        const sc = 1 + (1 - k) * 0.35
+        d.ent.group.scale.set(sc, sc, sc)
+        d.ent.group.position.y = -(1 - k) * 0.6
+        if (d.life <= 0) { this.entityGroup.remove(d.ent.group); this.dying.splice(i, 1) }
       }
 
       // marker pulse-out
@@ -735,7 +954,9 @@ export class Arena {
       if (!this.camTarget) this.camTarget = this.avatar.position.clone()
       if (this.camTargetSnap) { this.camTarget.copy(this.avatar.position); this.camTargetSnap = false }
       this.camTarget.lerp(this.avatar.position, 1 - Math.pow(0.003, dt))
-      const { theta, phi, radius } = this.orbit
+      const speedZoom = Math.min(speed / WALK_SPEED, 1) * 2.2
+      const { theta, phi } = this.orbit
+      const radius = this.orbit.radius + speedZoom
       this.camera.position.set(
         this.camTarget.x + radius * Math.sin(phi) * Math.sin(theta),
         this.camTarget.y + radius * Math.cos(phi),
@@ -743,7 +964,7 @@ export class Arena {
       )
       this.camera.lookAt(this.camTarget.x, this.camTarget.y + 1.2, this.camTarget.z)
 
-      this.renderer.render(this.scene, this.camera)
+      this.composer.render()
       this.onFrame?.()
     }
     tick()

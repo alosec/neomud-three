@@ -104,6 +104,17 @@ function buildTemple(arena, room) {
         new THREE.MeshBasicMaterial({ color: glassColors[i], transparent: true, opacity: 0.85 }),
         sx * 14.5, 6.6, z, { ry: sx > 0 ? -Math.PI / 2 : Math.PI / 2, shadow: false })
     }
+    // volumetric-looking light shafts slanting in from the windows
+    for (let i = 0; i < 4; i++) {
+      const z = -9 + i * 6.5
+      const shaft = box(g, new THREE.PlaneGeometry(2.2, 11),
+        new THREE.MeshBasicMaterial({
+          color: glassColors[i], transparent: true, opacity: 0.10,
+          blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false
+        }),
+        sx * 10.5, 3.4, z, { shadow: false })
+      shaft.rotation.set(0, sx > 0 ? -Math.PI / 2 : Math.PI / 2, sx * 0.7)
+    }
     // side walls behind the glass
     box(g, new THREE.BoxGeometry(0.8, 9, 30), stoneMat(), sx * 15.5, 4.5, 0)
   }
