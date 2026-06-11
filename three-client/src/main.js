@@ -285,6 +285,27 @@ sock.on('loot_received', (m) => {
   sock.send('view_inventory')
 })
 
+// ── SFX ─────────────────────────────────────────────────────
+const sfxCache = new Map()
+function playSfx(folder, id, vol = 0.5) {
+  if (!id || !audioUnlocked) return
+  const key = `${folder}/${id}`
+  let a = sfxCache.get(key)
+  if (!a) {
+    a = new Audio(`${SERVER_HTTP}/assets/audio/${folder}/${id}.mp3`)
+    sfxCache.set(key, a)
+  }
+  a.volume = vol
+  a.currentTime = 0
+  a.play().catch(() => {})
+}
+
+function npcById(id) { return state.npcs.find(n => n.id === id) }
+function equippedWeaponSound() {
+  const w = state.inventory.find(i => i.equipped && (i.slot === 'WEAPON' || i.slot === 'weapon'))
+  return w ? (state.itemCatalog[w.itemId]?.attackSound || '') : ''
+}
+
 // ── modal ───────────────────────────────────────────────────
 function showModal(title, body) {
   $('m-title').textContent = title
@@ -363,6 +384,17 @@ for (const t of ['npc_entered', 'npc_left', 'player_entered', 'player_left']) {
 
 sock.on('combat_hit', (m) => {
   const mine = state.player && m.defenderName === state.player.name && m.isPlayerDefender
+  // sfx: misses/dodges/parries from general; attacker npc's own attack sound; player swings
+  if (m.isDodge) playSfx('general', 'dodge', 0.4)
+  else if (m.isParry) playSfx('general', 'parry', 0.4)
+  else if (m.isMiss) playSfx('general', 'miss', 0.3)
+  else if (m.isBackstab) playSfx('general', 'backstab', 0.5)
+  else if (mine) {
+    const att = state.npcs.find(n => n.name === m.attackerName)
+    playSfx('npcs', att?.attackSound || '', 0.45)
+  } else if (state.player && m.attackerName === state.player.name) {
+    playSfx('items', equippedWeaponSound(), 0.45)
+  }
   if (mine) {
     state.player.currentHp = m.defenderHp
     state.player.maxHp = m.defenderMaxHp
@@ -388,6 +420,9 @@ sock.on('combat_hit', (m) => {
 })
 
 sock.on('npc_died', (m) => {
+  const npc = npcById(m.npcId)
+  if (npc?.deathSound) playSfx('npcs', npc.deathSound, 0.55)
+  else playSfx('general', 'enemy_death', 0.5)
   log(`${m.npcName} is slain by ${m.killerName}!`, 'l-good')
   world.killEntity(`npc:${m.npcId}`)
   state.npcs = state.npcs.filter(n => n.id !== m.npcId)
@@ -450,8 +485,12 @@ sock.on('skill_effect', (m) => {
 sock.on('player_says', (m) => log(`${m.playerName} says: ${m.message}`, 'l-say'))
 sock.on('system_message', (m) => log(m.message, 'l-sys'))
 sock.on('error', (m) => log(m.message, 'l-err'))
-sock.on('pickup_result', (m) => log(`Picked up ${m.quantity} × ${m.itemName}.`, 'l-good'))
+sock.on('pickup_result', (m) => {
+  playSfx('general', m.isCoin ? 'coin_pickup' : 'item_pickup', 0.45)
+  log(`Picked up ${m.quantity} × ${m.itemName}.`, 'l-good')
+})
 sock.on('loot_dropped', (m) => {
+  playSfx('general', 'loot_drop', 0.4)
   log(`${m.npcName} dropped loot!`, 'l-good')
   for (const it of m.items || []) {
     const ex = state.groundItems.find(g => g.itemId === it.itemId)

@@ -17,8 +17,10 @@ over playability for now. Commit + push each milestone.
    flash+shake / death dissolve, __sock dev handle, memory bank
 6. `47832fd3` camera shake + damage vignette on player hit, target selection
    ring, loot glow halos, room BGM (server mp3, gesture-unlocked, crossfade)
-7. (this commit) live menu backdrop grove behind login, glassy login card,
+7. `7870f16e` live menu backdrop grove behind login, glassy login card,
    inventory panel (bag icon / I key: item art, use/equip/unequip, coins)
+8. (this commit) combat/loot SFX from server bundle: npc attack/death sounds,
+   weapon swings, dodge/parry/miss/backstab, loot drop, coin/item pickup
 
 ## Testing note
 Persistent test character exists: `__sock.send('login',{characterName:'Vistari',force:true})`
@@ -27,6 +29,5 @@ Persistent test character exists: `__sock.send('login',{characterName:'Vistari',
 ## Next candidates (not started)
 - town:cellar, town:magic_shop set pieces
 - Vendor/trainer UI (interact_vendor / interact_trainer flows)
-- Combat SFX (npc attack/death sounds arrive on npc_entered fields)
 - Minimap inset; spell bar for caster classes
 - Attack lunge animation; weather (rain) for moody zones
