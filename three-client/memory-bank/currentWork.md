@@ -22,7 +22,7 @@ over playability for now. Commit + push each milestone.
 8. `2005396e` combat/loot SFX from server bundle
 9. `3c5d8208` six new zone themes (marsh/volcanic/cave/desert/necropolis/moor)
    covering all 23 zones + hash-picked centerpieces for unbuilt rooms
-10. (this commit) set pieces batch 3: tavern cellar, Enchanted Emporium
+10. `a7d1831c` set pieces batch 3: tavern cellar, Enchanted Emporium
    (rune circle, orbiting crystals, glowing tomes), Grimjaw's Forge (furnace,
    anvil, weapon racks, work lanterns), Sunlit Clearing (god-ray, wildflowers,
    butterflies), Deep Forest (dense + watching eyes), Forest Stream (water
@@ -34,8 +34,8 @@ Persistent test character exists: `__sock.send('login',{characterName:'Vistari',
 — avoids the 5/hour guest rate limit. HMR reload logs you out; just re-send.
 
 ## Set piece coverage
-All of town (8/8) and forest (7/7) now bespoke. Marsh/gorge onward rely on
-zone themes + centerpieces (still distinct per room via seeded hash).
+All of town (8/8) and forest (7/7) bespoke. Marsh + gorge in progress
+(batch 4). Beyond that: zone themes + seeded centerpieces.
 
 ## Next candidates (not started)
 - Vendor/trainer UI (interact_vendor / interact_trainer flows)
