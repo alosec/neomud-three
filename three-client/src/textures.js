@@ -214,3 +214,25 @@ export function marble(repeat = 5) {
     })
   }, repeat)
 }
+
+// ── generic palette ground (sand, ash, mud, moor…) ──────────
+// palette: {base:[r,g,b], vary:[r,g,b], detailScale, patchScale}
+export function paletteGround(seed, palette, repeat = 8) {
+  const N = makeNoise(seed)
+  const { base, vary, detailScale = 30, patchScale = 5 } = palette
+  return canvasTex(512, (ctx, size) => {
+    shade(ctx, size, (u, v) => {
+      const patch = fbm(N, u * patchScale, v * patchScale, 3)
+      const det = fbm(N, u * detailScale, v * detailScale, 4)
+      const k = patch * 0.6 + det * 0.4
+      return [base[0] + vary[0] * k, base[1] + vary[1] * k, base[2] + vary[2] * k]
+    })
+  }, repeat)
+}
+
+export const sand = () => paletteGround(101, { base: [54, 46, 34], vary: [34, 28, 20], detailScale: 36, patchScale: 4 })
+export const ash = () => paletteGround(111, { base: [30, 26, 26], vary: [34, 28, 24], detailScale: 26, patchScale: 6 })
+export const mud = () => paletteGround(121, { base: [34, 36, 24], vary: [26, 30, 16], detailScale: 22, patchScale: 4 })
+export const moorGrass = () => paletteGround(131, { base: [40, 48, 34], vary: [30, 34, 22], detailScale: 34, patchScale: 5 })
+export const graveEarth = () => paletteGround(141, { base: [32, 30, 38], vary: [24, 24, 30], detailScale: 28, patchScale: 5 })
+export const caveRock = () => paletteGround(151, { base: [36, 34, 42], vary: [28, 26, 34], detailScale: 20, patchScale: 7 })

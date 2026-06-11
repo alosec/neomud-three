@@ -65,13 +65,67 @@ const themes = {
     ground: () => TEX.stoneSlabs(),
     particles: { color: 0xff8844, count: 60, height: 6, speed: 0.5 }, // embers
     torch: 0xff7733, sky: false
+  },
+  marsh: {
+    fog: 0x0c1410, fogDensity: 0.022,
+    ambient: [0x7a9a80, 1.0], hemi: [0x4a7a60, 0x2a3320, 1.1],
+    moon: [0x88c8a8, 1.4],
+    ground: () => TEX.mud(),
+    particles: { color: 0x99ffbb, count: 90, height: 3, speed: 0.3 }, // wisps
+    torch: 0x88ffaa, sky: true, skyTop: 0x0a1810, skyBottom: 0x16291c
+  },
+  volcanic: {
+    fog: 0x180c08, fogDensity: 0.020,
+    ambient: [0xb07858, 1.15], hemi: [0x884433, 0x331a10, 1.0],
+    moon: [0xcc6644, 1.2],
+    ground: () => TEX.ash(),
+    particles: { color: 0xff7733, count: 130, height: 8, speed: 0.8 }, // embers
+    torch: 0xff5522, sky: false
+  },
+  cave: {
+    fog: 0x0a0a12, fogDensity: 0.028,
+    ambient: [0x6878a8, 0.9], hemi: [0x445588, 0x221a2a, 0.9],
+    moon: [0x6688cc, 0.8],
+    ground: () => TEX.caveRock(),
+    particles: { color: 0x88bbff, count: 50, height: 5, speed: 0.2 }, // motes
+    torch: 0x77aaff, sky: false
+  },
+  desert: {
+    fog: 0x14100e, fogDensity: 0.016,
+    ambient: [0xc0a880, 0.85], hemi: [0x8878b8, 0x554433, 0.8],
+    moon: [0xd8c8a8, 1.5],
+    ground: () => TEX.sand(),
+    particles: { color: 0xc8b088, count: 60, height: 3, speed: 1.2 }, // blowing sand
+    torch: 0xffcc88, sky: true, skyTop: 0x141022, skyBottom: 0x2c2030
+  },
+  necropolis: {
+    fog: 0x0e0e16, fogDensity: 0.024,
+    ambient: [0x8888b8, 0.9], hemi: [0x5a5a98, 0x1f1f2a, 0.9],
+    moon: [0x99aadd, 1.5],
+    ground: () => TEX.graveEarth(),
+    particles: { color: 0xaaccff, count: 80, height: 4, speed: 0.25 }, // soul motes
+    torch: 0x99bbff, sky: true, skyTop: 0x0c0c1a, skyBottom: 0x1a1a2c
+  },
+  moor: {
+    fog: 0x121618, fogDensity: 0.016,
+    ambient: [0x98a8a8, 1.1], hemi: [0x6a8a8a, 0x333a30, 1.1],
+    moon: [0xaaccc8, 1.7],
+    ground: () => TEX.moorGrass(),
+    particles: { color: 0xc8d8d8, count: 70, height: 5, speed: 1.0 }, // wind motes
+    torch: 0xcdddcc, sky: true, skyTop: 0x10141c, skyBottom: 0x222a30
   }
 }
 
 export function themeForZone(zoneId = '') {
   const z = zoneId.toLowerCase()
-  if (/forest|grove|wood|swamp|fen|wild|garden|grotto/.test(z)) return 'forest'
-  if (/town|city|village|haven|market|keep|harbor|port/.test(z)) return 'town'
+  if (/marsh|swamp|fen|bog|drowned/.test(z)) return 'marsh'
+  if (/gorge|volcan|pyro|ash|burn|ember|flame/.test(z)) return 'volcanic'
+  if (/cave|mine|barrow|cradle|vein|deep|threshold|seal/.test(z)) return 'cave'
+  if (/desert|waste|cracked|glass|salt|mirage|dune|bone/.test(z)) return 'desert'
+  if (/necro|grave|tomb|crypt|vael/.test(z)) return 'necropolis'
+  if (/moor|foothill|steppe|highmoor|skyveil|reach|pass/.test(z)) return 'moor'
+  if (/forest|grove|wood|wild|garden|grotto/.test(z)) return 'forest'
+  if (/town|city|village|haven|market|harbor|port/.test(z)) return 'town'
   return 'dungeon'
 }
 
@@ -293,12 +347,19 @@ export class Arena {
 
     // perimeter + props by theme (set pieces may opt out of the generic ring)
     if (!setPiece || setPiece.perimeter !== false) {
-      if (themeName === 'town') this._buildTown(rnd)
-      else if (themeName === 'forest') this._buildForest(rnd)
-      else this._buildDungeon(rnd)
+      const builders = {
+        town: () => this._buildTown(rnd), forest: () => this._buildForest(rnd),
+        marsh: () => this._buildMarsh(rnd), volcanic: () => this._buildVolcanic(rnd),
+        cave: () => this._buildCave(rnd), desert: () => this._buildDesert(rnd),
+        necropolis: () => this._buildNecropolis(rnd), moor: () => this._buildMoor(rnd)
+      }
+      ;(builders[themeName] || (() => this._buildDungeon(rnd)))()
     }
     if (setPiece) setPiece.build(this, room, rnd)
-    else buildUnfinishedMarker(this)
+    else {
+      this._buildCenterpiece(themeName, rnd)
+      buildUnfinishedMarker(this)
+    }
 
     // portals for each exit
     const exits = Object.entries(room.exits || {})
@@ -617,6 +678,350 @@ export class Arena {
       sp.userData.drift = { vx: (Math.random() - 0.5) * 0.35, vz: (Math.random() - 0.5) * 0.35, seed: Math.random() * 20 }
       this.roomGroup.add(sp)
       this.mist.push(sp)
+    }
+  }
+
+
+  _lane(v) { // keep portal lanes open
+    return Math.abs(v.x) > 0.9 || Math.abs(v.y) > 0.9 || Math.abs(Math.abs(v.x) - Math.abs(v.y)) < 0.1
+  }
+
+  _buildMarsh(rnd) {
+    const trunkMat = new THREE.MeshStandardMaterial({ map: TEX.bark(), roughness: 1 })
+    const mossMat = new THREE.MeshStandardMaterial({ color: 0x2a4430, roughness: 1 })
+    // gnarled trees draped with moss
+    for (let i = 0; i < 60; i++) {
+      const ang = rnd() * Math.PI * 2
+      const v = new THREE.Vector2(Math.cos(ang), Math.sin(ang))
+      if (this._lane(v)) continue
+      const dist = WALL_R - 4 + rnd() * 8
+      const x = v.x * dist, z = v.y * dist
+      const h = 5 + rnd() * 4
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.6, h, 6), trunkMat)
+      trunk.position.set(x, h / 2, z)
+      trunk.rotation.set((rnd() - 0.5) * 0.35, 0, (rnd() - 0.5) * 0.35)
+      trunk.castShadow = true
+      const blob = new THREE.Mesh(new THREE.SphereGeometry(1.6 + rnd(), 7, 6), mossMat)
+      blob.position.set(x + (rnd() - 0.5), h * 0.85, z + (rnd() - 0.5))
+      blob.scale.y = 0.6
+      blob.castShadow = true
+      this.roomGroup.add(trunk, blob)
+      // hanging moss strand
+      const strand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.02, 1.6, 4),
+        new THREE.MeshStandardMaterial({ color: 0x3a5a40, roughness: 1 }))
+      strand.position.set(x + (rnd() - 0.5) * 1.6, h * 0.7, z + (rnd() - 0.5) * 1.6)
+      this.roomGroup.add(strand)
+    }
+    // murky water pools
+    const waterMat = new THREE.MeshStandardMaterial({
+      color: 0x16241a, roughness: 0.15, metalness: 0.55, transparent: true, opacity: 0.92
+    })
+    for (let i = 0; i < 5; i++) {
+      const x = (rnd() - 0.5) * 30, z = (rnd() - 0.5) * 30
+      if (Math.hypot(x, z) < 5) continue
+      const pool = new THREE.Mesh(new THREE.CircleGeometry(2 + rnd() * 2.5, 22), waterMat)
+      pool.rotation.x = -Math.PI / 2
+      pool.position.set(x, 0.06, z)
+      this.roomGroup.add(pool)
+    }
+    // cattails
+    for (let i = 0; i < 14; i++) {
+      const x = (rnd() - 0.5) * 34, z = (rnd() - 0.5) * 34
+      if (Math.hypot(x, z) < 4) continue
+      const reed = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 1.6 + rnd(), 4),
+        new THREE.MeshStandardMaterial({ color: 0x4a5a30 }))
+      reed.position.set(x, 0.9, z)
+      reed.rotation.z = (rnd() - 0.5) * 0.2
+      const head = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.4, 5),
+        new THREE.MeshStandardMaterial({ color: 0x4a3520 }))
+      head.position.set(x + reed.rotation.z, 1.8 + rnd() * 0.4, z)
+      this.roomGroup.add(reed, head)
+    }
+    // will-o-wisps
+    for (let i = 0; i < 3; i++) {
+      const x = (rnd() - 0.5) * 24, z = (rnd() - 0.5) * 24
+      const wisp = new THREE.PointLight(0x88ffbb, 9, 9, 2)
+      wisp.position.set(x, 1.4, z)
+      wisp.userData.flicker = true
+      this.roomGroup.add(wisp)
+    }
+  }
+
+  _buildVolcanic(rnd) {
+    const basaltMat = new THREE.MeshStandardMaterial({ color: 0x1c1a1e, roughness: 0.85 })
+    // basalt column clusters around the rim
+    for (let i = 0; i < 40; i++) {
+      const ang = rnd() * Math.PI * 2
+      const v = new THREE.Vector2(Math.cos(ang), Math.sin(ang))
+      if (this._lane(v)) continue
+      const dist = WALL_R - 2 + rnd() * 7
+      const h = 3 + rnd() * 7
+      const col = new THREE.Mesh(new THREE.CylinderGeometry(0.8 + rnd() * 0.5, 0.9 + rnd() * 0.5, h, 6), basaltMat)
+      col.position.set(v.x * dist, h / 2 - rnd() * 0.8, v.y * dist)
+      col.rotation.y = rnd() * Math.PI
+      col.castShadow = true
+      this.roomGroup.add(col)
+    }
+    // glowing lava cracks across the ground
+    for (let i = 0; i < 9; i++) {
+      const x = (rnd() - 0.5) * 34, z = (rnd() - 0.5) * 34
+      const crack = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.3 + rnd() * 0.4, 3 + rnd() * 5),
+        new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending })
+      )
+      crack.rotation.x = -Math.PI / 2
+      crack.rotation.z = rnd() * Math.PI
+      crack.position.set(x, 0.05, z)
+      this.roomGroup.add(crack)
+      if (i < 4) {
+        const heat = new THREE.PointLight(0xff5511, 12, 8, 2)
+        heat.position.set(x, 0.8, z)
+        heat.userData.flicker = true
+        this.roomGroup.add(heat)
+      }
+    }
+    // smoking vents
+    for (let i = 0; i < 3; i++) {
+      const x = (rnd() - 0.5) * 26, z = (rnd() - 0.5) * 26
+      const vent = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.4, 8), basaltMat)
+      vent.position.set(x, 0.7, z)
+      this.roomGroup.add(vent)
+    }
+  }
+
+  _buildCave(rnd) {
+    const rockMat = new THREE.MeshStandardMaterial({ map: TEX.stoneWall(2), roughness: 0.95, color: 0x9090a8 })
+    // enclosing rock wall ring
+    for (let i = 0; i < 30; i++) {
+      const ang = (i / 30) * Math.PI * 2
+      const v = new THREE.Vector2(Math.cos(ang), Math.sin(ang))
+      if (this._lane(v)) continue
+      const w = new THREE.Mesh(new THREE.DodecahedronGeometry(4 + rnd() * 2.5, 0), rockMat)
+      w.position.set(v.x * (WALL_R + 2), 2 + rnd() * 2, v.y * (WALL_R + 2))
+      w.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3)
+      w.castShadow = true
+      this.roomGroup.add(w)
+    }
+    // stalagmites
+    for (let i = 0; i < 16; i++) {
+      const x = (rnd() - 0.5) * 32, z = (rnd() - 0.5) * 32
+      if (Math.hypot(x, z) < 4) continue
+      const h = 0.8 + rnd() * 2.6
+      const stal = new THREE.Mesh(new THREE.ConeGeometry(0.35 + rnd() * 0.4, h, 7), rockMat)
+      stal.position.set(x, h / 2, z)
+      stal.castShadow = true
+      this.roomGroup.add(stal)
+    }
+    // glowing crystal clusters
+    const crystalColors = [0x66aaff, 0xaa66ff, 0x66ffd8]
+    for (let i = 0; i < 5; i++) {
+      const x = (rnd() - 0.5) * 28, z = (rnd() - 0.5) * 28
+      if (Math.hypot(x, z) < 5) continue
+      const color = crystalColors[Math.floor(rnd() * 3)]
+      for (let c = 0; c < 4; c++) {
+        const h = 0.5 + rnd() * 1.3
+        const cr = new THREE.Mesh(new THREE.ConeGeometry(0.16 + rnd() * 0.12, h, 5),
+          new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9 }))
+        cr.position.set(x + (rnd() - 0.5) * 1.4, h / 2, z + (rnd() - 0.5) * 1.4)
+        cr.rotation.set((rnd() - 0.5) * 0.5, 0, (rnd() - 0.5) * 0.5)
+        this.roomGroup.add(cr)
+      }
+      const gl = new THREE.PointLight(color, 10, 9, 2)
+      gl.position.set(x, 1.2, z)
+      this.roomGroup.add(gl)
+    }
+  }
+
+  _buildDesert(rnd) {
+    const duneMat = new THREE.MeshStandardMaterial({ map: TEX.sand(), roughness: 1 })
+    // dunes ringing the arena
+    for (let i = 0; i < 14; i++) {
+      const ang = rnd() * Math.PI * 2
+      const v = new THREE.Vector2(Math.cos(ang), Math.sin(ang))
+      if (this._lane(v)) continue
+      const dune = new THREE.Mesh(new THREE.SphereGeometry(5 + rnd() * 4, 10, 8), duneMat)
+      dune.position.set(v.x * (WALL_R + 4), -2.5 - rnd(), v.y * (WALL_R + 4))
+      dune.scale.y = 0.45
+      this.roomGroup.add(dune)
+    }
+    // half-buried ruins: broken columns + sandstone blocks
+    const ruinMat = new THREE.MeshStandardMaterial({ color: 0x8a7858, roughness: 0.9 })
+    for (let i = 0; i < 6; i++) {
+      const x = (rnd() - 0.5) * 30, z = (rnd() - 0.5) * 30
+      if (Math.hypot(x, z) < 5) continue
+      if (rnd() > 0.5) {
+        const h = 1.5 + rnd() * 3
+        const col = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.55, h, 9), ruinMat)
+        col.position.set(x, h / 2 - 0.4, z)
+        col.rotation.z = (rnd() - 0.5) * 0.35
+        col.castShadow = true
+        this.roomGroup.add(col)
+      } else {
+        const b = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1, 1.1), ruinMat)
+        b.position.set(x, 0.3, z)
+        b.rotation.set(0, rnd() * 3, (rnd() - 0.5) * 0.3)
+        this.roomGroup.add(b)
+      }
+    }
+    // bleached bones: rib arcs
+    const boneMat = new THREE.MeshStandardMaterial({ color: 0xd8d0b8, roughness: 0.8 })
+    for (let i = 0; i < 2; i++) {
+      const x = (rnd() - 0.5) * 24, z = (rnd() - 0.5) * 24
+      for (let r = 0; r < 4; r++) {
+        const rib = new THREE.Mesh(new THREE.TorusGeometry(1.6 - r * 0.18, 0.09, 6, 14, Math.PI), boneMat)
+        rib.position.set(x + r * 1.1, 0.1, z)
+        rib.rotation.set(0, 0, (rnd() - 0.5) * 0.2)
+        this.roomGroup.add(rib)
+      }
+    }
+  }
+
+  _buildNecropolis(rnd) {
+    const stoneMat2 = new THREE.MeshStandardMaterial({ map: TEX.stoneWall(2), roughness: 0.9, color: 0xa0a0b8 })
+    // tombstone rows
+    for (let i = 0; i < 22; i++) {
+      const x = (rnd() - 0.5) * 34, z = (rnd() - 0.5) * 34
+      if (Math.hypot(x, z) < 4.5) continue
+      const h = 0.9 + rnd() * 0.8
+      const tomb = rnd() > 0.3
+        ? new THREE.Mesh(new THREE.BoxGeometry(0.9, h, 0.18), stoneMat2)
+        : new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, h, 10, 1, false, 0, Math.PI), stoneMat2)
+      tomb.position.set(x, h / 2, z)
+      tomb.rotation.y = rnd() * Math.PI
+      tomb.rotation.z = (rnd() - 0.5) * 0.22
+      tomb.castShadow = true
+      this.roomGroup.add(tomb)
+    }
+    // dead trees
+    const deadMat = new THREE.MeshStandardMaterial({ color: 0x1a161a, roughness: 1 })
+    for (let i = 0; i < 10; i++) {
+      const ang = rnd() * Math.PI * 2
+      const v = new THREE.Vector2(Math.cos(ang), Math.sin(ang))
+      if (this._lane(v)) continue
+      const dist = WALL_R - 3 + rnd() * 6
+      const h = 5 + rnd() * 4
+      const t = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.45, h, 5), deadMat)
+      t.position.set(v.x * dist, h / 2, v.y * dist)
+      t.rotation.z = (rnd() - 0.5) * 0.3
+      t.castShadow = true
+      this.roomGroup.add(t)
+      for (let b = 0; b < 3; b++) {
+        const br = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.1, 1.8, 4), deadMat)
+        br.position.set(v.x * dist + (rnd() - 0.5) * 1.6, h * 0.6 + rnd() * h * 0.3, v.y * dist + (rnd() - 0.5) * 1.6)
+        br.rotation.set((rnd() - 0.5) * 2, 0, (rnd() - 0.5) * 2)
+        this.roomGroup.add(br)
+      }
+    }
+    // ghost-light braziers
+    for (let i = 0; i < 3; i++) {
+      const x = (rnd() - 0.5) * 22, z = (rnd() - 0.5) * 22
+      const gl = new THREE.PointLight(0x99bbff, 13, 12, 2)
+      gl.position.set(x, 1.6, z)
+      gl.userData.flicker = true
+      this.roomGroup.add(gl)
+    }
+  }
+
+  _buildMoor(rnd) {
+    const rockMat = new THREE.MeshStandardMaterial({ color: 0x55585c, roughness: 1 })
+    // scattered boulders
+    for (let i = 0; i < 18; i++) {
+      const x = (rnd() - 0.5) * 38, z = (rnd() - 0.5) * 38
+      if (Math.hypot(x, z) < 4) continue
+      const r = 0.5 + rnd() * 1.6
+      const b = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 0), rockMat)
+      b.position.set(x, r * 0.45, z)
+      b.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3)
+      b.castShadow = true
+      this.roomGroup.add(b)
+    }
+    // grass tufts
+    const tuftMat = new THREE.MeshStandardMaterial({ color: 0x4a5c3a, roughness: 1, side: THREE.DoubleSide })
+    for (let i = 0; i < 40; i++) {
+      const x = (rnd() - 0.5) * 36, z = (rnd() - 0.5) * 36
+      const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.7 + rnd() * 0.5, 4), tuftMat)
+      tuft.position.set(x, 0.3, z)
+      tuft.rotation.z = (rnd() - 0.5) * 0.4
+      this.roomGroup.add(tuft)
+    }
+    // distant standing stones on the rim
+    for (let i = 0; i < 7; i++) {
+      const ang = rnd() * Math.PI * 2
+      const v = new THREE.Vector2(Math.cos(ang), Math.sin(ang))
+      if (this._lane(v)) continue
+      const h = 3 + rnd() * 3
+      const st = new THREE.Mesh(new THREE.BoxGeometry(1.1, h, 0.8), rockMat)
+      st.position.set(v.x * (WALL_R + 1), h / 2 - 0.3, v.y * (WALL_R + 1))
+      st.rotation.set((rnd() - 0.5) * 0.15, rnd() * Math.PI, (rnd() - 0.5) * 0.15)
+      st.castShadow = true
+      this.roomGroup.add(st)
+    }
+  }
+
+  // hash-picked centerpiece for rooms without a bespoke set piece
+  _buildCenterpiece(themeName, rnd) {
+    const pick = Math.floor(rnd() * 5)
+    const stone = new THREE.MeshStandardMaterial({ map: TEX.stoneWall(2), roughness: 0.9 })
+    const g = this.roomGroup
+    const off = new THREE.Vector3((rnd() - 0.5) * 10, 0, (rnd() - 0.5) * 10)
+    if (pick === 0) {
+      // stone circle
+      const n = 5 + Math.floor(rnd() * 3)
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2
+        const h = 2 + rnd() * 1.6
+        const m = new THREE.Mesh(new THREE.BoxGeometry(0.8, h, 0.6), stone)
+        m.position.set(off.x + Math.cos(a) * 4, h / 2, off.z + Math.sin(a) * 4)
+        m.rotation.y = a
+        m.rotation.z = (rnd() - 0.5) * 0.12
+        m.castShadow = true
+        g.add(m)
+      }
+    } else if (pick === 1) {
+      // ruined archway
+      for (const sx of [-1, 1]) {
+        const p = new THREE.Mesh(new THREE.BoxGeometry(1, 4.4, 1), stone)
+        p.position.set(off.x + sx * 2.2, 2.2, off.z)
+        p.castShadow = true
+        g.add(p)
+      }
+      const top = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.8, 1.1), stone)
+      top.position.set(off.x - 1, 4.6, off.z)
+      top.rotation.z = 0.35
+      g.add(top)
+    } else if (pick === 2) {
+      // broken statue on plinth
+      const plinth = new THREE.Mesh(new THREE.BoxGeometry(2, 1, 2), stone)
+      plinth.position.set(off.x, 0.5, off.z)
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 2.2, 8), stone)
+      torso.position.set(off.x, 2.1, off.z)
+      torso.rotation.z = 0.1
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 9, 8), stone)
+      head.position.set(off.x + 1.6, 0.42, off.z + 1.2) // fallen beside it
+      plinth.castShadow = torso.castShadow = true
+      g.add(plinth, torso, head)
+    } else if (pick === 3) {
+      // old well
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.5, 1, 14, 1, true), stone)
+      ring.position.set(off.x, 0.5, off.z)
+      const beam = new THREE.Mesh(new THREE.BoxGeometry(0.16, 2.4, 0.16),
+        new THREE.MeshStandardMaterial({ color: 0x3a2a1c }))
+      beam.position.set(off.x - 1.2, 1.2, off.z)
+      const beam2 = beam.clone(); beam2.position.x = off.x + 1.2
+      const cross = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.6, 6), beam.material)
+      cross.position.set(off.x, 2.3, off.z)
+      cross.rotation.z = Math.PI / 2
+      g.add(ring, beam, beam2, cross)
+    } else {
+      // obelisk with a faint glow rune
+      const ob = new THREE.Mesh(new THREE.BoxGeometry(1.2, 5, 1.2), stone)
+      ob.position.set(off.x, 2.5, off.z)
+      ob.rotation.y = rnd()
+      ob.castShadow = true
+      const rune = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 1.6),
+        new THREE.MeshBasicMaterial({ color: 0x8866cc, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending }))
+      rune.position.set(off.x, 2.5, off.z + 0.62)
+      g.add(ob, rune)
     }
   }
 
