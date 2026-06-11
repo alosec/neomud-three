@@ -19,15 +19,25 @@ over playability for now. Commit + push each milestone.
    ring, loot glow halos, room BGM (server mp3, gesture-unlocked, crossfade)
 7. `7870f16e` live menu backdrop grove behind login, glassy login card,
    inventory panel (bag icon / I key: item art, use/equip/unequip, coins)
-8. (this commit) combat/loot SFX from server bundle: npc attack/death sounds,
-   weapon swings, dodge/parry/miss/backstab, loot drop, coin/item pickup
+8. `2005396e` combat/loot SFX from server bundle
+9. `3c5d8208` six new zone themes (marsh/volcanic/cave/desert/necropolis/moor)
+   covering all 23 zones + hash-picked centerpieces for unbuilt rooms
+10. (this commit) set pieces batch 3: tavern cellar, Enchanted Emporium
+   (rune circle, orbiting crystals, glowing tomes), Grimjaw's Forge (furnace,
+   anvil, weapon racks, work lanterns), Sunlit Clearing (god-ray, wildflowers,
+   butterflies), Deep Forest (dense + watching eyes), Forest Stream (water
+   ribbon + stepping stones), Overgrown Ruins (mossy colonnade + sigil altar),
+   Hidden Cave (luminous pool + crystal formation)
 
 ## Testing note
 Persistent test character exists: `__sock.send('login',{characterName:'Vistari',force:true})`
 — avoids the 5/hour guest rate limit. HMR reload logs you out; just re-send.
 
+## Set piece coverage
+All of town (8/8) and forest (7/7) now bespoke. Marsh/gorge onward rely on
+zone themes + centerpieces (still distinct per room via seeded hash).
+
 ## Next candidates (not started)
-- town:cellar, town:magic_shop set pieces
 - Vendor/trainer UI (interact_vendor / interact_trainer flows)
 - Minimap inset; spell bar for caster classes
 - Attack lunge animation; weather (rain) for moody zones

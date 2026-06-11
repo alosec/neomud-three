@@ -1297,7 +1297,14 @@ export class Arena {
           o.userData.base ??= o.intensity
           o.intensity = o.userData.base + Math.sin(t * 9 + o.position.x * 3) * o.userData.base * 0.25 + Math.random() * 2
         }
-        if (o.userData.spin) { o.rotation.y = t * 0.6; o.position.y = 5.4 + Math.sin(t * 1.3) * 0.3 }
+        if (o.userData.spinFlat) o.rotation.z = t * 0.35
+        if (o.userData.spin) { o.rotation.y = t * 0.6; if (!o.isMesh || o.geometry?.type === 'OctahedronGeometry') o.position.y = 5.4 + Math.sin(t * 1.3) * 0.3 }
+        if (o.userData.orbit) {
+          const orb = o.userData.orbit
+          o.position.x = Math.cos(t * orb.speed + orb.phase) * orb.r
+          o.position.z = Math.sin(t * orb.speed + orb.phase) * orb.r
+          o.position.y = orb.y + Math.sin(t * 1.7 + orb.phase) * 0.25
+        }
         if (o.userData.flame) o.scale.y = 1 + Math.sin(t * 11) * 0.18 + Math.random() * 0.08
       })
 

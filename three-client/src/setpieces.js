@@ -533,6 +533,352 @@ function buildMarket(arena, room, rnd) {
   }
 }
 
+
+// ═══ town:cellar — Tavern Cellar ════════════════════════════
+function buildCellar(arena, room, rnd) {
+  const g = arena.roomGroup
+  arena.groundMesh.material = new THREE.MeshStandardMaterial({ map: TEX.stoneSlabs(8), roughness: 0.95 })
+  arena.scene.fog = new THREE.FogExp2(0x0c0a08, 0.034)
+  arena.scene.background = new THREE.Color(0x0c0a08)
+
+  // keg racks along the walls
+  for (const sx of [-1, 1]) {
+    for (let i = 0; i < 4; i++) {
+      const z = -12 + i * 8
+      box(g, new THREE.BoxGeometry(1.2, 3.4, 5), darkWoodMat(), sx * 14, 1.7, z)
+      for (let k = 0; k < 4; k++) {
+        box(g, new THREE.CylinderGeometry(0.7, 0.7, 1.3, 10), woodMat(),
+          sx * 13.2, 0.9 + Math.floor(k / 2) * 1.6, z - 1.2 + (k % 2) * 2.4, { rx: Math.PI / 2 })
+      }
+    }
+  }
+  // stacked crates + sacks in corners
+  for (let i = 0; i < 10; i++) {
+    const x = (rnd() - 0.5) * 22, z = (rnd() - 0.5) * 22
+    if (Math.hypot(x, z) < 4) continue
+    if (rnd() > 0.5) box(g, new THREE.BoxGeometry(1.1, 1.1, 1.1), woodMat(), x, 0.55, z, { ry: rnd() * 3 })
+    else {
+      const sack = box(g, new THREE.SphereGeometry(0.5, 8, 6),
+        mat('sack', () => new THREE.MeshStandardMaterial({ color: 0x9a8868, roughness: 1 })), x, 0.35, z)
+      sack.scale.y = 0.7
+    }
+  }
+  // cobwebs: translucent triangles in upper corners
+  const webMat = mat('web', () => new THREE.MeshBasicMaterial({ color: 0xccccdd, transparent: true, opacity: 0.12, side: THREE.DoubleSide }))
+  for (let i = 0; i < 5; i++) {
+    const web = box(g, new THREE.PlaneGeometry(2.4, 2.4), webMat, (rnd() - 0.5) * 24, 3.2 + rnd(), (rnd() - 0.5) * 24, { shadow: false })
+    web.rotation.set(rnd(), rnd() * 3, rnd())
+  }
+  // single guttering lantern
+  glowSphere(g, 0xffbb66, 0.16, 3, 2.6, -2)
+  pointLight(g, 0xff9944, 30, 22, 3, 2.8, -2, true)
+  // dripping-water shimmer
+  for (let i = 0; i < 3; i++) {
+    const pool = box(g, new THREE.CircleGeometry(0.8 + rnd(), 16),
+      mat('cellarwater', () => new THREE.MeshStandardMaterial({ color: 0x1a2026, roughness: 0.1, metalness: 0.6 })),
+      (rnd() - 0.5) * 18, 0.05, (rnd() - 0.5) * 18, { rx: -Math.PI / 2, shadow: false })
+  }
+}
+
+// ═══ town:magic_shop — The Enchanted Emporium ═══════════════
+function buildMagicShop(arena, room, rnd) {
+  const g = arena.roomGroup
+  arena.groundMesh.material = new THREE.MeshStandardMaterial({ map: TEX.marble(), roughness: 0.5, color: 0x9988bb })
+  arena.scene.fog = new THREE.FogExp2(0x100c1a, 0.026)
+  arena.scene.background = new THREE.Color(0x100c1a)
+
+  const W = 17
+  const wallMat = mat('arcanewall', () => new THREE.MeshStandardMaterial({ color: 0x2a2238, roughness: 0.9 }))
+  box(g, new THREE.BoxGeometry(W * 2 + 2, 7, 1), wallMat, 0, 3.5, -W)
+  box(g, new THREE.BoxGeometry(W * 2 + 2, 7, 1), wallMat, 0, 3.5, W)
+  box(g, new THREE.BoxGeometry(1, 7, W - 4), wallMat, -W, 3.5, -(W + 4) / 2 - 2)
+  box(g, new THREE.BoxGeometry(1, 7, W - 4), wallMat, -W, 3.5, (W + 4) / 2 + 2)
+  box(g, new THREE.BoxGeometry(1, 7, W - 4), wallMat, W, 3.5, -(W + 4) / 2 - 2)
+  box(g, new THREE.BoxGeometry(1, 7, W - 4), wallMat, W, 3.5, (W + 4) / 2 + 2)
+
+  // rune circle inlaid at the center
+  const runes = box(g, new THREE.RingGeometry(2.6, 3.0, 48),
+    new THREE.MeshBasicMaterial({ color: 0xaa66ff, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }),
+    0, 0.06, 0, { rx: -Math.PI / 2, shadow: false })
+  runes.userData.spinFlat = true
+  const inner = box(g, new THREE.RingGeometry(1.6, 1.75, 40),
+    new THREE.MeshBasicMaterial({ color: 0x66aaff, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }),
+    0, 0.07, 0, { rx: -Math.PI / 2, shadow: false })
+  pointLight(g, 0x9966ff, 24, 14, 0, 2.5, 0)
+
+  // floating crystals orbiting above the circle
+  for (let i = 0; i < 4; i++) {
+    const cr = box(g, new THREE.OctahedronGeometry(0.35, 0),
+      new THREE.MeshBasicMaterial({ color: [0xaa66ff, 0x66aaff, 0x66ffd8, 0xff66aa][i] }),
+      Math.cos(i * 1.57) * 2.2, 3 + i * 0.3, Math.sin(i * 1.57) * 2.2, { shadow: false })
+    cr.userData.orbit = { r: 2.2, speed: 0.5 + i * 0.13, phase: i * 1.57, y: 2.8 + i * 0.35 }
+  }
+
+  // bookshelves with glowing tomes
+  const shelfMat = darkWoodMat()
+  const tomeColors = [0xcc5555, 0x55cc88, 0x5577cc, 0xccaa44, 0xaa55cc]
+  for (const [bx, bz, ry] of [[-13, -8, Math.PI / 2], [-13, 4, Math.PI / 2], [10, -13, 0], [2, -13, 0]]) {
+    box(g, new THREE.BoxGeometry(6, 4.6, 0.9), shelfMat, bx, 2.3, bz, { ry })
+    for (let row = 0; row < 3; row++) {
+      for (let t = 0; t < 8; t++) {
+        const tome = box(g, new THREE.BoxGeometry(0.34, 0.62, 0.5),
+          new THREE.MeshStandardMaterial({ color: tomeColors[(t + row) % 5], roughness: 0.8,
+            emissive: tomeColors[(t + row) % 5], emissiveIntensity: rnd() > 0.75 ? 0.6 : 0.05 }),
+          bx + (ry ? 0 : -2.4 + t * 0.7), 1 + row * 1.4, bz + (ry ? -2.4 + t * 0.7 : 0), { ry })
+      }
+    }
+  }
+
+  // potion display table
+  box(g, new THREE.CylinderGeometry(1.8, 1.9, 1.0, 12), shelfMat, 8, 0.5, 7)
+  const cols = [0xff5566, 0x55ff88, 0x5588ff, 0xffaa33, 0xcc66ff]
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2
+    box(g, new THREE.CylinderGeometry(0.1, 0.14, 0.42, 6),
+      new THREE.MeshBasicMaterial({ color: cols[i], transparent: true, opacity: 0.9 }),
+      8 + Math.cos(a) * 1.1, 1.25, 7 + Math.sin(a) * 1.1, { shadow: false })
+  }
+  pointLight(g, 0x88ffcc, 10, 8, 8, 2, 7)
+
+  // hanging celestial orbs
+  for (const [ox, oz, c] of [[-6, -10, 0xffd890], [6, 10, 0x88ccff], [-8, 10, 0xcc88ff]]) {
+    glowSphere(g, c, 0.28, ox, 4.2, oz)
+    pointLight(g, c, 13, 11, ox, 4.1, oz)
+  }
+}
+
+// ═══ town:forge — Grimjaw's Forge ═══════════════════════════
+function buildForge(arena, room, rnd) {
+  const g = arena.roomGroup
+  arena.groundMesh.material = new THREE.MeshStandardMaterial({ map: TEX.stoneSlabs(7), roughness: 0.9, color: 0x887878 })
+  arena.scene.fog = new THREE.FogExp2(0x140c08, 0.026)
+  arena.scene.background = new THREE.Color(0x140c08)
+
+  // workshop walls enclosing the smithy
+  const W = 17
+  const fwall = mat('forgewall', () => new THREE.MeshStandardMaterial({ map: TEX.stoneWall(2), roughness: 0.9, color: 0xa08878 }))
+  box(g, new THREE.BoxGeometry(W * 2 + 2, 6.5, 1), fwall, 0, 3.25, -W)
+  box(g, new THREE.BoxGeometry(W * 2 + 2, 6.5, 1), fwall, 0, 3.25, W)
+  box(g, new THREE.BoxGeometry(1, 6.5, W - 4), fwall, -W, 3.25, -(W + 4) / 2 - 2)
+  box(g, new THREE.BoxGeometry(1, 6.5, W - 4), fwall, -W, 3.25, (W + 4) / 2 + 2)
+  box(g, new THREE.BoxGeometry(1, 6.5, W - 4), fwall, W, 3.25, -(W + 4) / 2 - 2)
+  box(g, new THREE.BoxGeometry(1, 6.5, W - 4), fwall, W, 3.25, (W + 4) / 2 + 2)
+  // hanging work lanterns
+  for (const [lx, lz] of [[-7, -2], [7, 2], [0, 8]]) {
+    glowSphere(g, 0xffc070, 0.22, lx, 3.8, lz)
+    pointLight(g, 0xffaa55, 26, 16, lx, 3.7, lz, true)
+  }
+
+  // forge hearth: brick furnace with molten glow
+  box(g, new THREE.BoxGeometry(7, 5, 4), stoneMat(), 0, 2.5, -14)
+  box(g, new THREE.BoxGeometry(2.2, 1.2, 0.4),
+    new THREE.MeshBasicMaterial({ color: 0xff6611 }), 0, 1.4, -11.9, { shadow: false })
+  const forgeFire = box(g, new THREE.PlaneGeometry(2.0, 1.0),
+    new THREE.MeshBasicMaterial({ color: 0xffaa33, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending }),
+    0, 1.4, -11.8, { shadow: false })
+  forgeFire.userData.flame = true
+  pointLight(g, 0xff6611, 70, 30, 0, 2, -10.5, true)
+  // chimney
+  box(g, new THREE.CylinderGeometry(0.9, 1.1, 4, 8), stoneMat(), 0, 7, -14)
+
+  // anvil on a stump
+  box(g, new THREE.CylinderGeometry(0.8, 0.9, 1.0, 10), darkWoodMat(), 3.5, 0.5, -8)
+  const anvilMat = mat('anvil', () => new THREE.MeshStandardMaterial({ color: 0x3a3a44, metalness: 0.8, roughness: 0.35 }))
+  box(g, new THREE.BoxGeometry(1.7, 0.5, 0.7), anvilMat, 3.5, 1.25, -8)
+  box(g, new THREE.ConeGeometry(0.35, 0.9, 6), anvilMat, 4.5, 1.25, -8, { ry: 0, rx: 0, shadow: true }).rotation.z = -Math.PI / 2
+
+  // quench barrel with steam
+  box(g, new THREE.CylinderGeometry(0.7, 0.8, 1.2, 12), woodMat(), -3.5, 0.6, -8)
+  box(g, new THREE.CircleGeometry(0.62, 12),
+    mat('quench', () => new THREE.MeshStandardMaterial({ color: 0x223038, roughness: 0.1, metalness: 0.5 })),
+    -3.5, 1.22, -8, { rx: -Math.PI / 2, shadow: false })
+
+  // weapon racks
+  for (const [wx, wz, ry] of [[-12, -2, Math.PI / 2], [-12, 6, Math.PI / 2]]) {
+    box(g, new THREE.BoxGeometry(4.4, 3, 0.5), darkWoodMat(), wx, 1.5, wz, { ry })
+    for (let i = 0; i < 4; i++) {
+      const blade = box(g, new THREE.BoxGeometry(0.09, 2.0, 0.2),
+        mat('steel', () => new THREE.MeshStandardMaterial({ color: 0xb0b8c8, metalness: 0.8, roughness: 0.3 })),
+        wx + 0.3, 1.7, wz - 1.5 + i * 1.0, { ry })
+      blade.rotation.z = 0.08
+    }
+  }
+  // coal pile + scattered ingots
+  for (let i = 0; i < 6; i++) {
+    box(g, new THREE.DodecahedronGeometry(0.25 + rnd() * 0.2, 0),
+      mat('coal', () => new THREE.MeshStandardMaterial({ color: 0x141214, roughness: 1 })),
+      6 + (rnd() - 0.5) * 2.5, 0.2, -12 + (rnd() - 0.5) * 2.5, { ry: rnd() * 3 })
+  }
+  for (let i = 0; i < 4; i++) {
+    box(g, new THREE.BoxGeometry(0.7, 0.22, 0.3),
+      mat('ingot', () => new THREE.MeshStandardMaterial({ color: 0xcc8844, metalness: 0.7, roughness: 0.4 })),
+      -6 + rnd() * 2, 0.12 + (i % 2) * 0.24, -12 + rnd() * 2, { ry: rnd() })
+  }
+  // glowing sparks rise from the hearth — extra ember particles handled by theme
+}
+
+// ═══ forest:clearing — Sunlit Clearing ══════════════════════
+function buildClearing(arena, room, rnd) {
+  const g = arena.roomGroup
+  // a single shaft of golden light breaking through — the room's identity
+  for (let i = 0; i < 3; i++) {
+    const shaft = box(g, new THREE.PlaneGeometry(3.5 - i, 16),
+      new THREE.MeshBasicMaterial({ color: 0xffe8a8, transparent: true, opacity: 0.07 + i * 0.02,
+        blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }),
+      0, 7, 0, { shadow: false })
+    shaft.rotation.z = 0.35
+    shaft.rotation.y = i * 1.0
+  }
+  pointLight(g, 0xffe8a8, 40, 22, 0, 5, 0)
+  // ring of wildflowers under the beam
+  for (let i = 0; i < 26; i++) {
+    const a = rnd() * Math.PI * 2, r = 1.5 + rnd() * 5
+    glowSphere(g, [0xddaa44, 0xcc5566, 0xd0d0e8, 0xb05599][Math.floor(rnd() * 4)],
+      0.07, Math.cos(a) * r, 0.34, Math.sin(a) * r)
+    box(g, new THREE.CylinderGeometry(0.02, 0.03, 0.3, 4),
+      mat('stem', () => new THREE.MeshStandardMaterial({ color: 0x3a5c30 })),
+      Math.cos(a) * r, 0.15, Math.sin(a) * r)
+  }
+  // butterflies — tiny glow points orbiting slowly
+  for (let i = 0; i < 5; i++) {
+    const b = glowSphere(g, 0xffeeaa, 0.06, 0, 1.5, 0)
+    b.userData.orbit = { r: 2 + rnd() * 4, speed: 0.3 + rnd() * 0.5, phase: rnd() * 6, y: 1 + rnd() * 1.5 }
+  }
+  // old shrine stone half-swallowed by moss
+  const shrine = box(g, new THREE.BoxGeometry(1.4, 2.2, 1.0), stoneMat(), 6, 1.1, -5, { ry: 0.4 })
+  shrine.rotation.z = 0.12
+  glowSphere(g, 0x88ddaa, 0.12, 6, 2.4, -5)
+  pointLight(g, 0x88ddaa, 8, 7, 6, 2.4, -5)
+}
+
+// ═══ forest:deep — Deep Forest ══════════════════════════════
+function buildDeepForest(arena, room, rnd) {
+  const g = arena.roomGroup
+  // darker, denser — extra inner trees and looming canopy shadow
+  arena.scene.fog = new THREE.FogExp2(0x060d08, 0.028)
+  arena.scene.background = new THREE.Color(0x060d08)
+  const barkMat = mat('bark3', () => new THREE.MeshStandardMaterial({ map: TEX.bark(), roughness: 1 }))
+  const leafMat = mat('deepleaf', () => new THREE.MeshStandardMaterial({ color: 0x152818, roughness: 1 }))
+  for (let i = 0; i < 12; i++) {
+    const x = (rnd() - 0.5) * 30, z = (rnd() - 0.5) * 30
+    if (Math.hypot(x, z) < 6) continue
+    const h = 9 + rnd() * 5
+    const trunk = box(g, new THREE.CylinderGeometry(0.5, 0.8, h, 8), barkMat, x, h / 2, z)
+    trunk.rotation.z = (rnd() - 0.5) * 0.08
+    box(g, new THREE.ConeGeometry(3.2 + rnd(), 4.5, 8), leafMat, x, h * 0.75, z)
+  }
+  // eyes in the dark: pairs of tiny glow dots at the rim
+  for (let i = 0; i < 4; i++) {
+    const a = rnd() * Math.PI * 2
+    const x = Math.cos(a) * (WALL_R - 2), z = Math.sin(a) * (WALL_R - 2)
+    glowSphere(g, 0xffcc33, 0.05, x - 0.12, 1.1 + rnd() * 0.8, z)
+    glowSphere(g, 0xffcc33, 0.05, x + 0.12, 1.1 + rnd() * 0.8, z)
+  }
+  // pale toadstool rings
+  for (const [mx, mz] of [[-7, 5], [8, -7]]) {
+    for (let i = 0; i < 7; i++) {
+      const a = (i / 7) * Math.PI * 2
+      box(g, new THREE.SphereGeometry(0.14, 7, 5),
+        mat('toad', () => new THREE.MeshStandardMaterial({ color: 0xc8c0b0, roughness: 0.9 })),
+        mx + Math.cos(a) * 1.3, 0.12, mz + Math.sin(a) * 1.3)
+    }
+  }
+}
+
+// ═══ forest:stream — Forest Stream ══════════════════════════
+function buildStream(arena, room, rnd) {
+  const g = arena.roomGroup
+  // a winding water ribbon crossing the clearing
+  const waterMat = mat('streamwater', () => new THREE.MeshStandardMaterial({
+    color: 0x2a4a58, roughness: 0.08, metalness: 0.6, transparent: true, opacity: 0.9
+  }))
+  for (let i = 0; i < 12; i++) {
+    const z = -22 + i * 4
+    const x = Math.sin(i * 0.6) * 4
+    const seg = box(g, new THREE.PlaneGeometry(4.6, 4.6), waterMat, x, 0.05, z, { rx: -Math.PI / 2, shadow: false })
+    seg.rotation.z = Math.sin(i * 0.6) * 0.3
+  }
+  // stepping stones across the middle
+  for (let i = 0; i < 4; i++) {
+    box(g, new THREE.CylinderGeometry(0.6 + rnd() * 0.2, 0.7, 0.35, 9),
+      mat('stepstone', () => new THREE.MeshStandardMaterial({ color: 0x5a5a62, roughness: 1 })),
+      Math.sin(0.6 * 5) * 4 - 2 + i * 1.4, 0.18, -2 + i * 0.4)
+  }
+  // mossy banks: reeds and glow flies near the water
+  for (let i = 0; i < 12; i++) {
+    const z = -20 + rnd() * 40
+    const x = Math.sin((z + 22) / 4 * 0.6) * 4 + (rnd() > 0.5 ? 3 : -3) + (rnd() - 0.5)
+    box(g, new THREE.CylinderGeometry(0.03, 0.04, 1.2 + rnd() * 0.7, 4),
+      mat('reed', () => new THREE.MeshStandardMaterial({ color: 0x4a6a38 })), x, 0.7, z)
+  }
+  pointLight(g, 0x66aacc, 14, 16, 0, 2, 0)
+}
+
+// ═══ forest:ruins — Overgrown Ruins ═════════════════════════
+function buildRuins(arena, room, rnd) {
+  const g = arena.roomGroup
+  const mossStone = mat('mossstone', () => new THREE.MeshStandardMaterial({ map: TEX.stoneWall(2), roughness: 0.95, color: 0x8aa888 }))
+  // broken colonnade
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2
+    const x = Math.cos(a) * 7, z = Math.sin(a) * 7
+    const h = rnd() > 0.4 ? 1.5 + rnd() * 2 : 5.5
+    const col = box(g, new THREE.CylinderGeometry(0.6, 0.7, h, 10), mossStone, x, h / 2, z)
+    col.rotation.z = (rnd() - 0.5) * 0.1
+    if (h < 3) { // fallen top section beside it
+      const seg = box(g, new THREE.CylinderGeometry(0.55, 0.6, 2.4, 10), mossStone, x + 1.6, 0.55, z + 1, { rx: Math.PI / 2, ry: rnd() })
+    }
+  }
+  // collapsed wall fragments
+  for (let i = 0; i < 5; i++) {
+    const x = (rnd() - 0.5) * 26, z = (rnd() - 0.5) * 26
+    if (Math.hypot(x, z) < 5) continue
+    box(g, new THREE.BoxGeometry(3 + rnd() * 2, 1 + rnd() * 1.5, 0.9), mossStone, x, 0.6, z, { ry: rnd() * 3 })
+  }
+  // central cracked altar with a faint ancient glow
+  box(g, new THREE.BoxGeometry(2.6, 1.2, 1.6), mossStone, 0, 0.6, 0, { ry: 0.3 })
+  const sigil = box(g, new THREE.CircleGeometry(1.1, 24),
+    new THREE.MeshBasicMaterial({ color: 0x66ddaa, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending }),
+    0, 1.22, 0, { rx: -Math.PI / 2, shadow: false })
+  pointLight(g, 0x66ddaa, 16, 13, 0, 2, 0)
+  // creeping vines: thin green tubes over stones
+  for (let i = 0; i < 8; i++) {
+    const x = (rnd() - 0.5) * 16, z = (rnd() - 0.5) * 16
+    const vine = box(g, new THREE.CylinderGeometry(0.05, 0.05, 2.5 + rnd() * 2, 4),
+      mat('vine', () => new THREE.MeshStandardMaterial({ color: 0x3a6a35 })), x, 0.5, z)
+    vine.rotation.set((rnd() - 0.5) * 2.6, rnd() * 3, (rnd() - 0.5) * 2.6)
+  }
+}
+
+// ═══ forest:cave — Hidden Cave ══════════════════════════════
+function buildHiddenCave(arena, room, rnd) {
+  const g = arena.roomGroup
+  // a luminous underground pool — the cave's secret
+  const pool = box(g, new THREE.CircleGeometry(5, 32),
+    mat('cavepool', () => new THREE.MeshStandardMaterial({
+      color: 0x1a4858, roughness: 0.05, metalness: 0.5, transparent: true, opacity: 0.92,
+      emissive: 0x0a3848, emissiveIntensity: 0.7
+    })), -4, 0.06, 3, { rx: -Math.PI / 2, shadow: false })
+  pointLight(g, 0x44ccdd, 30, 20, -4, 1.5, 3)
+  // big crystal formation rising from the pool edge
+  for (let i = 0; i < 6; i++) {
+    const a = rnd() * Math.PI * 2
+    const h = 1.2 + rnd() * 2.8
+    const cr = box(g, new THREE.ConeGeometry(0.3 + rnd() * 0.25, h, 5),
+      new THREE.MeshBasicMaterial({ color: 0x55ddee, transparent: true, opacity: 0.85 }),
+      -4 + Math.cos(a) * 4.5, h / 2, 3 + Math.sin(a) * 4.5, { shadow: false })
+    cr.rotation.set((rnd() - 0.5) * 0.6, 0, (rnd() - 0.5) * 0.6)
+  }
+  // old explorer's remains: pack, torn bedroll, scattered coins glint
+  box(g, new THREE.SphereGeometry(0.4, 8, 6),
+    mat('pack', () => new THREE.MeshStandardMaterial({ color: 0x55402a, roughness: 1 })), 7, 0.35, -6)
+  box(g, new THREE.BoxGeometry(1.8, 0.14, 0.8),
+    mat('bedroll', () => new THREE.MeshStandardMaterial({ color: 0x6a4a3a, roughness: 1 })), 8.2, 0.08, -5, { ry: 0.7 })
+  for (let i = 0; i < 4; i++) {
+    glowSphere(g, 0xffd44a, 0.05, 7 + rnd() * 1.5, 0.06, -6 + rnd() * 1.5)
+  }
+}
+
 // ═══ registry ═══════════════════════════════════════════════
 export const SET_PIECES = {
   'town:temple': { theme: 'town', perimeter: false, build: buildTemple },
@@ -540,7 +886,15 @@ export const SET_PIECES = {
   'town:gate': { theme: 'town', perimeter: false, build: buildGate },
   'forest:edge': { theme: 'forest', perimeter: true, build: buildForestEdge },
   'town:tavern': { theme: 'town', perimeter: false, build: buildTavern },
-  'town:market': { theme: 'town', perimeter: false, build: buildMarket }
+  'town:market': { theme: 'town', perimeter: false, build: buildMarket },
+  'town:cellar': { theme: 'dungeon', perimeter: false, build: buildCellar },
+  'town:magic_shop': { theme: 'cave', perimeter: false, build: buildMagicShop },
+  'town:forge': { theme: 'volcanic', perimeter: false, build: buildForge },
+  'forest:clearing': { theme: 'forest', perimeter: true, build: buildClearing },
+  'forest:deep': { theme: 'forest', perimeter: true, build: buildDeepForest },
+  'forest:stream': { theme: 'forest', perimeter: true, build: buildStream },
+  'forest:ruins': { theme: 'forest', perimeter: true, build: buildRuins },
+  'forest:cave': { theme: 'cave', perimeter: true, build: buildHiddenCave }
 }
 
 // marker for rooms that have no bespoke set piece yet
