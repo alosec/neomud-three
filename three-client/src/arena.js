@@ -147,6 +147,7 @@ export class Arena {
     this.entities = new Map()
     this.dying = []                   // entities animating out
     this.vel = new THREE.Vector3()    // avatar velocity (motion feel)
+    this.camShake = 0
     this.dustPool = []
     this.lastDust = 0
     this.portals = []                 // {dir, pos, light, disc, label}
@@ -659,6 +660,17 @@ export class Arena {
         group.userData.pick = { kind: e.kind, id: e.id, key: e.key }
         sprite.userData.pick = group.userData.pick
 
+        if (e.kind === 'item' || e.kind === 'coins') {
+          const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: this._mistTex(), color: e.kind === 'coins' ? 0xffcc55 : 0x88bbff,
+            transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false
+          }))
+          halo.scale.set(1.8, 1.8, 1)
+          halo.position.y = 0.5
+          halo.userData.lootHalo = true
+          group.add(halo)
+        }
+
         // soft ground shadow blob
         const blob = new THREE.Mesh(
           new THREE.CircleGeometry(size * 0.28, 20),
@@ -712,6 +724,8 @@ export class Arena {
     bar.tex.needsUpdate = true
   }
 
+  shakeCamera(amount = 0.5) { this.camShake = Math.min(1.2, this.camShake + amount) }
+
   flashEntity(key) {
     const ent = this.entities.get(key)
     if (!ent) return
@@ -728,9 +742,17 @@ export class Arena {
   }
 
   setEntitySelected(key) {
-    for (const [k, ent] of this.entities) {
-      ent.sprite.material.color.set(k === key ? 0xffb0a0 : 0xffffff)
+    if (!this.selRing) {
+      this.selRing = new THREE.Mesh(
+        new THREE.RingGeometry(1.0, 1.18, 40),
+        new THREE.MeshBasicMaterial({ color: 0xff4433, transparent: true, opacity: 0.9, side: THREE.DoubleSide })
+      )
+      this.selRing.rotation.x = -Math.PI / 2
+      this.selRing.position.y = 0.07
+      this.scene.add(this.selRing)
     }
+    this.selKey = key
+    this.selRing.visible = !!key && this.entities.has(key)
   }
 
   worldToScreen(v) {
@@ -938,6 +960,18 @@ export class Arena {
         if (d.life <= 0) { this.entityGroup.remove(d.ent.group); this.dying.splice(i, 1) }
       }
 
+      // selection ring follows + pulses
+      if (this.selRing && this.selRing.visible) {
+        const ent = this.entities.get(this.selKey)
+        if (ent) {
+          this.selRing.position.x = ent.group.position.x
+          this.selRing.position.z = ent.group.position.z
+          const k = 1 + Math.sin(t * 5) * 0.08
+          this.selRing.scale.setScalar(k)
+          this.selRing.material.opacity = 0.7 + Math.sin(t * 5) * 0.2
+        } else this.selRing.visible = false
+      }
+
       // marker pulse-out
       if (this.marker.material.opacity > 0) {
         const age = t - (this.markerBorn || 0)
@@ -962,6 +996,13 @@ export class Arena {
         this.camTarget.y + radius * Math.cos(phi),
         this.camTarget.z + radius * Math.sin(phi) * Math.cos(theta)
       )
+      if (this.camShake > 0) {
+        this.camShake = Math.max(0, this.camShake - dt * 2.6)
+        const sh = this.camShake * this.camShake * 0.45
+        this.camera.position.x += (Math.random() - 0.5) * sh
+        this.camera.position.y += (Math.random() - 0.5) * sh
+        this.camera.position.z += (Math.random() - 0.5) * sh
+      }
       this.camera.lookAt(this.camTarget.x, this.camTarget.y + 1.2, this.camTarget.z)
 
       this.composer.render()

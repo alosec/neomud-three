@@ -142,6 +142,17 @@ function applyRoom(room, players, npcs, entryDir = null) {
   }
   updateRoomTitle()
   syncEntities()
+  if (room.bgm) playBgm(room.bgm)
+}
+
+// red damage vignette pulse
+const dmgEl = document.createElement('div')
+dmgEl.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:35;opacity:0;transition:opacity 0.5s ease;background:radial-gradient(ellipse at center, transparent 55%, rgba(180,20,20,0.55) 100%)'
+document.body.appendChild(dmgEl)
+function damagePulse() {
+  dmgEl.style.transition = 'none'
+  dmgEl.style.opacity = '1'
+  requestAnimationFrame(() => { dmgEl.style.transition = 'opacity 0.5s ease'; dmgEl.style.opacity = '0' })
 }
 
 // fade overlay for room transitions
@@ -149,6 +160,38 @@ const fadeEl = document.createElement('div')
 fadeEl.style.cssText = 'position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.35s ease;z-index:40'
 document.body.appendChild(fadeEl)
 function fade(out) { fadeEl.style.opacity = out ? '1' : '0' }
+
+// ── audio: room BGM from the server bundle ──────────────────
+let bgmAudio = null, bgmCurrent = null, audioUnlocked = false
+function playBgm(id) {
+  if (!id || bgmCurrent === id) return
+  bgmCurrent = id
+  const start = () => {
+    if (bgmAudio) { const old = bgmAudio; let v = old.volume
+      const fade = setInterval(() => { v -= 0.08; if (v <= 0) { old.pause(); clearInterval(fade) } else old.volume = v }, 60) }
+    const a = new Audio(`${SERVER_HTTP}/assets/audio/bgm/${id}.mp3`)
+    a.loop = true
+    a.volume = 0
+    a.play().then(() => {
+      let v = 0
+      const fade = setInterval(() => { v += 0.04; if (v >= 0.35) { a.volume = 0.35; clearInterval(fade) } else a.volume = v }, 80)
+    }).catch(() => {
+      // try ogg fallback
+      const b = new Audio(`${SERVER_HTTP}/assets/audio/bgm/${id}.ogg`)
+      b.loop = true; b.volume = 0.35
+      b.play().catch(() => {})
+      bgmAudio = b
+      return
+    })
+    bgmAudio = a
+  }
+  if (audioUnlocked) start()
+  else {
+    const unlock = () => { audioUnlocked = true; start(); removeEventListener('pointerdown', unlock); removeEventListener('keydown', unlock) }
+    addEventListener('pointerdown', unlock)
+    addEventListener('keydown', unlock)
+  }
+}
 
 // ── modal ───────────────────────────────────────────────────
 function showModal(title, body) {
@@ -230,6 +273,10 @@ sock.on('combat_hit', (m) => {
     state.player.currentHp = m.defenderHp
     state.player.maxHp = m.defenderMaxHp
     updateVitals()
+    if (!m.isMiss && !m.isDodge && !m.isParry && m.damage > 0) {
+      damagePulse()
+      world.shakeCamera(Math.min(0.3 + m.damage / 25, 0.9))
+    }
     floatText(world.avatarScreenPos(),
       m.isMiss || m.isDodge || m.isParry ? (m.isDodge ? 'dodge' : m.isParry ? 'parry' : 'miss') : `-${m.damage}`,
       '#ff6060')
