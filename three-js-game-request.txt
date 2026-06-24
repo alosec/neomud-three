@@ -1,0 +1,7 @@
+we are on a fork of a friends MUD style game. we've been trying to slop vibe code together a three js implementation of his 2d game, using the server as truth and three as a client.
+
+the current repo is an absolute mess. we're on a 'lab' branch with 2 stashs off branch master; i think upstream roomsmith games work isnow merged here?
+
+please make a cool, working three js game based on my friends game now, by whatever means. the best solution is likely, possibly, to discard all existing work bc it kinda stinks, and do whatever you want in terms of going back to the original upstream, setting the fork afresh, and then vibing on that to make a playable click-to-move style game as intended.
+
+go ahead and execute now, do not bother with asking for permissions or approvals, you got this, make a cool game. work as efficiently as you can. go

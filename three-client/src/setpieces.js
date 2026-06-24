@@ -128,17 +128,89 @@ function buildTemple(arena, room) {
 function buildSquare(arena, room, rnd) {
   const g = arena.roomGroup
 
-  // central fountain
-  box(g, new THREE.CylinderGeometry(3.4, 3.7, 0.9, 24), stoneMat(), 0, 0.45, 0)
-  box(g, new THREE.CylinderGeometry(2.9, 2.9, 0.25, 24),
+  // ── grand fountain: tiered basin, hero statue, arcing jets ──
+  box(g, new THREE.CylinderGeometry(4.2, 4.6, 0.9, 28), stoneMat(), 0, 0.45, 0)
+  box(g, new THREE.CylinderGeometry(3.7, 3.7, 0.25, 28),
     mat('water', () => new THREE.MeshBasicMaterial({
       map: TEX.portalSwirl(), color: 0x3377cc, transparent: true, opacity: 0.9
     })), 0, 0.95, 0, { shadow: false })
-  box(g, new THREE.CylinderGeometry(0.35, 0.45, 2.2, 10), stoneMat(), 0, 1.6, 0)
-  box(g, new THREE.CylinderGeometry(1.1, 1.2, 0.3, 16), stoneMat(), 0, 2.8, 0)
-  glowSphere(g, 0x88ccff, 0.22, 0, 3.2, 0)
-  pointLight(g, 0x77aadd, 18, 14, 0, 3.4, 0)
-  arena.fountainWater = g.children[g.children.length - 5] // spin in tick? handled via traverse name
+  box(g, new THREE.CylinderGeometry(1.5, 1.7, 1.6, 18), stoneMat(), 0, 1.7, 0)
+  box(g, new THREE.CylinderGeometry(1.9, 1.9, 0.22, 18),
+    mat('water', () => new THREE.MeshBasicMaterial({
+      map: TEX.portalSwirl(), color: 0x4488dd, transparent: true, opacity: 0.9
+    })), 0, 2.5, 0, { shadow: false })
+  // hero statue: sword raised
+  box(g, new THREE.CylinderGeometry(0.55, 0.7, 1.0, 10), stoneMat(), 0, 3.0, 0)
+  const statue = box(g, new THREE.CylinderGeometry(0.34, 0.45, 2.0, 8), stoneMat(), 0, 4.4, 0)
+  box(g, new THREE.SphereGeometry(0.3, 9, 8), stoneMat(), 0, 5.6, 0)
+  const arm = box(g, new THREE.CylinderGeometry(0.1, 0.12, 1.1, 6), stoneMat(), 0.55, 5.3, 0)
+  arm.rotation.z = -0.8
+  const sword = box(g, new THREE.BoxGeometry(0.09, 1.6, 0.18),
+    mat('steel', () => new THREE.MeshStandardMaterial({ color: 0xb0b8c8, metalness: 0.8, roughness: 0.3 })), 1.0, 6.3, 0)
+  sword.rotation.z = -0.18
+  glowSphere(g, 0xcfe8ff, 0.12, 1.12, 7.05, 0) // moonlight catching the blade tip
+  // arcing water jets (additive ribbons) + splash glow
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2
+    const jet = box(g, new THREE.PlaneGeometry(0.18, 2.6),
+      new THREE.MeshBasicMaterial({ color: 0x99ccee, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false }),
+      Math.cos(a) * 2.6, 2.0, Math.sin(a) * 2.6, { shadow: false })
+    jet.rotation.z = Math.cos(a) * 0.5
+    jet.rotation.x = Math.sin(a) * 0.5
+  }
+  glowSphere(g, 0x88ccff, 0.2, 0, 3.0, 0)
+  pointLight(g, 0x77aadd, 22, 15, 0, 3.6, 0)
+
+  // ── bell tower landmark on the plaza edge ──
+  const tower = new THREE.Group()
+  const tbody = new THREE.Mesh(new THREE.BoxGeometry(3.4, 11, 3.4),
+    mat('towerstone', () => new THREE.MeshStandardMaterial({ map: TEX.stoneWall(3), roughness: 0.9 })))
+  tbody.position.y = 5.5; tbody.castShadow = true
+  tower.add(tbody)
+  const belfry = new THREE.Mesh(new THREE.BoxGeometry(2.8, 2.2, 2.8), woodMat())
+  belfry.position.y = 12.1; belfry.castShadow = true
+  tower.add(belfry)
+  const spire = new THREE.Mesh(new THREE.ConeGeometry(2.4, 2.8, 4),
+    mat('spire', () => new THREE.MeshStandardMaterial({ color: 0x3a4a5c, roughness: 0.8 })))
+  spire.position.y = 14.6; spire.rotation.y = Math.PI / 4
+  tower.add(spire)
+  // bell glint + clock face
+  const bell = new THREE.Mesh(new THREE.SphereGeometry(0.5, 9, 7),
+    mat('bellbrass', () => new THREE.MeshStandardMaterial({ color: 0xc8a040, metalness: 0.8, roughness: 0.35 })))
+  bell.position.y = 12.0
+  tower.add(bell)
+  const clock = new THREE.Mesh(new THREE.CircleGeometry(0.8, 20),
+    new THREE.MeshBasicMaterial({ color: 0xf2e2b0 }))
+  clock.position.set(0, 9.4, 1.75)
+  tower.add(clock)
+  tower.position.set(13, 0, -10); tower.rotation.y = -0.5
+  g.add(tower)
+  pointLight(g, 0xffd890, 18, 14, 12, 9.5, -8.5)
+
+  // ── lantern garlands criss-crossing the plaza ──
+  const garlandColors = [0xffc868, 0xff9868, 0xffe8a8, 0xc8e8a8]
+  const poleAt = []
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + 0.25
+    const px = Math.cos(a) * 11.5, pz = Math.sin(a) * 11.5
+    poleAt.push([px, pz])
+    box(g, new THREE.CylinderGeometry(0.1, 0.14, 5.2, 7), darkWoodMat(), px, 2.6, pz)
+    // small pennant on each pole
+    const flag = box(g, new THREE.PlaneGeometry(0.9, 0.55),
+      new THREE.MeshStandardMaterial({ color: garlandColors[i % 4], roughness: 0.9, side: THREE.DoubleSide }),
+      px + 0.5, 4.9, pz, { shadow: false })
+    flag.rotation.y = a
+  }
+  for (let i = 0; i < 6; i++) {
+    const [ax, az] = poleAt[i]
+    const [bx, bz] = poleAt[(i + 2) % 6] // skip-one for criss-cross
+    for (let j = 1; j < 8; j++) {
+      const f = j / 8
+      const sag = Math.sin(f * Math.PI) * 1.6
+      glowSphere(g, garlandColors[(i + j) % 4], 0.11, ax + (bx - ax) * f, 5.0 - sag, az + (bz - az) * f)
+    }
+  }
+  pointLight(g, 0xffc878, 16, 20, 0, 4.5, 0, true)
 
   // market stalls with striped canopies
   const canopyA = mat('canA', () => new THREE.MeshStandardMaterial({ color: 0xa03c34, roughness: 0.9, side: THREE.DoubleSide }))
@@ -188,6 +260,52 @@ function buildSquare(arena, room, rnd) {
   }
   nb.position.set(6, 0, 6); nb.rotation.y = -0.8
   g.add(nb)
+
+  // benches facing the fountain
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + 0.5
+    const bx = Math.cos(a) * 6.5, bz = Math.sin(a) * 6.5
+    const bench = new THREE.Group()
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.14, 0.7), woodMat())
+    seat.position.y = 0.65; seat.castShadow = true
+    bench.add(seat)
+    const back = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.6, 0.1), woodMat())
+    back.position.set(0, 1.05, -0.32)
+    bench.add(back)
+    for (const lx of [-1, 1]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.65, 0.6), darkWoodMat())
+      leg.position.set(lx, 0.32, 0)
+      bench.add(leg)
+    }
+    bench.position.set(bx, 0, bz)
+    bench.lookAt(0, 0, 0)
+    g.add(bench)
+  }
+
+  // hay cart + market clutter
+  const hay = mat('hay', () => new THREE.MeshStandardMaterial({ color: 0xa08a40, roughness: 1 }))
+  const cart2 = new THREE.Group()
+  const bed2 = new THREE.Mesh(new THREE.BoxGeometry(3, 0.5, 1.8), woodMat())
+  bed2.position.y = 1; bed2.castShadow = true
+  cart2.add(bed2)
+  const pile = new THREE.Mesh(new THREE.SphereGeometry(1.0, 8, 6), hay)
+  pile.position.y = 1.6; pile.scale.set(1.3, 0.7, 0.8)
+  cart2.add(pile)
+  for (const [wx, wz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.18, 12), darkWoodMat())
+    wheel.position.set(wx, 0.6, wz * 0.95); wheel.rotation.x = Math.PI / 2
+    cart2.add(wheel)
+  }
+  cart2.position.set(-11, 0, 1); cart2.rotation.y = 1.1
+  g.add(cart2)
+  for (const [cx, cz] of [[12, 4], [12.8, 4.6], [12.3, 5.4], [-4, -11], [-4.8, -11.6]]) {
+    if (rnd() > 0.5) box(g, new THREE.BoxGeometry(0.9, 0.9, 0.9), woodMat(), cx, 0.45, cz, { ry: rnd() * 3 })
+    else box(g, new THREE.CylinderGeometry(0.42, 0.5, 1.1, 10), woodMat(), cx, 0.55, cz)
+  }
+  for (let i = 0; i < 3; i++) {
+    const ba = box(g, new THREE.SphereGeometry(0.55, 8, 6), hay, 10.5 + rnd() * 2, 0.35, 7 + rnd() * 2, { ry: rnd() * 3 })
+    ba.scale.set(1.2, 0.7, 0.8)
+  }
 
   // flower planters
   for (const [x, z] of [[-5, -2], [5, 2], [2, -5], [-3, 5]]) {
